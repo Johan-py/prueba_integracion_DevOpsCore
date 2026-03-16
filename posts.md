@@ -1,1 +1,2 @@
 # posts
+# se agregaron colores
