@@ -1,0 +1,28 @@
+{
+  "name": "social-is-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "install:all": "bun install",
+    "dev:back": "cd backend && bun run dev",
+    "dev:front": "cd frontend && bun run dev",
+    "dev": "concurrently \"bun run dev:back\" \"bun run dev:front\"",
+    "prisma:generate": "cd backend && bun x prisma generate",
+    "prisma:migrate": "cd backend && bun x prisma migrate dev",
+    "prisma:seed": "cd backend && bun run seed",
+    "lab:chaos": "cd scripts && sh chaos_devs.sh"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@next/eslint-plugin-next": "^16.2.0",
+    "@typescript-eslint/eslint-plugin": "^8.57.1",
+    "@typescript-eslint/parser": "^8.57.1",
+    "concurrently": "^9.2.1",
+    "eslint": "9.x"
+  },
+  "dependencies": {}
+}

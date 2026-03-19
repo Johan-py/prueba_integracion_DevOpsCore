@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1001,
+    "username": "arquitecto_is",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=admin",
+    "content": "🚀 ¡Bienvenidos al Laboratorio de Git Practice! Este es un post de ejemplo. Los estudiantes deben editar este archivo JSON para agregar sus propias publicaciones y practicar git commit/push. 💻🔥",
+    "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2070&auto=format&fit=crop",
+    "time": "Hace 5 minutos",
+    "tags": ["#GitPractice", "#ScreamingArchitecture", "#Bun", "#DevOpsLab"]
+  },
+  {
+    "id": 1002,
+    "username": "estudiante_devops",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=student1",
+    "content": "¡Hola! Estoy practicando Git subiendo este post directamente al archivo JSON. Los nuevos grupos deben usar IDs únicos (ej: 1003, 1004, etc) para evitar conflictos. 🛠️",
+    "image": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070&auto=format&fit=crop",
+    "time": "Hace 2 minutos",
+    "tags": ["#DevOps", "#Nextjs", "#GitFlow", "#Practice"]
+  }
+]

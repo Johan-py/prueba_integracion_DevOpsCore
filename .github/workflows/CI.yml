@@ -1,0 +1,40 @@
+name: Validador de IDs - Práctica Git
+
+on:
+  push:
+    branches: [develop, main, feature/**]
+  pull_request:
+    branches: [develop, main]
+
+jobs:
+  validate-unique-ids:
+    name: 🔍 Verificar IDs únicos en posts.json
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Clonar repositorio
+        uses: actions/checkout@v3
+      
+      - name: 🔎 Validar que no hay IDs duplicados
+        run: |
+          echo "🔍 Verificando IDs únicos en posts.json..."
+          
+          # Extraer todos los IDs y buscar duplicados
+          DUPLICADOS=$(jq '[.[].id] | group_by(.) | map(select(length>1)) | flatten' backend/src/modules/posts/data/posts.json)
+          
+          if [ "$DUPLICADOS" != "[]" ]; then
+            echo "❌ ERROR: Se encontraron IDs duplicados:"
+            echo "$DUPLICADOS"
+            echo ""
+            echo "📌 Cada post debe tener un ID ÚNICO."
+            echo "🔧 Corrige los IDs duplicados antes de continuar."
+            exit 1
+          else
+            echo "✅ ¡Todos los IDs son únicos! Muy bien 👍"
+          fi
+      
+      - name: 📊 Mostrar estadísticas
+        run: |
+          TOTAL=$(jq length backend/src/modules/posts/data/posts.json)
+          echo "📊 Total de posts en el feed: $TOTAL"
+          echo "🎉 Validación completada exitosamente."

@@ -1,0 +1,132 @@
+# Dependencias
+node_modules/
+node_modules.linux
+bun.lock
+bun.lockb
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+.nx/
+
+# Backend - Prisma
+prisma/*.db
+prisma/*.db-journal
+prisma/*.db3
+prisma/migrations/README.md
+backend/prisma/*.db
+backend/prisma/*.db-journal
+backend/prisma/migrations/README.md
+
+# Backend - Bun
+*.tsbuildinfo
+bunfig.toml
+
+# Frontend - Next.js
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/.vercel
+frontend/*.log
+
+# Stress Lab
+infra/stress-lab/.next/
+infra/stress-lab/out/
+infra/stress-lab/build/
+infra/stress-lab/.vercel
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+.env*.local
+
+# Logs
+*.log
+npm-debug.log*
+bun-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+jest.config.js
+vitest.config.js
+*.test.ts
+*.spec.ts
+__tests__/
+test-results/
+junit.xml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+.vscode/settings.json
+.idea/workspace.xml
+
+# Docker
+docker-compose.override.yml
+*.pid
+docker-data/
+.dockerignore
+*.docker
+
+# Temp files
+tmp/
+temp/
+*.tmp
+*.temp
+.cache/
+.cache-loader
+
+# SSL Certificates (si usas HTTPS local)
+*.pem
+*.key
+*.crt
+*.csr
+
+# System files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Prisma (archivos que no deberían subirse)
+backend/prisma/*.db
+backend/prisma/*.db-journal
+backend/prisma/migrations/README.md
+
+# Respaldo de archivos de configuración (los que creamos hoy)
+*.backup
+*.old
+*.orig
+
+# Archivos específicos de tu proyecto que contienen datos sensibles
+**/salsa.txt
+**/stress_file.txt
+**/rutas_api.txt
+**/dev_feature_*.txt
+**/check_rutas.ts
+
+# Stress lab específico
+infra/stress-lab/public/*.txt
+infra/stress-lab/*.txt*.config.ts
+*.config.ts
