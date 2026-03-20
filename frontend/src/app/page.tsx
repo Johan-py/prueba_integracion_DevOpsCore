@@ -1,17 +1,12 @@
-import { Stories } from '@/features/stories/components/Stories'
-import { PostFeed } from '@/features/feed/components/PostFeed'
-import './globals.css'
-
 export default function Home() {
   return (
-    <div className="w-full">
-      {/* Stories - Premium Visualization */}
-      <Stories />
+    <div className="max-w-4xl mx-auto">
+      <h1 className="text-4xl font-bold text-center mb-8">Bienvenido a PropBol</h1>
+      <p className="text-lg text-center text-gray-600 mb-12">
+        Esta es la página de inicio. Comienza a construir tu aplicación aquí.
+      </p>
 
-      {/* Decorative Separator or Gap */}
-      <div className="h-6" />
-      {/* Main Feed Visualization */}
-      <PostFeed />
+      {/* Aquí irán tus componentes y contenido */}
     </div>
   )
 }
