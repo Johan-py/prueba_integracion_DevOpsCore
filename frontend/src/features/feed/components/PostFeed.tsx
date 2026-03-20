@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from 'react'
 
-interface Post 
+interface Post {
+
+
   id: number
   username: string
   avatar: string
