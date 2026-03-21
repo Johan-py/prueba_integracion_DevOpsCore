@@ -46,12 +46,22 @@
   }
   ,
   {
-      "id": 2001,
-      "username": "Bytemafia_Adrian.Perez",
-      "avatar": "https://api.dicebear.com/9.x/adventurer/svg?seed=Aneka",
-      "content": "Este es mi post para practicar, todo bien¡¡ (Por ahora)",
-      "image": "https://images.unsplash.com/photo-1575553939928-d03b21323afe?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      "time": "Hace 2 minutos",
-      "tags": ["#Bytemafia", "#Dev", "#DevOpsCore"]
+    "id": 2001,
+    "username": "Bytemafia_Adrian.Perez",
+    "avatar": "https://api.dicebear.com/9.x/adventurer/svg?seed=Aneka",
+    "content": "Este es mi post para practicar, todo bien¡¡ (Por ahora)",
+    "image": "https://images.unsplash.com/photo-1575553939928-d03b21323afe?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "time": "Hace 2 minutos",
+    "tags": ["#Bytemafia", "#Dev", "#DevOpsCore"]
+    }
+   ,
+   {
+    "id": 1016,
+    "username": "Miguel Angel Massi Geronimo",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Miguel",
+    "content": "Compartiendo mi setup de desarrollo.",
+    "image": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=2072&auto=format&fit=crop",
+    "time": "Hace un instante",
+    "tags": ["#setup", "#bytemafia", "#bytemafia"]
   }
 ]
