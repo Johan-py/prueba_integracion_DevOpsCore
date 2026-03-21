@@ -45,7 +45,53 @@
     "time": "Hace 1 minuto",
     "tags": ["#SigmaDevelopers", "#GitPractice", "#DevOps", "#Learning"]
   }
-  
-  
+  ,
+  {
+  "id": 2020,
+  "username": "bytemafia_mireya",
+  "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=bytemafia",
+  "content": "¡Hola desde Bytemafia! Aprendiendo Git colaborativo",
+  "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f",
+  "time": "Hace 1 minuto",
+  "tags": ["#Bytemafia", "#GitPractice", "#DevOps"]
+}
+  ,{
+    "id": 1011,
+    "username": "Bellido Zeballos Shawn Brandon",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=ByteMafiaDev",
+    "content": "Probando el flujo de Git con el equipo. ¡Todo listo! 💻",
+    "time": "Hace un momento",
+    "likes": 0,
+    "tags": ["#git", "#desarrollo", "#bytemafia"]
+  }
+  ,
+  {
+    "id": 2001,
+    "username": "Bytemafia_Adrian.Perez",
+    "avatar": "https://api.dicebear.com/9.x/adventurer/svg?seed=Aneka",
+    "content": "Este es mi post para practicar, todo bien¡¡ (Por ahora)",
+    "image": "https://images.unsplash.com/photo-1575553939928-d03b21323afe?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "time": "Hace 2 minutos",
+    "tags": ["#Bytemafia", "#Dev", "#DevOpsCore"]
+    }
+   ,
+   {
+    "id": 1016,
+    "username": "Miguel Angel Massi Geronimo",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Miguel",
+    "content": "Compartiendo mi setup de desarrollo.",
+    "image": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=2072&auto=format&fit=crop",
+    "time": "Hace un instante",
+    "tags": ["#setup", "#bytemafia", "#bytemafia"]
+  },
+  {
+    "id": 1017,
+    "username": "Bytemafia_Israel",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Bytemafia_Israel",
+    "content": "Probando el flujo de Git con el equipo. ¡Todo listo! 💻🚀",
+    "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2070&auto=format&fit=crop",
+    "time": "Hace un momento",
+    "likes": 0,
+    "tags": ["#git", "#desarrollo", "#bytemafia"]
+}
 ]
-
