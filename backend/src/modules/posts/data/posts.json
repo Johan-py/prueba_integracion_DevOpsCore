@@ -63,5 +63,15 @@
     "image": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=2072&auto=format&fit=crop",
     "time": "Hace un instante",
     "tags": ["#setup", "#bytemafia", "#bytemafia"]
-  }
+  },
+  {
+    "id": 1017,
+    "username": "Bytemafia_Israel",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Bytemafia_Israel",
+    "content": "Probando el flujo de Git con el equipo. ¡Todo listo! 💻🚀",
+    "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2070&auto=format&fit=crop",
+    "time": "Hace un momento",
+    "likes": 0,
+    "tags": ["#git", "#desarrollo", "#bytemafia"]
+}
 ]
