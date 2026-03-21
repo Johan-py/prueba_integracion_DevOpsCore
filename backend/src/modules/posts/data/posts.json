@@ -53,6 +53,17 @@
     "time": "Recién publicado",
     "tags": ["#BitPro", "#GitPractice", "#GitColaborativo", "#Sistemas"]
   },
+
+    {
+        "id": 1026,
+        "username": "Madahi_Angeles_Aranibar_Mamani",
+        "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=madahi",
+        "content": "Hola, soy Madahi del grupo BitPro. Esta es mi contribución para la práctica de Git colaborativo.",
+        "image": "https://images.unsplash.com/photo-1633356122544-f134324a6cee",
+        "time": "Hace 1 minuto",
+        "tags": [ "#BitPro", "#GitPractice", "#GitColaborativo", "#Sistemas" ]
+    },
+
   {
     "id": 1030,
     "username": "BitPro_Rodrigo110620",
@@ -62,4 +73,5 @@
     "time": "Hace 1 minuto",
     "tags": ["#BitPro", "#GitPractice", "#DevOps"]
   }
+>>>>>>> c520eb5d76692f749013eb5a059f8c706d207701
 ]
