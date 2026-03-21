@@ -61,5 +61,14 @@
     "image": "https://worldcampus.saintleo.edu/img/article/estudiar-ingenieria-en-sistemas-cuales-son-los-retos-de-ser-ingenierio-en-sistemas.webp" ,
     "time": "Hace 1 minuto",
     "tags": ["#TeamCebollitas", "#GitPractice", "#DevOps", "#Learning"]
+  },
+  {
+    "id": 1028,
+    "username": "teamCebollitas_JosePardo",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=cebollita",
+    "content": "¡Hola! Soy Jose Pardo del grupo TeamCebollitas. Estoy aprendiendo Git colaborativo y esta es mi primera contribución 🚀",
+    "image": "https://worldcampus.saintleo.edu/img/article/estudiar-ingenieria-en-sistemas-cuales-son-los-retos-de-ser-ingenierio-en-sistemas.webp" ,
+    "time": "Hace 1 minuto",
+    "tags": ["#TeamCebollitas", "#GitPractice", "#DevOps", "#Learning"]
   }
 ]
