@@ -41,20 +41,7 @@
       "#Learning"
     ]
   },
-  {
-    "id": 1023,
-    "username": "Lia_Cardenas_Morales",
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=neida",
-    "content": "¡Hola! Soy Lia del grupo BitPro. Estoy aprendiendo Git colaborativo y esta es mi primera contribución 🚀",
-    "image": "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2070&auto=format&fit=crop",
-    "time": "Hace 1 minuto",
-    "tags": [
-      "#BitPro",
-      "#GitPractice",
-      "#DevOps",
-      "#Informatica"
-    ]
-  },
+  
   {
     "id": 1022,
     "username": "Ninel_Daniela_Alcocer_Zabala",
@@ -66,6 +53,20 @@
       "#BitPro",
       "#GitPractice",
       "#GitFlow",
+      "#Informatica"
+    ]
+  },
+  {
+    "id": 1023,
+    "username": "Lia_Cardenas_Morales",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=neida",
+    "content": "¡Hola! Soy Lia del grupo BitPro. Estoy aprendiendo Git colaborativo y esta es mi primera contribución 🚀",
+    "image": "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2070&auto=format&fit=crop",
+    "time": "Hace 1 minuto",
+    "tags": [
+      "#BitPro",
+      "#GitPractice",
+      "#DevOps",
       "#Informatica"
     ]
   },
