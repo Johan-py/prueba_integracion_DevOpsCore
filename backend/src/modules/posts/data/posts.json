@@ -88,6 +88,15 @@
     "image": "https://worldcampus.saintleo.edu/img/article/estudiar-ingenieria-en-sistemas-cuales-son-los-retos-de-ser-ingenierio-en-sistemas.webp" ,
     "time": "Hace 1 minuto",
     "tags": ["#TeamCebollitas", "#GitPractice", "#DevOps", "#Learning"]
+  },
+  {
+  "id": 1069,
+  "username": "grupoPrisma_WilberOjedaValente",
+  "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Prisma",
+  "content": "¡Hola! Soy Wilber Ojeda Valente del grupo Prisma. Estoy aprendiendo Git colaborativo y esta es mi primera contribución 🚀",
+  "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f",
+  "time": "Hace 1 minuto",
+  "tags": ["#GrupoPrisma", "#GitPractice", "#DevOps"]
   }
 
 ]
