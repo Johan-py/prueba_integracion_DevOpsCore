@@ -26,16 +26,6 @@
     "time": "Hace 1 minuto",
     "tags": ["#SigmaDevelopers", "#GitPractice", "#DevOps", "#Learning"]
   }
-    ,{
-    "id": 1006,
-    "username": "AndrésGGfd",
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=UnidadLK520",
-    "content": "Hola soy andres no se como llegue aqui asi que saludame por favor ",
-    "image": "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2070&auto=format&fit=crop",
-    "time": "Hace 1 minuto",
-    "tags": ["#SigmaDevelopers", "#GitPractice", "#DevOps", "#Learning"]
-  } 
-
   ,{
     "id": 1009,
     "username": "UnidadLK520",
@@ -93,5 +83,14 @@
     "time": "Hace un momento",
     "likes": 0,
     "tags": ["#git", "#desarrollo", "#bytemafia"]
-}
+  }
+{
+    "id": 1018,
+    "username": "Esther_Romero_Menacho",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Esther",
+    "content": "¡Hola! Soy Esther Romero Menacho de Bytemafia",
+    "image": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97",
+    "time": "Hace 1 minuto",
+    "tags": ["#Bytemafia", "#SistemasUMSS", "#GitPractice"]
+  }
 ]
