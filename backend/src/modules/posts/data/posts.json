@@ -63,7 +63,15 @@
         "time": "Hace 1 minuto",
         "tags": [ "#BitPro", "#GitPractice", "#GitColaborativo", "#Sistemas" ]
     },
-
+  {
+    "id": 1028,
+    "username": "Cristhian_BitPro",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Cristhian1028",
+    "content": "¡Hola a todos! Soy Cristhian del grupo BitPro. Cumpliendo con mi parte del laboratorio Git (EXPLOTADO LABORALMENTE😞😞😞!!!).",
+    "image": "https://images.unsplash.com/photo-1555066931-4365d14bab8c",
+    "time": "Recién publicado",
+    "tags": ["#BitPro", "#GitPractice", "#Desarrollo"]
+  },
   {
     "id": 1030,
     "username": "BitPro_Rodrigo110620",
