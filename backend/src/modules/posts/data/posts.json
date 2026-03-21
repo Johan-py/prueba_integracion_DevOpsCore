@@ -18,15 +18,6 @@
     "tags": ["#DevOps", "#Nextjs", "#GitFlow", "#Practice"]
   },
   {
-    "id": 1003,
-    "username": "Joel_Fernando",
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=neida",
-    "content": "¡Hola! Soy Joel del grupo Sigma_developers. Estoy aprendiendo Git colaborativo y esta es mi primera contribución 🚀",
-    "image": "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2070&auto=format&fit=crop",
-    "time": "Hace 1 minuto",
-    "tags": ["#SigmaDevelopers", "#GitPractice", "#DevOps", "#Learning"]
-  },
-  {
     "id": 1031,
     "username": "teamCebollitas_MelodyGutierrez",
     "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=neida",
@@ -88,6 +79,14 @@
     "image": "https://worldcampus.saintleo.edu/img/article/estudiar-ingenieria-en-sistemas-cuales-son-los-retos-de-ser-ingenierio-en-sistemas.webp" ,
     "time": "Hace 1 minuto",
     "tags": ["#TeamCebollitas", "#GitPractice", "#DevOps", "#Learning"]
-  }
-
+  },
+  {
+    "id": 1071,
+    "username": "Joel_Fernando",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=joel",
+    "content": "¡Hola! Soy Joel del grupo Sigma_developers. Estoy aprendiendo Git colaborativo y esta es mi primera contribución 🚀",
+    "image": "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2070&auto=format&fit=crop",
+    "time": "Hace 1 minuto",
+    "tags": ["#SigmaDevelopers", "#GitPractice", "#DevOps", "#Learning"]
+  },
 ]
