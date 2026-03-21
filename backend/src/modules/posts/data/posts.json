@@ -82,5 +82,20 @@
   "image": "",
   "time": "Hace 1 minuto",
   "tags": ["#practica", "#git"]
+  },
+    {
+    "id": 1069
+    
+  },
+  {
+    "id": 1066,
+    "username": "grupo7_gilmer",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=grupo7_gilmer",
+    "content": "Practicando Git colaborativo ",
+    "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f",
+    "time": "Hace 1 minuto",
+    "tags": ["#Grupo7"]
   }
 ]
+
+
