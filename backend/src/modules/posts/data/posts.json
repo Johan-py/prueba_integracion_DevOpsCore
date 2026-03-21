@@ -25,5 +25,15 @@
     "image": "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2070&auto=format&fit=crop",
     "time": "Hace 1 minuto",
     "tags": ["#SigmaDevelopers", "#GitPractice", "#DevOps", "#Learning"]
+  },
+  {
+    "id": 1004,
+    "username": "Gustavo_Corrales",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=student1",
+    "content": "Hola Soy Gustavo Corrales del grupo Prisma. Estoy aprendiendo Git colaborativo y esta es mi primera contribución 🚀",
+    "image": "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2070&auto=format&fit=crop",
+    "time": "Hace 1 minuto",
+    "tags": ["#SigmaDevelopers", "#GitPractice", "#DevOps", "#Learning", "#GitFlow", "#Practice"]
   }
+
 ]
