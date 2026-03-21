@@ -153,7 +153,7 @@
     "time": "Hace 1 minuto",
     "tags": ["#SigmaDevelopers", "#GitPractice", "#DevOps", "#Learning", "#GitFlow", "#Practice"]
   },
-
+{
     "id": 1041,
     "username": "JuanDavidGutierrezLucero",
     "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=JuanDavidGutierrezLucero",
@@ -237,11 +237,7 @@
     "image": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070&auto=format&fit=crop",
     "time": "Hace 30 minuto",
     "tags": ["#LaComarcaIS", "#GitPractice", "#DevOps"]
-  }
-]
-
   },
-  
 {
   "id": 1050,
   "username": "NoemiCondoriGaspar",
@@ -260,5 +256,3 @@
   "time": "Hace 2 minuto",
   "tags": ["#LaComarcaIS", "#GitPractice", "#DevOps", "#Learning"]
 }
-
-]
