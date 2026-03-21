@@ -99,6 +99,15 @@
     "time": "Hace 1 minuto",
     "tags": ["#SigmaDevelopers", "#GitPractice", "#DevOps", "#Learning"]
   },
+{
+  "id": 1073,
+  "username": "cristian_encinas",
+  "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=cristian",
+  "content": "¡Hola! Soy Cristian del grupo Sigma Developers. Esta es mi contribución para la práctica de Git colaborativo 🚀",
+  "image": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2070&auto=format&fit=crop",
+  "time": "Hace 1 minuto",
+  "tags": ["#SigmaDevelopers", "#GitPractice", "#DevOps", "#Learning"]
+},
   {
     "id": 1074,
     "username": "alison_mamani",
