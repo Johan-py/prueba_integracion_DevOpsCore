@@ -18,6 +18,128 @@
     "time": "Hace 2 minutos",
     "tags": ["#DevOps", "#Nextjs", "#GitFlow", "#Practice"]
   },
+
+  {
+    "id": 1022,
+    "username": "Ninel_Daniela_Alcocer_Zabala",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=ninel",
+    "content": "Hola, soy Ninel del equipo BitPro. Probando el setup!!!",
+    "image": "https://images.unsplash.com/photo-1634838080334-28befa9efe80?q=80&w=387&auto=format&fit=crop&ixlib=rb-4.1.0",
+    "time": "Hace 1 minuto",
+    "tags": [
+      "#BitPro",
+      "#GitPractice",
+      "#GitFlow",
+      "#Informatica"
+    ]
+  },
+  {
+    "id": 1023,
+    "username": "Lia_Cardenas_Morales",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=neida",
+    "content": "¡Hola! Soy Lia del grupo BitPro. Estoy aprendiendo Git colaborativo y esta es mi primera contribución 🚀",
+    "image": "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2070&auto=format&fit=crop",
+    "time": "Hace 1 minuto",
+    "tags": [
+      "#BitPro",
+      "#GitPractice",
+      "#DevOps",
+      "#Informatica"
+    ]
+  },
+  {
+    "id": 1024,
+    "username": "Jorge_Paniagua",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=JorgePanaigua",
+    "content": "¡Hola! Soy Jorge, Lead de BitPro. Integrando mi primer post de nuestro equipo",
+    "image": "https://images.unsplash.com/photo-1571171637578-41bc2dd41cd2?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0",
+    "time": "Recién publicado",
+    "tags": [
+      "#BitPro",
+      "#GitPractice",
+      "#GitColaborativo",
+      "#Sistemas"
+    ]
+  },
+  {
+    "id": 1025,
+    "username": "Melby_Mendoza",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=MelbyMendoza",
+    "content": "¡Hola! Soy Melby Mendoza, parte de BitPro. Integrando mi primer post de nuestro equipo",
+    "image": "https://images.unsplash.com/photo-1669023414162-8b0573b9c6b2?q=80&w=1032&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "time": "Recién publicado",
+    "tags": [
+      "#BitPro",
+      "#GitPractice",
+      "#GitColaborativo",
+      "#Sistemas"
+    ]
+  },
+  {
+    "id": 1026,
+    "username": "Madahi_Angeles_Aranibar_Mamani",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=madahi",
+    "content": "Hola, soy Madahi del grupo BitPro. Esta es mi contribución para la práctica de Git colaborativo.",
+    "image": "https://images.unsplash.com/photo-1633356122544-f134324a6cee",
+    "time": "Hace 1 minuto",
+    "tags": [
+      "#BitPro",
+      "#GitPractice",
+      "#GitColaborativo",
+      "#Sistemas"
+    ]
+  },
+  {
+    "id": 1027,
+    "username": "Darlyn_Alejandra_veliz_Mamani_bitpro",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=bitpro",
+    "content": "Hola 🚀 soy Darlyn del grupo BitPro aprendiendo Git colaborativo integrando el primer post de nuestro equipo",
+    "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f",
+    "time": "Hace 1 minuto",
+    "tags": [
+      "#BitPro",
+      "#GitPractice",
+      "#GitColaborativo",
+      "#Sistemas",
+      "#DevOps"
+    ]
+  },
+  {
+    "id": 1028,
+    "username": "Cristhian_BitPro",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Cristhian1028",
+    "content": "¡Hola a todos! Soy Cristhian del grupo BitPro. Cumpliendo con mi parte del laboratorio Git (EXPLOTADO LABORALMENTE😞😞😞!!!).",
+    "image": "https://images.unsplash.com/photo-1555066931-4365d14bab8c",
+    "time": "Recién publicado",
+    "tags": ["#BitPro", "#GitPractice", "#Desarrollo"]
+  },
+  {
+    "id": 1029,
+    "username": "Jhilmer_Chinchilla_Condori",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=bitpro",
+    "content": "¡Hola,soy Jhilmer del Grupo BitPro.Aprendiendo Git colaborativo.",
+    "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f",
+    "time": "Hace 1 minuto",
+    "tags": [
+      "#BitPro",
+      "#GitPractice",
+      "#DevOps",
+      "#Grupo3"
+    ]
+  },
+  {
+    "id": 1030,
+    "username": "BitPro_Rodrigo110620",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=rodrigo1030",
+    "content": "Hola, soy Rodrigo Figueroa Camacho del Grupo BitPro. Estoy aprendiendo Git colaborativo",
+    "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f",
+    "time": "Hace 1 minuto",
+    "tags": [
+      "#BitPro",
+      "#GitPractice",
+      "#DevOps"
+    ]
+  },
   {
     "id": 1031,
     "username": "teamCebollitas_MelodyGutierrez",
