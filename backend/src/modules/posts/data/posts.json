@@ -61,5 +61,14 @@
     "image": "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2070&auto=format&fit=crop",
     "time": "Hace 1 minuto",
     "tags": ["#SigmaDevelopers", "#GitPractice", "#DevOps", "#Learning", "#GitFlow", "#Practice"]
+  } ,
+  {
+    "id": 1066,
+    "username": "Hurtado",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Hurtado",
+    "content": "¡Hola desde el Grupo 7! Soy Hurtado practicando Git colaborativo ",
+    "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f",
+    "time": "Hace 1 minuto",
+    "tags": ["#Grupo7", "#GitPractice", "#DevOps"]
   }
 ]
