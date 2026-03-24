@@ -7,8 +7,6 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun --hot src/index.ts",
     "seed": "bun prisma db seed",
-    "install:all": "bun install",
-    "build": "bun build"
   },
   "keywords": [],
   "author": "",
