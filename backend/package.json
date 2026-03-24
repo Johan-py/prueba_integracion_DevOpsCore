@@ -6,7 +6,7 @@
     "dev": "bun --hot src/index.ts",
     "build": "tsc",
     "lint": "eslint .",
-    "seed": "bun prisma db seed",
+    "seed": "bun prisma db seed"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.6.0",
