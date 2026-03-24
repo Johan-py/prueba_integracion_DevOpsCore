@@ -8,7 +8,7 @@
     "dev": "bun --hot src/index.ts",
     "seed": "bun prisma db seed",
     "install:all": "bun install",
-    "build": "bun run build"
+    "build": "bun build"
   },
   "keywords": [],
   "author": "",
