@@ -7,8 +7,8 @@
     "build": "tsc",
     "lint": "eslint .",
     "seed": "bun prisma db seed",
-    "install:all": "bun install"
-    
+    "install:all": "bun install",
+    "build": "bun build"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.6.0",
