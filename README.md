@@ -2,11 +2,11 @@
 
 Proyecto base para **simulaciones de estrés DevOps**. Incluye:
 
-* Frontend y Backend en **Next.js + TSX** (App Router)
-* API REST simple (`/api/calculator`)
-* Tests con **Bun**
-* Docker para contenedores
-* Scripts de desarrollo y CI/CD listos para pipelines
+- Frontend y Backend en **Next.js + TSX** (App Router)
+- API REST simple (`/api/calculator`)
+- Tests con **Bun**
+- Docker para contenedores
+- Scripts de desarrollo y CI/CD listos para pipelines
 
 Este proyecto permite simular: fallos en pipelines, tests rotos, conflictos de merge y despliegues fallidos.
 
@@ -33,9 +33,9 @@ nextjs-stress-lab/
 
 ## ⚡ Requisitos
 
-* **Bun** (v1.3+) → [https://bun.sh](https://bun.sh)
-* Git
-* Docker (opcional para pruebas de despliegue)
+- **Bun** (v1.3+) → [https://bun.sh](https://bun.sh)
+- Git
+- Docker (opcional para pruebas de despliegue)
 
 > No necesitas Node.js, Bun reemplaza todo.
 
@@ -80,9 +80,9 @@ GET /api/calculator?a=10&b=2&op=divide
 
 ## 🛠 Estructura de pruebas para DevOps
 
-* **DevOps 1**: Infraestructura y Docker, simular despliegues y caídas de servicios
-* **DevOps 2**: Pipelines y tests, inyectar tests rotos o builds fallidos
-* **DevOps 3**: Repositorio y monitoreo, crear PR con conflictos y revisar alertas
+- **DevOps 1**: Infraestructura y Docker, simular despliegues y caídas de servicios
+- **DevOps 2**: Pipelines y tests, inyectar tests rotos o builds fallidos
+- **DevOps 3**: Repositorio y monitoreo, crear PR con conflictos y revisar alertas
 
 ---
 
@@ -95,16 +95,15 @@ docker build -t nextjs-stress-lab .
 docker run -p 3000:3000 nextjs-stress-lab
 ```
 
-* Acceder a `http://localhost:3000/`
-* API: `http://localhost:3000/api/calculator`
+- Acceder a `http://localhost:3000/`
+- API: `http://localhost:3000/api/calculator`
 
 ---
 
 ## ✅ Notas finales
 
-* Usa `bun test` para todos los tests; no es necesario configurar Jest manualmente
-* Toda la lógica de API está en `app/api/calculator/route.ts`
-* Layout obligatorio en `app/layout.tsx` para evitar errores de Next.js con App Router
+- Usa `bun test` para todos los tests; no es necesario configurar Jest manualmente
+- Toda la lógica de API está en `app/api/calculator/route.ts`
+- Layout obligatorio en `app/layout.tsx` para evitar errores de Next.js con App Router
 
 > Este repositorio sirve como **base para construir escenarios de estrés realistas para el equipo de DevOps**.
-

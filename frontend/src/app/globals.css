@@ -31,3 +31,59 @@
     color: hsl(var(--foreground));
   }
 }
+
+.cluster-bubble {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  color: #ffffff;
+  border: 3px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  cursor: pointer;
+  user-select: none;
+}
+
+.cluster-bubble:hover {
+  transform: scale(1.12);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.cluster-bubble--high {
+  /* verde   ≥ 10 */
+}
+.cluster-bubble--medium {
+  /* naranja 2-9  */
+}
+.cluster-bubble--low {
+  /* azul    1    */
+}
+
+.leaflet-cluster-anim .leaflet-marker-icon,
+.leaflet-cluster-anim .leaflet-marker-shadow {
+  transition:
+    transform 400ms ease,
+    opacity 400ms ease !important;
+}
+
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+  transition:
+    transform 400ms ease,
+    opacity 400ms ease;
+}
+
+.leaflet-cluster-spider-leg {
+  stroke: #64748b;
+  stroke-opacity: 0.5;
+  stroke-width: 1.5;
+}
+
+.leaflet-popup {
+  z-index: 1001 !important;
+}
