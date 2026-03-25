@@ -2,7 +2,7 @@
   "name": "social-is-frontend",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
+    "scripts": {
     "dev": "bun x next dev",
     "build": "bun x next build",
     "start": "bun x next start",
