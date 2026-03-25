@@ -1,6 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
+  "type": "module",
   "scripts": {
     "dev": "bun --hot src/index.ts",
     "build": "tsc",
