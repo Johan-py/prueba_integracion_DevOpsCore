@@ -2,7 +2,6 @@
 
 Un laboratorio de ingeniería de software que combina una **red social de clase mundial** con un **entorno de prácticas DevOps realistas**. Este proyecto no es solo otra app más - es un ecosistema completo diseñado para que los equipos de desarrollo y operaciones puedan simular, practicar y dominar escenarios complejos del mundo real.
 
-
 ## 🏗️ Arquitectura del Sistema
 
 Este proyecto implementa **Screaming Architecture** - donde la estructura del código grita su propósito:
@@ -25,14 +24,14 @@ SOCIAL_IS/
 
 ### Tecnologías Core
 
-| Componente | Tecnología | Razón de elección |
-|------------|------------|-------------------|
-| **Runtime** | Bun v1.3+ | Performance extrema, monorepos nativos |
-| **Frontend** | Next.js 16 + React 19 | App Router, Server Components |
-| **Backend** | Express + Prisma | API REST robusta, type-safe |
-| **Estilos** | TailwindCSS v4 | Utility-first, diseño premium |
-| **Testing** | Bun Test | Integración nativa, velocidad |
-| **Contenedores** | Docker | Despliegue consistente |
+| Componente       | Tecnología            | Razón de elección                      |
+| ---------------- | --------------------- | -------------------------------------- |
+| **Runtime**      | Bun v1.3+             | Performance extrema, monorepos nativos |
+| **Frontend**     | Next.js 16 + React 19 | App Router, Server Components          |
+| **Backend**      | Express + Prisma      | API REST robusta, type-safe            |
+| **Estilos**      | TailwindCSS v4        | Utility-first, diseño premium          |
+| **Testing**      | Bun Test              | Integración nativa, velocidad          |
+| **Contenedores** | Docker                | Despliegue consistente                 |
 
 ---
 
@@ -57,7 +56,7 @@ bun install
 bun run dev:all
 
 # O individualmente
-cd frontend 
+cd frontend
 bun run dev    # :3000
 
 cd backend
@@ -66,12 +65,12 @@ bun run dev     # :5000
 
 ### Comandos esenciales
 
-| Comando | Propósito |
-|---------|-----------|
-| `bun run dev:all` | Inicia todo el stack (frontend + backend) |
-| `bun test` | Ejecuta suite de tests completo |
-| `bun run build` | Build de producción optimizado |
-| `docker-compose up` | Levanta infraestructura completa |
+| Comando             | Propósito                                 |
+| ------------------- | ----------------------------------------- |
+| `bun run dev:all`   | Inicia todo el stack (frontend + backend) |
+| `bun test`          | Ejecuta suite de tests completo           |
+| `bun run build`     | Build de producción optimizado            |
+| `docker-compose up` | Levanta infraestructura completa          |
 
 ---
 
@@ -80,6 +79,7 @@ bun run dev     # :5000
 El backend expone endpoints RESTful con manejo robusto de errores:
 
 ### Posts API
+
 ```bash
 # Obtener todos los posts
 GET http://localhost:5000/api/posts
@@ -100,16 +100,19 @@ Content-Type: application/json
 Este es el corazón del proyecto - donde los equipos practican escenarios reales:
 
 ### DevOps 1: Infraestructura y Contenedores
+
 - **Simulación de caídas**: Docker containers que fallan intencionalmente
 - **Recovery procedures**: Scripts para restaurar servicios automáticamente
 - **Load testing**: Pruebas de estrés con k6 y Artillery
 
 ### DevOps 2: Pipelines y Calidad
+
 - **Tests rotos intencionales**: Escenarios para debugging de CI/CD
 - **Builds fallidos**: Simulación de problemas de compilación
 - **Conflictos de merge**: Prácticas de resolución realistas
 
 ### DevOps 3: Monitoreo y Respuesta
+
 - **Alertas falsas**: Distinguir entre problemas reales y falsos positivos
 - **Métricas en tiempo real**: Dashboards con Prometheus + Grafana
 - **Incident response**: Procedimientos de escalado
@@ -132,6 +135,7 @@ Este es el corazón del proyecto - donde los equipos practican escenarios reales
 ## 🐳 Docker y Despliegue
 
 ### Desarrollo local
+
 ```bash
 # Build y run completo
 docker-compose up --build
@@ -143,6 +147,7 @@ docker-compose up --build
 ```
 
 ### Producción
+
 ```bash
 # Build optimizado
 docker build -t social-is:latest .
@@ -158,15 +163,18 @@ docker run -d \
 ---
 
 ## 🎨 Frontend
+
 La interfaz sigue los estándares de las redes sociales modernas:
 
 ### Características
+
 - **Design System**: Componentes consistentes y reutilizables
 - **Responsive First**: Mobile-first con breakpoints inteligentes
 - **Micro-interactions**: Animaciones sutiles y feedback inmediato
 - **Performance**: Lazy loading, code splitting, optimización automática
 
 ### Estructura de Componentes
+
 ```
 src/
 ├── components/
@@ -184,6 +192,7 @@ src/
 ## 🔧 Backend - Arquitectura Escalable
 
 ### Módulos Desacoplados
+
 Cada módulo es una unidad independiente con su propia lógica:
 
 ```
@@ -201,6 +210,7 @@ src/modules/
 ```
 
 ### Base de Datos con Prisma
+
 ```typescript
 // Schema type-safe
 model Post {
@@ -213,5 +223,3 @@ model Post {
 ```
 
 ---
-
-

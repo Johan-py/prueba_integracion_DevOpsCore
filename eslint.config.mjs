@@ -17,9 +17,8 @@ export default [
       '**/*.config.ts',
       '**/tailwind.config.*',
       '**/postcss.config.*',
-      '**/.git/**',
-
-    ],
+      '**/.git/**'
+    ]
   },
 
   // Configuración base para JavaScript
@@ -32,13 +31,13 @@ export default [
       globals: {
         browser: true,
         node: true,
-        es2022: true,
-      },
+        es2022: true
+      }
     },
     rules: {
       'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-      'no-undef': 'off',
-    },
+      'no-undef': 'off'
+    }
   },
 
   // Configuración específica para frontend TypeScript
@@ -51,19 +50,19 @@ export default [
         ecmaVersion: 2022,
         sourceType: 'module',
         ecmaFeatures: {
-          jsx: true,
-        },
+          jsx: true
+        }
       },
       globals: {
         browser: true,
         node: true,
         es2022: true,
-        React: true,
-      },
+        React: true
+      }
     },
     plugins: {
       '@typescript-eslint': tsPlugin,
-      '@next/next': nextPlugin,
+      '@next/next': nextPlugin
     },
     rules: {
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
@@ -73,16 +72,16 @@ export default [
       '@next/next/no-html-link-for-pages': ['error', 'frontend/src/app'],
       '@next/next/no-img-element': 'warn',
       'no-console': ['warn', { allow: ['warn', 'error'] }],
-      'prefer-const': 'error',
+      'prefer-const': 'error'
     },
     settings: {
       react: {
-        version: 'detect',
+        version: 'detect'
       },
       next: {
-        rootDir: 'frontend',
-      },
-    },
+        rootDir: 'frontend'
+      }
+    }
   },
 
   // Configuración para backend TypeScript
@@ -91,24 +90,24 @@ export default [
     languageOptions: {
       parser: tsParser,
       parserOptions: {
-        project: './tsconfig.json', 
+        project: './tsconfig.json',
         ecmaVersion: 2022,
-        sourceType: 'module',
+        sourceType: 'module'
       },
       globals: {
         node: true,
-        es2022: true,
-      },
+        es2022: true
+      }
     },
     plugins: {
-      '@typescript-eslint': tsPlugin,
+      '@typescript-eslint': tsPlugin
     },
     rules: {
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 'warn',
       'no-console': 'off',
-      'prefer-const': 'error',
-    },
+      'prefer-const': 'error'
+    }
   },
 
   // Configuración para archivos de configuración (sin TypeScript)
@@ -118,19 +117,19 @@ export default [
       'frontend/postcss.config.{js,ts}',
       'frontend/next.config.{js,ts}',
       'backend/prisma.config.ts',
-      '**/.eslintrc.{js,json}',
+      '**/.eslintrc.{js,json}'
     ],
     languageOptions: {
       sourceType: 'script',
       globals: {
         module: true,
         require: true,
-        __dirname: true,
-      },
+        __dirname: true
+      }
     },
     rules: {
       '@typescript-eslint/no-var-requires': 'off',
-      'no-undef': 'off',
-    },
-  },
+      'no-undef': 'off'
+    }
+  }
 ]
