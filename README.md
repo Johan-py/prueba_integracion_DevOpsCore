@@ -149,8 +149,7 @@ chore: tareas internas
 * No modificar configuraciones críticas sin aprobación
 * Mantener commits pequeños:
 
-  * recomendado: ≤ 250 líneas
-  * máximo permitido: 400 líneas
+  * máximo permitido: 250 líneas
 * Seguir arquitectura por capas en backend
 * Separar lógica y UI en frontend
 
