@@ -9,7 +9,11 @@ export default function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
-  const isFormValid = email !== '' && password !== ''
+  const isFormValid =
+  email.length > 0 &&
+  password.length > 0 &&
+  !errors.email &&
+  !errors.password
   const validate = (field: string, value: string) => {
     let newErrors = { ...errors }
 
