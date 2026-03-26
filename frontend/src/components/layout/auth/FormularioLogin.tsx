@@ -26,7 +26,9 @@ export default function LoginForm() {
     if (field === 'password') {
       if (!value) {
         newErrors.password = 'La contraseña es obligatoria'
-      } else {
+      } else if(value.length > 16){
+        newErrors.password = ' La contraseña no puede tener mas de 16 caracteres'
+      }else{
         delete newErrors.password
       }
     }
@@ -71,6 +73,7 @@ export default function LoginForm() {
               type={showPassword ? 'text' : 'password'}
               placeholder="Ingresa tu contraseña"
               value={password}
+              maxLength={16}
               onChange={(e) => {
                 setPassword(e.target.value)
                 validate('password', e.target.value)
