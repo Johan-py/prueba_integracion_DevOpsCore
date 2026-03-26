@@ -1,4 +1,4 @@
-import LoginForm from '@/components/layout/auth/FormularioLogin'
+import LoginForm from '@/components/layout/auth/formularioSingUp'
 
 export default function LoginPage() {
   return (
