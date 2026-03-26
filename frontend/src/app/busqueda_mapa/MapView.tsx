@@ -96,11 +96,15 @@ function formatPrice(price: number, currency: 'USD' | 'BOB'): string {
 interface MapViewProps {
   center?: [number, number]
   zoom?: number
+  selectedId?: string | null
+  onSelect?: (id: string) => void
 }
 
 export default function MapView({
   center = [-17.392418841841394, -66.1461583463333],
   zoom = 12,
+  selectedId,
+  onSelect,
 }: MapViewProps) {
   const { properties, isLoading, error } = useProperties()
 
@@ -139,8 +143,8 @@ export default function MapView({
         <Marker position={center} icon={createGpsIcon()}>
           <Popup>Tu ubicación actual</Popup>
         </Marker>
-
-        <MarkerClusterGroup
+        
+                <MarkerClusterGroup
           iconCreateFunction={createClusterIcon}
           maxClusterRadius={CLUSTER_CONFIG.maxClusterRadius}
           disableClusteringAtZoom={CLUSTER_CONFIG.disableClusteringAtZoom}
@@ -152,28 +156,78 @@ export default function MapView({
           removeOutsideVisibleBounds={true}
           clusterPane="markerPane"
         >
-          {properties.map((property) => (
-            <Marker
-              key={property.id}
-              position={[property.lat, property.lng]}
-              icon={createPinIcon(property.type)}
-            >
-              <Popup>
-                <div className="text-sm min-w-[160px]">
-                  <p className="font-semibold text-gray-800 mb-1">
-                    {property.title}
-                  </p>
-                  <p className="font-bold" style={{ color: PIN_LABEL[property.type] }}>
-                    {formatPrice(property.price, property.currency)}
-                  </p>
-                  <p className="text-gray-500 capitalize mt-1">{property.type}</p>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
+          {properties.map((property) => {
+            const isSelected = property.id === selectedId
+
+            return (
+              <Marker
+                key={property.id}
+                position={[property.lat, property.lng]}
+                icon={isSelected ? createSelectedIcon() : createPinIcon(property.type)}
+                eventHandlers={{
+                  click: () => onSelect?.(property.id),
+                }}
+              >
+                <Popup>
+                  <div className="text-sm min-w-[160px]">
+                    <p className="font-semibold text-gray-800 mb-1">
+                      {property.title}
+                    </p>
+                    <p
+                      className="font-bold"
+                      style={{ color: PIN_LABEL[property.type] }}
+                    >
+                      {formatPrice(property.price, property.currency)}
+                    </p>
+                    <p className="text-gray-500 capitalize mt-1">
+                      {property.type}
+                    </p>
+                  </div>
+                </Popup>
+              </Marker>
+            )
+          })}
         </MarkerClusterGroup>
 
       </MapContainer>
     </div>
   )
+}
+
+function createSelectedIcon(): L.DivIcon {
+  return L.divIcon({
+    className: '',
+    html: `
+      <div style="
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform: scale(1.6);
+      ">
+        <div style="
+          width: 34px;
+          height: 34px;
+          border-radius: 50%;
+          background-color: #ef4444;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+          border: 2px solid white;
+        ">
+          <img 
+            src="/house.svg" 
+            style="
+              width:18px;
+              height:18px;
+              filter: brightness(0) invert(1);
+            " 
+          />
+        </div>
+      </div>
+    `,
+    iconSize: [34, 34],
+    iconAnchor: [17, 34],
+    popupAnchor: [0, -34],
+  })
 }
