@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import { validateEmail } from '@/lib/validators/auth'
+import { validateEmail, validatePassword} from '@/lib/validators/auth'
 
 type FormData = {
   email: string
@@ -55,6 +55,15 @@ export default function SignUpForm() {
           email: emailError || undefined
         }))
       }
+
+      if (field === 'password') {
+        const passwordError = validatePassword(value)
+        
+        setErrors((prev) => ({
+          ...prev,
+          password: passwordError || undefined
+        }))
+      }
     }
 
   const handleBlur = (field: keyof FormData) => () => {
@@ -69,6 +78,13 @@ export default function SignUpForm() {
       setErrors((prev) => ({
         ...prev,
         email: emailError || undefined
+      }))
+    }
+    if (field === 'password') {
+      const passwordError = validatePassword(formData.password)
+      setErrors((prev) => ({
+        ...prev,
+        password: passwordError || undefined
       }))
     }
   }
@@ -211,6 +227,11 @@ export default function SignUpForm() {
           placeholder="Ingresa tu contraseña"
           className="w-full rounded-md border border-slate-300 px-4 py-3 outline-none focus:border-orange-400"
         />
+        {touched.password && errors.password ? (
+        <p className="mt-1 text-sm text-red-600">
+        {errors.password}
+        </p>
+        ) : null}
       </div>
 
       <div>
