@@ -4,6 +4,14 @@ const app = express()
 
 app.use(express.json())
 
+// ✅ HEALTH CHECK
+app.get('/api/health', (_req, res) => {
+  res.status(200).json({
+    ok: true,
+    message: 'Server running'
+  })
+})
+
 // ✅ ENDPOINT
 app.post('/api/users', (req, res) => {
   const user = req.body
