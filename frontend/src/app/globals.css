@@ -122,4 +122,19 @@
     height: 10px;
   }
 }
+/* Commit 4: controles y animaciones */
+@media (max-width: 768px) {
+  .leaflet-control-zoom {
+    transform: scale(0.9);
+    transform-origin: bottom right;
+  }
+  .leaflet-marker-icon,
+  .leaflet-marker-shadow,
+  .leaflet-cluster-anim .leaflet-marker-icon,
+  .leaflet-cluster-anim .leaflet-marker-shadow {
+    transition:
+    transform 250ms ease,
+    opacity 250ms ease;
+  }
+}
 
