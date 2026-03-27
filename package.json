@@ -26,6 +26,7 @@
     "eslint": "^10.1.0"
   },
   "dependencies": {
+    "@prisma/config": "^7.5.0",
     "tailwind": "^4.0.0"
   }
 }
