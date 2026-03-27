@@ -67,6 +67,23 @@ export default function SignUpForm() {
           password: passwordError || undefined
         }))
       }
+      if (field === 'confirmPassword') {
+        setErrors((prev) => ({
+          ...prev,
+          confirmPassword:
+          value !== formData.password
+            ? 'Las contraseñas no coinciden'
+            : undefined
+        }))
+      }
+      if(field === 'phone'){
+        const onlyNumbersRegex = /^[0-9]*$/
+        setErrors((prev) => ({
+          ...prev,
+          phone: onlyNumbersRegex.test(value) ? undefined : 'El teléfono solo permite números'
+        }))
+      }
+
     }
 
   const handleBlur = (field: keyof FormData) => () => {
@@ -92,6 +109,22 @@ export default function SignUpForm() {
         password: passwordError || undefined
       }))
     }
+    if (field === 'confirmPassword') {
+      setErrors((prev) => ({
+        ...prev,
+      confirmPasswordError =
+        formData.confirmPassword !== formData.password
+          ? 'Las contraseñas no coinciden'
+          : undefined
+      }))
+    }
+    if (field === 'phone') {
+      const onlyNumbersRegex = /^[0-9]*$/
+      setErrors((prev) => ({
+        ...prev,
+        phone: onlyNumbersRegex.test(formData.phone) ? undefined : 'El teléfono solo permite números'
+      }))
+    }
   }
 
   const handleCancel = () => {
@@ -103,7 +136,9 @@ export default function SignUpForm() {
 
   const isFormValid = useMemo(() => {
     return formData.email.trim() 
-    !== '' && !validateEmail(formData.email) && !validatePassword(formData.password)
+    !== '' && !validateEmail(formData.email) && !validatePassword(formData.password) &&
+    formData.confirmPassword === formData.password &&
+    (formData.phone === '' || !errors.phone) 
   }, [formData.email, formData.password])
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -128,6 +163,25 @@ export default function SignUpForm() {
       ...formData,
       email: formData.email.trim()
     })
+    const confirmPasswordError =
+      formData.confirmPassword !== formData.password
+        ? 'Las contraseñas no coinciden'
+        : undefined
+    
+    const newErrors: FormErrors = {
+      email: emailError || undefined,
+      password: passwordError || undefined,
+      confirmPassword: confirmPasswordError || undefined
+    }
+
+    setErrors(newErrors)
+    setTouched((prev) => ({
+      ...prev,
+      email: true,
+      password: true,
+      confirmPassword: true
+    }))
+    if (emailError || passwordError || confirmPasswordError) return
   }
 
   return (
@@ -223,6 +277,9 @@ export default function SignUpForm() {
           placeholder="Ingresa tu teléfono"
           className="w-full rounded-md border border-slate-300 px-4 py-3 outline-none focus:border-orange-400"
         />
+        {touched.phone && errors.phone ? (
+          <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+        ) : null}
       </div>
 
       <div>
@@ -264,6 +321,9 @@ export default function SignUpForm() {
           placeholder="Confirma tu contraseña"
           className="w-full rounded-md border border-slate-300 px-4 py-3 outline-none focus:border-orange-400"
         />
+        {touched.confirmPassword && errors.confirmPassword ? (
+          <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
+        ) : null}
       </div>
 
       <button
