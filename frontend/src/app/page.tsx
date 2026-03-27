@@ -1,3 +1,5 @@
+import FilterPanel from '@/components/rentals/FilterPanel';
+
 export default function Home() {
   return (
     <div className="max-w-4xl mx-auto">
@@ -5,7 +7,11 @@ export default function Home() {
       <p className="text-lg text-center text-gray-600 mb-12">
         Esta es la página de inicio. Comienza a construir tu aplicación aquí.
       </p>
-      {/* Aquí irán tus componentes y contenido */}
+      {/*Contenedor del Panel de Filtros*/}
+    <div className="relative" style={{ left: '-150px' }}> 
+        <FilterPanel />
+      </div>
+      
     </div>
   )
 }
