@@ -1,284 +1,258 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
+import { validateEmail } from '@/lib/validators/auth'
 
-export default function RegisterForm() {
-  const [email, setEmail] = useState('')
-  const [nombre, setNombre] = useState('')
-  const [apellido, setApellido] = useState('')
-  const [telefono, setTelefono] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
+type FormData = {
+  email: string
+  firstName: string
+  lastName: string
+  phone: string
+  password: string
+  confirmPassword: string
+}
 
-  const [errors, setErrors] = useState<{
-    email?: string
-    nombre?: string
-    apellido?: string
-    telefono?: string
-    password?: string
-    confirmPassword?: string
-  }>({})
+type FormErrors = {
+  email?: string
+  firstName?: string
+  lastName?: string
+  phone?: string
+  password?: string
+  confirmPassword?: string
+}
 
-  const isFormValid =
-    email.trim().length > 0 &&
-    nombre.trim().length > 0 &&
-    apellido.trim().length > 0 &&
-    telefono.trim().length > 0 &&
-    password.length > 0 &&
-    confirmPassword.length > 0 &&
-    !errors.email &&
-    !errors.nombre &&
-    !errors.apellido &&
-    !errors.telefono &&
-    !errors.password &&
-    !errors.confirmPassword
+export default function SignUpForm() {
+  const [formData, setFormData] = useState<FormData>({
+    email: '',
+    firstName: '',
+    lastName: '',
+    phone: '',
+    password: '',
+    confirmPassword: ''
+  })
 
-  const validate = (field: string, value: string) => {
-    const newErrors = { ...errors }
+  const [errors, setErrors] = useState<FormErrors>({})
+  const [touched, setTouched] = useState<Record<string, boolean>>({})
+
+  const handleChange =
+    (field: keyof FormData) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      const rawValue = event.target.value
+
+      const value =
+        field === 'email' ? rawValue.trimStart() : rawValue
+
+      setFormData((prev) => ({
+        ...prev,
+        [field]: value
+      }))
+
+      if (field === 'email') {
+        const emailError = validateEmail(value)
+
+        setErrors((prev) => ({
+          ...prev,
+          email: emailError || undefined
+        }))
+      }
+    }
+
+  const handleBlur = (field: keyof FormData) => () => {
+    setTouched((prev) => ({
+      ...prev,
+      [field]: true
+    }))
 
     if (field === 'email') {
-      if (!value.trim()) {
-        newErrors.email = 'El correo es obligatorio'
-      } else if (!/\S+@\S+\.\S+/.test(value)) {
-        newErrors.email = 'Formato de correo inválido'
-      } else {
-        delete newErrors.email
-      }
+      const emailError = validateEmail(formData.email)
+
+      setErrors((prev) => ({
+        ...prev,
+        email: emailError || undefined
+      }))
     }
+  }
 
-    if (field === 'nombre') {
-      if (!value.trim()) {
-        newErrors.nombre = 'El nombre es obligatorio'
-      } else {
-        delete newErrors.nombre
-      }
-    }
+  const isFormValid = useMemo(() => {
+    return (
+      formData.email.trim() !== '' &&
+      !validateEmail(formData.email)
+    )
+  }, [formData.email])
 
-    if (field === 'apellido') {
-      if (!value.trim()) {
-        newErrors.apellido = 'El apellido es obligatorio'
-      } else {
-        delete newErrors.apellido
-      }
-    }
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
 
-    if (field === 'telefono') {
-      if (!value.trim()) {
-        newErrors.telefono = 'El teléfono es obligatorio'
-      } else if (!/^\d+$/.test(value)) {
-        newErrors.telefono = 'Solo se permiten números'
-      } else {
-        delete newErrors.telefono
-      }
-    }
+    const emailError = validateEmail(formData.email)
 
-    if (field === 'password') {
-      if (!value) {
-        newErrors.password = 'La contraseña es obligatoria'
-      } else if (value.length > 16) {
-        newErrors.password = 'La contraseña no puede tener más de 16 caracteres'
-      } else {
-        delete newErrors.password
-      }
-
-      if (confirmPassword && value !== confirmPassword) {
-        newErrors.confirmPassword = 'Las contraseñas no coinciden'
-      } else if (confirmPassword) {
-        delete newErrors.confirmPassword
-      }
-    }
-
-    if (field === 'confirmPassword') {
-      if (!value) {
-        newErrors.confirmPassword = 'Debes confirmar la contraseña'
-      } else if (value !== password) {
-        newErrors.confirmPassword = 'Las contraseñas no coinciden'
-      } else {
-        delete newErrors.confirmPassword
-      }
+    const newErrors: FormErrors = {
+      email: emailError || undefined
     }
 
     setErrors(newErrors)
-  }
+    setTouched((prev) => ({
+      ...prev,
+      email: true
+    }))
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    if (emailError) return
 
-    const trimmedEmail = email.trim()
-    const trimmedNombre = nombre.trim()
-    const trimmedApellido = apellido.trim()
-    const trimmedTelefono = telefono.trim()
-
-    setEmail(trimmedEmail)
-    setNombre(trimmedNombre)
-    setApellido(trimmedApellido)
-    setTelefono(trimmedTelefono)
-
-    validate('email', trimmedEmail)
-    validate('nombre', trimmedNombre)
-    validate('apellido', trimmedApellido)
-    validate('telefono', trimmedTelefono)
-    validate('password', password)
-    validate('confirmPassword', confirmPassword)
-
-    console.log({
-      email: trimmedEmail,
-      nombre: trimmedNombre,
-      apellido: trimmedApellido,
-      telefono: trimmedTelefono,
-      password,
-      confirmPassword
+    console.log('Formulario listo para enviar', {
+      ...formData,
+      email: formData.email.trim()
     })
   }
 
   return (
-    <div className="w-full max-w-sm rounded-md bg-white p-6 shadow-md">
-      <h1 className="mb-4 text-3xl font-bold text-gray-900">Crear cuenta</h1>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label
+          htmlFor="email"
+          className="mb-2 block text-sm font-medium text-slate-700"
+        >
+          Correo electrónico
+        </label>
 
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
-            Correo electrónico
-          </label>
-          <input
-            type="email"
-            placeholder="Ingresa tu correo electrónico"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value)
-              validate('email', e.target.value)
-            }}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-orange-500"
-          />
-          {errors.email && (
-            <p className="mt-1 text-xs text-red-500">{errors.email}</p>
-          )}
-        </div>
-
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
-            Nombre
-          </label>
-          <input
-            type="text"
-            placeholder="Ingresa tu nombre"
-            value={nombre}
-            onChange={(e) => {
-              setNombre(e.target.value)
-              validate('nombre', e.target.value)
-            }}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-orange-500"
-          />
-          {errors.nombre && (
-            <p className="mt-1 text-xs text-red-500">{errors.nombre}</p>
-          )}
-        </div>
-
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
-            Apellido
-          </label>
-          <input
-            type="text"
-            placeholder="Ingresa tu apellido"
-            value={apellido}
-            onChange={(e) => {
-              setApellido(e.target.value)
-              validate('apellido', e.target.value)
-            }}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-orange-500"
-          />
-          {errors.apellido && (
-            <p className="mt-1 text-xs text-red-500">{errors.apellido}</p>
-          )}
-        </div>
-
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
-            Teléfono
-          </label>
-          <input
-            type="text"
-            placeholder="Ingresa tu teléfono"
-            value={telefono}
-            onChange={(e) => {
-              setTelefono(e.target.value)
-              validate('telefono', e.target.value)
-            }}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-orange-500"
-          />
-          {errors.telefono && (
-            <p className="mt-1 text-xs text-red-500">{errors.telefono}</p>
-          )}
-        </div>
-
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
-            Contraseña
-          </label>
-          <input
-            type="password"
-            placeholder="Ingresa tu contraseña"
-            value={password}
-            maxLength={16}
-            onChange={(e) => {
-              setPassword(e.target.value)
-              validate('password', e.target.value)
-            }}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-orange-500"
-          />
-          {errors.password && (
-            <p className="mt-1 text-xs text-red-500">{errors.password}</p>
-          )}
-        </div>
-
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
-            Confirmar contraseña
-          </label>
-          <input
-            type="password"
-            placeholder="Confirma tu contraseña"
-            value={confirmPassword}
-            maxLength={16}
-            onChange={(e) => {
-              setConfirmPassword(e.target.value)
-              validate('confirmPassword', e.target.value)
-            }}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-orange-500"
-          />
-          {errors.confirmPassword && (
-            <p className="mt-1 text-xs text-red-500">{errors.confirmPassword}</p>
-          )}
-        </div>
-
-        <button
-          type="submit"
-          disabled={!isFormValid}
-          className={`w-full rounded-md py-2 text-sm font-semibold text-white ${
-            isFormValid
-              ? 'bg-orange-500 hover:bg-orange-600'
-              : 'cursor-not-allowed bg-orange-300'
+        <input
+          id="email"
+          name="email"
+          type="email"
+          value={formData.email}
+          onChange={handleChange('email')}
+          onBlur={handleBlur('email')}
+          placeholder="Ingresa tu correo"
+          className={`w-full rounded-md border px-4 py-3 outline-none transition ${
+            touched.email && errors.email
+              ? 'border-red-500'
+              : 'border-slate-300 focus:border-orange-400'
           }`}
-        >
-          Registrarse
-        </button>
+          aria-invalid={Boolean(touched.email && errors.email)}
+          aria-describedby="email-error"
+        />
 
-        <button
-          type="button"
-          className="w-full rounded-md bg-gray-700 py-2 text-sm font-medium text-white hover:bg-gray-800"
-        >
-          Cancelar registro
-        </button>
-      </form>
+        {touched.email && errors.email ? (
+          <p id="email-error" className="mt-1 text-sm text-red-600">
+            {errors.email}
+          </p>
+        ) : null}
+      </div>
 
-      <p className="mt-4 text-center text-sm text-gray-600">
+      <div>
+        <label
+          htmlFor="firstName"
+          className="mb-2 block text-sm font-medium text-slate-700"
+        >
+          Nombre
+        </label>
+        <input
+          id="firstName"
+          name="firstName"
+          type="text"
+          value={formData.firstName}
+          onChange={handleChange('firstName')}
+          onBlur={handleBlur('firstName')}
+          placeholder="Ingresa tu nombre"
+          className="w-full rounded-md border border-slate-300 px-4 py-3 outline-none focus:border-orange-400"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="lastName"
+          className="mb-2 block text-sm font-medium text-slate-700"
+        >
+          Apellido
+        </label>
+        <input
+          id="lastName"
+          name="lastName"
+          type="text"
+          value={formData.lastName}
+          onChange={handleChange('lastName')}
+          onBlur={handleBlur('lastName')}
+          placeholder="Ingresa tu apellido"
+          className="w-full rounded-md border border-slate-300 px-4 py-3 outline-none focus:border-orange-400"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="phone"
+          className="mb-2 block text-sm font-medium text-slate-700"
+        >
+          Teléfono
+        </label>
+        <input
+          id="phone"
+          name="phone"
+          type="text"
+          value={formData.phone}
+          onChange={handleChange('phone')}
+          onBlur={handleBlur('phone')}
+          placeholder="Ingresa tu teléfono"
+          className="w-full rounded-md border border-slate-300 px-4 py-3 outline-none focus:border-orange-400"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="password"
+          className="mb-2 block text-sm font-medium text-slate-700"
+        >
+          Contraseña
+        </label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          value={formData.password}
+          onChange={handleChange('password')}
+          onBlur={handleBlur('password')}
+          placeholder="Ingresa tu contraseña"
+          className="w-full rounded-md border border-slate-300 px-4 py-3 outline-none focus:border-orange-400"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="confirmPassword"
+          className="mb-2 block text-sm font-medium text-slate-700"
+        >
+          Confirmar contraseña
+        </label>
+        <input
+          id="confirmPassword"
+          name="confirmPassword"
+          type="password"
+          value={formData.confirmPassword}
+          onChange={handleChange('confirmPassword')}
+          onBlur={handleBlur('confirmPassword')}
+          placeholder="Confirma tu contraseña"
+          className="w-full rounded-md border border-slate-300 px-4 py-3 outline-none focus:border-orange-400"
+        />
+      </div>
+
+      <button
+        type="submit"
+        disabled={!isFormValid}
+        className="w-full rounded-md bg-orange-400 px-4 py-3 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        Registrarse
+      </button>
+
+      <button
+        type="button"
+        className="w-full rounded-md bg-slate-700 px-4 py-3 font-semibold text-white"
+      >
+        Cancelar registro
+      </button>
+
+      <p className="text-center text-sm text-slate-600">
         ¿Ya tienes una cuenta?{' '}
-        <Link href="/login" className="font-semibold text-orange-500 hover:underline">
+        <Link href="/sign-in" className="font-semibold text-orange-500">
           Inicia sesión
         </Link>
       </p>
-    </div>
+    </form>
   )
 }
