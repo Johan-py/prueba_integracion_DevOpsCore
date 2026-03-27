@@ -41,6 +41,13 @@ const PIN_LABEL: Record<PropertyMapPin['type'], string> = {
   local:        '#059669',
 }
 
+const SELECTED_ICONS: Record<PropertyMapPin['type'], string> = {
+  casa: '/house.svg',
+  departamento: '/department.svg',
+  terreno: '/land.svg',
+  local: '/local.svg',
+}
+
 function createPinIcon(type: PropertyMapPin['type']): L.DivIcon {
   const fill = PIN_FILL[type] ?? '#6b7280'
   const halo = PIN_HALO[type] ?? 'rgba(107,114,128,0.25)'
@@ -163,7 +170,7 @@ export default function MapView({
               <Marker
                 key={property.id}
                 position={[property.lat, property.lng]}
-                icon={isSelected ? createSelectedIcon() : createPinIcon(property.type)}
+                icon={isSelected ? createSelectedIcon(property.type) : createPinIcon(property.type)}
                 eventHandlers={{
                   click: () => onSelect?.(property.id),
                 }}
@@ -194,7 +201,9 @@ export default function MapView({
   )
 }
 
-function createSelectedIcon(): L.DivIcon {
+function createSelectedIcon(type: PropertyMapPin['type']): L.DivIcon {
+  const iconPath = SELECTED_ICONS[type]
+
   return L.divIcon({
     className: '',
     html: `
@@ -205,8 +214,8 @@ function createSelectedIcon(): L.DivIcon {
         transform: scale(1.6);
       ">
         <div style="
-          width: 34px;
-          height: 34px;
+          width: 36px;
+          height: 36px;
           border-radius: 50%;
           background-color: #ef4444;
           display: flex;
@@ -216,18 +225,19 @@ function createSelectedIcon(): L.DivIcon {
           border: 2px solid white;
         ">
           <img 
-            src="/house.svg" 
+            src="${iconPath}" 
             style="
-              width:18px;
-              height:18px;
-              filter: brightness(0) invert(1);
+              width:20px;
+              height:20px;
+              object-fit: contain;
+              display: block;
             " 
           />
         </div>
       </div>
     `,
-    iconSize: [34, 34],
-    iconAnchor: [17, 34],
-    popupAnchor: [0, -34],
+    iconSize: [36, 36],
+    iconAnchor: [18, 36],
+    popupAnchor: [0, -36],
   })
 }
