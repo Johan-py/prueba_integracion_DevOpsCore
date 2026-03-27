@@ -123,7 +123,11 @@ export default function Navbar() {
                       filteredNotifications.map((notification) => (
                         <div
                           key={notification.id}
-                          onClick={() => markAsRead(notification.id)}
+                          onClick={() => {
+                            if (notification.status !== 'archivada') {
+                              markAsRead(notification.id)
+                            }
+                          }}
                           className={`cursor-pointer border-b border-gray-100 px-4 py-3 transition hover:bg-gray-50 ${
                             notification.status === 'no leida' ? 'bg-blue-50' : 'bg-white'
                           }`}
