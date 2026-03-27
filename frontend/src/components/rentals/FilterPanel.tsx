@@ -13,8 +13,13 @@ export default function FilterPanel() {
           <h2 className="text-lg font-bold">Filtros</h2>
         </div>
 
+        {/* ORDENAR */}
+        <div className="flex items-center gap-1 cursor-pointer group">
+          <span className="text-sm font-medium text-orange-400 group-hover:text-orange-600">Ordenar</span>
+          <ArrowDownUp size={16} className="text-orange-400 group-hover:text-orange-600" />
         </div>
-        
+      </div>
+
       </aside>
   );
 }
