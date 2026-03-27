@@ -62,7 +62,7 @@
 }
 .cluster-bubble--low {
   /* azul    1    */
-  
+
 }
 
 .leaflet-cluster-anim .leaflet-marker-icon,
@@ -87,4 +87,14 @@
 
 .leaflet-popup {
   z-index: 1001 !important;
+}
+/* Commit 1: tamaño clusters móvil */
+@media (max-width: 768px) {
+  .cluster-bubble {
+    min-width: 36px;
+    min-height: 36px;
+    font-size: 12px;
+    border-width: 2px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
+  }
 }
