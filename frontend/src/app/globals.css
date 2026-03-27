@@ -98,3 +98,10 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
   }
 }
+/* Commit 2: sin hover en touch */
+@media (max-width: 768px) {
+  .cluster-bubble:hover {
+    transform: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
+  }
+}
