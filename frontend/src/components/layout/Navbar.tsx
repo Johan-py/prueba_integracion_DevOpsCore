@@ -4,8 +4,15 @@ import Link from 'next/link'
 import { useNotifications } from '@/hooks/useNotifications'
 
 export default function Navbar() {
-  const { open, notifications, notificationRef, toggleNotifications } =
-    useNotifications()
+  const {
+    open,
+    filter,
+    notifications,
+    filteredNotifications,
+    notificationRef,
+    toggleNotifications,
+    setFilter,
+  } = useNotifications()
 
   return (
     <nav className="bg-white shadow-md">
@@ -42,9 +49,9 @@ export default function Navbar() {
                   />
                 </svg>
 
-                {notifications.length > 0 && (
+                {notifications.filter((n) => n.status === 'no leida').length > 0 && (
                   <span className="absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1 text-xs font-semibold text-white">
-                    {notifications.length}
+                    {notifications.filter((n) => n.status === 'no leida').length}
                   </span>
                 )}
               </button>
@@ -57,20 +64,77 @@ export default function Navbar() {
                     </h3>
                   </div>
 
+                  <div className="flex flex-wrap gap-2 border-b border-gray-100 px-4 py-3">
+                    <button
+                      type="button"
+                      onClick={() => setFilter('todas')}
+                      className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+                        filter === 'todas'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      Todas
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setFilter('leida')}
+                      className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+                        filter === 'leida'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      Leídas
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setFilter('no leida')}
+                      className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+                        filter === 'no leida'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      No leídas
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setFilter('archivada')}
+                      className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+                        filter === 'archivada'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      Archivadas
+                    </button>
+                  </div>
+
                   <div className="max-h-80 overflow-y-auto">
-                    {notifications.length === 0 ? (
+                    {filteredNotifications.length === 0 ? (
                       <p className="px-4 py-6 text-center text-sm text-gray-500">
                         No hay notificaciones
                       </p>
                     ) : (
-                      notifications.map((notification) => (
+                      filteredNotifications.map((notification) => (
                         <div
                           key={notification.id}
                           className="cursor-pointer border-b border-gray-100 px-4 py-3 transition hover:bg-gray-50"
                         >
-                          <p className="text-sm font-semibold text-gray-800">
-                            {notification.title}
-                          </p>
+                          <div className="flex items-center justify-between gap-3">
+                            <p className="text-sm font-semibold text-gray-800">
+                              {notification.title}
+                            </p>
+
+                            <span className="text-[10px] uppercase text-gray-400">
+                              {notification.status}
+                            </span>
+                          </div>
+
                           <p className="mt-1 text-sm text-gray-600">
                             {notification.description}
                           </p>

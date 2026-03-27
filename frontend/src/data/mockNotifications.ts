@@ -4,21 +4,25 @@ export const mockNotifications: NotificationItem[] = [
   {
     id: 1,
     title: 'Nueva solicitud',
-    description: 'Mensaje 1'
+    description: 'Tienes una nueva notificación.',
+    status: 'no leida'
   },
   {
     id: 2,
     title: 'Mensaje recibido',
-    description: 'Mensaje 2'
+    description: 'Revisa tu bandeja de entrada.',
+    status: 'leida'
   },
   {
     id: 3,
     title: 'Actualización',
-    description: 'Mensaje 3'
+    description: 'Tu perfil fue actualizado correctamente.',
+    status: 'no leida'
   },
   {
     id: 4,
-    title: 'Mensaje 4',
-    description: 'Mensaje 4'
+    title: 'Recordatorio',
+    description: 'Tienes una notificación pendiente.',
+    status: 'archivada'
   }
 ]
