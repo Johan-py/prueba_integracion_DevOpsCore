@@ -10,10 +10,16 @@ export const loginService = async ({
 }) => {
   const user = await findUser(email);
 
-  const trimmedPassword = password.trim();
-
   if (!user) {
     throw new Error("User not found");
+  }
+
+  const trimmedPassword = password.trim();
+
+  const isValidPassword = user.password === trimmedPassword;
+
+  if (!isValidPassword) {
+    throw new Error("Invalid Credentials");
   }
 
   const token = generateToken(user);
