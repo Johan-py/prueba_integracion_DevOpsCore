@@ -105,3 +105,21 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
   }
 }
+/* Commit 3: popup móvil */
+@media (max-width: 768px) {
+  .leaflet-popup-content-wrapper {
+    max-width: 220px;
+    border-radius: 12px;
+  }
+  .leaflet-popup-content {
+    margin: 10px 12px;
+    font-size: 13px;
+    line-height: 1.4;
+    word-break: break-word;
+  }
+  .leaflet-popup-tip {
+    width: 10px;
+    height: 10px;
+  }
+}
+
