@@ -6,7 +6,295 @@ datasource db {
   provider = "postgresql"
 }
 
-// ====================== ENUMS ======================
+model Rol {
+  id       Int       @id @default(autoincrement())
+  nombre   RolNombre @unique
+  usuarios Usuario[]
+
+  @@map("rol")
+}
+
+model Usuario {
+  id             Int            @id @default(autoincrement())
+  nombre         String
+  apellido       String
+  pais           String?
+  avatar         String?
+  genero         Genero?
+  direccion      String?
+  correo         String         @unique
+  password       String
+  activo         Boolean        @default(true)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  fechaRegistro  DateTime       @default(now())
+  rolId          Int
+  cambioEmails   CambioEmail[]
+  inmuebles      Inmueble[]
+  notificaciones Notificacion[]
+  perfil         Perfil?
+  publicaciones  Publicacion[]
+  sesiones       Sesion[]
+  telefonos      Telefono[]
+  rol            Rol            @relation(fields: [rolId], references: [id])
+  visitas        Visitor[]
+
+  @@index([correo])
+  @@map("usuario")
+}
+
+model Telefono {
+  numero     String
+  principal  Boolean @default(false)
+  codigoPais String
+  id         Int     @id @default(autoincrement())
+  usuarioId  Int
+  usuario    Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@map("telefono")
+}
+
+model Sesion {
+  token           String   @unique
+  estado          Boolean  @default(true)
+  fechaExpiracion DateTime
+  fechaInicio     DateTime @default(now())
+  id              Int      @id @default(autoincrement())
+  usuarioId       Int
+  usuario         Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@map("sesion")
+}
+
+model Notificacion {
+  titulo        String
+  mensaje       String
+  leida         Boolean   @default(false)
+  eliminada     Boolean   @default(false)
+  fechaCreacion DateTime  @default(now())
+  fechaLectura  DateTime?
+  id            Int       @id @default(autoincrement())
+  usuarioId     Int
+  usuario       Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@map("notificacion")
+}
+
+model CambioEmail {
+  id           Int       @id @default(autoincrement())
+  token        String    @unique
+  completadoEn DateTime?
+  creadoEn     DateTime  @default(now())
+  emailNuevo   String
+  expiraEn     DateTime
+  usuarioId    Int
+  usuario      Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@map("cambio_email")
+}
+
+model Perfil {
+  datos          Json?
+  id             Int     @id @default(autoincrement())
+  nombreCompleto String
+  usuarioId      Int     @unique
+  usuario        Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@map("perfil")
+}
+
+model Inmueble {
+  titulo           String
+  precio           Decimal            @db.Decimal(12, 2)
+  descripcion      String?
+  estado           EstadoInmueble     @default(ACTIVO)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  fechaPublicacion DateTime           @default(now())
+  id               Int                @id @default(autoincrement())
+  nroBanos         Int?
+  nroCuartos       Int?
+  propietarioId    Int
+  superficieM2     Decimal?           @db.Decimal(10, 2)
+  tipoAccion       TipoAccion
+  categoria        Categoria?
+  propietario      Usuario            @relation(fields: [propietarioId], references: [id], onDelete: Cascade)
+  etiquetas        InmuebleEtiqueta[]
+  marcadores       MarcadorMapa[]
+  publicaciones    Publicacion[]
+  ubicacion        UbicacionInmueble?
+
+  @@index([propietarioId])
+  @@map("inmueble")
+}
+
+model UbicacionInmueble {
+  id                 Int                @id @default(autoincrement())
+  latitud            Decimal            @db.Decimal(10, 7)
+  longitud           Decimal            @db.Decimal(10, 7)
+  direccion          String?
+  zona               String?
+  ciudad             String
+  inmuebleId         Int                @unique
+  ubicacionMaestraId Int?
+  marcadores         MarcadorMapa[]
+  inmueble           Inmueble           @relation(fields: [inmuebleId], references: [id], onDelete: Cascade)
+  ubicacion_maestra  ubicacion_maestra? @relation(fields: [ubicacionMaestraId], references: [id])
+
+  @@map("ubicacion_inmueble")
+}
+
+model Etiqueta {
+  nombre    String             @unique
+  id        Int                @id @default(autoincrement())
+  inmuebles InmuebleEtiqueta[]
+
+  @@map("etiqueta")
+}
+
+model InmuebleEtiqueta {
+  etiquetaId Int
+  inmuebleId Int
+  etiqueta   Etiqueta @relation(fields: [etiquetaId], references: [id], onDelete: Cascade)
+  inmueble   Inmueble @relation(fields: [inmuebleId], references: [id], onDelete: Cascade)
+
+  @@id([inmuebleId, etiquetaId])
+  @@map("inmueble_etiqueta")
+}
+
+model Publicacion {
+  id               Int               @id @default(autoincrement())
+  titulo           String
+  descripcion      String?
+  estado           EstadoPublicacion @default(ACTIVA)
+  fechaPublicacion DateTime          @default(now())
+  usuarioId        Int
+  inmuebleId       Int
+  multimedia       Multimedia[]
+  inmueble         Inmueble          @relation(fields: [inmuebleId], references: [id], onDelete: Cascade)
+  usuario          Usuario           @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@map("publicacion")
+}
+
+model Multimedia {
+  id            Int            @id @default(autoincrement())
+  url           String
+  tipo          TipoMultimedia
+  pesoMb        Decimal?       @db.Decimal(8, 2)
+  publicacionId Int
+  publicacion   Publicacion    @relation(fields: [publicacionId], references: [id], onDelete: Cascade)
+
+  @@map("multimedia")
+}
+
+model MarcadorMapa {
+  id            Int               @id @default(autoincrement())
+  tipo          TipoMarcador
+  esVisible     Boolean           @default(true)
+  nivelZ        Int?
+  inmuebleId    Int
+  ubicacionId   Int
+  grupos        DetalleGrupo[]
+  interacciones InteraccionMapa[]
+  inmueble      Inmueble          @relation(fields: [inmuebleId], references: [id], onDelete: Cascade)
+  ubicacion     UbicacionInmueble @relation(fields: [ubicacionId], references: [id], onDelete: Cascade)
+
+  @@map("marcador_mapa")
+}
+
+model GrupoMarcadores {
+  id                Int            @id @default(autoincrement())
+  latitudCentro     Decimal        @db.Decimal(10, 7)
+  longitudCentro    Decimal        @db.Decimal(10, 7)
+  cantidadInmuebles Int
+  nivelColor        String?
+  nivelZoom         Int
+  radioKm           Decimal?       @db.Decimal(10, 2)
+  actualizadoEn     DateTime       @updatedAt
+  marcadores        DetalleGrupo[]
+
+  @@map("grupo_marcadores")
+}
+
+model DetalleGrupo {
+  grupoId    Int
+  marcadorId Int
+  grupo      GrupoMarcadores @relation(fields: [grupoId], references: [id], onDelete: Cascade)
+  marcador   MarcadorMapa    @relation(fields: [marcadorId], references: [id], onDelete: Cascade)
+
+  @@id([grupoId, marcadorId])
+  @@map("detalle_grupo")
+}
+
+model SesionMapa {
+  id              Int               @id @default(autoincrement())
+  token           String            @unique
+  limiteNorte     Decimal?          @db.Decimal(10, 7)
+  limiteSur       Decimal?          @db.Decimal(10, 7)
+  limiteEste      Decimal?          @db.Decimal(10, 7)
+  limiteOeste     Decimal?          @db.Decimal(10, 7)
+  nivelZoom       Int
+  latitudCentro   Decimal?          @db.Decimal(10, 7)
+  longitudCentro  Decimal?          @db.Decimal(10, 7)
+  iniciadoEn      DateTime          @default(now())
+  ultimaActividad DateTime          @updatedAt
+  interacciones   InteraccionMapa[]
+
+  @@map("sesion_mapa")
+}
+
+model InteraccionMapa {
+  id              Int             @id @default(autoincrement())
+  tipo            TipoInteraccion
+  latitudMomento  Decimal?        @db.Decimal(10, 7)
+  longitudMomento Decimal?        @db.Decimal(10, 7)
+  zoomMomento     Int?
+  ocurrioEn       DateTime        @default(now())
+  sesionId        Int
+  marcadorId      Int
+  marcador        MarcadorMapa    @relation(fields: [marcadorId], references: [id], onDelete: Cascade)
+  sesion          SesionMapa      @relation(fields: [sesionId], references: [id], onDelete: Cascade)
+
+  @@map("interaccion_mapa")
+}
+
+model BannerHome {
+  id            Int      @id @default(autoincrement())
+  activo        Boolean  @default(true)
+  subtitulo     String?
+  fechaCreacion DateTime @default(now())
+  orden         Int
+  titulo        String?
+  urlImagen     String
+
+  @@map("banner_home")
+}
+
+model Visitor {
+  id          Int      @id @default(autoincrement())
+  fechaVisita DateTime @default(now())
+  ip          String
+  metaData    Json?
+  usuarioId   Int?
+  usuario     Usuario? @relation(fields: [usuarioId], references: [id])
+
+  @@map("visitor")
+}
+
+model ubicacion_maestra {
+  id                 Int                 @id @default(autoincrement())
+  departamento       String
+  provincia          String?
+  municipio          String?
+  nombre             String
+  latitud            Decimal             @db.Decimal(10, 7)
+  longitud           Decimal             @db.Decimal(10, 7)
+  popularidad        Int                 @default(0)
+  ubicacion_inmueble UbicacionInmueble[]
+
+  @@index([nombre])
+}
 
 enum Genero {
   MASCULINO
@@ -44,8 +332,8 @@ enum Categoria {
 enum RolNombre {
   ADMIN
   PROPIETARIO
-  AGENTE
   VISITANTE
+  AGENTE
 }
 
 enum TipoMultimedia {
@@ -64,333 +352,4 @@ enum TipoInteraccion {
   HOVER
   ZOOM
   DRAG
-}
-
-// ====================== USUARIOS ======================
-
-model Rol {
-  id        Int       @id @default(autoincrement())
-  nombre    RolNombre @unique
-
-  usuarios  Usuario[]
-
-  @@map("rol")
-}
-
-model Usuario {
-  id              Int      @id @default(autoincrement())
-  nombre          String
-  apellido        String
-  correo          String   @unique
-  password        String
-  pais            String?
-  avatar          String?
-  genero          Genero?
-  direccion       String?
-  activo          Boolean  @default(true)
-  fechaRegistro   DateTime @default(now())
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  rolId           Int
-  rol             Rol      @relation(fields: [rolId], references: [id])
-
-  telefonos       Telefono[]
-  sesiones        Sesion[]
-  notificaciones  Notificacion[]
-  cambioEmails    CambioEmail[]
-  inmuebles       Inmueble[]
-  perfil          Perfil?
-  publicaciones   Publicacion[]
-  visitas         Visitor[]
-
-  @@index([correo])
-  @@map("usuario")
-}
-
-// ====================== RELACIONADOS ======================
-
-model Telefono {
-  id          Int     @id @default(autoincrement())
-  codigoPais  String
-  numero      String
-  principal   Boolean @default(false)
-
-  usuarioId   Int
-  usuario     Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-
-  @@map("telefono")
-}
-
-model Sesion {
-  id               Int      @id @default(autoincrement())
-  token            String   @unique
-  fechaInicio      DateTime @default(now())
-  fechaExpiracion  DateTime
-  estado           Boolean  @default(true)
-
-  usuarioId        Int
-  usuario          Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-
-  @@map("sesion")
-}
-
-model Notificacion {
-  id              Int      @id @default(autoincrement())
-  titulo          String
-  mensaje         String
-  leida           Boolean  @default(false)
-  fechaCreacion   DateTime @default(now())
-  fechaLectura    DateTime?
-  eliminada       Boolean  @default(false)
-
-  usuarioId       Int
-  usuario         Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-
-  @@map("notificacion")
-}
-
-model CambioEmail {
-  id             Int      @id @default(autoincrement())
-  emailNuevo     String
-  token          String   @unique
-  expiraEn       DateTime
-  creadoEn       DateTime @default(now())
-  completadoEn   DateTime?
-
-  usuarioId      Int
-  usuario        Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-
-  @@map("cambio_email")
-}
-
-// ====================== PERFIL (1:1) ======================
-
-model Perfil {
-  id             Int   @id @default(autoincrement())
-  nombreCompleto String
-  datos          Json?
-
-  usuarioId      Int   @unique
-  usuario        Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-
-  @@map("perfil")
-}
-
-// ====================== INMUEBLES ======================
-
-model Inmueble {
-  id                Int            @id @default(autoincrement())
-  titulo            String
-  tipoAccion        TipoAccion
-  categoria         Categoria?
-  precio            Decimal        @db.Decimal(12, 2)
-  superficieM2      Decimal?       @db.Decimal(10, 2)
-  nroCuartos        Int?
-  nroBanos          Int?
-  descripcion       String?
-  estado            EstadoInmueble @default(ACTIVO)
-  fechaPublicacion  DateTime       @default(now())
-
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-
-  propietarioId     Int
-  propietario       Usuario @relation(fields: [propietarioId], references: [id], onDelete: Cascade)
-
-  ubicacion         UbicacionInmueble?
-  publicaciones     Publicacion[]
-  etiquetas         InmuebleEtiqueta[]
-  marcadores        MarcadorMapa[]
-
-  @@index([propietarioId])
-  @@map("inmueble")
-}
-
-// ====================== UBICACION NORMALIZADA ======================
-
-model UbicacionInmueble {
-  id           Int      @id @default(autoincrement())
-  latitud      Decimal  @db.Decimal(10, 7)
-  longitud     Decimal  @db.Decimal(10, 7)
-  direccion    String?
-  zona         String?
-  ciudad       String
-
-  inmuebleId   Int   @unique
-  inmueble     Inmueble @relation(fields: [inmuebleId], references: [id], onDelete: Cascade)
-
-  marcadores   MarcadorMapa[]
-
-  @@map("ubicacion_inmueble")
-}
-
-// ====================== ETIQUETAS ======================
-
-model Etiqueta {
-  id        Int    @id @default(autoincrement())
-  nombre    String @unique
-
-  inmuebles InmuebleEtiqueta[]
-
-  @@map("etiqueta")
-}
-
-model InmuebleEtiqueta {
-  inmuebleId Int
-  etiquetaId Int
-
-  inmueble   Inmueble @relation(fields: [inmuebleId], references: [id], onDelete: Cascade)
-  etiqueta   Etiqueta @relation(fields: [etiquetaId], references: [id], onDelete: Cascade)
-
-  @@id([inmuebleId, etiquetaId])
-  @@map("inmueble_etiqueta")
-}
-
-// ====================== PUBLICACIONES ======================
-
-model Publicacion {
-  id               Int      @id @default(autoincrement())
-  titulo           String
-  descripcion      String?
-  estado           EstadoPublicacion @default(ACTIVA)
-  fechaPublicacion DateTime @default(now())
-
-  usuarioId        Int
-  inmuebleId       Int
-
-  usuario          Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  inmueble         Inmueble @relation(fields: [inmuebleId], references: [id], onDelete: Cascade)
-
-  multimedia       Multimedia[]
-
-  @@map("publicacion")
-}
-
-model Multimedia {
-  id            Int    @id @default(autoincrement())
-  url           String
-  tipo          TipoMultimedia
-  pesoMb        Decimal? @db.Decimal(8,2)
-
-  publicacionId Int
-  publicacion   Publicacion @relation(fields: [publicacionId], references: [id], onDelete: Cascade)
-
-  @@map("multimedia")
-}
-
-// ====================== MAPA ======================
-
-model MarcadorMapa {
-  id            Int    @id @default(autoincrement())
-  tipo          TipoMarcador
-  esVisible     Boolean @default(true)
-  nivelZ        Int?
-
-  inmuebleId    Int
-  ubicacionId   Int
-
-  inmueble      Inmueble @relation(fields: [inmuebleId], references: [id], onDelete: Cascade)
-  ubicacion     UbicacionInmueble @relation(fields: [ubicacionId], references: [id], onDelete: Cascade)
-
-  interacciones InteraccionMapa[]
-  grupos        DetalleGrupo[]
-
-  @@map("marcador_mapa")
-}
-
-model GrupoMarcadores {
-  id                Int      @id @default(autoincrement())
-  latitudCentro     Decimal  @db.Decimal(10, 7)
-  longitudCentro    Decimal  @db.Decimal(10, 7)
-  cantidadInmuebles Int
-  nivelColor        String?
-  nivelZoom         Int
-  radioKm           Decimal? @db.Decimal(10,2)
-
-  actualizadoEn     DateTime @updatedAt
-
-  marcadores        DetalleGrupo[]
-
-  @@map("grupo_marcadores")
-}
-
-model DetalleGrupo {
-  grupoId     Int
-  marcadorId  Int
-
-  grupo       GrupoMarcadores @relation(fields: [grupoId], references: [id], onDelete: Cascade)
-  marcador    MarcadorMapa    @relation(fields: [marcadorId], references: [id], onDelete: Cascade)
-
-  @@id([grupoId, marcadorId])
-  @@map("detalle_grupo")
-}
-
-// ====================== SESION MAPA ======================
-
-model SesionMapa {
-  id               Int      @id @default(autoincrement())
-  token            String   @unique
-
-  limiteNorte      Decimal? @db.Decimal(10,7)
-  limiteSur        Decimal? @db.Decimal(10,7)
-  limiteEste       Decimal? @db.Decimal(10,7)
-  limiteOeste      Decimal? @db.Decimal(10,7)
-
-  nivelZoom        Int
-  latitudCentro    Decimal? @db.Decimal(10,7)
-  longitudCentro   Decimal? @db.Decimal(10,7)
-
-  iniciadoEn       DateTime @default(now())
-  ultimaActividad  DateTime @updatedAt
-
-  interacciones    InteraccionMapa[]
-
-  @@map("sesion_mapa")
-}
-
-model InteraccionMapa {
-  id               Int      @id @default(autoincrement())
-  tipo             TipoInteraccion
-
-  latitudMomento   Decimal? @db.Decimal(10,7)
-  longitudMomento  Decimal? @db.Decimal(10,7)
-  zoomMomento      Int?
-
-  ocurrioEn        DateTime @default(now())
-
-  sesionId         Int
-  marcadorId       Int
-
-  sesion           SesionMapa   @relation(fields: [sesionId], references: [id], onDelete: Cascade)
-  marcador         MarcadorMapa @relation(fields: [marcadorId], references: [id], onDelete: Cascade)
-
-  @@map("interaccion_mapa")
-}
-
-// ====================== HOMEPAGE ======================
-
-model BannerHome {
-  id              Int      @id @default(autoincrement())
-  urlImagen       String
-  orden           Int
-  activo          Boolean  @default(true)
-  fechaCreacion   DateTime @default(now())
-  titulo          String?
-  subtitulo       String?
-
-  @@map("banner_home")
-}
-
-model Visitor {
-  id            Int      @id @default(autoincrement())
-  ip            String
-  metaData      Json?
-  fechaVisita   DateTime @default(now())
-
-  usuarioId     Int?
-  usuario       Usuario? @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
-
-  @@map("visitor")
 }
