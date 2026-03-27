@@ -54,9 +54,6 @@ export default function LoginForm() {
     console.log('Correo original:', `"${email}"`)
     console.log('Correo sin espacios al inicio/final:', `"${trimmedEmail}"`)
     console.log('Password:', password)
-
-    // Aquí después puedes enviar al backend usando trimmedEmail
-    // login({ email: trimmedEmail, password })
   }
 
   return (
@@ -146,8 +143,15 @@ export default function LoginForm() {
       </form>
 
       <p className="mt-4 text-center text-sm text-gray-600">
+        ¿No tienes una cuenta?
+      </p>
+
+      <p className="mt-4 text-center text-sm text-gray-600">
         ¿No tienes una cuenta?{' '}
-        <Link href="/register" className="font-semibold text-orange-500 hover:underline">
+        <Link
+          href="/sign-up"
+          className="font-semibold text-orange-500 hover:underline"
+        >
           Regístrate
         </Link>
       </p>
