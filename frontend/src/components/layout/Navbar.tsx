@@ -12,7 +12,8 @@ export default function Navbar() {
     notificationRef,
     toggleNotifications,
     setFilter,
-    markAsRead
+    markAsRead,
+    archiveNotification
   } = useNotifications()
 
   return (
@@ -138,6 +139,20 @@ export default function Navbar() {
                           </div>
 
                           <p className="mt-1 text-sm text-gray-600">{notification.description}</p>
+                          {notification.status !== 'archivada' && (
+                            <div className="mt-2 flex justify-end">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  archiveNotification(notification.id)
+                                }}
+                                className="text-xs text-gray-400 hover:text-gray-600 transition"
+                              >
+                                Archivar
+                              </button>
+                            </div>
+                          )}
                         </div>
                       ))
                     )}

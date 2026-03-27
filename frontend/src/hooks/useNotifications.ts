@@ -20,6 +20,11 @@ export function useNotifications() {
   const markAsRead = (id: number) => {
     setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, status: 'leida' } : n)))
   }
+
+  const archiveNotification = (id: number) => {
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, status: 'archivada' } : n)))
+  }
+
   const filteredNotifications = useMemo(() => {
     if (filter === 'todas') {
       return notifications
@@ -50,6 +55,7 @@ export function useNotifications() {
     notificationRef,
     toggleNotifications,
     setFilter,
-    markAsRead
+    markAsRead,
+    archiveNotification
   }
 }
