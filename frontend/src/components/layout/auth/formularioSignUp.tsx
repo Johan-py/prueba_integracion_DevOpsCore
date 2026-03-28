@@ -46,7 +46,7 @@ export default function SignUpForm() {
   const [serverMessage, setServerMessage] = useState('')
   const [serverError, setServerError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-
+  
   const handleChange =
     (field: keyof FormData) => (event: React.ChangeEvent<HTMLInputElement>) => {
       const rawValue = event.target.value
@@ -230,6 +230,8 @@ if (field === 'phone') {
   setServerMessage('')
   setServerError('')
 
+  if (isSubmitting) return
+
   const emailError = validateEmail(formData.email)
 
   const firstNameError =
@@ -301,41 +303,45 @@ if (field === 'phone') {
     password: formData.password.trim(),
     confirmPassword: formData.confirmPassword.trim()
   }
+   
+  setIsSubmitting(true)
+
+try {
+  const response = await fetch(`${API_URL}/api/auth/register`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  })
+
+  let data: any = null
 
   try {
-    const response = await fetch(`${API_URL}/api/auth/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    })
-
-    let data: any = null
-
-    try {
-      data = await response.json()
-    } catch {
-      data = null
-    }
-
-    if (!response.ok) {
-      throw new Error(data?.message || 'No se pudo completar el registro')
-    }
-
-    setServerMessage(data?.message || 'Usuario registrado correctamente')
-    console.log('Registro exitoso:', data)
-  } catch (error) {
-    const message =
-  error instanceof TypeError
-       ? 'No hay conexión a internet o no se pudo conectar con el servidor'
-       : error instanceof Error
-       ? error.message
-       : 'No se pudo completar el registro'
-
-       setServerError(message)
-       console.error('Error al registrar:', error)
+    data = await response.json()
+  } catch {
+    data = null
   }
+
+  if (!response.ok) {
+    throw new Error(data?.message || 'No se pudo completar el registro')
+  }
+
+  setServerMessage(data?.message || 'Usuario registrado correctamente')
+  console.log('Registro exitoso:', data)
+} catch (error) {
+  const message =
+    error instanceof TypeError
+      ? 'No hay conexión a internet o no se pudo conectar con el servidor'
+      : error instanceof Error
+        ? error.message
+        : 'No se pudo completar el registro'
+
+  setServerError(message)
+  console.error('Error al registrar:', error)
+} finally {
+  setIsSubmitting(false)
+}
 }
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -551,12 +557,16 @@ if (field === 'phone') {
       </div>
 
       <button
-        type="submit"
-        disabled={!isFormValid}
-        className="w-full rounded-md bg-orange-400 px-4 py-3 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        Registrarse
-      </button>
+         type="submit"
+         disabled={!isFormValid || isSubmitting}
+         className={`w-1/2 rounded-md px-4 py-3 font-semibold text-white transition ${
+         isFormValid && !isSubmitting
+         ? 'bg-orange-500 hover:bg-orange-600'
+         : 'cursor-not-allowed bg-slate-300'
+          }`}
+        >
+         {isSubmitting ? 'Registrando...' : 'Registrarse'}
+       </button>
 
       <button
         type="button"
