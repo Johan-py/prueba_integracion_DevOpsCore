@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react'; // Este es el "nosequé" que faltaba importar
 import { ArrowDownUp, Filter } from 'lucide-react';
 import { useFilterLogic } from '@/hooks/useFilterLogic'; // Ajusta la ruta según tu carpeta
 
@@ -29,18 +30,24 @@ const DUMMY_TYPES = [
 
 export default function FilterPanel() {
   // 1. Usamos el Hook pasando los datos iniciales
-  const { 
-    sortOrder, 
-    toggleSort, 
-    handleSeeMore, 
-    getVisibleData,
-    viewLevel 
-  } = useFilterLogic(DUMMY_RENTALS);
+const [limitRentals, setLimitRentals] = useState(3);
+const [limitSales, setLimitSales] = useState(3);
+const [limitTypes, setLimitTypes] = useState(3);
+const [sortOrder, setSortOrder] = useState<'none' | 'asc' | 'desc'>('none');
 
+const toggleSort = () => setSortOrder(prev => prev === 'none' ? 'asc' : prev === 'asc' ? 'desc' : 'none');
+
+// Función auxiliar de ordenamiento (Estándar: 1 responsabilidad [cite: 74])
+const sortData = (data: { name: string, count: number }[]) => {
+  if (sortOrder === 'none') return data;
+  return [...data].sort((a, b) => 
+    sortOrder === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
+  );
+};
   // 2. Obtenemos solo los datos que deben ser visibles para cada sección
-  const visibleRentals = getVisibleData(DUMMY_RENTALS);
-  const visibleSales = getVisibleData(DUMMY_SALES);
-  const visibleTypes = getVisibleData(DUMMY_TYPES);
+const visibleRentals = sortData(DUMMY_RENTALS).slice(0, limitRentals);
+const visibleSales = sortData(DUMMY_SALES).slice(0, limitSales);
+const visibleTypes = sortData(DUMMY_TYPES).slice(0, limitTypes);
 
   return (
     <aside className="w-full md:w-80 bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
@@ -79,13 +86,19 @@ export default function FilterPanel() {
               <span className="text-gray-400">{city.count} casas</span>
             </div>
           ))}
-
-          {viewLevel < 3 && (
+{limitRentals < DUMMY_RENTALS.length ? (
             <button 
-              onClick={handleSeeMore}
+              onClick={() => setLimitRentals(DUMMY_RENTALS.length)}
               className="text-sm text-orange-400 hover:text-orange-600 font-medium mt-1 w-fit transition-colors underline"
             >
               Ver más {'>'}
+            </button>
+          ) : (
+            <button 
+              onClick={() => setLimitRentals(3)}
+              className="text-sm text-orange-400 hover:text-orange-600 font-medium mt-1 w-fit transition-colors underline"
+            >
+              {'<'} Ver menos
             </button>
           )}
         </div>
@@ -107,14 +120,21 @@ export default function FilterPanel() {
             </div>
           ))}
 
-          {viewLevel < 3 && visibleSales.length < DUMMY_SALES.length && (
-            <button 
-              onClick={handleSeeMore}
-              className="text-sm text-orange-400 hover:text-orange-600 font-medium mt-1 w-fit transition-colors underline"
-            >
-              Ver más {'>'}
-            </button>
-          )}
+          {limitSales < DUMMY_SALES.length ? (
+  <button 
+    onClick={() => setLimitSales(DUMMY_SALES.length)}
+    className="text-sm text-orange-400 hover:text-orange-600 font-medium mt-1 w-fit transition-colors underline"
+  >
+    Ver más {'>'}
+  </button>
+) : (
+  <button 
+    onClick={() => setLimitSales(3)}
+    className="text-sm text-orange-400 hover:text-orange-600 font-medium mt-1 w-fit transition-colors underline"
+  >
+    {'<'} Ver menos
+  </button>
+)}
         </div>
       </section>
 
@@ -133,15 +153,21 @@ export default function FilterPanel() {
               <span className="text-gray-400">{type.count} propiedades</span>
             </div>
           ))}
-
-          {viewLevel < 3 && visibleTypes.length < DUMMY_TYPES.length && (
-            <button 
-              onClick={handleSeeMore}
-              className="text-sm text-orange-400 hover:text-orange-600 font-medium mt-1 w-fit transition-colors underline"
-            >
-              Ver más {'>'}
-            </button>
-          )}
+{limitTypes < DUMMY_TYPES.length ? (
+  <button 
+    onClick={() => setLimitTypes(DUMMY_TYPES.length)}
+    className="text-sm text-orange-400 hover:text-orange-600 font-medium mt-1 w-fit transition-colors underline"
+  >
+    Ver más {'>'}
+  </button>
+) : (
+  <button 
+    onClick={() => setLimitTypes(3)}
+    className="text-sm text-orange-400 hover:text-orange-600 font-medium mt-1 w-fit transition-colors underline"
+  >
+    {'<'} Ver menos
+  </button>
+)}
         </div>
       </section>
     
