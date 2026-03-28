@@ -1,17 +1,18 @@
 import {
+  ALLOWED_YOUTUBE_HOSTS,
+  MAX_VIDEOS_PER_PUBLICATION,
+  MULTIMEDIA_TYPES
+} from './multimedia.constants.js'
+import {
+  countMultimediaByPublicationIdAndTypeRepository,
   createMultimediaRepository,
-  findPublicationById,
-  getMultimediaByPublicationId,
-  countMultimediaByPublicationIdAndType
+  findPublicationByIdRepository,
+  getMultimediaByPublicationIdRepository
 } from './multimedia.repository.js'
-
-const MULTIMEDIA_TYPES = {
-  IMAGE: 1,
-  VIDEO: 2
-}
-
-const MAX_VIDEOS_PER_PUBLICATION = 2
-const ALLOWED_YOUTUBE_HOSTS = ['youtube.com', 'www.youtube.com', 'youtu.be']
+import {
+  GetPublicationMultimediaInput,
+  RegisterVideoLinkInput
+} from './multimedia.types.js'
 
 const isValidYoutubeUrl = (videoUrl: string): boolean => {
   try {
@@ -39,24 +40,29 @@ const isValidYoutubeUrl = (videoUrl: string): boolean => {
   }
 }
 
-export const getPublicationMultimediaService = async ({
-  id_publicacion,
-  usuario_id
-}: {
-  id_publicacion: number
-  usuario_id: number
-}) => {
-  const publication = await findPublicationById(id_publicacion)
+const validatePublicationOwnership = async (
+  publicacionId: number,
+  usuarioId: number
+) => {
+  const publication = await findPublicationByIdRepository(publicacionId)
 
   if (!publication) {
     throw new Error('La publicación no existe')
   }
 
-  if (publication.usuario_id !== usuario_id) {
+  if (publication.usuarioId !== usuarioId) {
     throw new Error('La publicación no pertenece al usuario autenticado')
   }
 
-  const multimedia = await getMultimediaByPublicationId(id_publicacion)
+  return publication
+}
+
+export const getPublicationMultimediaService = async ({
+  publicacionId,
+  usuarioId
+}: GetPublicationMultimediaInput) => {
+  const publication = await validatePublicationOwnership(publicacionId, usuarioId)
+  const multimedia = await getMultimediaByPublicationIdRepository(publicacionId)
 
   return {
     publication,
@@ -65,25 +71,13 @@ export const getPublicationMultimediaService = async ({
 }
 
 export const registerVideoLinkService = async ({
-  id_publicacion,
-  usuario_id,
+  publicacionId,
+  usuarioId,
   videoUrl
-}: {
-  id_publicacion: number
-  usuario_id: number
-  videoUrl: string
-}) => {
-  const publication = await findPublicationById(id_publicacion)
+}: RegisterVideoLinkInput) => {
+  const publication = await validatePublicationOwnership(publicacionId, usuarioId)
 
-  if (!publication) {
-    throw new Error('La publicación no existe')
-  }
-
-  if (publication.usuario_id !== usuario_id) {
-    throw new Error('La publicación no pertenece al usuario autenticado')
-  }
-
-  const normalizedVideoUrl = videoUrl?.trim()
+  const normalizedVideoUrl = videoUrl.trim()
 
   if (!normalizedVideoUrl) {
     throw new Error('El enlace de video es obligatorio')
@@ -93,8 +87,8 @@ export const registerVideoLinkService = async ({
     throw new Error('Enlace de video no válido')
   }
 
-  const totalVideos = await countMultimediaByPublicationIdAndType(
-    id_publicacion,
+  const totalVideos = await countMultimediaByPublicationIdAndTypeRepository(
+    publicacionId,
     MULTIMEDIA_TYPES.VIDEO
   )
 
@@ -103,11 +97,10 @@ export const registerVideoLinkService = async ({
   }
 
   const newVideo = await createMultimediaRepository({
-    id_publicacion,
-    id_tipo: MULTIMEDIA_TYPES.VIDEO,
+    publicacionId,
+    tipo: MULTIMEDIA_TYPES.VIDEO,
     url: normalizedVideoUrl,
-    formato: 'youtube',
-    peso_mb: 0
+    pesoMb: null
   })
 
   return {

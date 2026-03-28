@@ -1,62 +1,44 @@
-export type MultimediaRecord = {
-  id_multimedia: number
-  id_publicacion: number
-  id_tipo: number
-  url: string
-  formato: string
-  peso_mb: number
-}
-
-type PublicacionRecord = {
-  id_publicacion: number
-  usuario_id: number
-  titulo: string
-}
+import { MultimediaRecord, MultimediaType, PublicacionRecord } from './multimedia.types.js'
 
 const publicacionesMock: PublicacionRecord[] = [
-  { id_publicacion: 1, usuario_id: 1, titulo: 'Casa en venta' },
-  { id_publicacion: 2, usuario_id: 2, titulo: 'Departamento céntrico' }
+  { id: 1, usuarioId: 1, titulo: 'Casa en venta' },
+  { id: 2, usuarioId: 2, titulo: 'Departamento céntrico' }
 ]
 
 const multimediaTable: MultimediaRecord[] = [
   {
-    id_multimedia: 1,
-    id_publicacion: 1,
-    id_tipo: 1,
+    id: 1,
+    publicacionId: 1,
+    tipo: 'IMAGEN',
     url: 'https://example.com/portada.jpg',
-    formato: 'jpg',
-    peso_mb: 2.4
+    pesoMb: 2.4
   }
 ]
 
-export const findPublicationById = async (id_publicacion: number) => {
-  return publicacionesMock.find(
-    (publicacion) => publicacion.id_publicacion === id_publicacion
-  )
+export const findPublicationByIdRepository = async (publicacionId: number) => {
+  return publicacionesMock.find((publication) => publication.id === publicacionId)
 }
 
-export const getMultimediaByPublicationId = async (id_publicacion: number) => {
-  return multimediaTable.filter(
-    (multimedia) => multimedia.id_publicacion === id_publicacion
-  )
+export const getMultimediaByPublicationIdRepository = async (publicacionId: number) => {
+  return multimediaTable.filter((multimedia) => multimedia.publicacionId === publicacionId)
 }
 
-export const countMultimediaByPublicationIdAndType = async (
-  id_publicacion: number,
-  id_tipo: number
+export const countMultimediaByPublicationIdAndTypeRepository = async (
+  publicacionId: number,
+  tipo: MultimediaType
 ) => {
   return multimediaTable.filter(
     (multimedia) =>
-      multimedia.id_publicacion === id_publicacion &&
-      multimedia.id_tipo === id_tipo
+      multimedia.publicacionId === publicacionId &&
+      multimedia.tipo === tipo
   ).length
 }
 
 export const createMultimediaRepository = async (
-  data: Omit<MultimediaRecord, 'id_multimedia'>
+  data: Omit<MultimediaRecord, 'id'>
 ) => {
   const newRecord: MultimediaRecord = {
-    id_multimedia: multimediaTable.length + 1,
+    id: multimediaTable.length + 1,
     ...data
   }
 
