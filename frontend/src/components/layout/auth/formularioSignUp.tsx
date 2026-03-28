@@ -85,15 +85,31 @@ export default function SignUpForm() {
       }
 
       if (field === 'phone') {
-        const onlyNumbersRegex = /^[0-9]*$/
+  const onlyNumbersRegex = /^[0-9]*$/
 
-        setErrors((prev) => ({
-          ...prev,
-          phone: onlyNumbersRegex.test(value)
-            ? undefined
-            : 'El teléfono solo permite números'
-        }))
-      }
+  setErrors((prev) => ({
+    ...prev,
+    phone:
+      value.trim() === ''
+        ? 'El campo no puede estar vacío'
+        : onlyNumbersRegex.test(value)
+          ? undefined
+          : 'El teléfono solo permite números'
+  }))
+}
+      if (field === 'firstName') {
+  setErrors((prev) => ({
+    ...prev,
+    firstName: value.trim() === '' ? 'El campo no puede estar vacío' : undefined
+  }))
+}
+
+if (field === 'lastName') {
+  setErrors((prev) => ({
+    ...prev,
+    lastName: value.trim() === '' ? 'El campo no puede estar vacío' : undefined
+  }))
+}
     }
 
   const handleBlur = (field: keyof FormData) => () => {
@@ -140,6 +156,38 @@ export default function SignUpForm() {
           : 'El teléfono solo permite números'
       }))
     }
+    if (field === 'firstName') {
+  setErrors((prev) => ({
+    ...prev,
+    firstName:
+      formData.firstName.trim() === ''
+        ? 'El campo no puede estar vacío'
+        : undefined
+  }))
+}
+
+if (field === 'lastName') {
+  setErrors((prev) => ({
+    ...prev,
+    lastName:
+      formData.lastName.trim() === ''
+        ? 'El campo no puede estar vacío'
+        : undefined
+  }))
+ }
+ if (field === 'phone') {
+  const onlyNumbersRegex = /^[0-9]*$/
+
+  setErrors((prev) => ({
+    ...prev,
+    phone:
+      formData.phone.trim() === ''
+        ? 'El campo no puede estar vacío'
+        : onlyNumbersRegex.test(formData.phone)
+          ? undefined
+          : 'El teléfono solo permite números'
+  }))
+}
   }
 
   const handleCancel = () => {
@@ -170,54 +218,68 @@ export default function SignUpForm() {
   }, [formData, errors.phone])
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
+  event.preventDefault()
 
-    const emailError = validateEmail(formData.email)
-    const passwordError = validatePassword(formData.password)
-    const confirmPasswordError =
-      formData.confirmPassword !== formData.password
+  const emailError = validateEmail(formData.email)
+
+  const firstNameError =
+    formData.firstName.trim() === '' ? 'El campo no puede estar vacío' : undefined
+
+  const lastNameError =
+    formData.lastName.trim() === '' ? 'El campo no puede estar vacío' : undefined
+
+  const passwordError = validatePassword(formData.password)
+
+  const confirmPasswordError =
+    formData.confirmPassword.trim() === ''
+      ? 'El campo no puede estar vacío'
+      : formData.confirmPassword !== formData.password
         ? 'Las contraseñas no coinciden'
         : undefined
-    const onlyNumbersRegex = /^[0-9]*$/
-    const phoneError = onlyNumbersRegex.test(formData.phone)
-      ? undefined
-      : 'El teléfono solo permite números'
 
-    const newErrors: FormErrors = {
+  const onlyNumbersRegex = /^[0-9]*$/
+  const phoneError =
+    formData.phone.trim() === ''
+      ? 'El campo no puede estar vacío'
+      : onlyNumbersRegex.test(formData.phone)
+        ? undefined
+        : 'El teléfono solo permite números'
+
+  const newErrors: FormErrors = {
       email: emailError || undefined,
+      firstName: firstNameError,
+      lastName: lastNameError,
+      phone: phoneError,
       password: passwordError || undefined,
-      confirmPassword: confirmPasswordError || undefined,
-      phone: phoneError
+      confirmPassword: confirmPasswordError || undefined
     }
 
-    setErrors(newErrors)
-    setTouched((prev) => ({
-      ...prev,
-      email: true,
-      firstName: true,
-      lastName: true,
-      phone: true,
-      password: true,
-      confirmPassword: true
-    }))
+     setErrors(newErrors)
+     setTouched({
+       email: true,
+       firstName: true,
+       lastName: true,
+       phone: true,
+       password: true,
+       confirmPassword: true
+       })
 
-    if (
-      emailError ||
-      passwordError ||
-      confirmPasswordError ||
-      phoneError ||
-      formData.firstName.trim() === '' ||
-      formData.lastName.trim() === '' ||
-      formData.phone.trim() === ''
-    ) {
-      return
-    }
+       if (
+        emailError ||
+        firstNameError ||
+        lastNameError ||
+        passwordError ||
+        confirmPasswordError ||
+        phoneError
+       ) {
+        return
+       }
 
-    console.log('Formulario listo para enviar', {
-      ...formData,
-      email: formData.email.trim()
-    })
-  }
+       console.log('Formulario listo para enviar', {
+         ...formData,
+         email: formData.email.trim()
+          })
+          }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -283,17 +345,29 @@ export default function SignUpForm() {
         >
           Apellido
         </label>
-        <input
-          id="lastName"
-          name="lastName"
-          type="text"
-          value={formData.lastName}
-          onChange={handleChange('lastName')}
-          onBlur={handleBlur('lastName')}
-          placeholder="Ingresa tu apellido"
-          className="w-full rounded-md border border-slate-300 px-4 py-3 outline-none focus:border-orange-400"
-        />
-      </div>
+       <input
+       id="lastName"
+       name="lastName"
+       type="text"
+       value={formData.lastName}
+       onChange={handleChange('lastName')}
+       onBlur={handleBlur('lastName')}
+       placeholder="Ingresa tu apellido"
+       className={`w-full rounded-md border px-4 py-3 outline-none transition ${
+       touched.lastName && errors.lastName
+       ? 'border-red-500'
+       : 'border-slate-300 focus:border-orange-400'
+        }`}
+        aria-invalid={Boolean(touched.lastName && errors.lastName)}
+        aria-describedby="lastName-error"
+       />
+
+     {touched.lastName && errors.lastName ? (
+     <p id="lastName-error" className="mt-1 text-sm text-red-600">
+     {errors.lastName}
+     </p>
+     ) : null}
+    </div>
 
       <div>
         <label
@@ -302,19 +376,28 @@ export default function SignUpForm() {
         >
           Teléfono
         </label>
-        <input
-          id="phone"
-          name="phone"
-          type="text"
-          value={formData.phone}
-          onChange={handleChange('phone')}
-          onBlur={handleBlur('phone')}
-          placeholder="Ingresa tu teléfono"
-          className="w-full rounded-md border border-slate-300 px-4 py-3 outline-none focus:border-orange-400"
-        />
-        {touched.phone && errors.phone ? (
-          <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
-        ) : null}
+       <input
+       id="phone"
+       name="phone"
+       type="text"
+       value={formData.phone}
+       onChange={handleChange('phone')}
+       onBlur={handleBlur('phone')}
+       placeholder="Ingresa tu teléfono"
+       className={`w-full rounded-md border px-4 py-3 outline-none transition ${
+       touched.phone && errors.phone
+      ? 'border-red-500'
+      : 'border-slate-300 focus:border-orange-400'
+      }`}
+      aria-invalid={Boolean(touched.phone && errors.phone)}
+      aria-describedby="phone-error"
+     />
+
+{touched.phone && errors.phone ? (
+  <p id="phone-error" className="mt-1 text-sm text-red-600">
+    {errors.phone}
+  </p>
+) : null}
       </div>
 
       <div>
