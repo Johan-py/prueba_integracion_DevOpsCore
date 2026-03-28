@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { validateEmail, validatePassword } from '@/lib/validators/auth'
@@ -38,6 +39,8 @@ export default function SignUpForm() {
   const [formData, setFormData] = useState<FormData>(initialFormData)
   const [errors, setErrors] = useState<FormErrors>({})
   const [touched, setTouched] = useState<Record<string, boolean>>({})
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const handleChange =
     (field: keyof FormData) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,7 +66,11 @@ export default function SignUpForm() {
 
         setErrors((prev) => ({
           ...prev,
-          password: passwordError || undefined
+          password: passwordError || undefined,
+          confirmPassword:
+            formData.confirmPassword && formData.confirmPassword !== value
+              ? 'Las contraseñas no coinciden'
+              : undefined
         }))
       }
 
@@ -139,6 +146,8 @@ export default function SignUpForm() {
     setFormData(initialFormData)
     setErrors({})
     setTouched({})
+    setShowPassword(false)
+    setShowConfirmPassword(false)
     router.push('/')
   }
 
@@ -315,16 +324,31 @@ export default function SignUpForm() {
         >
           Contraseña
         </label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          value={formData.password}
-          onChange={handleChange('password')}
-          onBlur={handleBlur('password')}
-          placeholder="Ingresa tu contraseña"
-          className="w-full rounded-md border border-slate-300 px-4 py-3 outline-none focus:border-orange-400"
-        />
+
+        <div className="relative">
+          <input
+            id="password"
+            name="password"
+            type={showPassword ? 'text' : 'password'}
+            value={formData.password}
+            onChange={handleChange('password')}
+            onBlur={handleBlur('password')}
+            placeholder="Ingresa tu contraseña"
+            className="w-full rounded-md border border-slate-300 px-4 py-3 pr-12 outline-none focus:border-orange-400"
+          />
+
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
+            aria-label={
+              showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+            }
+          >
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+        </div>
+
         {touched.password && errors.password ? (
           <p className="mt-1 text-sm text-red-600">{errors.password}</p>
         ) : null}
@@ -337,18 +361,37 @@ export default function SignUpForm() {
         >
           Confirmar contraseña
         </label>
-        <input
-          id="confirmPassword"
-          name="confirmPassword"
-          type="password"
-          value={formData.confirmPassword}
-          onChange={handleChange('confirmPassword')}
-          onBlur={handleBlur('confirmPassword')}
-          placeholder="Confirma tu contraseña"
-          className="w-full rounded-md border border-slate-300 px-4 py-3 outline-none focus:border-orange-400"
-        />
+
+        <div className="relative">
+          <input
+            id="confirmPassword"
+            name="confirmPassword"
+            type={showConfirmPassword ? 'text' : 'password'}
+            value={formData.confirmPassword}
+            onChange={handleChange('confirmPassword')}
+            onBlur={handleBlur('confirmPassword')}
+            placeholder="Confirma tu contraseña"
+            className="w-full rounded-md border border-slate-300 px-4 py-3 pr-12 outline-none focus:border-orange-400"
+          />
+
+          <button
+            type="button"
+            onClick={() => setShowConfirmPassword((prev) => !prev)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
+            aria-label={
+              showConfirmPassword
+                ? 'Ocultar confirmación de contraseña'
+                : 'Mostrar confirmación de contraseña'
+            }
+          >
+            {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+        </div>
+
         {touched.confirmPassword && errors.confirmPassword ? (
-          <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
+          <p className="mt-1 text-sm text-red-600">
+            {errors.confirmPassword}
+          </p>
         ) : null}
       </div>
 
