@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
-import { Search, MapPin, DollarSign, Home, Building, Square, ChevronRight } from 'lucide-react';
+import { Search, MapPin, DollarSign, Home, Building, Square, ChevronRight, List } from 'lucide-react';
 
 const MapView = dynamic(() => import('./MapView'), { ssr: false })
 
@@ -127,6 +127,7 @@ export default function BusquedaMapaPage() {
               >
                 Inmuebles
               </span>
+              <List className="w-4 h-4 text-black mt-1" />
             </button>
           )}
 
