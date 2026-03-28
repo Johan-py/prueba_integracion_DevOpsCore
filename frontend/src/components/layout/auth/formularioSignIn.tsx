@@ -45,6 +45,14 @@ export default function LoginForm() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault()
 
+  if (!email || !password) {
+    setErrors({
+      email: !email ? 'El correo es obligatorio' : undefined,
+      password: !password ? 'La contraseña es obligatoria' : undefined
+    })
+    return
+  }
+
   const trimmedEmail = email.trim()
   setEmail(trimmedEmail)
 
@@ -98,6 +106,7 @@ export default function LoginForm() {
 
           <input
             type="email"
+            required
             placeholder="Ingresa tu correo electrónico"
             value={email}
             onChange={(e) => {
@@ -120,6 +129,7 @@ export default function LoginForm() {
           <div className="relative">
             <input
               type={showPassword ? 'text' : 'password'}
+              required
               placeholder="Ingresa tu contraseña"
               value={password}
               maxLength={16}
