@@ -8,6 +8,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@prisma/client": "^7.5.0",
     "@vercel/node": "^5.6.20",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
@@ -17,6 +18,7 @@
     "morgan": "^1.10.1"
   },
   "devDependencies": {
+    "@prisma/config": "^7.5.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/jsonwebtoken": "^9.0.10",
