@@ -24,3 +24,14 @@ export interface RegisterVideoLinkInput {
   usuarioId: number
   videoUrl: string
 }
+export interface ImageUploadItemInput {
+  url: string
+  extension: string
+  pesoMb: number
+}
+
+export interface RegisterImagesInput {
+  publicacionId: number
+  usuarioId: number
+  images: ImageUploadItemInput[]
+}
