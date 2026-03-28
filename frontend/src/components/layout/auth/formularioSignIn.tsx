@@ -56,8 +56,6 @@ export default function LoginForm() {
     console.log('Correo sin espacios al inicio/final:', `"${trimmedEmail}"`)
     console.log('Password:', trimmedPassword)
 
-    // Aquí después puedes enviar al backend usando trimmedEmail
-    // login({ email: trimmedEmail, password })
   }
 
   return (
@@ -140,15 +138,11 @@ export default function LoginForm() {
 
         <button
           type="button"
-          className="w-full rounded-md bg-gray-700 py-2 text-sm font-medium text-white hover:bg-gray-800"
+          className="mx-auto block w-fit rounded-md bg-gray-700 px-4 py-1.5 text-xs font-medium text-white hover:bg-gray-800"
         >
           Cancelar Inicio de sesión
         </button>
-      </form>
-
-      <p className="mt-4 text-center text-sm text-gray-600">
-        ¿No tienes una cuenta?
-      </p>
+        </form>
 
       <p className="mt-4 text-center text-sm text-gray-600">
         ¿No tienes una cuenta?{' '}
