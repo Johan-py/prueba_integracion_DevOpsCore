@@ -35,13 +35,16 @@ const initialFormData: FormData = {
 
 export default function SignUpForm() {
   const router = useRouter()
-
+  const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000'
+  
   const [formData, setFormData] = useState<FormData>(initialFormData)
   const [errors, setErrors] = useState<FormErrors>({})
   const [touched, setTouched] = useState<Record<string, boolean>>({})
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [successMsg, setSuccessMsg] = useState<string | null>(null)
+  const [serverMessage, setServerMessage] = useState('')
+  const [serverError, setServerError] = useState('')
 
   const handleChange =
     (field: keyof FormData) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -220,16 +223,27 @@ if (field === 'phone') {
     )
   }, [formData, errors.phone, errors.firstName, errors.lastName])
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
   event.preventDefault()
+
+  setServerMessage('')
+  setServerError('')
 
   const emailError = validateEmail(formData.email)
 
   const firstNameError =
-    formData.firstName.trim() === '' ? 'El campo no puede estar vacío' : undefined
+    formData.firstName.trim() === ''
+      ? 'El campo no puede estar vacío'
+      : !/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(formData.firstName)
+        ? 'El nombre solo puede contener letras'
+        : undefined
 
   const lastNameError =
-    formData.lastName.trim() === '' ? 'El campo no puede estar vacío' : undefined
+    formData.lastName.trim() === ''
+      ? 'El campo no puede estar vacío'
+      : !/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(formData.lastName)
+        ? 'El apellido solo puede contener letras'
+        : undefined
 
   const passwordError = validatePassword(formData.password)
 
@@ -249,49 +263,92 @@ if (field === 'phone') {
         : 'El teléfono solo permite números'
 
   const newErrors: FormErrors = {
-      email: emailError || undefined,
-      firstName: firstNameError,
-      lastName: lastNameError,
-      phone: phoneError,
-      password: passwordError || undefined,
-      confirmPassword: confirmPasswordError || undefined
+    email: emailError || undefined,
+    firstName: firstNameError,
+    lastName: lastNameError,
+    phone: phoneError,
+    password: passwordError || undefined,
+    confirmPassword: confirmPasswordError || undefined
+  }
+
+  setErrors(newErrors)
+  setTouched({
+    email: true,
+    firstName: true,
+    lastName: true,
+    phone: true,
+    password: true,
+    confirmPassword: true
+  })
+
+  if (
+    emailError ||
+    firstNameError ||
+    lastNameError ||
+    passwordError ||
+    confirmPasswordError ||
+    phoneError
+  ) {
+    return
+  }
+
+  const payload = {
+    nombre: formData.firstName.trim(),
+    apellido: formData.lastName.trim(),
+    correo: formData.email.trim().toLowerCase(),
+    telefono: formData.phone.trim(),
+    password: formData.password.trim(),
+    confirmPassword: formData.confirmPassword.trim()
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/api/auth/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    })
+
+    let data: any = null
+
+    try {
+      data = await response.json()
+    } catch {
+      data = null
     }
 
-    setErrors(newErrors)
-    setTouched({
-      email: true,
-      firstName: true,
-      lastName: true,
-      phone: true,
-      password: true,
-      confirmPassword: true
-      })
-
-      if (
-        emailError ||
-        firstNameError ||
-        lastNameError ||
-        passwordError ||
-        confirmPasswordError ||
-        phoneError
-      ) {
-        return
-      }
-
-      setSuccessMsg('¡Registro exitoso! Redirigiendo...')
-      setTimeout(() => router.replace('/'), 1500)
+    if (!response.ok) {
+      throw new Error(data?.message || 'No se pudo completar el registro')
     }
+
+    setServerMessage(data?.message || 'Usuario registrado correctamente')
+    console.log('Registro exitoso:', data)
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : 'No se pudo completar el registro'
+
+    setServerError(message)
+    console.error('Error al registrar:', error)
+  }
+}
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <h2 className="text-center text-2xl font-bold text-slate-800">
         Registro
       </h2>
 
-    {successMsg && ( 
-      <p className="rounded-md bg-green-50 px-4 py-3 text-sm text-green-600">
-      {successMsg}
+      {serverMessage ? (
+      <p className="rounded-md bg-green-100 px-4 py-3 text-sm text-green-700">
+      {serverMessage}
       </p>
-    )}  
+      ) : null}
+
+      {serverError ? (
+       <p className="rounded-md bg-red-100 px-4 py-3 text-sm text-red-700">
+       {serverError}
+       </p>
+       ) : null}
 
       <div>
         <label
