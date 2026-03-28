@@ -61,6 +61,14 @@ const fakeLogin = async (email: string, password: string) => {
  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault()
 
+  if (!email || !password) {
+    setErrors({
+      email: !email ? 'El correo es obligatorio' : undefined,
+      password: !password ? 'La contraseña es obligatoria' : undefined
+    })
+    return
+  }
+
   const trimmedEmail = email.trim()
   setEmail(trimmedEmail)
 
@@ -99,6 +107,7 @@ const fakeLogin = async (email: string, password: string) => {
 
           <input
             type="email"
+            required
             placeholder="Ingresa tu correo electrónico"
             value={email}
             onChange={(e) => {
@@ -121,6 +130,7 @@ const fakeLogin = async (email: string, password: string) => {
           <div className="relative">
             <input
               type={showPassword ? 'text' : 'password'}
+              required
               placeholder="Ingresa tu contraseña"
               value={password}
               maxLength={16}
@@ -167,15 +177,11 @@ const fakeLogin = async (email: string, password: string) => {
 
         <button
           type="button"
-          className="w-full rounded-md bg-gray-700 py-2 text-sm font-medium text-white hover:bg-gray-800"
+          className="mx-auto block w-fit rounded-md bg-gray-700 px-4 py-1.5 text-xs font-medium text-white hover:bg-gray-800"
         >
           Cancelar Inicio de sesión
         </button>
-      </form>
-
-      <p className="mt-4 text-center text-sm text-gray-600">
-        ¿No tienes una cuenta?
-      </p>
+        </form>
 
       <p className="mt-4 text-center text-sm text-gray-600">
         ¿No tienes una cuenta?{' '}

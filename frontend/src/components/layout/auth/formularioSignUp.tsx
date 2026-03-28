@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { validateEmail, validatePassword } from '@/lib/validators/auth'
@@ -38,11 +39,12 @@ export default function SignUpForm() {
   const [formData, setFormData] = useState<FormData>(initialFormData)
   const [errors, setErrors] = useState<FormErrors>({})
   const [touched, setTouched] = useState<Record<string, boolean>>({})
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const handleChange =
     (field: keyof FormData) => (event: React.ChangeEvent<HTMLInputElement>) => {
       const rawValue = event.target.value
-
       const value = field === 'email' ? rawValue.trimStart() : rawValue
 
       setFormData((prev) => ({
@@ -64,26 +66,55 @@ export default function SignUpForm() {
 
         setErrors((prev) => ({
           ...prev,
-          password: passwordError || undefined
+          password: passwordError || undefined,
+          confirmPassword:
+            formData.confirmPassword && formData.confirmPassword !== value
+              ? 'Las contraseñas no coinciden'
+              : undefined
         }))
       }
+
       if (field === 'confirmPassword') {
         setErrors((prev) => ({
           ...prev,
           confirmPassword:
-          value !== formData.password
-            ? 'Las contraseñas no coinciden'
-            : undefined
-        }))
-      }
-      if(field === 'phone'){
-        const onlyNumbersRegex = /^[0-9]*$/
-        setErrors((prev) => ({
-          ...prev,
-          phone: onlyNumbersRegex.test(value) ? undefined : 'El teléfono solo permite números'
+            value !== formData.password
+              ? 'Las contraseñas no coinciden'
+              : undefined
         }))
       }
 
+      if (field === 'phone') {
+  const onlyNumbersRegex = /^[0-9]*$/
+
+  setErrors((prev) => ({
+    ...prev,
+    phone:
+      value.trim() === ''
+        ? 'El campo no puede estar vacío'
+        : onlyNumbersRegex.test(value)
+          ? undefined
+          : 'El teléfono solo permite números'
+          
+          
+  }))
+}
+      if (field === 'firstName') {
+        const soloLetrasRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/
+        setErrors((prev) => ({
+          ...prev,
+          firstName: value === '' || !soloLetrasRegex.test(value)
+          ? undefined
+          : 'El nombre solo puede contener letras'
+  }))
+}
+
+if (field === 'lastName') {
+  setErrors((prev) => ({
+    ...prev,
+    lastName: value.trim() === '' ? 'El campo no puede estar vacío' : undefined
+  }))
+}
     }
 
   const handleBlur = (field: keyof FormData) => () => {
@@ -109,80 +140,151 @@ export default function SignUpForm() {
         password: passwordError || undefined
       }))
     }
+
     if (field === 'confirmPassword') {
       setErrors((prev) => ({
         ...prev,
-      confirmPasswordError =
-        formData.confirmPassword !== formData.password
-          ? 'Las contraseñas no coinciden'
-          : undefined
+        confirmPassword:
+          formData.confirmPassword !== formData.password
+            ? 'Las contraseñas no coinciden'
+            : undefined
       }))
     }
+
     if (field === 'phone') {
       const onlyNumbersRegex = /^[0-9]*$/
+
       setErrors((prev) => ({
         ...prev,
-        phone: onlyNumbersRegex.test(formData.phone) ? undefined : 'El teléfono solo permite números'
+        phone: onlyNumbersRegex.test(formData.phone)
+          ? undefined
+          : 'El teléfono solo permite números'
       }))
     }
+    if (field === 'firstName') {
+  setErrors((prev) => ({
+    ...prev,
+    firstName:
+      formData.firstName.trim() === ''
+        ? 'El campo no puede estar vacío'
+        : undefined
+  }))
+}
+
+if (field === 'lastName') {
+  setErrors((prev) => ({
+    ...prev,
+    lastName:
+      formData.lastName.trim() === ''
+        ? 'El campo no puede estar vacío'
+        : undefined
+  }))
+ }
+ if (field === 'phone') {
+  const onlyNumbersRegex = /^[0-9]*$/
+
+  setErrors((prev) => ({
+    ...prev,
+    phone:
+      formData.phone.trim() === ''
+        ? 'El campo no puede estar vacío'
+        : onlyNumbersRegex.test(formData.phone)
+          ? undefined
+          : 'El teléfono solo permite números'
+  }))
+}
   }
 
   const handleCancel = () => {
     setFormData(initialFormData)
     setErrors({})
     setTouched({})
+    setShowPassword(false)
+    setShowConfirmPassword(false)
     router.push('/')
   }
 
   const isFormValid = useMemo(() => {
-    return formData.email.trim() 
-    !== '' && !validateEmail(formData.email) && !validatePassword(formData.password) &&
-    formData.confirmPassword === formData.password &&
-    (formData.phone === '' || !errors.phone) 
-  }, [formData.email, formData.password])
+    const requiredFieldsCompleted =
+      formData.email.trim() !== '' &&
+      formData.firstName.trim() !== '' &&
+      formData.lastName.trim() !== '' &&
+      formData.phone.trim() !== '' &&
+      formData.password.trim() !== '' &&
+      formData.confirmPassword.trim() !== ''
+
+    return (
+      requiredFieldsCompleted &&
+      !validateEmail(formData.email) &&
+      !validatePassword(formData.password) &&
+      formData.confirmPassword === formData.password &&
+      !errors.phone
+    )
+  }, [formData, errors.phone])
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
+  event.preventDefault()
 
-    const emailError = validateEmail(formData.email)
-    const passwordError = validatePassword(formData.password)
-    const newErrors: FormErrors = {
-      email: emailError || undefined,
-      password: passwordError || undefined
-    }
+  const emailError = validateEmail(formData.email)
 
-    setErrors(newErrors)
-    setTouched((prev) => ({
-      ...prev,
-      email: true
-    }))
+  const firstNameError =
+    formData.firstName.trim() === '' ? 'El campo no puede estar vacío' : undefined
 
-    if (emailError || passwordError) return
+  const lastNameError =
+    formData.lastName.trim() === '' ? 'El campo no puede estar vacío' : undefined
 
-    console.log('Formulario listo para enviar', {
-      ...formData,
-      email: formData.email.trim()
-    })
-    const confirmPasswordError =
-      formData.confirmPassword !== formData.password
+  const passwordError = validatePassword(formData.password)
+
+  const confirmPasswordError =
+    formData.confirmPassword.trim() === ''
+      ? 'El campo no puede estar vacío'
+      : formData.confirmPassword !== formData.password
         ? 'Las contraseñas no coinciden'
         : undefined
-    
-    const newErrors: FormErrors = {
+
+  const onlyNumbersRegex = /^[0-9]*$/
+  const phoneError =
+    formData.phone.trim() === ''
+      ? 'El campo no puede estar vacío'
+      : onlyNumbersRegex.test(formData.phone)
+        ? undefined
+        : 'El teléfono solo permite números'
+
+  const newErrors: FormErrors = {
       email: emailError || undefined,
+      firstName: firstNameError,
+      lastName: lastNameError,
+      phone: phoneError,
       password: passwordError || undefined,
       confirmPassword: confirmPasswordError || undefined
     }
 
-    setErrors(newErrors)
-    setTouched((prev) => ({
-      ...prev,
-      email: true,
-      password: true,
-      confirmPassword: true
-    }))
-    if (emailError || passwordError || confirmPasswordError) return
-  }
+     setErrors(newErrors)
+     setTouched({
+       email: true,
+       firstName: true,
+       lastName: true,
+       phone: true,
+       password: true,
+       confirmPassword: true
+       })
+
+       if (
+        emailError ||
+        firstNameError ||
+        lastNameError ||
+        passwordError ||
+        confirmPasswordError ||
+        phoneError
+       ) {
+        return
+       }
+
+       console.log('Formulario listo para enviar', {
+         ...formData,
+         email: formData.email.trim()
+          })
+          }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -248,17 +350,29 @@ export default function SignUpForm() {
         >
           Apellido
         </label>
-        <input
-          id="lastName"
-          name="lastName"
-          type="text"
-          value={formData.lastName}
-          onChange={handleChange('lastName')}
-          onBlur={handleBlur('lastName')}
-          placeholder="Ingresa tu apellido"
-          className="w-full rounded-md border border-slate-300 px-4 py-3 outline-none focus:border-orange-400"
-        />
-      </div>
+       <input
+       id="lastName"
+       name="lastName"
+       type="text"
+       value={formData.lastName}
+       onChange={handleChange('lastName')}
+       onBlur={handleBlur('lastName')}
+       placeholder="Ingresa tu apellido"
+       className={`w-full rounded-md border px-4 py-3 outline-none transition ${
+       touched.lastName && errors.lastName
+       ? 'border-red-500'
+       : 'border-slate-300 focus:border-orange-400'
+        }`}
+        aria-invalid={Boolean(touched.lastName && errors.lastName)}
+        aria-describedby="lastName-error"
+       />
+
+     {touched.lastName && errors.lastName ? (
+     <p id="lastName-error" className="mt-1 text-sm text-red-600">
+     {errors.lastName}
+     </p>
+     ) : null}
+    </div>
 
       <div>
         <label
@@ -267,19 +381,28 @@ export default function SignUpForm() {
         >
           Teléfono
         </label>
-        <input
-          id="phone"
-          name="phone"
-          type="text"
-          value={formData.phone}
-          onChange={handleChange('phone')}
-          onBlur={handleBlur('phone')}
-          placeholder="Ingresa tu teléfono"
-          className="w-full rounded-md border border-slate-300 px-4 py-3 outline-none focus:border-orange-400"
-        />
-        {touched.phone && errors.phone ? (
-          <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
-        ) : null}
+       <input
+       id="phone"
+       name="phone"
+       type="text"
+       value={formData.phone}
+       onChange={handleChange('phone')}
+       onBlur={handleBlur('phone')}
+       placeholder="Ingresa tu teléfono"
+       className={`w-full rounded-md border px-4 py-3 outline-none transition ${
+       touched.phone && errors.phone
+      ? 'border-red-500'
+      : 'border-slate-300 focus:border-orange-400'
+      }`}
+      aria-invalid={Boolean(touched.phone && errors.phone)}
+      aria-describedby="phone-error"
+     />
+
+{touched.phone && errors.phone ? (
+  <p id="phone-error" className="mt-1 text-sm text-red-600">
+    {errors.phone}
+  </p>
+) : null}
       </div>
 
       <div>
@@ -289,16 +412,31 @@ export default function SignUpForm() {
         >
           Contraseña
         </label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          value={formData.password}
-          onChange={handleChange('password')}
-          onBlur={handleBlur('password')}
-          placeholder="Ingresa tu contraseña"
-          className="w-full rounded-md border border-slate-300 px-4 py-3 outline-none focus:border-orange-400"
-        />
+
+        <div className="relative">
+          <input
+            id="password"
+            name="password"
+            type={showPassword ? 'text' : 'password'}
+            value={formData.password}
+            onChange={handleChange('password')}
+            onBlur={handleBlur('password')}
+            placeholder="Ingresa tu contraseña"
+            className="w-full rounded-md border border-slate-300 px-4 py-3 pr-12 outline-none focus:border-orange-400"
+          />
+
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
+            aria-label={
+              showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+            }
+          >
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+        </div>
+
         {touched.password && errors.password ? (
           <p className="mt-1 text-sm text-red-600">{errors.password}</p>
         ) : null}
@@ -311,18 +449,37 @@ export default function SignUpForm() {
         >
           Confirmar contraseña
         </label>
-        <input
-          id="confirmPassword"
-          name="confirmPassword"
-          type="password"
-          value={formData.confirmPassword}
-          onChange={handleChange('confirmPassword')}
-          onBlur={handleBlur('confirmPassword')}
-          placeholder="Confirma tu contraseña"
-          className="w-full rounded-md border border-slate-300 px-4 py-3 outline-none focus:border-orange-400"
-        />
+
+        <div className="relative">
+          <input
+            id="confirmPassword"
+            name="confirmPassword"
+            type={showConfirmPassword ? 'text' : 'password'}
+            value={formData.confirmPassword}
+            onChange={handleChange('confirmPassword')}
+            onBlur={handleBlur('confirmPassword')}
+            placeholder="Confirma tu contraseña"
+            className="w-full rounded-md border border-slate-300 px-4 py-3 pr-12 outline-none focus:border-orange-400"
+          />
+
+          <button
+            type="button"
+            onClick={() => setShowConfirmPassword((prev) => !prev)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
+            aria-label={
+              showConfirmPassword
+                ? 'Ocultar confirmación de contraseña'
+                : 'Mostrar confirmación de contraseña'
+            }
+          >
+            {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+        </div>
+
         {touched.confirmPassword && errors.confirmPassword ? (
-          <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
+          <p className="mt-1 text-sm text-red-600">
+            {errors.confirmPassword}
+          </p>
         ) : null}
       </div>
 

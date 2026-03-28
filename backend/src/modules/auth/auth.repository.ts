@@ -1,12 +1,12 @@
 import { prisma } from "../../lib/prisma.js";
 
 interface CreateUserInput {
-  nombre: string
-  apellido: string
-  correo: string
-  password: string
-  rolId: number
-  telefono?: string
+  nombre: string;
+  apellido: string;
+  correo: string;
+  password: string;
+  rolId: number;
+  telefono?: string;
 }
 
 export const createUser = async (data: CreateUserInput) => {
@@ -20,18 +20,18 @@ export const createUser = async (data: CreateUserInput) => {
       telefonos: data.telefono
         ? {
             create: {
-              codigoPais: '+591',
+              codigoPais: "+591",
               numero: data.telefono,
-              principal: true
-            }
+              principal: true,
+            },
           }
-        : undefined
+        : undefined,
     },
     include: {
-      telefonos: true
-    }
-  })
-}
+      telefonos: true,
+    },
+  });
+};
 
 export const findUser = async (correo: string) => {
   return await prisma.usuario.findUnique({
@@ -41,8 +41,7 @@ export const findUser = async (correo: string) => {
 export const findUserByCorreo = async (correo: string) => {
   return await prisma.usuario.findUnique({
     where: {
-      correo
-    }
-  })
-}
-
+      correo,
+    },
+  });
+};
