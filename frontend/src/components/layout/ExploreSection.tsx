@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ComboBox } from "../ui/ComboBox";
-import { Home, Search } from "lucide-react"; 
+import { Home, Search, MapPin } from "lucide-react"; 
 
 const searchOptions = [
   { id: "venta", name: "Venta" },
@@ -66,6 +66,22 @@ export default function ExploreSection() {
                 icon={Home} 
               />
             </div>
+
+ {/* Campo de búsqueda para ciudad o zona */}
+  <div className="w-full">
+    <label className="block text-sm font-medium text-stone-700 mb-2 text-center">
+      CIUDAD/ZONA
+    </label>
+
+    <div className="h-[46px] rounded-xl border border-stone-300 bg-white px-4 flex items-center gap-3 shadow-sm">
+      <MapPin className="w-5 h-5 text-stone-400" />
+      <input
+        type="text"
+        placeholder="Cochabamba, La Paz, Santa Cruz"
+        className="w-full bg-transparent outline-none text-sm text-stone-700 placeholder:text-stone-400"
+      />
+    </div>
+  </div>
 
             {/* El botón "BUSCAR" a la derecha pe */}
             <button className="w-full md:w-auto bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-10 rounded-xl transition-all flex items-center justify-center gap-2 shadow-md h-[46px] mb-[1px]">
