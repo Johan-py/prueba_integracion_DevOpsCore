@@ -61,6 +61,31 @@ export default function FilterPanel() {
             <span className="text-gray-400 hover:text-gray-600 cursor-pointer transition-colors">Cochabamba</span>
             <span className="text-gray-400">2100 casas</span>
           </div>
+            {/* ENLACE VER MÁS */}    
+          <button className="text-sm text-orange-400 hover:text-orange-600 font-medium mt-1 w-fit transition-colors">
+            Ver más {'>'}
+          </button>
+
+        {/* SECCIÓN: Por tipo de inmueble*/}
+        <section className="mt-4">
+        <h3 className="text-xl font-bold text-black mb-3 inline-block border-b-2 border-black pb-0.5">
+            Por tipo de inmueble                                                                                                                                                                                                                                                                                    
+          </h3>
+        </section>
+          {/* Fila de ejemplo: Casas */}
+          <div className="flex justify-between items-center text-lg">
+            <span className="text-gray-400 hover:text-gray-600 cursor-pointer transition-colors">Casas</span> 
+            <span className="text-gray-400">5000 casas</span>
+          </div>
+          {/* Fila de ejemplo: Departamentos */}
+          <div className="flex justify-between items-center text-lg">
+            <span className="text-gray-400 hover:text-gray-600 cursor-pointer transition-colors">Departamentos</span>                   
+            <span className="text-gray-400">2100 casas</span>
+          </div>
+            {/* ENLACE VER MÁS */}
+          <button className="text-sm text-orange-400 hover:text-orange-600 font-medium mt-1 w-fit transition-colors">
+            Ver más {'>'}
+          </button> 
         </div>
       </aside>
   );
