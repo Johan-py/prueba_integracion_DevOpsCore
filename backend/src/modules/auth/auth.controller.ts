@@ -30,6 +30,11 @@ export const registerController = async (req: Request, res: Response) => {
   }
 };
 
-export const loginController = async (body: any) => {
+type LoginBody = {
+  email: string;
+  password: string;
+};
+
+export const loginController = async (body: LoginBody) => {
   return loginService(body);
 };

@@ -4,6 +4,8 @@ import {
 } from "./users.repository.js";
 type payload = {
   name: string;
+  password: string;
+  confirmPassword: string;
 };
 export const getUsersService = async () => {
   return getUsersRepository();
@@ -28,5 +30,5 @@ export const createUserService = async (data: payload) => {
 
   const { confirmPassword, ...userData } = data;
 
-  return createUserRepository(data);
+  return createUserRepository(userData);
 };
