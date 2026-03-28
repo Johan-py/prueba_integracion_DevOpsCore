@@ -24,6 +24,7 @@ export interface RegisterVideoLinkInput {
   usuarioId: number
   videoUrl: string
 }
+
 export interface ImageUploadItemInput {
   url: string
   extension: string

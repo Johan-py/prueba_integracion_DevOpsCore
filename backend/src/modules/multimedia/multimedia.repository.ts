@@ -1,48 +1,97 @@
+import { TipoMultimedia } from '@prisma/client'
+import { prisma } from '../../lib/prisma.js'
 import { MultimediaRecord, MultimediaType, PublicacionRecord } from './multimedia.types.js'
 
-const publicacionesMock: PublicacionRecord[] = [
-  { id: 1, usuarioId: 1, titulo: 'Casa en venta' },
-  { id: 2, usuarioId: 2, titulo: 'Departamento céntrico' }
-]
-
-const multimediaTable: MultimediaRecord[] = [
-  {
-    id: 1,
-    publicacionId: 1,
-    tipo: 'IMAGEN',
-    url: 'https://example.com/portada.jpg',
-    pesoMb: 2.4
+const mapPublicationRecord = (publication: {
+  id: number
+  usuarioId: number
+  titulo: string
+}): PublicacionRecord => {
+  return {
+    id: publication.id,
+    usuarioId: publication.usuarioId,
+    titulo: publication.titulo
   }
-]
+}
+
+const mapMultimediaRecord = (multimedia: {
+  id: number
+  publicacionId: number
+  tipo: TipoMultimedia
+  url: string
+  pesoMb: unknown
+}): MultimediaRecord => {
+  return {
+    id: multimedia.id,
+    publicacionId: multimedia.publicacionId,
+    tipo: multimedia.tipo as MultimediaType,
+    url: multimedia.url,
+    pesoMb:
+      multimedia.pesoMb === null || multimedia.pesoMb === undefined
+        ? null
+        : Number(multimedia.pesoMb)
+  }
+}
 
 export const findPublicationByIdRepository = async (publicacionId: number) => {
-  return publicacionesMock.find((publication) => publication.id === publicacionId)
+  const publication = await prisma.publicacion.findUnique({
+    where: { id: publicacionId },
+    select: {
+      id: true,
+      usuarioId: true,
+      titulo: true
+    }
+  })
+
+  return publication ? mapPublicationRecord(publication) : null
 }
 
 export const getMultimediaByPublicationIdRepository = async (publicacionId: number) => {
-  return multimediaTable.filter((multimedia) => multimedia.publicacionId === publicacionId)
+  const multimedia = await prisma.multimedia.findMany({
+    where: { publicacionId },
+    orderBy: { id: 'asc' },
+    select: {
+      id: true,
+      publicacionId: true,
+      tipo: true,
+      url: true,
+      pesoMb: true
+    }
+  })
+
+  return multimedia.map(mapMultimediaRecord)
 }
 
 export const countMultimediaByPublicationIdAndTypeRepository = async (
   publicacionId: number,
   tipo: MultimediaType
 ) => {
-  return multimediaTable.filter(
-    (multimedia) =>
-      multimedia.publicacionId === publicacionId &&
-      multimedia.tipo === tipo
-  ).length
+  return prisma.multimedia.count({
+    where: {
+      publicacionId,
+      tipo: tipo as TipoMultimedia
+    }
+  })
 }
 
 export const createMultimediaRepository = async (
   data: Omit<MultimediaRecord, 'id'>
 ) => {
-  const newRecord: MultimediaRecord = {
-    id: multimediaTable.length + 1,
-    ...data
-  }
+  const created = await prisma.multimedia.create({
+    data: {
+      publicacionId: data.publicacionId,
+      tipo: data.tipo as TipoMultimedia,
+      url: data.url,
+      pesoMb: data.pesoMb
+    },
+    select: {
+      id: true,
+      publicacionId: true,
+      tipo: true,
+      url: true,
+      pesoMb: true
+    }
+  })
 
-  multimediaTable.push(newRecord)
-
-  return newRecord
+  return mapMultimediaRecord(created)
 }
