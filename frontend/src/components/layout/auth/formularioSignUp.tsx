@@ -340,6 +340,10 @@ export default function SignUpForm() {
       }
 
       setServerMessage(data?.message || 'Usuario registrado correctamente')
+      setTimeout(() => {
+      router.replace('/')
+       }, 1500) 
+
     } catch (error) {
       const message =
         error instanceof TypeError
