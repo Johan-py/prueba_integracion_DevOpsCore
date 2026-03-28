@@ -1,6 +1,14 @@
+import { availableParallelism } from "os";
 import { generateToken } from "../../utils/jwt.js";
-import { findUser, createUser, findUserByCorreo } from "./auth.repository.js";
-import { Prisma } from "@prisma/client";
+import {
+  createSession,
+  desactiveSessionByToken,
+  findActiveSessionByToken,
+  findUser,
+  createUser,
+  findUserByCorreo,
+} from "./auth.repository.js";
+import { Prisma, RolNombre } from "@prisma/client";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const onlyLettersRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
@@ -14,21 +22,20 @@ export const loginService = async ({
   email: string;
   password: string;
 }) => {
+  if (!email || !password) {
+    throw new Error("Correo y contraseña son obligatorios");
+  }
 
-if (!email || !password) {
-  throw new Error("Correo y contraseña son obligatorios");
-}
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-if (!emailRegex.test(email)) {
-  throw new Error("Formato de correo inválido");
-}
+  if (!emailRegex.test(email)) {
+    throw new Error("Formato de correo inválido");
+  }
 
   const user = await findUser(email);
 
   if (!user) {
-    throw new Error("User not found");
+    throw new Error("Usuario no encontrado");
   }
 
   const trimmedPassword = password.trim();
@@ -36,12 +43,63 @@ if (!emailRegex.test(email)) {
   const isValidPassword = user.password === trimmedPassword;
 
   if (!isValidPassword) {
-    throw new Error("Invalid Credentials");
+    throw new Error("Credenciales invalidas");
   }
 
-  const token = generateToken(user);
+  const token = generateToken({
+    id: user.id,
+    correo: user.correo,
+  });
 
-  return { user, token };
+  const fechaExpiracion = new Date(Date.now() + 60 * 60 * 1000);
+
+  await createSession({
+    token,
+    usuarioId: user.id,
+    fechaExpiracion,
+  });
+
+  return {
+    message: "login exitoso",
+    token,
+    user: {
+      id: user.id,
+      nombre: user.nombre,
+      apellido: user.apellido,
+      corrreo: user.correo,
+      rolId: user.rolId,
+    },
+  };
+};
+
+export const getMeService = async (token: string) => {
+  const session = await findActiveSessionByToken(token);
+
+  if (!session) {
+    throw new Error("Sesión inválida o expirada");
+  }
+
+  return {
+    user: {
+      id: session.usuario.id,
+      nombre: session.usuario.nombre,
+      apellido: session.usuario.apellido,
+      correo: session.usuario.correo,
+      rol: session.usuario.rol,
+    },
+  };
+};
+
+export const logoutService = async (token: string) => {
+  const result = await desactiveSessionByToken(token);
+
+  if (result.count === 0) {
+    throw new Error("Sesión no encontrada o ya cerrada");
+  }
+
+  return {
+    message: "Sesión cerrada correctamente",
+  };
 };
 
 export interface RegisterUserInput {
@@ -86,13 +144,15 @@ export const registerUser = async (data: RegisterUserInput) => {
   }
 
   if (!/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
-    throw new Error('La contraseña debe tener al menos una mayúscula y un número')
+    throw new Error(
+      "La contraseña debe tener al menos una mayúscula y un número",
+    );
   }
 
   if (password !== confirmPassword) {
-    throw new Error('Las contraseñas no coinciden')
+    throw new Error("Las contraseñas no coinciden");
   }
-  
+
   const existingUser = await findUserByCorreo(correo);
 
   if (existingUser) {

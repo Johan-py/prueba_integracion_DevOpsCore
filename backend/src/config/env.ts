@@ -1,5 +1,5 @@
-import 'dotenv/config'
+import "dotenv/config";
 
 export const config = {
-  JWT_SECRET: process.env.JWT_SECRET!
-}
+  JWT_SECRET: process.env.JWT_SECRET!,
+};

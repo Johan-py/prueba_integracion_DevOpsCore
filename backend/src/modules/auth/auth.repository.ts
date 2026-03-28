@@ -45,3 +45,60 @@ export const findUserByCorreo = async (correo: string) => {
     },
   });
 };
+
+export const findUserById = async (id: number) => {
+  return await prisma.usuario.findUnique({
+    where: { id },
+    include: {
+      rol: true,
+    },
+  });
+};
+
+export const createSession = async ({
+  token,
+  usuarioId,
+  fechaExpiracion,
+}: {
+  token: string;
+  usuarioId: number;
+  fechaExpiracion: Date;
+}) => {
+  return await prisma.sesion.create({
+    data: {
+      token,
+      usuarioId,
+      fechaExpiracion,
+      estado: true,
+    },
+  });
+};
+
+export const findActiveSessionByToken = async (token: string) => {
+  return await prisma.sesion.findFirst({
+    where: {
+      token,
+      estado: true,
+      fechaExpiracion: { gt: new Date() },
+    },
+    include: {
+      usuario: {
+        include: {
+          rol: true,
+        },
+      },
+    },
+  });
+};
+
+export const desactiveSessionByToken = async (token: string) => {
+  return await prisma.sesion.updateMany({
+    where: {
+      token,
+      estado: true,
+    },
+    data: {
+      estado: false,
+    },
+  });
+};
