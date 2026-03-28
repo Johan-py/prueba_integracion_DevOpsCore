@@ -45,6 +45,7 @@ export default function SignUpForm() {
   const [successMsg, setSuccessMsg] = useState<string | null>(null)
   const [serverMessage, setServerMessage] = useState('')
   const [serverError, setServerError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleChange =
     (field: keyof FormData) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -326,10 +327,14 @@ if (field === 'phone') {
     console.log('Registro exitoso:', data)
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : 'No se pudo completar el registro'
+  error instanceof TypeError
+       ? 'No hay conexión a internet o no se pudo conectar con el servidor'
+       : error instanceof Error
+       ? error.message
+       : 'No se pudo completar el registro'
 
-    setServerError(message)
-    console.error('Error al registrar:', error)
+       setServerError(message)
+       console.error('Error al registrar:', error)
   }
 }
   return (
