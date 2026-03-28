@@ -95,12 +95,17 @@ export default function SignUpForm() {
         : onlyNumbersRegex.test(value)
           ? undefined
           : 'El teléfono solo permite números'
+          
+          
   }))
 }
       if (field === 'firstName') {
-  setErrors((prev) => ({
-    ...prev,
-    firstName: value.trim() === '' ? 'El campo no puede estar vacío' : undefined
+        const soloLetrasRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/
+        setErrors((prev) => ({
+          ...prev,
+          firstName: value === '' || !soloLetrasRegex.test(value)
+          ? undefined
+          : 'El nombre solo puede contener letras'
   }))
 }
 
