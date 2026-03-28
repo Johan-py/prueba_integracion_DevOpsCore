@@ -1,8 +1,10 @@
 import express from 'express'
+import publicacionRoutes from './modules/publicacion/publicacion.routes.js'
 
 const app = express()
 
 app.use(express.json())
+app.use('/api/publicaciones', publicacionRoutes)
 
 // ✅ HEALTH CHECK
 app.get('/api/health', (_req, res) => {
