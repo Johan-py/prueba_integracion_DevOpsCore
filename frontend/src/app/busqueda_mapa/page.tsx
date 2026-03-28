@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState,useEffect} from 'react'
 import dynamic from 'next/dynamic'
 import { Search, MapPin, DollarSign, Home, Building, Square } from 'lucide-react'
 import { useProperties } from '@/hooks/useProperties'
@@ -11,6 +11,17 @@ export default function BusquedaMapaPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null)
   const { properties } = useProperties()
+  const [hoveredId, setHoveredId] = useState<string | null>(null)
+   useEffect(() => {
+  if (!hoveredId) return
+
+  const timeout = setTimeout(() => {
+    setSelectedPropertyId(hoveredId)
+  }, 200)
+
+  return () => clearTimeout(timeout)
+}, [hoveredId])
+
   return (
     <div className="flex flex-col w-full min-h-[calc(100vh-theme(spacing.32))] border rounded-lg overflow-hidden shadow-sm bg-white">
       {/* Barra Superior */}
@@ -108,7 +119,7 @@ export default function BusquedaMapaPage() {
                 {properties.map((property) => (
                  <div
                    key={property.id}
-                   onMouseEnter={() => setSelectedPropertyId(property.id)}
+                   onMouseEnter={() => setHoveredId(property.id)}
                    onClick={() => setSelectedPropertyId(property.id)}
                    className={`
                     p-3 border rounded-lg cursor-pointer transition-all
