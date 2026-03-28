@@ -110,9 +110,12 @@ export default function SignUpForm() {
 }
 
 if (field === 'lastName') {
+  const soloLetrasRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/
   setErrors((prev) => ({
     ...prev,
-    lastName: value.trim() === '' ? 'El campo no puede estar vacío' : undefined
+    lastName: value === '' || soloLetrasRegex.test(value)
+      ? undefined
+      : 'El apellido solo puede contener letras'
   }))
 }
     }
@@ -162,25 +165,28 @@ if (field === 'lastName') {
       }))
     }
     if (field === 'firstName') {
-  setErrors((prev) => ({
-    ...prev,
-    firstName:
-      formData.firstName.trim() === ''
-        ? 'El campo no puede estar vacío'
-        : undefined
+      const soloLetrasRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/
+      setErrors((prev) => ({
+      ...prev,
+      firstName: formData.firstName === '' || soloLetrasRegex.test(formData.firstName)
+      ? undefined
+      : 'El nombre solo puede contener letras'
+
   }))
 }
 
 if (field === 'lastName') {
+  const soloLetrasRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/
   setErrors((prev) => ({
     ...prev,
     lastName:
-      formData.lastName.trim() === ''
-        ? 'El campo no puede estar vacío'
-        : undefined
+      formData.lastName === '' || soloLetrasRegex.test(formData.lastName)
+      ? undefined
+      : 'El apellido solo puede contener letras'
   }))
- }
- if (field === 'phone') {
+}
+
+if (field === 'phone') {
   const onlyNumbersRegex = /^[0-9]*$/
 
   setErrors((prev) => ({
