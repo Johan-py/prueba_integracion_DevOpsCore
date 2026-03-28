@@ -42,7 +42,23 @@ export default function LoginForm() {
     setErrors(newErrors)
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+const fakeLogin = async (email: string, password: string) => {
+  await new Promise((res) => setTimeout(res, 1000)) // simula espera
+
+  if (email === 'test@test.com' && password === '123456') {
+    return {
+      ok: true,
+      data: { token: 'fake-jwt' },
+    }
+  }
+
+  return {
+    ok: false,
+    message: 'Credenciales incorrectas',
+  }
+}
+
+ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault()
 
   if (!email || !password) {
@@ -62,35 +78,20 @@ export default function LoginForm() {
   if (!isFormValid) return
 
   try {
-    const response = await fetch('http://localhost:5000/api/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: trimmedEmail,
-        password,
-      }),
-    })
+    // MOCK EN VEZ DE FETCH
+    const result = await fakeLogin(trimmedEmail, password)
 
-    let data = null
-    try {
-      data = await response.json()
-    } catch {
-      data = null
-    }
-
-    if (!response.ok) {
-      setPassword('') // 
-      alert(data?.message || 'Error al iniciar sesión')
+    if (!result.ok) {
+      setPassword('') // limpiar contraseña
+      alert(result.message || 'Error al iniciar sesión')
       return
     }
 
-    console.log('Login exitoso', data)
+    console.log('Login exitoso', result.data)
 
   } catch (error) {
-    setPassword('') // 
-    alert('Error de conexión con el servidor')
+    setPassword('')
+    alert('Error inesperado')
   }
 }
 
