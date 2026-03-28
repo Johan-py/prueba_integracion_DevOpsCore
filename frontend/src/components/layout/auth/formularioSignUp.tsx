@@ -112,7 +112,7 @@ export default function SignUpForm() {
     if (field === 'confirmPassword') {
       setErrors((prev) => ({
         ...prev,
-      confirmPasswordError =
+      confirmPasswordError :
         formData.confirmPassword !== formData.password
           ? 'Las contraseñas no coinciden'
           : undefined
@@ -142,47 +142,36 @@ export default function SignUpForm() {
   }, [formData.email, formData.password])
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
+  event.preventDefault()
 
-    const emailError = validateEmail(formData.email)
-    const passwordError = validatePassword(formData.password)
-    const newErrors: FormErrors = {
-      email: emailError || undefined,
-      password: passwordError || undefined
-    }
+  const emailError = validateEmail(formData.email)
+  const passwordError = validatePassword(formData.password)
+  const confirmPasswordError =
+    formData.confirmPassword !== formData.password
+      ? 'Las contraseñas no coinciden'
+      : undefined
 
-    setErrors(newErrors)
-    setTouched((prev) => ({
-      ...prev,
-      email: true
-    }))
-
-    if (emailError || passwordError) return
-
-    console.log('Formulario listo para enviar', {
-      ...formData,
-      email: formData.email.trim()
-    })
-    const confirmPasswordError =
-      formData.confirmPassword !== formData.password
-        ? 'Las contraseñas no coinciden'
-        : undefined
-    
-    const newErrors: FormErrors = {
-      email: emailError || undefined,
-      password: passwordError || undefined,
-      confirmPassword: confirmPasswordError || undefined
-    }
-
-    setErrors(newErrors)
-    setTouched((prev) => ({
-      ...prev,
-      email: true,
-      password: true,
-      confirmPassword: true
-    }))
-    if (emailError || passwordError || confirmPasswordError) return
+  const newErrors: FormErrors = {
+    email: emailError || undefined,
+    password: passwordError || undefined,
+    confirmPassword: confirmPasswordError || undefined
   }
+
+  setErrors(newErrors)
+  setTouched((prev) => ({
+    ...prev,
+    email: true,
+    password: true,
+    confirmPassword: true
+  }))
+
+  if (emailError || passwordError || confirmPasswordError) return
+
+  console.log('Formulario listo para enviar', {
+    ...formData,
+    email: formData.email.trim()
+  })
+}
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">

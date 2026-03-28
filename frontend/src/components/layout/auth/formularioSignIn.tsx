@@ -42,23 +42,49 @@ export default function LoginForm() {
     setErrors(newErrors)
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault()
 
-    const trimmedEmail = email.trim()
-    const trimmedPassword = password.trim()
+  const trimmedEmail = email.trim()
+  setEmail(trimmedEmail)
 
-    setEmail(trimmedEmail)
-    validate('email', trimmedEmail)
-    validate('password', trimmedPassword)
+  validate('email', trimmedEmail)
+  validate('password', password)
 
-    console.log('Correo original:', `"${email}"`)
-    console.log('Correo sin espacios al inicio/final:', `"${trimmedEmail}"`)
-    console.log('Password:', trimmedPassword)
+  if (!isFormValid) return
 
-    // Aquí después puedes enviar al backend usando trimmedEmail
-    // login({ email: trimmedEmail, password })
+  try {
+    const response = await fetch('http://localhost:5000/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: trimmedEmail,
+        password,
+      }),
+    })
+
+    let data = null
+    try {
+      data = await response.json()
+    } catch {
+      data = null
+    }
+
+    if (!response.ok) {
+      setPassword('') // 
+      alert(data?.message || 'Error al iniciar sesión')
+      return
+    }
+
+    console.log('Login exitoso', data)
+
+  } catch (error) {
+    setPassword('') // 
+    alert('Error de conexión con el servidor')
   }
+}
 
   return (
     <div className="w-full max-w-sm rounded-md bg-white p-6 shadow-md">
