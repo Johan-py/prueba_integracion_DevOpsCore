@@ -4,28 +4,107 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
+type User = {
+  name: string
+  email: string
+}
+
+const USER_STORAGE_KEY = 'propbol_user'
+const SESSION_EXPIRES_KEY = 'propbol_session_expires'
+const SESSION_DURATION_MS = 60 * 60 * 1000 // 1 hora
+
 export default function Navbar() {
   const router = useRouter()
   const panelRef = useRef<HTMLDivElement | null>(null)
 
-  const [user, setUser] = useState<{ name: string; email: string } | null>(null)
+  const [user, setUser] = useState<User | null>(null)
   const [isPanelOpen, setIsPanelOpen] = useState(false)
   const [showLogoutModal, setShowLogoutModal] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
+  const clearSession = () => {
+    localStorage.removeItem(USER_STORAGE_KEY)
+    localStorage.removeItem(SESSION_EXPIRES_KEY)
+    setUser(null)
+    setIsPanelOpen(false)
+    setShowLogoutModal(false)
+  }
+
+  const isSessionExpired = () => {
+    const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY)
+    if (!expiresAt) return true
+    return Date.now() > Number(expiresAt)
+  }
+
+  const restoreSession = () => {
+    const savedUser = localStorage.getItem(USER_STORAGE_KEY)
+    const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY)
+
+    if (!savedUser || !expiresAt) {
+      clearSession()
+      return
+    }
+
+    if (Date.now() > Number(expiresAt)) {
+      clearSession()
+      return
+    }
+
+    setUser(JSON.parse(savedUser))
+  }
+
   useEffect(() => {
-    const savedUser = localStorage.getItem('propbol_user')
-    if (savedUser) {
-      setUser(JSON.parse(savedUser))
+    restoreSession()
+  }, [])
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!panelRef.current) return
+
+      if (!panelRef.current.contains(event.target as Node)) {
+        setIsPanelOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
 
-  const togglePanel = () => setIsPanelOpen(!isPanelOpen)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (user && isSessionExpired()) {
+        clearSession()
+        router.push('/')
+      }
+    }, 10000)
+
+    return () => clearInterval(interval)
+  }, [user, router])
+
+  const togglePanel = () => {
+    if (user && isSessionExpired()) {
+      clearSession()
+      router.push('/')
+      return
+    }
+
+    setIsPanelOpen(!isPanelOpen)
+  }
 
   const handleLoginMock = () => {
-    const mockUser = { name: 'Juan Perez', email: 'juan.perez@gmail.com' }
+    const mockUser: User = {
+      name: 'Juan Perez',
+      email: 'juan.perez@gmail.com',
+    }
+
+    const expiresAt = Date.now() + SESSION_DURATION_MS
+
     setUser(mockUser)
-    localStorage.setItem('propbol_user', JSON.stringify(mockUser))
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(mockUser))
+    localStorage.setItem(SESSION_EXPIRES_KEY, String(expiresAt))
   }
 
   const handleOpenLogoutModal = () => {
@@ -43,30 +122,11 @@ export default function Navbar() {
     setIsLoggingOut(true)
 
     setTimeout(() => {
-      setUser(null)
-      setIsPanelOpen(false)
-      setShowLogoutModal(false)
+      clearSession()
       setIsLoggingOut(false)
-      localStorage.removeItem('propbol_user')
       router.push('/')
     }, 400)
   }
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (!panelRef.current) return
-
-      if (!panelRef.current.contains(event.target as Node)) {
-        setIsPanelOpen(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [])
 
   return (
     <>
