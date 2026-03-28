@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
-import { Search, MapPin, DollarSign, Home, Building, Square } from 'lucide-react'
+import { Search, MapPin, DollarSign, Home, Building, Square, ChevronRight } from 'lucide-react';
 
 const MapView = dynamic(() => import('./MapView'), { ssr: false })
 
@@ -115,26 +115,20 @@ export default function BusquedaMapaPage() {
         {/* Área del Mapa */}
         <section className="flex-grow bg-gray-100 relative w-full h-[60vh] md:h-auto transition-all duration-300">
           {/* Botón flotante para expandir/contraer el panel */}
-          <button
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="absolute left-0 top-4 z-[1000] bg-white border border-gray-300 shadow-md p-2 rounded-r-md hover:bg-gray-50 flex items-center justify-center transition-colors focus:outline-none hidden md:flex"
-            title={isSidebarOpen ? 'Contraer panel' : 'Expandir panel'}
-          >
-            <svg
-              className="w-5 h-5 text-gray-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
+          {!isSidebarOpen && (
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              className="absolute left-0 top-4 z-[1000] bg-white text-black shadow-md rounded-r-md hover:bg-gray-100 transition-colors focus:outline-none flex flex-col items-center pt-3 pb-5 px-1.5 gap-4 border-l-0"
+              title="Mostrar Lista de Inmuebles"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d={isSidebarOpen ? 'M15 19l-7-7 7-7' : 'M9 5l7 7-7 7'}
-              />
-            </svg>
-          </button>
+              <ChevronRight className="w-4 h-4" />
+              <span 
+                className="[writing-mode:vertical-lr] rotate-180 text-xs font-bold tracking-widest whitespace-nowrap"
+              >
+                Inmuebles
+              </span>
+            </button>
+          )}
 
           <div className="absolute inset-0">
             <MapView />
