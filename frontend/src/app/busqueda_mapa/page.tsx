@@ -2,24 +2,72 @@
 
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
+import { Search, MapPin, DollarSign, Home, Building, Square } from 'lucide-react'
 
 const MapView = dynamic(() => import('./MapView'), { ssr: false })
 
 export default function BusquedaMapaPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null)
-
   return (
     <div className="flex flex-col w-full min-h-[calc(100vh-theme(spacing.32))] border rounded-lg overflow-hidden shadow-sm bg-white">
       {/* Barra Superior */}
-      <header className="w-full p-4 border-b border-gray-200 bg-gray-50 shrink-0">
-        <h2 className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wide">
-          Criterios de Búsqueda (Módulo Externo)
-        </h2>
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="h-10 w-full md:w-1/3 bg-gray-200 rounded animate-pulse"></div>
-          <div className="h-10 w-full md:w-1/3 bg-gray-200 rounded animate-pulse"></div>
-          <div className="h-10 w-full md:w-1/3 bg-gray-200 rounded animate-pulse"></div>
+      <header className="w-full p-4 border-b border-gray-200 bg-white shrink-0 z-10 shadow-sm">
+        {/* Fila superior: Tipos de contrato */}
+        <div className="flex items-center justify-center gap-8 mb-4 text-sm">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <div className="w-5 h-5 bg-[#ea580c] rounded-sm flex items-center justify-center"></div>
+            <span className="text-[#ea580c] font-medium">Venta</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <div className="w-5 h-5 border-2 border-gray-300 rounded-sm hover:border-gray-400 transition-colors"></div>
+            <span className="text-gray-600">Alquiler</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <div className="w-5 h-5 border-2 border-gray-300 rounded-sm hover:border-gray-400 transition-colors"></div>
+            <span className="text-gray-600">Anticrético</span>
+          </label>
+        </div>
+
+        {/* Fila inferior: Filtros principales */}
+        <div className="flex flex-wrap md:flex-nowrap items-center justify-center gap-3">
+          <button className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-600 hover:bg-gray-50 transition-colors">
+            <Building className="w-4 h-4" />
+            <span className="font-medium text-sm">Casas</span>
+          </button>
+
+          <div className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md flex-grow min-w-[200px] max-w-md focus-within:border-[#ea580c] focus-within:ring-1 focus-within:ring-[#ea580c] transition-all">
+            <Search className="w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Buscar"
+              className="outline-none w-full text-gray-700 placeholder-gray-400 text-sm bg-transparent"
+            />
+          </div>
+
+          <button className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-600 hover:bg-gray-50 transition-colors">
+            <MapPin className="w-4 h-4" />
+            <span className="font-medium text-sm">Zona</span>
+          </button>
+
+          <button className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-600 hover:bg-gray-50 transition-colors">
+            <DollarSign className="w-4 h-4" />
+            <span className="font-medium text-sm">Precio</span>
+          </button>
+
+          <button className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-600 hover:bg-gray-50 transition-colors">
+            <Home className="w-4 h-4" />
+            <span className="font-medium text-sm">Capacidad</span>
+          </button>
+
+          <button className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-600 hover:bg-gray-50 transition-colors">
+            <Square className="w-4 h-4" />
+            <span className="font-medium text-sm">Metros²</span>
+          </button>
+
+          <button className="px-5 py-2 bg-[#ea580c] text-white font-medium text-sm rounded-md hover:bg-[#c2410c] transition-colors whitespace-nowrap">
+            Más Filtros
+          </button>
         </div>
       </header>
 
@@ -43,12 +91,14 @@ export default function BusquedaMapaPage() {
             md:w-[30vw] min-w-[250px]
           `}
           >
-            <div className="flex justify-end mb-4">
+            {/* Encabezado con el texto y flecha */}
+            <div className="flex items-center gap-2 mb-4">
               <button
                 onClick={() => setIsSidebarOpen(false)}
-                className="md:hidden text-gray-500 hover:text-gray-800 text-sm font-medium"
+                className="flex items-center gap-2 text-gray-700 hover:text-gray-900 font-medium group"
               >
-                Cerrar
+                <span className="text-lg">←</span>
+                <span>Lista de inmuebles</span>
               </button>
             </div>
 

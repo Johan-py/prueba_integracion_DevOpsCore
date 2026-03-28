@@ -5,19 +5,20 @@
 <<<<<<< HEAD
 **PropBol** es una plataforma web enfocada en la **compra, venta y gestión de inmuebles** en Bolivia.
 =======
+
 - Frontend y Backend en **Next.js + TSX** (App Router)
 - API REST simple (`/api/calculator`)
 - Tests con **Bun**
 - Docker para contenedores
 - Scripts de desarrollo y CI/CD listos para pipelines
->>>>>>> 1afaf7a466d87a424d3ccbff49795d0deb0e930b
+  > > > > > > > 56a083c5ffa951ac8667ced549881cfd37d5c116
 
 Permite a usuarios:
 
-* Publicar propiedades (casas, departamentos, terrenos)
-* Explorar listados disponibles
-* Gestionar información de usuarios
-* Autenticarse y operar de forma segura
+- Publicar propiedades (casas, departamentos, terrenos)
+- Explorar listados disponibles
+- Gestionar información de usuarios
+- Autenticarse y operar de forma segura
 
 El sistema está diseñado bajo una arquitectura moderna, escalable y desacoplada.
 
@@ -27,15 +28,18 @@ El sistema está diseñado bajo una arquitectura moderna, escalable y desacoplad
 
 El proyecto sigue un enfoque **monorepo** con separación clara por capas:
 
-* **Frontend** → Next.js (App Router + TypeScript)
-* **Backend** → API REST (Node.js + TypeScript)
-* **Infraestructura** → Docker + CI/CD (GitHub Actions)
+- **Frontend** → Next.js (App Router + TypeScript)
+- **Backend** → API REST (Node.js + TypeScript)
+- **Infraestructura** → Docker + CI/CD (GitHub Actions)
 
 ---
 
 <<<<<<< HEAD
+
 ## 📂 Estructura del Proyecto
+
 =======
+
 ## ⚡ Requisitos
 
 - **Bun** (v1.3+) → [https://bun.sh](https://bun.sh)
@@ -94,7 +98,8 @@ GET /api/calculator?a=10&b=2&op=divide
 ## 🐳 Docker
 
 Levantar contenedor de desarrollo:
->>>>>>> 1afaf7a466d87a424d3ccbff49795d0deb0e930b
+
+> > > > > > > 56a083c5ffa951ac8667ced549881cfd37d5c116
 
 ```bash
 .
@@ -105,12 +110,13 @@ Levantar contenedor de desarrollo:
 └── .github/      # pipelines CI/CD
 ```
 
-<<<<<<< HEAD
-=======
+# <<<<<<< HEAD
+
 - Acceder a `http://localhost:3000/`
 - API: `http://localhost:3000/api/calculator`
 
->>>>>>> 1afaf7a466d87a424d3ccbff49795d0deb0e930b
+> > > > > > > 56a083c5ffa951ac8667ced549881cfd37d5c116
+
 ---
 
 ## ⚙️ Requisitos
@@ -118,9 +124,9 @@ Levantar contenedor de desarrollo:
 <<<<<<< HEAD
 Asegúrate de tener instalado:
 
-* Bun >= 1.x
-* Node.js >= 18
-* Docker (opcional)
+- Bun >= 1.x
+- Node.js >= 18
+- Docker (opcional)
 
 ---
 
@@ -183,6 +189,7 @@ En otra terminal:
 cd frontend
 bun run dev
 ```
+
 ### 6. Ejecucion general (back y front)
 
 En la raiz del proyecto:
@@ -201,13 +208,12 @@ http://localhost:5000
 
 ```
 
-
 ---
 
 ## 🌿 Flujo de Trabajo
 
-* `main` → producción
-* `develop` → integración
+- `main` → producción
+- `develop` → integración
 
 ### Convención de commits
 
@@ -221,21 +227,21 @@ chore: tareas internas
 
 ## 📦 Buenas Prácticas
 
-* No subir archivos `.env`
-* No modificar configuraciones críticas sin aprobación
-* Mantener commits pequeños:
+- No subir archivos `.env`
+- No modificar configuraciones críticas sin aprobación
+- Mantener commits pequeños:
+  - máximo permitido: 250 líneas
 
-  * máximo permitido: 250 líneas
-* Seguir arquitectura por capas en backend
-* Separar lógica y UI en frontend
+- Seguir arquitectura por capas en backend
+- Separar lógica y UI en frontend
 
 ---
 
 ## 🔐 Seguridad
 
-* No hardcodear credenciales
-* Uso obligatorio de variables de entorno
-* Revisar scripts antes de ejecutarlos (`/scripts`)
+- No hardcodear credenciales
+- Uso obligatorio de variables de entorno
+- Revisar scripts antes de ejecutarlos (`/scripts`)
 
 ---
 
@@ -249,9 +255,9 @@ En desarrollo activo.
 
 Construir una plataforma robusta y escalable que facilite el mercado inmobiliario en Bolivia, permitiendo:
 
-* Mayor visibilidad de propiedades
-* Gestión eficiente de usuarios
-* Experiencia moderna y rápida
+- Mayor visibilidad de propiedades
+- Gestión eficiente de usuarios
+- Experiencia moderna y rápida
 
 ---
 
@@ -267,11 +273,12 @@ Para contribuir:
 
 ## 📄 Licencia
 
-Pendiente de definición.
-=======
+# Pendiente de definición.
+
 - Usa `bun test` para todos los tests; no es necesario configurar Jest manualmente
 - Toda la lógica de API está en `app/api/calculator/route.ts`
 - Layout obligatorio en `app/layout.tsx` para evitar errores de Next.js con App Router
 
 > Este repositorio sirve como **base para construir escenarios de estrés realistas para el equipo de DevOps**.
->>>>>>> 1afaf7a466d87a424d3ccbff49795d0deb0e930b
+>
+> > > > > > > 56a083c5ffa951ac8667ced549881cfd37d5c116

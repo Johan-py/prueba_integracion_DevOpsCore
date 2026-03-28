@@ -13,12 +13,6 @@
 
     "allowImportingTsExtensions": false
   },
-<<<<<<< HEAD
-  "include": ["src", "api"],
-  "exclude": ["node_modules"]
-}
-=======
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }
->>>>>>> 1afaf7a466d87a424d3ccbff49795d0deb0e930b

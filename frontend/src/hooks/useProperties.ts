@@ -6,7 +6,7 @@ import { MOCK_PROPERTIES } from '@/data/mockProperties'
 // 1. Cambiar USE_MOCK a false
 // 2. Asegurarse de que NEXT_PUBLIC_API_URL esté en .env.local
 
-const USE_MOCK = true
+const USE_MOCK = false
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
 
 interface UsePropertiesResult {
