@@ -1,17 +1,31 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export default function Navbar() {
+  const router = useRouter()
+  const panelRef = useRef<HTMLDivElement | null>(null)
+
   const [user, setUser] = useState<{ name: string; email: string } | null>(null)
   const [isPanelOpen, setIsPanelOpen] = useState(false)
   const [showLogoutModal, setShowLogoutModal] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem('propbol_user')
+    if (savedUser) {
+      setUser(JSON.parse(savedUser))
+    }
+  }, [])
 
   const togglePanel = () => setIsPanelOpen(!isPanelOpen)
 
   const handleLoginMock = () => {
-    setUser({ name: 'Juan Perez', email: 'juan.perez@gmail.com' })
+    const mockUser = { name: 'Juan Perez', email: 'juan.perez@gmail.com' }
+    setUser(mockUser)
+    localStorage.setItem('propbol_user', JSON.stringify(mockUser))
   }
 
   const handleOpenLogoutModal = () => {
@@ -19,14 +33,40 @@ export default function Navbar() {
   }
 
   const handleCancelLogout = () => {
+    if (isLoggingOut) return
     setShowLogoutModal(false)
   }
 
   const handleConfirmLogout = () => {
-    setUser(null)
-    setIsPanelOpen(false)
-    setShowLogoutModal(false)
+    if (isLoggingOut) return
+
+    setIsLoggingOut(true)
+
+    setTimeout(() => {
+      setUser(null)
+      setIsPanelOpen(false)
+      setShowLogoutModal(false)
+      setIsLoggingOut(false)
+      localStorage.removeItem('propbol_user')
+      router.push('/')
+    }, 400)
   }
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!panelRef.current) return
+
+      if (!panelRef.current.contains(event.target as Node)) {
+        setIsPanelOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   return (
     <>
@@ -52,7 +92,7 @@ export default function Navbar() {
               </Link>
             </div>
 
-            <div className="relative">
+            <div className="relative" ref={panelRef}>
               <button
                 onClick={togglePanel}
                 className="bg-gray-100 px-4 py-2 rounded-xl font-semibold text-gray-700 shadow-sm hover:bg-gray-200 hover:shadow transition duration-200"
@@ -75,6 +115,7 @@ export default function Navbar() {
                     <Link
                       href="/perfil"
                       className="block text-blue-600 font-medium mb-4 hover:text-blue-700 transition"
+                      onClick={() => setIsPanelOpen(false)}
                     >
                       Mi perfil
                     </Link>
@@ -121,16 +162,18 @@ export default function Navbar() {
           <div className="flex justify-end gap-3">
             <button
               onClick={handleCancelLogout}
-              className="px-5 py-2 rounded-lg bg-gray-100 text-gray-600 font-semibold hover:bg-gray-200 transition"
+              disabled={isLoggingOut}
+              className="px-5 py-2 rounded-lg bg-gray-100 text-gray-600 font-semibold hover:bg-gray-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancelar
             </button>
 
             <button
               onClick={handleConfirmLogout}
-              className="px-5 py-2 rounded-lg bg-[#ff0050] text-white font-semibold shadow-sm hover:opacity-90 transition"
+              disabled={isLoggingOut}
+              className="px-5 py-2 rounded-lg bg-[#ff0050] text-white font-semibold shadow-sm hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Cerrar Sesión
+              {isLoggingOut ? 'Cerrando...' : 'Cerrar Sesión'}
             </button>
           </div>
         </div>
