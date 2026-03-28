@@ -1,53 +1,80 @@
+// frontend/src/components/layout/PropertyCard.tsx
+import Image from 'next/image'; 
+import { BedDouble, Bath, Square, MessageSquareText, ImageOff } from 'lucide-react'; 
+
 type PropsTarjeta = {
   imagen?: string;
-  estado: string;
-  precio: string;
-  descripcion: string;
+  estado: string; 
+  precio: string; 
+  descripcion: string; 
   camas: number;
   banos: number;
   metros: number;
 };
 
-export default function PropertyCard({ imagen, estado, precio, descripcion, camas, banos, metros }: PropsTarjeta) {
+// 1. Definimos una constante para el color gris de fondo cuando no hay imagen
+const COLOR_GRIS_PLACEHOLDER = "bg-gray-200";
+
+export default function PropertyCard({ 
+  imagen, 
+  estado, 
+  precio, 
+  descripcion, 
+  camas, 
+  banos, 
+  metros 
+}: PropsTarjeta) {
   return (
-    // Este es el contenedor padre que envuelve toda la tarjeta
-    <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 max-w-sm">
+    <div className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300 border border-gray-100 group">
       
-      {/* 1. Imagen y Etiqueta */}
-      <div className="relative">
-        <img
-          src={imagen}
-          alt={descripcion}
-          className="w-full h-48 object-cover bg-gray-200"
-        />
-        <span className="absolute top-3 left-3 bg-orange-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase">
+      {/* 2. Implementación de Imagen o Cuadro Gris (Misión Día 3) */}
+      <div className={`relative aspect-[16/10] overflow-hidden ${!imagen ? COLOR_GRIS_PLACEHOLDER : ''} flex items-center justify-center`}>
+        {imagen ? (
+          <Image
+            src={imagen}
+            alt={descripcion}
+            fill
+            sizes="(max-w-7xl) 30vw"
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+        ) : (
+          /* Icono de cámara tachada si no hay foto para que no se vea feo */
+          <div className="flex flex-col items-center text-gray-400">
+            <ImageOff className="w-12 h-12 mb-1" />
+            <span className="text-[10px] font-medium uppercase">Sin foto disponible</span>
+          </div>
+        )}
+        
+        <span className="absolute top-3 left-3 bg-[#ea580c] text-white text-[10px] font-bold px-2.5 py-1.5 rounded-sm shadow uppercase tracking-wider z-10">
           {estado}
         </span>
       </div>
 
-      {/* 2. Contenido de la Tarjeta */}
-      <div className="p-4">
-        {/* Precio */}
-        <h2 className="text-2xl font-extrabold text-gray-900 mb-2">{precio}</h2>
+      <div className="p-4 flex flex-col gap-3">
+        <h2 className="text-xl md:text-2xl font-extrabold text-gray-950 tracking-tight">{precio}</h2>
 
-        {/* Descripción */}
-        <p className="text-sm text-gray-700 mb-4 line-clamp-2 font-medium">
+        <p className="text-sm text-gray-800 line-clamp-2 font-medium leading-relaxed min-h-[40px]">
           {descripcion}
         </p>
 
-        {/* 3. Detalles */}
-        <div className="flex items-center gap-4 text-xs font-bold text-gray-500 mb-4">
-          <span className="flex items-center gap-1 text-orange-500">🛏️ {camas}</span>
-          <span className="flex items-center gap-1 text-orange-500">🛁 {banos}</span>
-          <span className="flex items-center gap-1 text-gray-400">📐 {metros} m²</span>
+        <div className="flex items-center gap-4 text-gray-600 border-t border-gray-100 pt-3">
+          <span className="flex items-center gap-1.5 text-sm font-semibold">
+            <BedDouble className="w-4 h-4 text-[#ea580c]" /> {camas}
+          </span>
+          <span className="flex items-center gap-1.5 text-sm font-semibold">
+            <Bath className="w-4 h-4 text-[#ea580c]" /> {banos}
+          </span>
+          <span className="flex items-center gap-1.5 text-sm font-semibold border border-gray-200 bg-gray-50 px-2 py-0.5 rounded">
+            <Square className="w-4 h-4 text-gray-500" /> {metros} m²
+          </span>
         </div>
 
-        {/* 4. Botón verde */}
-        <button className="w-full bg-[#1db954] hover:bg-green-600 text-white font-semibold py-2.5 rounded-lg transition-colors flex justify-center items-center gap-2">
-          <span>💬</span> Contactar
+        {/* 3. Botón de contacto habilitado (Misión Día 3/4) */}
+        <button className="w-full mt-1 bg-[#25D366] hover:bg-[#128C7E] text-white font-semibold py-2.5 rounded-lg transition-colors flex justify-center items-center gap-2">
+          <MessageSquareText className="w-5 h-5" /> 
+          Contactar
         </button>
       </div>
-
     </div>
   );
 }
