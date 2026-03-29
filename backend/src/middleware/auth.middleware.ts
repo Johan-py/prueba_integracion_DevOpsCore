@@ -1,5 +1,5 @@
-import jwt from 'jsonwebtoken'
+import jwt from "jsonwebtoken";
 
 export const verifyToken = (token: string) => {
-  return jwt.verify(token, process.env.JWT_SECRET!)
-}
+  return jwt.verify(token, process.env.JWT_SECRET!);
+};

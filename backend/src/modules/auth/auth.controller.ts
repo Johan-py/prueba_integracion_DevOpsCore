@@ -1,8 +1,8 @@
-import { loginService } from './auth.service.js'
+import { loginService } from "./auth.service.js";
 type payload = {
-  name: string,
-  email: string
-}
+  name: string;
+  email: string;
+};
 export const loginController = async (body: payload) => {
-  return loginService(body)
-}
+  return loginService(body);
+};
