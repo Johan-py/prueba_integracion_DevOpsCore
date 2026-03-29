@@ -1,7 +1,32 @@
 import {
+  buscarPublicacionesPorUsuarioRepository,
   buscarPublicacionPorIdRepository,
   eliminarLogicamentePublicacionRepository
 } from './publicacion.repository.js'
+
+export const listarMisPublicacionesService = async (usuarioId: number) => {
+  if (Number.isNaN(usuarioId) || usuarioId <= 0) {
+    throw new Error('USUARIO_INVALIDO')
+  }
+
+  const publicaciones = await buscarPublicacionesPorUsuarioRepository(usuarioId)
+
+  return publicaciones.map((publicacion) => ({
+    id: publicacion.id,
+    titulo: publicacion.titulo,
+    precio: Number(publicacion.inmueble.precio),
+    ubicacion:
+      [publicacion.inmueble.ubicacion?.ciudad, publicacion.inmueble.ubicacion?.zona]
+        .filter(Boolean)
+        .join(', ') || 'Ubicación no disponible',
+    nroBanos: publicacion.inmueble.nroBanos,
+    nroCuartos: publicacion.inmueble.nroCuartos,
+    superficieM2: publicacion.inmueble.superficieM2
+      ? Number(publicacion.inmueble.superficieM2)
+      : null,
+    imagenUrl: publicacion.multimedia?.[0]?.url ?? null
+  }))
+}
 
 export const eliminarPublicacionService = async (
   publicacionId: number,

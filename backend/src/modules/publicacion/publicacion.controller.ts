@@ -1,5 +1,32 @@
 import { Request, Response } from 'express'
-import { eliminarPublicacionService } from './publicacion.service.js'
+import { eliminarPublicacionService, listarMisPublicacionesService } from './publicacion.service.js'
+
+export const listarMisPublicacionesController = async (req: Request, res: Response) => {
+  const usuarioId = Number(req.header('x-user-id'))
+
+  try {
+    const publicaciones = await listarMisPublicacionesService(usuarioId)
+
+    return res.status(200).json({
+      ok: true,
+      data: publicaciones
+    })
+  } catch (error) {
+    if (error instanceof Error && error.message === 'USUARIO_INVALIDO') {
+      return res.status(401).json({
+        ok: false,
+        message: 'Usuario no autenticado'
+      })
+    }
+
+    console.error('Error al listar mis publicaciones:', error)
+
+    return res.status(500).json({
+      ok: false,
+      message: 'No se pudieron obtener las publicaciones'
+    })
+  }
+}
 
 export const eliminarPublicacionController = async (req: Request, res: Response) => {
   const publicacionId = Number(req.params.id)
