@@ -1,182 +1,126 @@
 'use client';
 
-import { useState } from 'react'; // Este es el "nosequé" que faltaba importar
-import { ArrowDownUp, Filter } from 'lucide-react';
-import { useFilterLogic } from '@/hooks/useFilterLogic'; // Ajusta la ruta según tu carpeta
+import { useState, useEffect } from 'react';
+import { Filter } from 'lucide-react';
+import { useFilterLogic } from '@/hooks/useFilterLogic';
 
-// Datos de prueba (Simulando lo que vendría del backend de PropBol)
-const DUMMY_RENTALS = [
-  { name: 'Santa Cruz', count: 5000 },
-  { name: 'Cochabamba', count: 2100 },
-  { name: 'La Paz', count: 3500 },
-  { name: 'Tarija', count: 1200 },
-  { name: 'Beni', count: 800 },
-  { name: 'Oruro', count: 500 },
-];
-
-const DUMMY_SALES = [
-  { name: 'Santa Cruz', count: 8000 },
-  { name: 'Cochabamba', count: 4200 },
-  { name: 'La Paz', count: 1500 },
-  { name: 'Tarija', count: 900 },
-];
-
-const DUMMY_TYPES = [
-  { name: 'Casas', count: 4567 },
-  { name: 'Departamentos', count: 2340 },
-  { name: 'Cuartos', count: 2346 },
-  { name: 'Terrenos', count: 3450 },
-  { name: 'Espacios Cementerio', count: 5674 },
-];
+// Función auxiliar para normalizar el texto (Cochabamba, Santa Cruz, etc.)
+const formatName = (text: string) => {
+  if (!text) return "";
+  return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+};
 
 export default function FilterPanel() {
-  // 1. Usamos el Hook pasando los datos iniciales
-const [limitRentals, setLimitRentals] = useState(3);
-const [limitSales, setLimitSales] = useState(3);
-const [limitTypes, setLimitTypes] = useState(3);
-const [sortOrder, setSortOrder] = useState<'none' | 'asc' | 'desc'>('none');
+  const [rentalsData, setRentalsData] = useState([]);
+  const [salesData, setSalesData] = useState([]);
+  const [typesData, setTypesData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-const toggleSort = () => setSortOrder(prev => prev === 'none' ? 'asc' : prev === 'asc' ? 'desc' : 'none');
+  const rentalsLogic = useFilterLogic();
+  const salesLogic = useFilterLogic();
+  const typesLogic = useFilterLogic();
 
-// Función auxiliar de ordenamiento (Estándar: 1 responsabilidad [cite: 74])
-const sortData = (data: { name: string, count: number }[]) => {
-  if (sortOrder === 'none') return [...data].sort((a, b) => b.count - a.count);
-  return [...data].sort((a, b) => 
-    sortOrder === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
-  );
-};
-  // 2. Obtenemos solo los datos que deben ser visibles para cada sección
-const visibleRentals = sortData(DUMMY_RENTALS).slice(0, limitRentals);
-const visibleSales = sortData(DUMMY_SALES).slice(0, limitSales);
-const visibleTypes = sortData(DUMMY_TYPES).slice(0, limitTypes);
+  useEffect(() => {
+    const fetchFilters = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/filters');
+        const result = await response.json();
+        if (result.success) {
+          setRentalsData(result.data.rentals);
+          setSalesData(result.data.sales);
+          setTypesData(result.data.categories);
+        }
+      } catch (error) {
+        console.error("Error cargando datos reales:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFilters();
+  }, []);
+
+  if (loading) return <aside className="w-80 p-6 text-gray-500 italic">Sincronizando datos de PropBol...</aside>;
 
   return (
     <aside className="w-full md:w-80 bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-
+      
       {/* CABECERA */}
       <div className="flex items-center justify-between mb-6 border-b border-gray-800 pb-3">
         <div className="flex items-center gap-2 text-gray-900">
           <Filter size={20} className="text-orange-500" /> 
           <h2 className="text-lg font-bold">Filtros</h2>
         </div>
-
-        {/* BOTÓN ORDENAR (Conectado a toggleSort) */}
         <button 
-          onClick={toggleSort}
-          className="flex items-center gap-1 cursor-pointer group outline-none"
+          onClick={rentalsLogic.toggleSort} 
+          className="text-sm font-medium text-orange-400 hover:text-orange-600 outline-none"
         >
-          <span className="text-sm font-medium text-orange-400 group-hover:text-orange-600">
-            {sortOrder === 'none' ? 'Ordenar' : sortOrder === 'asc' ? 'Ordenar A↓' : 'Ordenar A↑'}
-          </span>
+          {rentalsLogic.sortOrder === 'none' ? 'Ordenar' : rentalsLogic.sortOrder === 'asc' ? 'A↓' : 'A↑'}
         </button>
       </div>
 
-      {/* SECCIÓN: Alquileres */}
+      {/* SECCIÓN: ALQUILERES */}
       <section className="mt-4">
-        <h3 className="text-xl font-bold text-black mb-3 inline-block border-b-2 border-black pb-0.5">
-          Alquileres
-        </h3>
-        
+        <h3 className="text-xl font-bold text-black mb-3 border-b-2 border-black inline-block">Alquileres</h3>
         <div className="flex flex-col gap-2 mt-2">
-          {visibleRentals.map((city, index) => (
+          {rentalsLogic.getVisibleData(rentalsData).map((city: any, index: number) => (
             <div key={index} className="flex justify-between items-center text-lg gap-3">
-  <span className="text-gray-400 hover:text-gray-600 cursor-pointer transition-colors truncate flex-1">
-    {city.name}
-  </span>
-  <span className="text-gray-400 whitespace-nowrap flex-shrink-0">
-    {city.count.toLocaleString()} casas
-  </span>
-</div>
+              {/* Normalizamos el nombre aquí con formatName */}
+              <span className="text-gray-400 hover:text-gray-600 cursor-pointer truncate flex-1">
+                {formatName(city.name)}
+              </span>
+              <span className="text-gray-400 whitespace-nowrap">{city.count.toLocaleString()} casas</span>
+            </div>
           ))}
-{limitRentals < DUMMY_RENTALS.length ? (
-            <button 
-              onClick={() => setLimitRentals(prev => prev === 3 ? 6 : DUMMY_RENTALS.length)}
-              className="text-sm text-orange-400 hover:text-orange-600 font-medium mt-1 w-fit transition-colors underline"
-            >
-              Ver más {'>'}
-            </button>
-          ) : (
-            <button 
-              onClick={() => setLimitRentals(3)}
-              className="text-sm text-orange-400 hover:text-orange-600 font-medium mt-1 w-fit transition-colors underline ml-auto"
-            >
-              {'<'} Ver menos
-            </button>
+          {rentalsLogic.viewLevel < 3 && rentalsData.length > 2 ? (
+            <button onClick={rentalsLogic.handleSeeMore} className="text-sm text-orange-400 underline mt-1 w-fit">Ver más {'>'}</button>
+          ) : rentalsData.length > 2 && (
+            <button onClick={rentalsLogic.handleSeeLess} className="text-sm text-orange-400 underline mt-1 w-fit ml-auto">{'<'} Ver menos</button>
           )}
         </div>
       </section>
 
-      {/* SECCIÓN: En venta */}
+      {/* SECCIÓN: EN VENTA */}
       <section className="mt-8">
-        <h3 className="text-xl font-bold text-black mb-3 inline-block border-b-2 border-black pb-0.5">
-          En venta
-        </h3>
-        
+        <h3 className="text-xl font-bold text-black mb-3 border-b-2 border-black inline-block">En venta</h3>
         <div className="flex flex-col gap-2 mt-2">
-          {visibleSales.map((city, index) => (
+          {salesLogic.getVisibleData(salesData).map((city: any, index: number) => (
             <div key={index} className="flex justify-between items-center text-lg gap-3">
-  <span className="text-gray-400 hover:text-gray-600 cursor-pointer transition-colors truncate flex-1">
-    {city.name}
-  </span>
-  <span className="text-gray-400 whitespace-nowrap flex-shrink-0">
-    {city.count.toLocaleString()} casas
-  </span>
-</div>
+              <span className="text-gray-400 hover:text-gray-600 cursor-pointer truncate flex-1">
+                {formatName(city.name)}
+              </span>
+              <span className="text-gray-400 whitespace-nowrap">{city.count.toLocaleString()} casas</span>
+            </div>
           ))}
-
-          {limitSales < DUMMY_SALES.length ? (
-  <button 
-    onClick={() => setLimitSales(prev => prev === 3 ? 6 :DUMMY_SALES.length)}
-    className="text-sm text-orange-400 hover:text-orange-600 font-medium mt-1 w-fit transition-colors underline"
-  >
-    Ver más {'>'}
-  </button>
-) : (
-  <button 
-    onClick={() => setLimitSales(3)}
-    className="text-sm text-orange-400 hover:text-orange-600 font-medium mt-1 w-fit transition-colors underline ml-auto"
-  >
-    {'<'} Ver menos
-  </button>
-)}
+          {salesLogic.viewLevel < 3 && salesData.length > 2 ? (
+            <button onClick={salesLogic.handleSeeMore} className="text-sm text-orange-400 underline mt-1 w-fit">Ver más {'>'}</button>
+          ) : salesData.length > 2 && (
+            <button onClick={salesLogic.handleSeeLess} className="text-sm text-orange-400 underline mt-1 w-fit ml-auto">{'<'} Ver menos</button>
+          )}
         </div>
       </section>
 
-      {/* SECCIÓN: Por tipo de inmueble */}
+      {/* SECCIÓN: POR TIPO DE INMUEBLE (Título actualizado) */}
       <section className="mt-8">
-        <h3 className="text-xl font-bold text-black mb-3 inline-block border-b-2 border-black pb-0.5">
+        <h3 className="text-xl font-bold text-black mb-3 border-b-2 border-black inline-block">
           Por tipo de inmueble
         </h3>
-        
         <div className="flex flex-col gap-2 mt-2">
-          {visibleTypes.map((type, index) => (
+          {typesLogic.getVisibleData(typesData).map((type: any, index: number) => (
             <div key={index} className="flex justify-between items-center text-lg gap-3">
-  <span className="text-gray-400 hover:text-gray-600 cursor-pointer transition-colors truncate flex-1">
-    {type.name}
-  </span>
-  <span className="text-gray-400 whitespace-nowrap flex-shrink-0">
-    {type.count.toLocaleString()} propiedades
-  </span>
-</div>
+              <span className="text-gray-400 hover:text-gray-600 cursor-pointer truncate flex-1">
+                {formatName(type.name)}
+              </span>
+              <span className="text-gray-400">{type.count.toLocaleString()} propiedades</span>
+            </div>
           ))}
-{limitTypes < DUMMY_TYPES.length ? (
-  <button 
-    onClick={() => setLimitTypes(prev => prev === 3 ? 6 : DUMMY_TYPES.length)}
-    className="text-sm text-orange-400 hover:text-orange-600 font-medium mt-1 w-fit transition-colors underline"
-  >
-    Ver más {'>'}
-  </button>
-) : (
-  <button 
-    onClick={() => setLimitTypes(3)}
-    className="text-sm text-orange-400 hover:text-orange-600 font-medium mt-1 w-fit transition-colors underline ml-auto"
-  >
-    {'<'} Ver menos
-  </button>
-)}
+          {typesLogic.viewLevel < 3 && typesData.length > 2 ? (
+            <button onClick={typesLogic.handleSeeMore} className="text-sm text-orange-400 underline mt-1 w-fit">Ver más {'>'}</button>
+          ) : typesData.length > 2 && (
+            <button onClick={typesLogic.handleSeeLess} className="text-sm text-orange-400 underline mt-1 w-fit ml-auto">{'<'} Ver menos</button>
+          )}
         </div>
       </section>
-    
+      
     </aside>
   );
 }
