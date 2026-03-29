@@ -120,6 +120,7 @@ export default function BusquedaMapaPage() {
                  <div
                    key={property.id}
                    onMouseEnter={() => setHoveredId(property.id)}
+                   onMouseLeave={() => setHoveredId(null)}
                    onClick={() => setSelectedPropertyId(property.id)}
                    className={`
                     p-3 border rounded-lg cursor-pointer transition-all
