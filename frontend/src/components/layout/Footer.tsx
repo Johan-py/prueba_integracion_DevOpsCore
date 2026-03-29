@@ -116,10 +116,10 @@ function FooterSection({ actions, title }: { actions: FooterAction[]; title: str
 function FooterBottomBar() {
   return (
     <div className="border-t border-stone-200">
-      <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-5 text-sm text-stone-600 sm:px-8 lg:flex-row lg:items-center lg:px-10">
+      <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-5 text-sm text-stone-600 sm:flex-row sm:flex-wrap sm:items-center sm:px-8 lg:px-10">
         <span className="h-4 w-4 rounded-md border border-stone-400" aria-hidden="true" />
         <span>2026 PropBol Inmobiliaria.</span>
-        <span className="hidden h-1 w-1 rounded-full bg-stone-300 lg:block" aria-hidden="true" />
+        <span className="hidden h-1 w-1 rounded-full bg-stone-300 sm:block" aria-hidden="true" />
         <span>Todos los derechos reservados</span>
       </div>
     </div>
@@ -130,7 +130,7 @@ export default function Footer() {
   return (
     <footer className="mt-auto border-t border-stone-200 bg-stone-50">
       <div className="mx-auto max-w-6xl px-6 py-10 sm:px-8 lg:px-10">
-        <div className="grid gap-10 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-8 [grid-template-columns:repeat(auto-fit,minmax(180px,1fr))]">
           <FooterBrand />
           <FooterSection actions={exploreActions} title="Explorar" />
           <FooterSection actions={companyActions} title="Conócenos" />
