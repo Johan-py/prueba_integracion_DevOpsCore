@@ -1,41 +1,54 @@
-import { Request, Response } from 'express'
-import { loginService, registerUser } from './auth.service.js'
+import { Request, Response } from "express";
+import { AuthError, loginService, registerUser } from "./auth.service.js";
 
 type RegisterBody = {
-  nombre: string
-  apellido: string
-  correo: string
-  password: string
-  confirmPassword: string
-  telefono?: string
-}
+  nombre: string;
+  apellido: string;
+  correo: string;
+  password: string;
+  confirmPassword: string;
+  telefono?: string;
+};
 
 const getRegisterErrorStatus = (message: string) => {
-  if (message === 'El correo ya está registrado') return 409
-  return 400
-}
+  if (message === "El correo ya está registrado") return 409;
+  return 400;
+};
 
 export const loginController = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body
-    const result = await loginService({ email, password })
+    const { correo, password } = req.body;
+    const result = await loginService({ correo, password });
 
-    return res.status(200).json(result)
+    return res.status(200).json({
+      message: "Inicio de sesión exitoso",
+      ...result,
+    });
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : 'Error interno del servidor'
+    if (error instanceof AuthError) {
+      if (error.retryAfterSeconds) {
+        res.setHeader("Retry-After", String(error.retryAfterSeconds));
+      }
 
-    return res.status(400).json({ message })
+      return res.status(error.statusCode).json({
+        message: error.message,
+      });
+    }
+
+    const message =
+      error instanceof Error ? error.message : "Error interno del servidor";
+
+    return res.status(400).json({ message });
   }
-}
+};
 
 export const registerController = async (
   req: Request<unknown, unknown, RegisterBody>,
-  res: Response
+  res: Response,
 ) => {
   try {
     const { nombre, apellido, correo, password, confirmPassword, telefono } =
-      req.body
+      req.body;
 
     const result = await registerUser({
       nombre,
@@ -43,18 +56,18 @@ export const registerController = async (
       correo,
       password,
       confirmPassword,
-      telefono
-    })
+      telefono,
+    });
 
     return res.status(201).json({
-      message: 'Usuario registrado correctamente',
+      message: "Usuario registrado correctamente",
       user: result.user,
-      token: result.token
-    })
+      token: result.token,
+    });
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : 'Error interno del servidor'
+      error instanceof Error ? error.message : "Error interno del servidor";
 
-    return res.status(getRegisterErrorStatus(message)).json({ message })
+    return res.status(getRegisterErrorStatus(message)).json({ message });
   }
-}
+};

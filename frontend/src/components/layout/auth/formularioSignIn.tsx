@@ -1,104 +1,126 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import Link from 'next/link'
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+type LoginResponse = {
+  message?: string;
+  token?: string;
+  user?: {
+    id: number;
+    correo: string;
+  };
+};
 
 export default function LoginForm() {
-  const [showPassword, setShowPassword] = useState(false)
+  const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
 
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
+  const [correo, setCorreo] = useState("");
+  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState<{ correo?: string; password?: string }>(
+    {},
+  );
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const isFormValid =
-    email.length > 0 &&
+    correo.length > 0 &&
     password.length > 0 &&
-    !errors.email &&
-    !errors.password
+    !errors.correo &&
+    !errors.password;
 
   const validate = (field: string, value: string) => {
-    const newErrors = { ...errors }
+    const newErrors = { ...errors };
 
-    if (field === 'email') {
+    if (field === "correo") {
       if (!value) {
-        newErrors.email = 'El correo es obligatorio'
+        newErrors.correo = "El correo es obligatorio";
       } else if (!/\S+@\S+\.\S+/.test(value)) {
-        newErrors.email = 'Formato de correo inválido'
+        newErrors.correo = "Formato de correo inválido";
       } else {
-        delete newErrors.email
+        delete newErrors.correo;
       }
     }
 
-    if (field === 'password') {
+    if (field === "password") {
       if (!value) {
-        newErrors.password = 'La contraseña es obligatoria'
+        newErrors.password = "La contraseña es obligatoria";
       } else if (value.length > 16) {
-        newErrors.password = 'La contraseña no puede tener mas de 16 caracteres'
+        newErrors.password =
+          "La contraseña no puede tener más de 16 caracteres";
       } else {
-        delete newErrors.password
+        delete newErrors.password;
       }
     }
 
-    setErrors(newErrors)
-  }
+    setErrors(newErrors);
+  };
 
-const fakeLogin = async (email: string, password: string) => {
-  await new Promise((res) => setTimeout(res, 1000)) // simula espera
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-  if (email === 'test@test.com' && password === '123456') {
-    return {
-      ok: true,
-      data: { token: 'fake-jwt' },
-    }
-  }
+    const trimmedCorreo = correo.trim().toLowerCase();
+    const trimmedPassword = password.trim();
 
-  return {
-    ok: false,
-    message: 'Credenciales incorrectas',
-  }
-}
+    const newErrors: { correo?: string; password?: string } = {};
 
-const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault()
-
-  const trimmedEmail = email.trim()
-
-  const newErrors: { email?: string; password?: string } = {}
-
-  // Validación manual segura
-  if (!trimmedEmail) {
-    newErrors.email = 'El correo es obligatorio'
-  } else if (!/\S+@\S+\.\S+/.test(trimmedEmail)) {
-    newErrors.email = 'Formato de correo inválido'
-  }
-
-  if (!password) {
-    newErrors.password = 'La contraseña es obligatoria'
-  }
-
-  setErrors(newErrors)
-
-  //  la validación real
-  if (Object.keys(newErrors).length > 0) return
-
-  try {
-    const result = await fakeLogin(trimmedEmail, password)
-
-    if (!result.ok) {
-      setPassword('') // 🔥 limpieza correcta
-      setErrors({
-        password: 'Credenciales incorrectas'
-      })
-      return
+    if (!trimmedCorreo) {
+      newErrors.correo = "El correo es obligatorio";
+    } else if (!/\S+@\S+\.\S+/.test(trimmedCorreo)) {
+      newErrors.correo = "Formato de correo inválido";
     }
 
-    console.log('Login exitoso', result.data)
+    if (!trimmedPassword) {
+      newErrors.password = "La contraseña es obligatoria";
+    }
 
-  } catch (error) {
-    setPassword('')
-    alert('Error inesperado')
-  }
-}
+    setErrors(newErrors);
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    if (Object.keys(newErrors).length > 0) return;
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          correo: trimmedCorreo,
+          password: trimmedPassword,
+        }),
+      });
+
+      const data: LoginResponse = await response.json();
+
+      if (!response.ok) {
+        setPassword("");
+        setErrorMessage(data.message || "Error al iniciar sesión");
+        return;
+      }
+
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+
+      setSuccessMessage(data.message || "Inicio de sesión exitoso");
+
+      setTimeout(() => {
+        router.push("/");
+      }, 1000);
+    } catch {
+      setPassword("");
+      setErrorMessage("No se pudo conectar con el servidor");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="w-full max-w-sm rounded-md bg-white p-6 shadow-md">
@@ -114,16 +136,16 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
             type="email"
             required
             placeholder="Ingresa tu correo electrónico"
-            value={email}
+            value={correo}
             onChange={(e) => {
-              setEmail(e.target.value)
-              validate('email', e.target.value)
+              setCorreo(e.target.value);
+              validate("correo", e.target.value);
             }}
             className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-orange-500"
           />
 
-          {errors.email && (
-            <p className="mt-1 text-xs text-red-500">{errors.email}</p>
+          {errors.correo && (
+            <p className="mt-1 text-xs text-red-500">{errors.correo}</p>
           )}
         </div>
 
@@ -134,14 +156,14 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 
           <div className="relative">
             <input
-              type={showPassword ? 'text' : 'password'}
+              type={showPassword ? "text" : "password"}
               required
               placeholder="Ingresa tu contraseña"
               value={password}
               maxLength={16}
               onChange={(e) => {
-                setPassword(e.target.value)
-                validate('password', e.target.value)
+                setPassword(e.target.value);
+                validate("password", e.target.value);
               }}
               className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 text-sm outline-none focus:border-orange-500"
             />
@@ -151,7 +173,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500"
             >
-              {showPassword ? 'Ocultar' : 'Ver'}
+              {showPassword ? "Ocultar" : "Ver"}
             </button>
           </div>
 
@@ -160,16 +182,28 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
           )}
         </div>
 
+        {errorMessage && (
+          <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
+            {errorMessage}
+          </p>
+        )}
+
+        {successMessage && (
+          <p className="rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-600">
+            {successMessage}
+          </p>
+        )}
+
         <button
           type="submit"
-          disabled={!isFormValid}
+          disabled={!isFormValid || isLoading}
           className={`w-full rounded-md py-2 text-sm font-semibold text-white ${
-            isFormValid
-              ? 'bg-orange-500 hover:bg-orange-600'
-              : 'cursor-not-allowed bg-orange-300'
+            !isFormValid || isLoading
+              ? "cursor-not-allowed bg-orange-300"
+              : "bg-orange-500 hover:bg-orange-600"
           }`}
         >
-          Iniciar sesión
+          {isLoading ? "Ingresando..." : "Iniciar sesión"}
         </button>
 
         <button
@@ -186,10 +220,10 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         >
           Cancelar Inicio de sesión
         </button>
-        </form>
+      </form>
 
       <p className="mt-4 text-center text-sm text-gray-600">
-        ¿No tienes una cuenta?{' '}
+        ¿No tienes una cuenta?{" "}
         <Link
           href="/sign-up"
           className="font-semibold text-orange-500 hover:underline"
@@ -198,5 +232,5 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         </Link>
       </p>
     </div>
-  )
+  );
 }
