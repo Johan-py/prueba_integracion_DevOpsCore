@@ -1,11 +1,16 @@
 'use client'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from "next/navigation";
 import { mockNotifications } from '@/data/mockNotifications'
 
 export default function NotificationsPage() {
   const router = useRouter();
-
+  const [notifications, setNotifications] = useState(mockNotifications);
+  
+  const handleDelete = (id: number) => {
+  const updated = notifications.filter((n) => n.id !== id);
+   setNotifications(updated);
+  };
 useEffect(() => {
   const handleEsc = (event: KeyboardEvent) => {
     if (event.key === "Escape") {
@@ -33,7 +38,7 @@ useEffect(() => {
         aria-live="polite"
         className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm"
       >
-        {mockNotifications.length === 0 ? (
+        {notifications.length === 0 ? (
           <p
             role="status"
             aria-live="polite"
@@ -42,7 +47,7 @@ useEffect(() => {
             No hay notificaciones
           </p>
         ) : (
-          mockNotifications.map((notification) => (
+          notifications.map((notification) => (
             <div
               key={notification.id}
               role="listitem"
@@ -56,6 +61,18 @@ useEffect(() => {
                 <h2 className="text-sm font-semibold text-gray-800">
                   {notification.title?.trim() || '(Sin título)'}
                 </h2>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] uppercase text-gray-400">
+                    {notification.status}
+                  </span>
+
+                  <button
+                    onClick={() => handleDelete(notification.id)}
+                    className="text-red-500 text-xs hover:underline"
+                  >
+                    Eliminar
+                  </button>
+                </div>
 
                 <span className="text-[10px] uppercase text-gray-400">{notification.status}</span>
               </div>
