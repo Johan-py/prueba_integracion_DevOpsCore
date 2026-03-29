@@ -17,6 +17,8 @@ export default function BusquedaMapaPage() {
   const { properties } = useProperties()
   const [hoveredId, setHoveredId] = useState<string | null>(null)
   const [data, setData] = useState<any[]>([])
+  const [searchTerm, setSearchTerm] = useState('')
+
    useEffect(() => {
   if (!hoveredId) return
 
@@ -58,6 +60,8 @@ export default function BusquedaMapaPage() {
             <input
               type="text"
               placeholder="Buscar"
+              value={searchTerm}  //conecta el input 
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="outline-none w-full text-gray-700 placeholder-gray-400 text-sm bg-transparent"
             />
           </div>
@@ -121,7 +125,10 @@ export default function BusquedaMapaPage() {
             {/* Título + botones vista + cantidad */}
             <div className="px-4 py-4 border-b border-stone-200 bg-white shrink-0 flex items-center justify-between">
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Lista de Inmuebles</h1>
+                {/* Título Dinámico */}
+                <h1 className="text-xl font-bold text-gray-900 line-clamp-1">
+                  {searchTerm ? `Resultados: ${searchTerm}` : 'Lista de Inmuebles'}
+                </h1>
                 <p className="text-sm text-gray-500 mt-0.5">
                   {data.length > 0 ? data.length : 3} encontrado{ (data.length > 0 ? data.length : 3) !== 1 ? 's' : ''}
                 </p>
