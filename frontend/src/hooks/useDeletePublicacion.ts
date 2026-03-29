@@ -3,12 +3,12 @@
 import { useState } from 'react'
 import { eliminarPublicacion } from '@/services/publicacion.service'
 
-export function useDeletePublicacion(publicacionId: number) {
+export function useDeletePublicacion(publicacionId: number, onDeleted?: () => void) {
   const [modalConfirmacionAbierto, setModalConfirmacionAbierto] = useState(false)
   const [modalExitoAbierto, setModalExitoAbierto] = useState(false)
   const [modalErrorAbierto, setModalErrorAbierto] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string>('')
+  const [error, setError] = useState('')
 
   const abrirConfirmacion = () => {
     setError('')
@@ -37,6 +37,7 @@ export function useDeletePublicacion(publicacionId: number) {
       await eliminarPublicacion(publicacionId)
 
       setModalConfirmacionAbierto(false)
+      onDeleted?.()
       setModalExitoAbierto(true)
     } catch (err) {
       const mensaje =
