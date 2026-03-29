@@ -1,15 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import {
-  Eye,
-  EyeOff,
-  Mail,
-  User,
-  Phone,
-  Lock,
-  ArrowRight
-} from 'lucide-react'
+import { Eye, EyeOff, Mail, User, Phone, Lock } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { validateEmail, validatePassword } from '@/lib/validators/auth'
@@ -46,78 +38,14 @@ const initialFormData: FormData = {
   confirmPassword: ''
 }
 
-/**
- * Design Tokens
- * Mantiene la lógica intacta y centraliza la capa visual.
- */
-const tokens = {
-  colors: {
-    brand: {
-      50: 'bg-orange-50',
-      100: 'bg-orange-100',
-      500: 'bg-orange-500',
-      600: 'bg-orange-600',
-      700: 'bg-orange-700',
-      text: 'text-orange-600',
-      textStrong: 'text-orange-700',
-      border: 'border-orange-300',
-      focus: 'focus:border-orange-500 focus:ring-orange-200'
-    },
-    neutral: {
-      0: 'bg-white',
-      50: 'bg-slate-50',
-      100: 'bg-slate-100',
-      200: 'bg-slate-200',
-      300: 'border-slate-300',
-      400: 'text-slate-400',
-      500: 'text-slate-500',
-      600: 'text-slate-600',
-      700: 'text-slate-700',
-      800: 'text-slate-800',
-      900: 'text-slate-900'
-    },
-    success: {
-      bg: 'bg-emerald-50',
-      border: 'border-emerald-200',
-      text: 'text-emerald-700'
-    },
-    danger: {
-      bg: 'bg-red-50',
-      border: 'border-red-200',
-      borderStrong: 'border-red-500',
-      text: 'text-red-600',
-      textStrong: 'text-red-700'
-    }
-  },
-  radius: {
-    md: 'rounded-xl',
-    lg: 'rounded-2xl'
-  },
-  shadow: {
-    card: 'shadow-sm shadow-slate-200/60'
-  },
-  typography: {
-    title: 'text-2xl md:text-3xl font-semibold tracking-tight text-slate-900',
-    subtitle: 'text-sm text-slate-600',
-    label: 'text-sm font-medium text-slate-700',
-    input: 'text-sm text-slate-900 placeholder:text-slate-400',
-    helper: 'text-sm text-red-600',
-    button: 'text-sm font-semibold'
-  },
-  spacing: {
-    form: 'space-y-5'
-  }
-}
-
-function getInputClasses(hasError?: boolean) {
+function getInputClasses(hasError?: boolean, hasRightIcon?: boolean) {
   return [
-    'w-full rounded-xl border bg-white pl-11 pr-12 py-3.5 outline-none',
-    'transition duration-200',
-    'focus:ring-4',
-    tokens.typography.input,
+    'w-full rounded-xl border bg-[#ffffff] pl-11 py-3 outline-none',
+    hasRightIcon ? 'pr-12' : 'pr-4',
+    'text-sm text-[#292524] placeholder:text-[#78716c] transition-all duration-200',
     hasError
-      ? `${tokens.colors.danger.borderStrong} focus:border-red-500 focus:ring-red-100`
-      : `${tokens.colors.neutral[300]} ${tokens.colors.brand.focus}`
+      ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-100'
+      : 'border-[#e7e5e4] focus:border-[#D97706] focus:ring-2 focus:ring-amber-100'
   ].join(' ')
 }
 
@@ -147,7 +75,7 @@ function FieldLabel({
   return (
     <label
       htmlFor={htmlFor}
-      className="mb-2 block text-sm font-medium text-slate-700"
+      className="mb-2 block text-sm font-medium text-[#292524]"
     >
       {children}
     </label>
@@ -485,40 +413,30 @@ export default function SignUpForm() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-2xl">
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-        <div className="mb-6 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-100">
-            <User className="h-7 w-7 text-orange-600" />
-          </div>
-
-          <h2 className="text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
+    <div className="flex min-h-screen items-center justify-center bg-[#f5f5f4] px-4 py-10">
+      <div className="w-full max-w-md">
+        <div className="rounded-2xl bg-[#ffffff] px-8 py-10 shadow-sm">
+          <h1 className="mb-8 text-center text-4xl font-bold text-[#292524]">
             Registro
-          </h2>
+          </h1>
 
-          <p className="mt-2 text-sm text-slate-600">
-            Completa tus datos para crear una cuenta
-          </p>
-        </div>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {serverMessage ? (
+              <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                {serverMessage}
+              </p>
+            ) : null}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {serverMessage ? (
-            <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-              {serverMessage}
-            </p>
-          ) : null}
+            {serverError ? (
+              <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {serverError}
+              </p>
+            ) : null}
 
-          {serverError ? (
-            <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              {serverError}
-            </p>
-          ) : null}
-
-          <div className="grid gap-5 md:grid-cols-2">
-            <div className="md:col-span-2">
+            <div>
               <FieldLabel htmlFor="email">Correo electrónico</FieldLabel>
               <div className="relative">
-                <Mail className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <Mail className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[#78716c]" />
                 <input
                   id="email"
                   name="email"
@@ -527,9 +445,7 @@ export default function SignUpForm() {
                   onChange={handleChange('email')}
                   onBlur={handleBlur('email')}
                   placeholder="Ingresa tu correo"
-                  className={getInputClasses(
-                    Boolean(touched.email && errors.email)
-                  )}
+                  className={getInputClasses(Boolean(touched.email && errors.email))}
                   aria-invalid={Boolean(touched.email && errors.email)}
                   aria-describedby="email-error"
                 />
@@ -543,7 +459,7 @@ export default function SignUpForm() {
             <div>
               <FieldLabel htmlFor="firstName">Nombre</FieldLabel>
               <div className="relative">
-                <User className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <User className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[#78716c]" />
                 <input
                   id="firstName"
                   name="firstName"
@@ -553,9 +469,7 @@ export default function SignUpForm() {
                   onBlur={handleBlur('firstName')}
                   placeholder="Ingresa tu nombre"
                   maxLength={30}
-                  className={getInputClasses(
-                    Boolean(touched.firstName && errors.firstName)
-                  )}
+                  className={getInputClasses(Boolean(touched.firstName && errors.firstName))}
                   aria-invalid={Boolean(touched.firstName && errors.firstName)}
                   aria-describedby="firstName-error"
                 />
@@ -569,7 +483,7 @@ export default function SignUpForm() {
             <div>
               <FieldLabel htmlFor="lastName">Apellido</FieldLabel>
               <div className="relative">
-                <User className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <User className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[#78716c]" />
                 <input
                   id="lastName"
                   name="lastName"
@@ -579,9 +493,7 @@ export default function SignUpForm() {
                   onBlur={handleBlur('lastName')}
                   placeholder="Ingresa tu apellido"
                   maxLength={30}
-                  className={getInputClasses(
-                    Boolean(touched.lastName && errors.lastName)
-                  )}
+                  className={getInputClasses(Boolean(touched.lastName && errors.lastName))}
                   aria-invalid={Boolean(touched.lastName && errors.lastName)}
                   aria-describedby="lastName-error"
                 />
@@ -592,10 +504,10 @@ export default function SignUpForm() {
               />
             </div>
 
-            <div className="md:col-span-2">
+            <div>
               <FieldLabel htmlFor="phone">Teléfono</FieldLabel>
               <div className="relative">
-                <Phone className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <Phone className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[#78716c]" />
                 <input
                   id="phone"
                   name="phone"
@@ -605,9 +517,7 @@ export default function SignUpForm() {
                   onBlur={handleBlur('phone')}
                   placeholder="Ingresa tu teléfono"
                   maxLength={20}
-                  className={getInputClasses(
-                    Boolean(touched.phone && errors.phone)
-                  )}
+                  className={getInputClasses(Boolean(touched.phone && errors.phone))}
                   aria-invalid={Boolean(touched.phone && errors.phone)}
                   aria-describedby="phone-error"
                 />
@@ -621,7 +531,7 @@ export default function SignUpForm() {
             <div>
               <FieldLabel htmlFor="password">Contraseña</FieldLabel>
               <div className="relative">
-                <Lock className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <Lock className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[#78716c]" />
                 <input
                   id="password"
                   name="password"
@@ -632,7 +542,8 @@ export default function SignUpForm() {
                   placeholder="Ingresa tu contraseña"
                   maxLength={255}
                   className={getInputClasses(
-                    Boolean(touched.password && errors.password)
+                    Boolean(touched.password && errors.password),
+                    true
                   )}
                   aria-invalid={Boolean(touched.password && errors.password)}
                   aria-describedby="password-error"
@@ -640,12 +551,12 @@ export default function SignUpForm() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-[#78716c] transition hover:bg-[#f5f5f4] hover:text-[#292524]"
                   aria-label={
                     showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
                   }
                 >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
               <FieldError
@@ -659,7 +570,7 @@ export default function SignUpForm() {
                 Confirmar contraseña
               </FieldLabel>
               <div className="relative">
-                <Lock className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <Lock className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[#78716c]" />
                 <input
                   id="confirmPassword"
                   name="confirmPassword"
@@ -670,9 +581,8 @@ export default function SignUpForm() {
                   placeholder="Confirma tu contraseña"
                   maxLength={255}
                   className={getInputClasses(
-                    Boolean(
-                      touched.confirmPassword && errors.confirmPassword
-                    )
+                    Boolean(touched.confirmPassword && errors.confirmPassword),
+                    true
                   )}
                   aria-invalid={Boolean(
                     touched.confirmPassword && errors.confirmPassword
@@ -682,14 +592,18 @@ export default function SignUpForm() {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword((prev) => !prev)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-[#78716c] transition hover:bg-[#f5f5f4] hover:text-[#292524]"
                   aria-label={
                     showConfirmPassword
                       ? 'Ocultar confirmación de contraseña'
                       : 'Mostrar confirmación de contraseña'
                   }
                 >
-                  {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  {showConfirmPassword ? (
+                    <EyeOff size={18} />
+                  ) : (
+                    <Eye size={18} />
+                  )}
                 </button>
               </div>
               <FieldError
@@ -699,41 +613,40 @@ export default function SignUpForm() {
                 }
               />
             </div>
-          </div>
 
-          <div className="grid gap-3 pt-2 sm:grid-cols-2">
-            <button
-              type="button"
-              onClick={handleCancel}
-              className="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-            >
-              Cancelar registro
-            </button>
+            <div className="grid grid-cols-2 gap-3 pt-2">
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="rounded-xl border border-[#e7e5e4] bg-[#ffffff] px-4 py-3 text-base font-semibold text-[#292524] transition hover:bg-[#f5f5f4]"
+              >
+                Cancelar registro
+              </button>
 
-            <button
-              type="submit"
-              disabled={!isFormValid || isSubmitting}
-              className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white transition ${
-                isFormValid && !isSubmitting
-                  ? 'bg-orange-500 hover:bg-orange-600'
-                  : 'cursor-not-allowed bg-slate-300'
-              }`}
-            >
-              {isSubmitting ? 'Registrando...' : 'Registrarse'}
-              {!isSubmitting ? <ArrowRight size={18} /> : null}
-            </button>
-          </div>
+              <button
+                type="submit"
+                disabled={!isFormValid || isSubmitting}
+                className={`rounded-xl px-4 py-3 text-base font-semibold transition ${
+                  isFormValid && !isSubmitting
+                    ? 'bg-amber-500 text-white hover:bg-amber-600'
+                    : 'cursor-not-allowed bg-[#e7e5e4] text-[#78716c]'
+                }`}
+              >
+                {isSubmitting ? 'Registrando...' : 'Registrarse'}
+              </button>
+            </div>
 
-          <p className="text-center text-sm text-slate-600">
-            ¿Ya tienes una cuenta?{' '}
-            <Link
-              href="/sign-in"
-              className="font-semibold text-orange-600 transition hover:text-orange-700 hover:underline"
-            >
-              Inicia sesión
-            </Link>
-          </p>
-        </form>
+            <p className="text-center text-sm text-[#78716c]">
+              ¿Ya tienes una cuenta?{' '}
+              <Link
+                href="/sign-in"
+                className="font-semibold text-[#D97706] transition hover:underline"
+              >
+                Inicia sesión
+              </Link>
+            </p>
+          </form>
+        </div>
       </div>
     </div>
   )
