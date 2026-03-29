@@ -1,7 +1,15 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Eye, EyeOff } from 'lucide-react'
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  User,
+  Phone,
+  Lock,
+  ArrowRight
+} from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { validateEmail, validatePassword } from '@/lib/validators/auth'
@@ -28,6 +36,7 @@ interface RegisterResponse {
   message: string
   token?: string
 }
+
 const initialFormData: FormData = {
   email: '',
   firstName: '',
@@ -35,6 +44,114 @@ const initialFormData: FormData = {
   phone: '',
   password: '',
   confirmPassword: ''
+}
+
+/**
+ * Design Tokens
+ * Mantiene la lógica intacta y centraliza la capa visual.
+ */
+const tokens = {
+  colors: {
+    brand: {
+      50: 'bg-orange-50',
+      100: 'bg-orange-100',
+      500: 'bg-orange-500',
+      600: 'bg-orange-600',
+      700: 'bg-orange-700',
+      text: 'text-orange-600',
+      textStrong: 'text-orange-700',
+      border: 'border-orange-300',
+      focus: 'focus:border-orange-500 focus:ring-orange-200'
+    },
+    neutral: {
+      0: 'bg-white',
+      50: 'bg-slate-50',
+      100: 'bg-slate-100',
+      200: 'bg-slate-200',
+      300: 'border-slate-300',
+      400: 'text-slate-400',
+      500: 'text-slate-500',
+      600: 'text-slate-600',
+      700: 'text-slate-700',
+      800: 'text-slate-800',
+      900: 'text-slate-900'
+    },
+    success: {
+      bg: 'bg-emerald-50',
+      border: 'border-emerald-200',
+      text: 'text-emerald-700'
+    },
+    danger: {
+      bg: 'bg-red-50',
+      border: 'border-red-200',
+      borderStrong: 'border-red-500',
+      text: 'text-red-600',
+      textStrong: 'text-red-700'
+    }
+  },
+  radius: {
+    md: 'rounded-xl',
+    lg: 'rounded-2xl'
+  },
+  shadow: {
+    card: 'shadow-sm shadow-slate-200/60'
+  },
+  typography: {
+    title: 'text-2xl md:text-3xl font-semibold tracking-tight text-slate-900',
+    subtitle: 'text-sm text-slate-600',
+    label: 'text-sm font-medium text-slate-700',
+    input: 'text-sm text-slate-900 placeholder:text-slate-400',
+    helper: 'text-sm text-red-600',
+    button: 'text-sm font-semibold'
+  },
+  spacing: {
+    form: 'space-y-5'
+  }
+}
+
+function getInputClasses(hasError?: boolean) {
+  return [
+    'w-full rounded-xl border bg-white pl-11 pr-12 py-3.5 outline-none',
+    'transition duration-200',
+    'focus:ring-4',
+    tokens.typography.input,
+    hasError
+      ? `${tokens.colors.danger.borderStrong} focus:border-red-500 focus:ring-red-100`
+      : `${tokens.colors.neutral[300]} ${tokens.colors.brand.focus}`
+  ].join(' ')
+}
+
+function FieldError({
+  id,
+  error
+}: {
+  id: string
+  error?: string
+}) {
+  if (!error) return null
+
+  return (
+    <p id={id} className="mt-2 text-sm text-red-600">
+      {error}
+    </p>
+  )
+}
+
+function FieldLabel({
+  htmlFor,
+  children
+}: {
+  htmlFor: string
+  children: React.ReactNode
+}) {
+  return (
+    <label
+      htmlFor={htmlFor}
+      className="mb-2 block text-sm font-medium text-slate-700"
+    >
+      {children}
+    </label>
+  )
 }
 
 export default function SignUpForm() {
@@ -334,7 +451,7 @@ export default function SignUpForm() {
       let data: RegisterResponse | null = null
 
       try {
-        data = await response.json() as RegisterResponse
+        data = (await response.json()) as RegisterResponse
       } catch {
         data = null
       }
@@ -348,10 +465,10 @@ export default function SignUpForm() {
       }
 
       setServerMessage(data?.message || 'Usuario registrado correctamente')
-      setTimeout(() => {
-  router.replace('/')
-       }, 1500) 
 
+      setTimeout(() => {
+        router.replace('/')
+      }, 1500)
     } catch (error) {
       const message =
         error instanceof TypeError
@@ -368,267 +485,256 @@ export default function SignUpForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-center text-2xl font-bold text-slate-800">
-        Registro
-      </h2>
-
-      {serverMessage ? (
-        <p className="rounded-md bg-green-100 px-4 py-3 text-sm text-green-700">
-          {serverMessage}
-        </p>
-      ) : null}
-
-      {serverError ? (
-        <p className="rounded-md bg-red-100 px-4 py-3 text-sm text-red-700">
-          {serverError}
-        </p>
-      ) : null}
-
-      <div>
-        <label
-          htmlFor="email"
-          className="mb-2 block text-sm font-medium text-slate-700"
-        >
-          Correo electrónico
-          </label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          value={formData.email}
-          onChange={handleChange('email')}
-          onBlur={handleBlur('email')}
-          placeholder="Ingresa tu correo"
-          className={`w-full rounded-md border px-4 py-3 outline-none transition ${
-            touched.email && errors.email
-              ? 'border-red-500'
-              : 'border-slate-300 focus:border-orange-400'
-          }`}
-          aria-invalid={Boolean(touched.email && errors.email)}
-          aria-describedby="email-error"
-           />
-        {touched.email && errors.email ? (
-          <p id="email-error" className="mt-1 text-sm text-red-600">
-            {errors.email}
-          </p>
-        ) : null}
-      </div>
-
-      <div>
-        <label
-          htmlFor="firstName"
-          className="mb-2 block text-sm font-medium text-slate-700"
-        >
-          Nombre
-        </label>
-        <input
-          id="firstName"
-          name="firstName"
-          type="text"
-          value={formData.firstName}
-          onChange={handleChange('firstName')}
-          onBlur={handleBlur('firstName')}
-          placeholder="Ingresa tu nombre"
-          maxLength={30}
-          className={`w-full rounded-md border px-4 py-3 outline-none transition ${
-            touched.firstName && errors.firstName
-              ? 'border-red-500'
-              : 'border-slate-300 focus:border-orange-400'
-          }`}
-          aria-invalid={Boolean(touched.firstName && errors.firstName)}
-          aria-describedby="firstName-error"
-        />
-        {touched.firstName && errors.firstName ? (
-          <p id="firstName-error" className="mt-1 text-sm text-red-600">
-            {errors.firstName}
-          </p>
-        ) : null}
-      </div>
-
-      <div>
-        <label
-          htmlFor="lastName"
-          className="mb-2 block text-sm font-medium text-slate-700"
-        >
-          Apellido
-        </label>
-        <input
-          id="lastName"
-          name="lastName"
-          type="text"
-          value={formData.lastName}
-          onChange={handleChange('lastName')}
-          onBlur={handleBlur('lastName')}
-          placeholder="Ingresa tu apellido"
-          maxLength={30}
-          className={`w-full rounded-md border px-4 py-3 outline-none transition ${
-            touched.lastName && errors.lastName
-              ? 'border-red-500'
-              : 'border-slate-300 focus:border-orange-400'
-          }`}
-          aria-invalid={Boolean(touched.lastName && errors.lastName)}
-          aria-describedby="lastName-error"
-        />
-        {touched.lastName && errors.lastName ? (
-          <p id="lastName-error" className="mt-1 text-sm text-red-600">
-            {errors.lastName}
-          </p>
-        ) : null}
-      </div>
-
-      <div>
-        <label
-          htmlFor="phone"
-          className="mb-2 block text-sm font-medium text-slate-700"
-        >
-          Teléfono
-        </label>
-        <input
-          id="phone"
-          name="phone"
-          type="text"
-          value={formData.phone}
-          onChange={handleChange('phone')}
-          onBlur={handleBlur('phone')}
-          placeholder="Ingresa tu teléfono"
-          maxLength={20}
-          className={`w-full rounded-md border px-4 py-3 outline-none transition ${
-            touched.phone && errors.phone
-              ? 'border-red-500'
-              : 'border-slate-300 focus:border-orange-400'
-          }`}
-          aria-invalid={Boolean(touched.phone && errors.phone)}
-          aria-describedby="phone-error"
-        />
-        {touched.phone && errors.phone ? (
-          <p id="phone-error" className="mt-1 text-sm text-red-600">
-            {errors.phone}
-          </p>
-        ) : null}
-      </div>
-
-      <div>
-        <label
-          htmlFor="password"
-          className="mb-2 block text-sm font-medium text-slate-700"
-        >
-          Contraseña
-           </label>
-        <div className="relative">
-          <input
-            id="password"
-            name="password"
-            type={showPassword ? 'text' : 'password'}
-            value={formData.password}
-            onChange={handleChange('password')}
-            onBlur={handleBlur('password')}
-            placeholder="Ingresa tu contraseña"
-            maxLength={255}
-            className={`w-full rounded-md border px-4 py-3 pr-12 outline-none transition ${
-              touched.password && errors.password
-                ? 'border-red-500'
-                : 'border-slate-300 focus:border-orange-400'
-            }`}
-            aria-invalid={Boolean(touched.password && errors.password)}
-            aria-describedby="password-error"
-             />
-          <button
-            type="button"
-            onClick={() => setShowPassword((prev) => !prev)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
-            aria-label={
-              showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
-            }
-          >
-            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-          </button>
-           </div>
-        {touched.password && errors.password ? (
-          <p id="password-error" className="mt-1 text-sm text-red-600">
-            {errors.password}
-          </p>
-        ) : null}
-      </div>
-
-      <div>
-        <label
-          htmlFor="confirmPassword"
-          className="mb-2 block text-sm font-medium text-slate-700"
-        >
-          Confirmar contraseña
-          </label>
-        <div className="relative">
-          <input
-            id="confirmPassword"
-            name="confirmPassword"
-            type={showConfirmPassword ? 'text' : 'password'}
-            value={formData.confirmPassword}
-            onChange={handleChange('confirmPassword')}
-            onBlur={handleBlur('confirmPassword')}
-            placeholder="Confirma tu contraseña"
-            maxLength={255}
-            className={`w-full rounded-md border px-4 py-3 pr-12 outline-none transition ${
-              touched.confirmPassword && errors.confirmPassword
-                ? 'border-red-500'
-                : 'border-slate-300 focus:border-orange-400'
-            }`}
-            aria-invalid={Boolean(
-              touched.confirmPassword && errors.confirmPassword
-            )}
-            aria-describedby="confirmPassword-error"
-            />
-          <button
-            type="button"
-            onClick={() => setShowConfirmPassword((prev) => !prev)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
-            aria-label={
-              showConfirmPassword
-                ? 'Ocultar confirmación de contraseña'
-                : 'Mostrar confirmación de contraseña'
-            }
-          >
-            {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-          </button>
+    <div className="mx-auto w-full max-w-2xl">
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+        <div className="mb-6 text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-100">
+            <User className="h-7 w-7 text-orange-600" />
           </div>
-        {touched.confirmPassword && errors.confirmPassword ? (
-          <p id="confirmPassword-error" className="mt-1 text-sm text-red-600">
-            {errors.confirmPassword}
+
+          <h2 className="text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
+            Registro
+          </h2>
+
+          <p className="mt-2 text-sm text-slate-600">
+            Completa tus datos para crear una cuenta
           </p>
-        ) : null}
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {serverMessage ? (
+            <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+              {serverMessage}
+            </p>
+          ) : null}
+
+          {serverError ? (
+            <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {serverError}
+            </p>
+          ) : null}
+
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="md:col-span-2">
+              <FieldLabel htmlFor="email">Correo electrónico</FieldLabel>
+              <div className="relative">
+                <Mail className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange('email')}
+                  onBlur={handleBlur('email')}
+                  placeholder="Ingresa tu correo"
+                  className={getInputClasses(
+                    Boolean(touched.email && errors.email)
+                  )}
+                  aria-invalid={Boolean(touched.email && errors.email)}
+                  aria-describedby="email-error"
+                />
+              </div>
+              <FieldError
+                id="email-error"
+                error={touched.email ? errors.email : undefined}
+              />
+            </div>
+
+            <div>
+              <FieldLabel htmlFor="firstName">Nombre</FieldLabel>
+              <div className="relative">
+                <User className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <input
+                  id="firstName"
+                  name="firstName"
+                  type="text"
+                  value={formData.firstName}
+                  onChange={handleChange('firstName')}
+                  onBlur={handleBlur('firstName')}
+                  placeholder="Ingresa tu nombre"
+                  maxLength={30}
+                  className={getInputClasses(
+                    Boolean(touched.firstName && errors.firstName)
+                  )}
+                  aria-invalid={Boolean(touched.firstName && errors.firstName)}
+                  aria-describedby="firstName-error"
+                />
+              </div>
+              <FieldError
+                id="firstName-error"
+                error={touched.firstName ? errors.firstName : undefined}
+              />
+            </div>
+
+            <div>
+              <FieldLabel htmlFor="lastName">Apellido</FieldLabel>
+              <div className="relative">
+                <User className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <input
+                  id="lastName"
+                  name="lastName"
+                  type="text"
+                  value={formData.lastName}
+                  onChange={handleChange('lastName')}
+                  onBlur={handleBlur('lastName')}
+                  placeholder="Ingresa tu apellido"
+                  maxLength={30}
+                  className={getInputClasses(
+                    Boolean(touched.lastName && errors.lastName)
+                  )}
+                  aria-invalid={Boolean(touched.lastName && errors.lastName)}
+                  aria-describedby="lastName-error"
+                />
+              </div>
+              <FieldError
+                id="lastName-error"
+                error={touched.lastName ? errors.lastName : undefined}
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <FieldLabel htmlFor="phone">Teléfono</FieldLabel>
+              <div className="relative">
+                <Phone className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <input
+                  id="phone"
+                  name="phone"
+                  type="text"
+                  value={formData.phone}
+                  onChange={handleChange('phone')}
+                  onBlur={handleBlur('phone')}
+                  placeholder="Ingresa tu teléfono"
+                  maxLength={20}
+                  className={getInputClasses(
+                    Boolean(touched.phone && errors.phone)
+                  )}
+                  aria-invalid={Boolean(touched.phone && errors.phone)}
+                  aria-describedby="phone-error"
+                />
+              </div>
+              <FieldError
+                id="phone-error"
+                error={touched.phone ? errors.phone : undefined}
+              />
+            </div>
+
+            <div>
+              <FieldLabel htmlFor="password">Contraseña</FieldLabel>
+              <div className="relative">
+                <Lock className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.password}
+                  onChange={handleChange('password')}
+                  onBlur={handleBlur('password')}
+                  placeholder="Ingresa tu contraseña"
+                  maxLength={255}
+                  className={getInputClasses(
+                    Boolean(touched.password && errors.password)
+                  )}
+                  aria-invalid={Boolean(touched.password && errors.password)}
+                  aria-describedby="password-error"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
+                  aria-label={
+                    showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+                  }
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+              <FieldError
+                id="password-error"
+                error={touched.password ? errors.password : undefined}
+              />
+            </div>
+
+            <div>
+              <FieldLabel htmlFor="confirmPassword">
+                Confirmar contraseña
+              </FieldLabel>
+              <div className="relative">
+                <Lock className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={formData.confirmPassword}
+                  onChange={handleChange('confirmPassword')}
+                  onBlur={handleBlur('confirmPassword')}
+                  placeholder="Confirma tu contraseña"
+                  maxLength={255}
+                  className={getInputClasses(
+                    Boolean(
+                      touched.confirmPassword && errors.confirmPassword
+                    )
+                  )}
+                  aria-invalid={Boolean(
+                    touched.confirmPassword && errors.confirmPassword
+                  )}
+                  aria-describedby="confirmPassword-error"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
+                  aria-label={
+                    showConfirmPassword
+                      ? 'Ocultar confirmación de contraseña'
+                      : 'Mostrar confirmación de contraseña'
+                  }
+                >
+                  {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+              <FieldError
+                id="confirmPassword-error"
+                error={
+                  touched.confirmPassword ? errors.confirmPassword : undefined
+                }
+              />
+            </div>
+          </div>
+
+          <div className="grid gap-3 pt-2 sm:grid-cols-2">
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+            >
+              Cancelar registro
+            </button>
+
+            <button
+              type="submit"
+              disabled={!isFormValid || isSubmitting}
+              className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white transition ${
+                isFormValid && !isSubmitting
+                  ? 'bg-orange-500 hover:bg-orange-600'
+                  : 'cursor-not-allowed bg-slate-300'
+              }`}
+            >
+              {isSubmitting ? 'Registrando...' : 'Registrarse'}
+              {!isSubmitting ? <ArrowRight size={18} /> : null}
+            </button>
+          </div>
+
+          <p className="text-center text-sm text-slate-600">
+            ¿Ya tienes una cuenta?{' '}
+            <Link
+              href="/sign-in"
+              className="font-semibold text-orange-600 transition hover:text-orange-700 hover:underline"
+            >
+              Inicia sesión
+            </Link>
+          </p>
+        </form>
       </div>
-
-      <div className="flex gap-3">
-        <button
-          type="button"
-          onClick={handleCancel}
-          className="w-1/2 rounded-md border border-slate-300 px-4 py-3 font-medium text-slate-700 transition hover:bg-slate-100"
-        >
-          Cancelar registro
-        </button>
-
-        <button
-          type="submit"
-          disabled={!isFormValid || isSubmitting}
-          className={`w-1/2 rounded-md px-4 py-3 font-semibold text-white transition ${
-            isFormValid && !isSubmitting
-              ? 'bg-orange-500 hover:bg-orange-600'
-              : 'cursor-not-allowed bg-slate-300'
-          }`}
-        >
-          {isSubmitting ? 'Registrando...' : 'Registrarse'}
-        </button>
-      </div>
-
-      <p className="text-center text-sm text-slate-600">
-        ¿Ya tienes una cuenta?{' '}
-        <Link
-          href="/sign-in"
-          className="font-medium text-orange-500 hover:underline"
-        >
-          Inicia sesión
-        </Link>
-      </p>
-    </form>
+    </div>
   )
 }
