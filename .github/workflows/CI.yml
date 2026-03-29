@@ -1,4 +1,4 @@
-name: Validador de IDs - Práctica Git
+name: 🚀 CI Monorepo
 
 on:
   push:
@@ -7,34 +7,103 @@ on:
     branches: [develop, main]
 
 jobs:
-  validate-unique-ids:
-    name: 🔍 Verificar IDs únicos en posts.json
+  lint:
+    name: 🧹 Lint
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Clonar repositorio
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: 🔎 Validar que no hay IDs duplicados
-        run: |
-          echo "🔍 Verificando IDs únicos en posts.json..."
+      - name: Instalar Bun
+        uses: oven-sh/setup-bun@v1
 
-          # Extraer todos los IDs y buscar duplicados
-          DUPLICADOS=$(jq '[.[].id] | group_by(.) | map(select(length>1)) | flatten' backend/src/modules/posts/data/posts.json)
+      - name: Cache Bun
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.bun
+            node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
 
-          if [ "$DUPLICADOS" != "[]" ]; then
-            echo "❌ ERROR: Se encontraron IDs duplicados:"
-            echo "$DUPLICADOS"
-            echo ""
-            echo "📌 Cada post debe tener un ID ÚNICO."
-            echo "🔧 Corrige los IDs duplicados antes de continuar."
-            exit 1
-          else
-            echo "✅ ¡Todos los IDs son únicos! Muy bien 👍"
-          fi
+      - name: Instalar dependencias
+        run: bun install
 
-      - name: 📊 Mostrar estadísticas
-        run: |
-          TOTAL=$(jq length backend/src/modules/posts/data/posts.json)
-          echo "📊 Total de posts en el feed: $TOTAL"
-          echo "🎉 Validación completada exitosamente."
+      - name: Lint general
+        run: bun run lint
+
+  type-check:
+    name: 🔎 TypeScript Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Instalar Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Cache Bun
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.bun
+            node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+
+      - name: Instalar deps
+        run: bun install
+
+      - name: Type check backend
+        run: cd backend && bunx tsc --noEmit
+
+      - name: Type check frontend
+        run: cd frontend && bunx tsc --noEmit
+
+  build-backend:
+    name: ⚙️ Build Backend
+    runs-on: ubuntu-latest
+    needs: [lint, type-check]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Instalar Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Cache Bun
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.bun
+            node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+
+      - name: Instalar deps
+        run: bun install
+
+      - name: Build backend
+        run: cd backend && bun run build
+
+  build-frontend:
+    name: 🌐 Build Frontend
+    runs-on: ubuntu-latest
+    needs: [lint, type-check]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Instalar Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Cache Bun
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.bun
+            node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+
+      - name: Instalar deps
+        run: bun install
+
+      - name: Build frontend
+        run: cd frontend && bun run build

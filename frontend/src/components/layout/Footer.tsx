@@ -1,6 +1,8 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 type FooterAction = {
   href?: string
@@ -16,9 +18,9 @@ const exploreActions: FooterAction[] = [
 ]
 
 const companyActions: FooterAction[] = [
-  { label: 'Sobre Nosotros' }, // TODO: '/sobre-nosotros'
+  { label: 'Sobre Nosotros', href: '/sobre-nosotros' },
   { label: 'Términos y Condiciones' }, // TODO: '/terminos-y-condiciones'
-  { label: 'Políticas de Privacidad' } // TODO: '/politicas-de-privacidad'
+  { label: 'Políticas de Privacidad', href: '/politicas-privacidad' }
 ]
 
 const socialActions: FooterAction[] = [
@@ -55,19 +57,26 @@ function scrollToHomeTop() {
 }
 
 function FooterBrand() {
+  const pathname = usePathname()
+
   return (
     <section className="border-t border-amber-600 pt-4">
-      <button
-        type="button"
-        onClick={scrollToHomeTop}
+      <Link
+        href="/"
+        onClick={(event) => {
+          if (pathname === '/') {
+            event.preventDefault()
+            scrollToHomeTop()
+          }
+        }}
         className="inline-flex items-center gap-3 transition-colors hover:text-amber-600"
       >
         <Image src="/icons/temp-icon.svg" alt="Logo temporal de PropBol" width={44} height={44} />
         <span className="text-2xl font-bold text-stone-900">PropBol</span>
-      </button>
+      </Link>
       <p className="mt-4 max-w-xs text-sm leading-8 text-stone-600">
-        Revolucionando el mercado inmobiliario con tecnología de punta y diseño centrado en
-        el usuario.
+        Revolucionando el mercado inmobiliario con tecnología de punta y diseño centrado en el
+        usuario.
       </p>
     </section>
   )
