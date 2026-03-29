@@ -19,7 +19,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 })
 
-// 🎨 COLOR SEGÚN TIPO
+//COLOR SEGÚN TIPO
 function getColorByType(type: string) {
   switch (type) {
     case 'casa':
@@ -33,4 +33,29 @@ function getColorByType(type: string) {
     default:
       return '#6b7280'
   }
+}
+
+//PIN estilo portal
+function createPinIcon(property: PropertyMapPin, isSelected: boolean): L.DivIcon {
+  const color = getColorByType(property.type)
+
+  return L.divIcon({
+    className: '',
+    html: `
+      <div style="
+        background:${isSelected ? color : 'white'};
+        color:${isSelected ? 'white' : color};
+        padding:4px 8px;
+        border-radius:12px;
+        font-size:12px;
+        font-weight:bold;
+        border:2px solid ${color};
+        box-shadow:0 2px 6px rgba(0,0,0,0.2);
+      ">
+        $${property.price.toLocaleString()}
+      </div>
+    `,
+    iconSize: [60, 30],
+    iconAnchor: [30, 30],
+  })
 }
