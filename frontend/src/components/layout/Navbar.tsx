@@ -130,85 +130,121 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="sticky top-0 z-40 bg-white border-b shadow-sm w-full">
-        <div className="container mx-auto px-4 py-4">
+      <nav className="sticky top-0 z-40 bg-[#F9F6EE]/85 backdrop-blur-md border-b border-gray-200/60 shadow-sm w-full transition-all duration-300">
+        <div className="container mx-auto px-4 md:px-8 py-3.5">
           <div className="flex justify-between items-center">
             
+            {/* Logo Profesional */}
             <Link
               href="/"
-              className="flex items-center gap-2 text-xl font-bold text-black hover:text-gray-700 transition p-1 rounded"
+              className="flex items-center gap-3 text-2xl font-extrabold text-gray-900 tracking-tight group"
             >
-              <div className="w-8 h-8 bg-black rounded-sm"></div>
-              PropBol
+              <div className="flex items-center justify-center w-10 h-10 bg-gray-900 rounded-xl shadow-md group-hover:shadow-lg group-hover:-translate-y-0.5 transition-all duration-300">
+                <svg className="w-5 h-5 text-[#F9F6EE]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+              </div>
+              Prop<span className="text-[#ff0050]">Bol</span>
             </Link>
 
-            <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-700">
-              <Link href="/" className="hover:text-black hover:shadow-sm transition p-1 rounded">
-                Inicio
+            {/* Menú de Navegación */}
+            <div className="hidden md:flex items-center gap-8 text-[15px] font-semibold text-gray-600">
+              <Link href="/" className="relative group py-2">
+                <span className="group-hover:text-gray-900 transition-colors duration-300">Inicio</span>
+                <span className="absolute left-0 bottom-0 w-full h-[2.5px] bg-[#ff0050] scale-x-0 group-hover:scale-x-100 transition-transform origin-left rounded-full"></span>
               </Link>
-              <Link href="#contacto" className="hover:text-black hover:shadow-sm transition p-1 rounded">
-                Contáctanos
+              
+              <Link href="#contacto" className="relative group py-2">
+                <span className="group-hover:text-gray-900 transition-colors duration-300">Contáctanos</span>
+                <span className="absolute left-0 bottom-0 w-full h-[2.5px] bg-[#ff0050] scale-x-0 group-hover:scale-x-100 transition-transform origin-left rounded-full"></span>
               </Link>
-              <Link href="#nosotros" className="hover:text-black hover:shadow-sm transition p-1 rounded">
-                Sobre Nosotros
+              
+              <Link href="#nosotros" className="relative group py-2">
+                <span className="group-hover:text-gray-900 transition-colors duration-300">Sobre Nosotros</span>
+                <span className="absolute left-0 bottom-0 w-full h-[2.5px] bg-[#ff0050] scale-x-0 group-hover:scale-x-100 transition-transform origin-left rounded-full"></span>
               </Link>
             </div>
 
+            {/* Icono de Usuario y Panel */}
             <div className="relative" ref={panelRef}>
               <button
                 onClick={togglePanel}
-                className="p-2 text-gray-700 rounded-full hover:bg-gray-100 hover:shadow-sm transition duration-200 focus:outline-none"
+                className="flex items-center justify-center p-2.5 bg-white border border-gray-200 text-gray-700 rounded-full hover:bg-gray-50 hover:shadow-md hover:border-gray-300 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#ff0050]/20"
                 aria-label="Menú de usuario"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                 </svg>
               </button>
 
+              {/* Modal/Dropdown Mejorado */}
               <div
-                className={`absolute right-0 mt-3 w-72 rounded-2xl border bg-white shadow-xl p-5 z-50 transition-all duration-200 ${
+                className={`absolute right-0 mt-3 w-80 rounded-2xl border border-gray-200 bg-[#F9F6EE] shadow-2xl p-5 z-50 origin-top-right transition-all duration-300 ${
                   isPanelOpen
-                    ? 'opacity-100 translate-y-0 visible'
-                    : 'opacity-0 -translate-y-2 invisible pointer-events-none'
+                    ? 'opacity-100 scale-100 visible'
+                    : 'opacity-0 scale-95 invisible pointer-events-none'
                 }`}
               >
-                <div className="flex justify-between items-center mb-4 border-b pb-2">
-                  <span className="font-bold text-sm text-gray-900">Bienvenido a PropBol</span>
-                  <button onClick={() => setIsPanelOpen(false)} className="text-gray-500 hover:text-black hover:shadow-sm rounded transition px-1">✕</button>
+                {/* Cabecera del Dropdown */}
+                <div className="flex justify-between items-center mb-4 border-b border-gray-200 pb-3">
+                  <span className="font-bold text-sm text-gray-800">Bienvenido a PropBol</span>
+                  <button 
+                    onClick={() => setIsPanelOpen(false)} 
+                    className="text-gray-400 hover:text-gray-800 hover:bg-black/5 p-1 rounded-full transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                  </button>
                 </div>
 
                 {user ? (
                   <>
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 bg-gray-500 rounded-full"></div> 
+                    <div className="flex items-center gap-3 mb-5 p-2 bg-white/50 rounded-xl border border-gray-100 shadow-sm">
+                      <div className="w-11 h-11 bg-gradient-to-tr from-gray-800 to-gray-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-inner">
+                        {user.name.charAt(0)}
+                      </div>
                       <div>
-                        <p className="font-bold text-gray-800 text-sm">{user.name}</p>
+                        <p className="font-bold text-gray-800 text-sm leading-tight">{user.name}</p>
                         <p className="text-xs text-gray-500">{user.email}</p>
                       </div>
                     </div>
 
                     <Link
                       href="/perfil"
-                      className="flex justify-between w-full text-black font-bold mb-4 hover:shadow-sm p-1 rounded transition text-sm"
+                      className="group flex justify-between w-full text-black font-bold mb-4 hover:shadow-sm p-2 rounded-lg transition text-sm hover:bg-white"
                       onClick={() => setIsPanelOpen(false)}
                     >
-                      Mi perfil <span>&gt;</span>
+                      Mi perfil <span className="text-gray-400 group-hover:text-black transition-colors">&gt;</span>
                     </Link>
 
                     <button
                       onClick={handleOpenLogoutModal}
-                      className="w-full bg-[#ff0050] text-white py-2 rounded-lg font-bold shadow-md hover:opacity-90 hover:shadow-lg transition text-sm"
+                      className="w-full bg-[#ff0050] text-white py-2.5 rounded-xl font-bold shadow-md hover:bg-[#e60048] hover:shadow-lg transition-all active:scale-95 text-sm"
                     >
                       Cerrar Sesión
                     </button>
                   </>
                 ) : (
-                  <div className="text-center py-2">
+                  <div className="flex flex-col items-center py-2 px-1">
+                    <div className="w-12 h-12 bg-[#ff0050]/10 rounded-full flex items-center justify-center mb-3">
+                      <svg className="w-6 h-6 text-[#ff0050]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                    </div>
+                    
+                    <p className="text-sm text-gray-600 text-center mb-5 font-medium px-2">
+                      Encuentra tu hogar ideal o publica tu inmueble hoy mismo.
+                    </p>
+                    
                     <button
                       onClick={handleLoginMock}
-                      className="text-sm font-semibold text-gray-600 hover:text-black hover:shadow-sm p-2 rounded transition w-full"
+                      className="group flex items-center justify-center gap-2 w-full bg-[#ff0050] text-white py-2.5 rounded-xl text-sm font-bold shadow-md hover:bg-[#e60048] hover:shadow-lg transition-all active:scale-95"
                     >
-                      Ingresar / Registrarse
+                      <span>Ingresar / Registrarse</span>
+                      <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                      </svg>
                     </button>
                   </div>
                 )}
@@ -218,29 +254,36 @@ export default function Navbar() {
         </div>
       </nav>
 
+      {/* Modal de Confirmación de Cierre de Sesión */}
       <div
-        className={`fixed inset-0 z-[100] flex items-center justify-center bg-black/40 transition-opacity duration-200 ${
+        className={`fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${
           showLogoutModal ? 'opacity-100 visible' : 'opacity-0 invisible'
         }`}
       >
         <div
-          className={`bg-white w-[360px] rounded-2xl shadow-xl px-6 py-5 text-center transition-all duration-200 ${
-            showLogoutModal ? 'scale-100 translate-y-0' : 'scale-95 translate-y-2'
+          className={`bg-[#F9F6EE] w-[360px] rounded-3xl shadow-2xl px-6 py-6 text-center transition-all duration-300 ${
+            showLogoutModal ? 'scale-100 translate-y-0' : 'scale-95 translate-y-4'
           }`}
         >
+          <div className="mx-auto w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
+             <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+             </svg>
+          </div>
+          
           <h2 className="text-[18px] font-bold text-gray-900 mb-2">
             ¿Cerrar Sesión?
           </h2>
 
-          <p className="text-sm text-gray-500 mb-6">
-            Se finalizará tu sesión actual en este dispositivo.
+          <p className="text-sm text-gray-600 mb-6 px-2">
+            Se finalizará tu sesión actual en este dispositivo. Tendrás que volver a ingresar tus datos la próxima vez.
           </p>
 
-          <div className="flex justify-center gap-4">
+          <div className="flex justify-center gap-3">
             <button
               onClick={handleCancelLogout}
               disabled={isLoggingOut}
-              className="px-5 py-2 rounded-lg bg-gray-100 text-gray-800 font-semibold hover:bg-gray-200 hover:shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 py-2.5 rounded-xl bg-gray-200 text-gray-800 font-bold hover:bg-gray-300 transition disabled:opacity-50"
             >
               Cancelar
             </button>
@@ -248,9 +291,9 @@ export default function Navbar() {
             <button
               onClick={handleConfirmLogout}
               disabled={isLoggingOut}
-              className="px-5 py-2 rounded-lg bg-[#ff0050] text-white font-semibold shadow-sm hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 py-2.5 rounded-xl bg-[#ff0050] text-white font-bold shadow-md hover:bg-[#e60048] hover:shadow-lg transition-all active:scale-95 disabled:opacity-50"
             >
-              {isLoggingOut ? 'Cerrando...' : 'Cerrar Sesión'}
+              {isLoggingOut ? 'Cerrando...' : 'Salir'}
             </button>
           </div>
         </div>
