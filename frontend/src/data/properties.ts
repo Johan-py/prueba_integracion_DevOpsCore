@@ -1,3 +1,4 @@
+export type PropertyType = "casa" | "departamento" | "terreno" | "local";
 export interface PropertyMapPin {
   id: string;
   title: string;
