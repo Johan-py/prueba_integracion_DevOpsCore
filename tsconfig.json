@@ -19,8 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
-    }
+    "@/*": ["./frontend/src/*"]
+  }
   },
   "include": [
     "next-env.d.ts",

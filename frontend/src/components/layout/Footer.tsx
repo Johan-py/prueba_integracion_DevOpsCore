@@ -75,8 +75,8 @@ function FooterBrand() {
         <span className="text-2xl font-bold text-stone-900">PropBol</span>
       </Link>
       <p className="mt-4 max-w-xs text-sm leading-8 text-stone-600">
-        Revolucionando el mercado inmobiliario con tecnología de punta y diseño centrado en
-        el usuario.
+        Revolucionando el mercado inmobiliario con tecnología de punta y diseño centrado en el
+        usuario.
       </p>
     </section>
   )
