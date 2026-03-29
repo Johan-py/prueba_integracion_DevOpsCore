@@ -10,13 +10,18 @@ interface CreateUserInput {
 }
 
 export const createUser = async (data: CreateUserInput) => {
+  const rol = await prisma.rol.findUnique({
+    where: { nombre: "VISITANTE" },
+  });
+
+  if (!rol) throw new Error("Rol de usuario no encontrado");
   return await prisma.usuario.create({
     data: {
       nombre: data.nombre,
       apellido: data.apellido,
       correo: data.correo,
       password: data.password,
-      rolId: data.rolId,
+      rolId: rol.id,
       telefonos: data.telefono
         ? {
             create: {

@@ -58,32 +58,37 @@ const fakeLogin = async (email: string, password: string) => {
   }
 }
 
- const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault()
 
-  if (!email || !password) {
-    setErrors({
-      email: !email ? 'El correo es obligatorio' : undefined,
-      password: !password ? 'La contraseña es obligatoria' : undefined
-    })
-    return
+  const trimmedEmail = email.trim()
+
+  const newErrors: { email?: string; password?: string } = {}
+
+  // Validación manual segura
+  if (!trimmedEmail) {
+    newErrors.email = 'El correo es obligatorio'
+  } else if (!/\S+@\S+\.\S+/.test(trimmedEmail)) {
+    newErrors.email = 'Formato de correo inválido'
   }
 
-  const trimmedEmail = email.trim()
-  setEmail(trimmedEmail)
+  if (!password) {
+    newErrors.password = 'La contraseña es obligatoria'
+  }
 
-  validate('email', trimmedEmail)
-  validate('password', password)
+  setErrors(newErrors)
 
-  if (!isFormValid) return
+  //  la validación real
+  if (Object.keys(newErrors).length > 0) return
 
   try {
-    // MOCK EN VEZ DE FETCH
     const result = await fakeLogin(trimmedEmail, password)
 
     if (!result.ok) {
-      setPassword('') // limpiar contraseña
-      alert(result.message || 'Error al iniciar sesión')
+      setPassword('') // 🔥 limpieza correcta
+      setErrors({
+        password: 'Credenciales incorrectas'
+      })
       return
     }
 

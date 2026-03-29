@@ -1,7 +1,15 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Eye, EyeOff } from 'lucide-react'
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  User,
+  Phone,
+  Lock,
+  ArrowRight
+} from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { validateEmail, validatePassword } from '@/lib/validators/auth'
@@ -24,6 +32,11 @@ type FormErrors = {
   confirmPassword?: string
 }
 
+interface RegisterResponse {
+  message: string
+  token?: string
+}
+
 const initialFormData: FormData = {
   email: '',
   firstName: '',
@@ -33,14 +46,129 @@ const initialFormData: FormData = {
   confirmPassword: ''
 }
 
+/**
+ * Design Tokens
+ * Mantiene la lógica intacta y centraliza la capa visual.
+ */
+const tokens = {
+  colors: {
+    brand: {
+      50: 'bg-orange-50',
+      100: 'bg-orange-100',
+      500: 'bg-orange-500',
+      600: 'bg-orange-600',
+      700: 'bg-orange-700',
+      text: 'text-orange-600',
+      textStrong: 'text-orange-700',
+      border: 'border-orange-300',
+      focus: 'focus:border-orange-500 focus:ring-orange-200'
+    },
+    neutral: {
+      0: 'bg-white',
+      50: 'bg-slate-50',
+      100: 'bg-slate-100',
+      200: 'bg-slate-200',
+      300: 'border-slate-300',
+      400: 'text-slate-400',
+      500: 'text-slate-500',
+      600: 'text-slate-600',
+      700: 'text-slate-700',
+      800: 'text-slate-800',
+      900: 'text-slate-900'
+    },
+    success: {
+      bg: 'bg-emerald-50',
+      border: 'border-emerald-200',
+      text: 'text-emerald-700'
+    },
+    danger: {
+      bg: 'bg-red-50',
+      border: 'border-red-200',
+      borderStrong: 'border-red-500',
+      text: 'text-red-600',
+      textStrong: 'text-red-700'
+    }
+  },
+  radius: {
+    md: 'rounded-xl',
+    lg: 'rounded-2xl'
+  },
+  shadow: {
+    card: 'shadow-sm shadow-slate-200/60'
+  },
+  typography: {
+    title: 'text-2xl md:text-3xl font-semibold tracking-tight text-slate-900',
+    subtitle: 'text-sm text-slate-600',
+    label: 'text-sm font-medium text-slate-700',
+    input: 'text-sm text-slate-900 placeholder:text-slate-400',
+    helper: 'text-sm text-red-600',
+    button: 'text-sm font-semibold'
+  },
+  spacing: {
+    form: 'space-y-5'
+  }
+}
+
+function getInputClasses(hasError?: boolean) {
+  return [
+    'w-full rounded-xl border bg-white pl-11 pr-12 py-3.5 outline-none',
+    'transition duration-200',
+    'focus:ring-4',
+    tokens.typography.input,
+    hasError
+      ? `${tokens.colors.danger.borderStrong} focus:border-red-500 focus:ring-red-100`
+      : `${tokens.colors.neutral[300]} ${tokens.colors.brand.focus}`
+  ].join(' ')
+}
+
+function FieldError({
+  id,
+  error
+}: {
+  id: string
+  error?: string
+}) {
+  if (!error) return null
+
+  return (
+    <p id={id} className="mt-2 text-sm text-red-600">
+      {error}
+    </p>
+  )
+}
+
+function FieldLabel({
+  htmlFor,
+  children
+}: {
+  htmlFor: string
+  children: React.ReactNode
+}) {
+  return (
+    <label
+      htmlFor={htmlFor}
+      className="mb-2 block text-sm font-medium text-slate-700"
+    >
+      {children}
+    </label>
+  )
+}
+
 export default function SignUpForm() {
   const router = useRouter()
+  const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000'
 
   const [formData, setFormData] = useState<FormData>(initialFormData)
   const [errors, setErrors] = useState<FormErrors>({})
   const [touched, setTouched] = useState<Record<string, boolean>>({})
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [serverMessage, setServerMessage] = useState('')
+  const [serverError, setServerError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const onlyLettersRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/
+  const onlyNumbersRegex = /^[0-9]*$/
 
   const handleChange =
     (field: keyof FormData) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,6 +189,42 @@ export default function SignUpForm() {
         }))
       }
 
+      if (field === 'firstName') {
+        setErrors((prev) => ({
+          ...prev,
+          firstName:
+            value.trim() === ''
+              ? 'El campo no puede estar vacío'
+              : onlyLettersRegex.test(value)
+                ? undefined
+                : 'El nombre solo puede contener letras'
+        }))
+      }
+
+      if (field === 'lastName') {
+        setErrors((prev) => ({
+          ...prev,
+          lastName:
+            value.trim() === ''
+              ? 'El campo no puede estar vacío'
+              : onlyLettersRegex.test(value)
+                ? undefined
+                : 'El apellido solo puede contener letras'
+        }))
+      }
+
+      if (field === 'phone') {
+        setErrors((prev) => ({
+          ...prev,
+          phone:
+            value.trim() === ''
+              ? 'El campo no puede estar vacío'
+              : onlyNumbersRegex.test(value)
+                ? undefined
+                : 'El teléfono solo permite números'
+        }))
+      }
+
       if (field === 'password') {
         const passwordError = validatePassword(value)
 
@@ -68,9 +232,11 @@ export default function SignUpForm() {
           ...prev,
           password: passwordError || undefined,
           confirmPassword:
-            formData.confirmPassword && formData.confirmPassword !== value
-              ? 'Las contraseñas no coinciden'
-              : undefined
+            formData.confirmPassword.trim() === ''
+              ? prev.confirmPassword
+              : formData.confirmPassword !== value
+                ? 'Las contraseñas no coinciden'
+                : undefined
         }))
       }
 
@@ -78,46 +244,13 @@ export default function SignUpForm() {
         setErrors((prev) => ({
           ...prev,
           confirmPassword:
-            value !== formData.password
-              ? 'Las contraseñas no coinciden'
-              : undefined
+            value.trim() === ''
+              ? 'El campo no puede estar vacío'
+              : value !== formData.password
+                ? 'Las contraseñas no coinciden'
+                : undefined
         }))
       }
-
-      if (field === 'phone') {
-  const onlyNumbersRegex = /^[0-9]*$/
-
-  setErrors((prev) => ({
-    ...prev,
-    phone:
-      value.trim() === ''
-        ? 'El campo no puede estar vacío'
-        : onlyNumbersRegex.test(value)
-          ? undefined
-          : 'El teléfono solo permite números'
-          
-          
-  }))
-}
-      if (field === 'firstName') {
-        const soloLetrasRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/
-        setErrors((prev) => ({
-          ...prev,
-          firstName: value === '' || !soloLetrasRegex.test(value)
-          ? undefined
-          : 'El nombre solo puede contener letras'
-  }))
-}
-
-if (field === 'lastName') {
-  const soloLetrasRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/
-  setErrors((prev) => ({
-    ...prev,
-    lastName: value === '' || soloLetrasRegex.test(value)
-      ? undefined
-      : 'El apellido solo puede contener letras'
-  }))
-}
     }
 
   const handleBlur = (field: keyof FormData) => () => {
@@ -135,6 +268,42 @@ if (field === 'lastName') {
       }))
     }
 
+    if (field === 'firstName') {
+      setErrors((prev) => ({
+        ...prev,
+        firstName:
+          formData.firstName.trim() === ''
+            ? 'El campo no puede estar vacío'
+            : onlyLettersRegex.test(formData.firstName)
+              ? undefined
+              : 'El nombre solo puede contener letras'
+      }))
+    }
+
+    if (field === 'lastName') {
+      setErrors((prev) => ({
+        ...prev,
+        lastName:
+          formData.lastName.trim() === ''
+            ? 'El campo no puede estar vacío'
+            : onlyLettersRegex.test(formData.lastName)
+              ? undefined
+              : 'El apellido solo puede contener letras'
+      }))
+    }
+
+    if (field === 'phone') {
+      setErrors((prev) => ({
+        ...prev,
+        phone:
+          formData.phone.trim() === ''
+            ? 'El campo no puede estar vacío'
+            : onlyNumbersRegex.test(formData.phone)
+              ? undefined
+              : 'El teléfono solo permite números'
+      }))
+    }
+
     if (field === 'password') {
       const passwordError = validatePassword(formData.password)
 
@@ -148,57 +317,13 @@ if (field === 'lastName') {
       setErrors((prev) => ({
         ...prev,
         confirmPassword:
-          formData.confirmPassword !== formData.password
-            ? 'Las contraseñas no coinciden'
-            : undefined
+          formData.confirmPassword.trim() === ''
+            ? 'El campo no puede estar vacío'
+            : formData.confirmPassword !== formData.password
+              ? 'Las contraseñas no coinciden'
+              : undefined
       }))
     }
-
-    if (field === 'phone') {
-      const onlyNumbersRegex = /^[0-9]*$/
-
-      setErrors((prev) => ({
-        ...prev,
-        phone: onlyNumbersRegex.test(formData.phone)
-          ? undefined
-          : 'El teléfono solo permite números'
-      }))
-    }
-    if (field === 'firstName') {
-      const soloLetrasRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/
-      setErrors((prev) => ({
-      ...prev,
-      firstName: formData.firstName === '' || soloLetrasRegex.test(formData.firstName)
-      ? undefined
-      : 'El nombre solo puede contener letras'
-
-  }))
-}
-
-if (field === 'lastName') {
-  const soloLetrasRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/
-  setErrors((prev) => ({
-    ...prev,
-    lastName:
-      formData.lastName === '' || soloLetrasRegex.test(formData.lastName)
-      ? undefined
-      : 'El apellido solo puede contener letras'
-  }))
-}
-
-if (field === 'phone') {
-  const onlyNumbersRegex = /^[0-9]*$/
-
-  setErrors((prev) => ({
-    ...prev,
-    phone:
-      formData.phone.trim() === ''
-        ? 'El campo no puede estar vacío'
-        : onlyNumbersRegex.test(formData.phone)
-          ? undefined
-          : 'El teléfono solo permite números'
-  }))
-}
   }
 
   const handleCancel = () => {
@@ -207,6 +332,9 @@ if (field === 'phone') {
     setTouched({})
     setShowPassword(false)
     setShowConfirmPassword(false)
+    setServerMessage('')
+    setServerError('')
+    setIsSubmitting(false)
     router.push('/')
   }
 
@@ -223,40 +351,54 @@ if (field === 'phone') {
       requiredFieldsCompleted &&
       !validateEmail(formData.email) &&
       !validatePassword(formData.password) &&
-      formData.confirmPassword === formData.password &&
-      !errors.phone
+      onlyLettersRegex.test(formData.firstName) &&
+      onlyLettersRegex.test(formData.lastName) &&
+      onlyNumbersRegex.test(formData.phone) &&
+      formData.confirmPassword === formData.password
     )
-  }, [formData, errors.phone])
+  }, [formData])
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-  event.preventDefault()
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
 
-  const emailError = validateEmail(formData.email)
+    setServerMessage('')
+    setServerError('')
 
-  const firstNameError =
-    formData.firstName.trim() === '' ? 'El campo no puede estar vacío' : undefined
+    if (isSubmitting) return
 
-  const lastNameError =
-    formData.lastName.trim() === '' ? 'El campo no puede estar vacío' : undefined
+    const emailError = validateEmail(formData.email)
 
-  const passwordError = validatePassword(formData.password)
+    const firstNameError =
+      formData.firstName.trim() === ''
+        ? 'El campo no puede estar vacío'
+        : onlyLettersRegex.test(formData.firstName)
+          ? undefined
+          : 'El nombre solo puede contener letras'
 
-  const confirmPasswordError =
-    formData.confirmPassword.trim() === ''
-      ? 'El campo no puede estar vacío'
-      : formData.confirmPassword !== formData.password
-        ? 'Las contraseñas no coinciden'
-        : undefined
+    const lastNameError =
+      formData.lastName.trim() === ''
+        ? 'El campo no puede estar vacío'
+        : onlyLettersRegex.test(formData.lastName)
+          ? undefined
+          : 'El apellido solo puede contener letras'
 
-  const onlyNumbersRegex = /^[0-9]*$/
-  const phoneError =
-    formData.phone.trim() === ''
-      ? 'El campo no puede estar vacío'
-      : onlyNumbersRegex.test(formData.phone)
-        ? undefined
-        : 'El teléfono solo permite números'
+    const passwordError = validatePassword(formData.password)
 
-  const newErrors: FormErrors = {
+    const confirmPasswordError =
+      formData.confirmPassword.trim() === ''
+        ? 'El campo no puede estar vacío'
+        : formData.confirmPassword !== formData.password
+          ? 'Las contraseñas no coinciden'
+          : undefined
+
+    const phoneError =
+      formData.phone.trim() === ''
+        ? 'El campo no puede estar vacío'
+        : onlyNumbersRegex.test(formData.phone)
+          ? undefined
+          : 'El teléfono solo permite números'
+
+    const newErrors: FormErrors = {
       email: emailError || undefined,
       firstName: firstNameError,
       lastName: lastNameError,
@@ -265,252 +407,334 @@ if (field === 'phone') {
       confirmPassword: confirmPasswordError || undefined
     }
 
-     setErrors(newErrors)
-     setTouched({
-       email: true,
-       firstName: true,
-       lastName: true,
-       phone: true,
-       password: true,
-       confirmPassword: true
-       })
+    setErrors(newErrors)
+    setTouched({
+      email: true,
+      firstName: true,
+      lastName: true,
+      phone: true,
+      password: true,
+      confirmPassword: true
+    })
 
-       if (
-        emailError ||
-        firstNameError ||
-        lastNameError ||
-        passwordError ||
-        confirmPasswordError ||
-        phoneError
-       ) {
-        return
-       }
+    if (
+      emailError ||
+      firstNameError ||
+      lastNameError ||
+      passwordError ||
+      confirmPasswordError ||
+      phoneError
+    ) {
+      return
+    }
 
-       console.log('Formulario listo para enviar', {
-         ...formData,
-         email: formData.email.trim()
-          })
-          }
+    const payload = {
+      nombre: formData.firstName.trim(),
+      apellido: formData.lastName.trim(),
+      correo: formData.email.trim().toLowerCase(),
+      telefono: formData.phone.trim(),
+      password: formData.password.trim(),
+      confirmPassword: formData.confirmPassword.trim()
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      const response = await fetch(`${API_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      })
+
+      let data: RegisterResponse | null = null
+
+      try {
+        data = (await response.json()) as RegisterResponse
+      } catch {
+        data = null
+      }
+
+      if (!response.ok) {
+        throw new Error(data?.message || 'No se pudo completar el registro')
+      }
+
+      if (data?.token) {
+        localStorage.setItem('token', data.token)
+      }
+
+      setServerMessage(data?.message || 'Usuario registrado correctamente')
+
+      setTimeout(() => {
+        router.replace('/')
+      }, 1500)
+    } catch (error) {
+      const message =
+        error instanceof TypeError
+          ? 'No hay conexión a internet o no se pudo conectar con el servidor'
+          : error instanceof Error
+            ? error.message
+            : 'No se pudo completar el registro'
+
+      setServerError(message)
+      console.error('Error al registrar:', error)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-center text-2xl font-bold text-slate-800">
-        Registro
-      </h2>
+    <div className="mx-auto w-full max-w-2xl">
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+        <div className="mb-6 text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-100">
+            <User className="h-7 w-7 text-orange-600" />
+          </div>
 
-      <div>
-        <label
-          htmlFor="email"
-          className="mb-2 block text-sm font-medium text-slate-700"
-        >
-          Correo electrónico
-        </label>
+          <h2 className="text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
+            Registro
+          </h2>
 
-        <input
-          id="email"
-          name="email"
-          type="email"
-          value={formData.email}
-          onChange={handleChange('email')}
-          onBlur={handleBlur('email')}
-          placeholder="Ingresa tu correo"
-          className={`w-full rounded-md border px-4 py-3 outline-none transition ${
-            touched.email && errors.email
-              ? 'border-red-500'
-              : 'border-slate-300 focus:border-orange-400'
-          }`}
-          aria-invalid={Boolean(touched.email && errors.email)}
-          aria-describedby="email-error"
-        />
-
-        {touched.email && errors.email ? (
-          <p id="email-error" className="mt-1 text-sm text-red-600">
-            {errors.email}
+          <p className="mt-2 text-sm text-slate-600">
+            Completa tus datos para crear una cuenta
           </p>
-        ) : null}
-      </div>
+        </div>
 
-      <div>
-        <label
-          htmlFor="firstName"
-          className="mb-2 block text-sm font-medium text-slate-700"
-        >
-          Nombre
-        </label>
-        <input
-          id="firstName"
-          name="firstName"
-          type="text"
-          value={formData.firstName}
-          onChange={handleChange('firstName')}
-          onBlur={handleBlur('firstName')}
-          placeholder="Ingresa tu nombre"
-          maxLength={30}
-          className="w-full rounded-md border border-slate-300 px-4 py-3 outline-none focus:border-orange-400"
-        />
-        {touched.firstName && errors.firstName ? (
-          <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>) : null}
-      </div>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {serverMessage ? (
+            <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+              {serverMessage}
+            </p>
+          ) : null}
 
-      <div>
-        <label
-          htmlFor="lastName"
-          className="mb-2 block text-sm font-medium text-slate-700"
-        >
-          Apellido
-        </label>
-        <input
-        id="lastName"
-        name="lastName"
-        type="text"
-        value={formData.lastName}
-        onChange={handleChange('lastName')}
-        onBlur={handleBlur('lastName')}
-        placeholder="Ingresa tu apellido"
-        maxLength={30}
-        className={`w-full rounded-md border px-4 py-3 outline-none transition ${
-        touched.lastName && errors.lastName
-        ? 'border-red-500'
-        : 'border-slate-300 focus:border-orange-400'
-        }`}
-        aria-invalid={Boolean(touched.lastName && errors.lastName)}
-        aria-describedby="lastName-error"
-      />
-      {touched.lastName && errors.lastName ? (
-        <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>) : null}
+          {serverError ? (
+            <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {serverError}
+            </p>
+          ) : null}
+
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="md:col-span-2">
+              <FieldLabel htmlFor="email">Correo electrónico</FieldLabel>
+              <div className="relative">
+                <Mail className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange('email')}
+                  onBlur={handleBlur('email')}
+                  placeholder="Ingresa tu correo"
+                  className={getInputClasses(
+                    Boolean(touched.email && errors.email)
+                  )}
+                  aria-invalid={Boolean(touched.email && errors.email)}
+                  aria-describedby="email-error"
+                />
+              </div>
+              <FieldError
+                id="email-error"
+                error={touched.email ? errors.email : undefined}
+              />
+            </div>
+
+            <div>
+              <FieldLabel htmlFor="firstName">Nombre</FieldLabel>
+              <div className="relative">
+                <User className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <input
+                  id="firstName"
+                  name="firstName"
+                  type="text"
+                  value={formData.firstName}
+                  onChange={handleChange('firstName')}
+                  onBlur={handleBlur('firstName')}
+                  placeholder="Ingresa tu nombre"
+                  maxLength={30}
+                  className={getInputClasses(
+                    Boolean(touched.firstName && errors.firstName)
+                  )}
+                  aria-invalid={Boolean(touched.firstName && errors.firstName)}
+                  aria-describedby="firstName-error"
+                />
+              </div>
+              <FieldError
+                id="firstName-error"
+                error={touched.firstName ? errors.firstName : undefined}
+              />
+            </div>
+
+            <div>
+              <FieldLabel htmlFor="lastName">Apellido</FieldLabel>
+              <div className="relative">
+                <User className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <input
+                  id="lastName"
+                  name="lastName"
+                  type="text"
+                  value={formData.lastName}
+                  onChange={handleChange('lastName')}
+                  onBlur={handleBlur('lastName')}
+                  placeholder="Ingresa tu apellido"
+                  maxLength={30}
+                  className={getInputClasses(
+                    Boolean(touched.lastName && errors.lastName)
+                  )}
+                  aria-invalid={Boolean(touched.lastName && errors.lastName)}
+                  aria-describedby="lastName-error"
+                />
+              </div>
+              <FieldError
+                id="lastName-error"
+                error={touched.lastName ? errors.lastName : undefined}
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <FieldLabel htmlFor="phone">Teléfono</FieldLabel>
+              <div className="relative">
+                <Phone className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <input
+                  id="phone"
+                  name="phone"
+                  type="text"
+                  value={formData.phone}
+                  onChange={handleChange('phone')}
+                  onBlur={handleBlur('phone')}
+                  placeholder="Ingresa tu teléfono"
+                  maxLength={20}
+                  className={getInputClasses(
+                    Boolean(touched.phone && errors.phone)
+                  )}
+                  aria-invalid={Boolean(touched.phone && errors.phone)}
+                  aria-describedby="phone-error"
+                />
+              </div>
+              <FieldError
+                id="phone-error"
+                error={touched.phone ? errors.phone : undefined}
+              />
+            </div>
+
+            <div>
+              <FieldLabel htmlFor="password">Contraseña</FieldLabel>
+              <div className="relative">
+                <Lock className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.password}
+                  onChange={handleChange('password')}
+                  onBlur={handleBlur('password')}
+                  placeholder="Ingresa tu contraseña"
+                  maxLength={255}
+                  className={getInputClasses(
+                    Boolean(touched.password && errors.password)
+                  )}
+                  aria-invalid={Boolean(touched.password && errors.password)}
+                  aria-describedby="password-error"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
+                  aria-label={
+                    showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+                  }
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+              <FieldError
+                id="password-error"
+                error={touched.password ? errors.password : undefined}
+              />
+            </div>
+
+            <div>
+              <FieldLabel htmlFor="confirmPassword">
+                Confirmar contraseña
+              </FieldLabel>
+              <div className="relative">
+                <Lock className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={formData.confirmPassword}
+                  onChange={handleChange('confirmPassword')}
+                  onBlur={handleBlur('confirmPassword')}
+                  placeholder="Confirma tu contraseña"
+                  maxLength={255}
+                  className={getInputClasses(
+                    Boolean(
+                      touched.confirmPassword && errors.confirmPassword
+                    )
+                  )}
+                  aria-invalid={Boolean(
+                    touched.confirmPassword && errors.confirmPassword
+                  )}
+                  aria-describedby="confirmPassword-error"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
+                  aria-label={
+                    showConfirmPassword
+                      ? 'Ocultar confirmación de contraseña'
+                      : 'Mostrar confirmación de contraseña'
+                  }
+                >
+                  {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+              <FieldError
+                id="confirmPassword-error"
+                error={
+                  touched.confirmPassword ? errors.confirmPassword : undefined
+                }
+              />
+            </div>
+          </div>
+
+          <div className="grid gap-3 pt-2 sm:grid-cols-2">
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+            >
+              Cancelar registro
+            </button>
+
+            <button
+              type="submit"
+              disabled={!isFormValid || isSubmitting}
+              className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white transition ${
+                isFormValid && !isSubmitting
+                  ? 'bg-orange-500 hover:bg-orange-600'
+                  : 'cursor-not-allowed bg-slate-300'
+              }`}
+            >
+              {isSubmitting ? 'Registrando...' : 'Registrarse'}
+              {!isSubmitting ? <ArrowRight size={18} /> : null}
+            </button>
+          </div>
+
+          <p className="text-center text-sm text-slate-600">
+            ¿Ya tienes una cuenta?{' '}
+            <Link
+              href="/sign-in"
+              className="font-semibold text-orange-600 transition hover:text-orange-700 hover:underline"
+            >
+              Inicia sesión
+            </Link>
+          </p>
+        </form>
+      </div>
     </div>
-
-      <div>
-        <label
-          htmlFor="phone"
-          className="mb-2 block text-sm font-medium text-slate-700"
-        >
-          Teléfono
-        </label>
-       <input
-       id="phone"
-       name="phone"
-       type="text"
-       value={formData.phone}
-       onChange={handleChange('phone')}
-       onBlur={handleBlur('phone')}
-       placeholder="Ingresa tu teléfono"
-       className={`w-full rounded-md border px-4 py-3 outline-none transition ${
-       touched.phone && errors.phone
-      ? 'border-red-500'
-      : 'border-slate-300 focus:border-orange-400'
-      }`}
-      aria-invalid={Boolean(touched.phone && errors.phone)}
-      aria-describedby="phone-error"
-     />
-
-{touched.phone && errors.phone ? (
-  <p id="phone-error" className="mt-1 text-sm text-red-600">
-    {errors.phone}
-  </p>
-) : null}
-      </div>
-
-      <div>
-        <label
-          htmlFor="password"
-          className="mb-2 block text-sm font-medium text-slate-700"
-        >
-          Contraseña
-        </label>
-
-        <div className="relative">
-          <input
-            id="password"
-            name="password"
-            type={showPassword ? 'text' : 'password'}
-            value={formData.password}
-            onChange={handleChange('password')}
-            onBlur={handleBlur('password')}
-            placeholder="Ingresa tu contraseña"
-            className="w-full rounded-md border border-slate-300 px-4 py-3 pr-12 outline-none focus:border-orange-400"
-          />
-
-          <button
-            type="button"
-            onClick={() => setShowPassword((prev) => !prev)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
-            aria-label={
-              showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
-            }
-          >
-            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-          </button>
-        </div>
-
-        {touched.password && errors.password ? (
-          <p className="mt-1 text-sm text-red-600">{errors.password}</p>
-        ) : null}
-      </div>
-
-      <div>
-        <label
-          htmlFor="confirmPassword"
-          className="mb-2 block text-sm font-medium text-slate-700"
-        >
-          Confirmar contraseña
-        </label>
-
-        <div className="relative">
-          <input
-            id="confirmPassword"
-            name="confirmPassword"
-            type={showConfirmPassword ? 'text' : 'password'}
-            value={formData.confirmPassword}
-            onChange={handleChange('confirmPassword')}
-            onBlur={handleBlur('confirmPassword')}
-            placeholder="Confirma tu contraseña"
-            className="w-full rounded-md border border-slate-300 px-4 py-3 pr-12 outline-none focus:border-orange-400"
-          />
-
-          <button
-            type="button"
-            onClick={() => setShowConfirmPassword((prev) => !prev)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
-            aria-label={
-              showConfirmPassword
-                ? 'Ocultar confirmación de contraseña'
-                : 'Mostrar confirmación de contraseña'
-            }
-          >
-            {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-          </button>
-        </div>
-
-        {touched.confirmPassword && errors.confirmPassword ? (
-          <p className="mt-1 text-sm text-red-600">
-            {errors.confirmPassword}
-          </p>
-        ) : null}
-      </div>
-
-      <button
-        type="submit"
-        disabled={!isFormValid}
-        className="w-full rounded-md bg-orange-400 px-4 py-3 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        Registrarse
-      </button>
-
-      <button
-        type="button"
-        onClick={handleCancel}
-        className="w-full rounded-md bg-slate-700 px-4 py-3 font-semibold text-white"
-      >
-        Cancelar registro
-      </button>
-
-      <p className="text-center text-sm text-slate-600">
-        ¿Ya tienes una cuenta?{' '}
-        <Link href="/sign-in" className="font-semibold text-orange-500">
-          Inicia sesión
-        </Link>
-      </p>
-    </form>
   )
 }
