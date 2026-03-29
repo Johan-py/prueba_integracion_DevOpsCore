@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Eye,
   EyeOff,
@@ -9,7 +9,6 @@ import {
   Phone,
   Lock,
   AlertCircle,
-  CheckCircle,
   Chrome
 } from 'lucide-react'
 import Link from 'next/link'
@@ -38,6 +37,9 @@ interface RegisterResponse {
   message: string
   token?: string
 }
+
+const MAX_NAME_LENGTH = 30
+const MAX_LAST_NAME_LENGTH = 30
 
 const initialFormData: FormData = {
   email: '',
@@ -105,12 +107,65 @@ export default function SignUpForm() {
   const [touched, setTouched] = useState<Record<string, boolean>>({})
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [serverMessage, setServerMessage] = useState('')
   const [serverError, setServerError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const onlyLettersRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/
   const onlyNumbersRegex = /^[0-9]*$/
+
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+
+    if (token) {
+      router.replace('/')
+    }
+  }, [router])
+
+  const validateFirstName = (value: string) => {
+    const trimmed = value.trim()
+
+    if (trimmed === '') return 'El campo no puede estar vacío'
+    if (trimmed.length > MAX_NAME_LENGTH) {
+      return `El nombre no puede superar ${MAX_NAME_LENGTH} caracteres`
+    }
+    if (!onlyLettersRegex.test(value)) {
+      return 'El nombre solo puede contener letras'
+    }
+
+    return undefined
+  }
+
+  const validateLastName = (value: string) => {
+    const trimmed = value.trim()
+
+    if (trimmed === '') return 'El campo no puede estar vacío'
+    if (trimmed.length > MAX_LAST_NAME_LENGTH) {
+      return `El apellido no puede superar ${MAX_LAST_NAME_LENGTH} caracteres`
+    }
+    if (!onlyLettersRegex.test(value)) {
+      return 'El apellido solo puede contener letras'
+    }
+
+    return undefined
+  }
+
+  const validatePhone = (value: string) => {
+    const trimmed = value.trim()
+
+    if (trimmed === '') return 'El campo no puede estar vacío'
+    if (!onlyNumbersRegex.test(value)) {
+      return 'El teléfono solo permite números'
+    }
+
+    return undefined
+  }
+
+  const validateConfirmPassword = (value: string, password: string) => {
+    if (value.trim() === '') return 'El campo no puede estar vacío'
+    if (value !== password) return 'Las contraseñas no coinciden'
+
+    return undefined
+  }
 
   const handleChange =
     (field: keyof FormData) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -122,48 +177,33 @@ export default function SignUpForm() {
         [field]: value
       }))
 
-      if (field === 'email') {
-        const emailError = validateEmail(value)
+      setServerError('')
 
+      if (field === 'email') {
         setErrors((prev) => ({
           ...prev,
-          email: emailError || undefined
+          email: validateEmail(value) || undefined
         }))
       }
 
       if (field === 'firstName') {
         setErrors((prev) => ({
           ...prev,
-          firstName:
-            value.trim() === ''
-              ? 'El campo no puede estar vacío'
-              : onlyLettersRegex.test(value)
-                ? undefined
-                : 'El nombre solo puede contener letras'
+          firstName: validateFirstName(value)
         }))
       }
 
       if (field === 'lastName') {
         setErrors((prev) => ({
           ...prev,
-          lastName:
-            value.trim() === ''
-              ? 'El campo no puede estar vacío'
-              : onlyLettersRegex.test(value)
-                ? undefined
-                : 'El apellido solo puede contener letras'
+          lastName: validateLastName(value)
         }))
       }
 
       if (field === 'phone') {
         setErrors((prev) => ({
           ...prev,
-          phone:
-            value.trim() === ''
-              ? 'El campo no puede estar vacío'
-              : onlyNumbersRegex.test(value)
-                ? undefined
-                : 'El teléfono solo permite números'
+          phone: validatePhone(value)
         }))
       }
 
@@ -176,21 +216,14 @@ export default function SignUpForm() {
           confirmPassword:
             formData.confirmPassword.trim() === ''
               ? prev.confirmPassword
-              : formData.confirmPassword !== value
-                ? 'Las contraseñas no coinciden'
-                : undefined
+              : validateConfirmPassword(formData.confirmPassword, value)
         }))
       }
 
       if (field === 'confirmPassword') {
         setErrors((prev) => ({
           ...prev,
-          confirmPassword:
-            value.trim() === ''
-              ? 'El campo no puede estar vacío'
-              : value !== formData.password
-                ? 'Las contraseñas no coinciden'
-                : undefined
+          confirmPassword: validateConfirmPassword(value, formData.password)
         }))
       }
     }
@@ -202,68 +235,47 @@ export default function SignUpForm() {
     }))
 
     if (field === 'email') {
-      const emailError = validateEmail(formData.email)
-
       setErrors((prev) => ({
         ...prev,
-        email: emailError || undefined
+        email: validateEmail(formData.email) || undefined
       }))
     }
 
     if (field === 'firstName') {
       setErrors((prev) => ({
         ...prev,
-        firstName:
-          formData.firstName.trim() === ''
-            ? 'El campo no puede estar vacío'
-            : onlyLettersRegex.test(formData.firstName)
-              ? undefined
-              : 'El nombre solo puede contener letras'
+        firstName: validateFirstName(formData.firstName)
       }))
     }
 
     if (field === 'lastName') {
       setErrors((prev) => ({
         ...prev,
-        lastName:
-          formData.lastName.trim() === ''
-            ? 'El campo no puede estar vacío'
-            : onlyLettersRegex.test(formData.lastName)
-              ? undefined
-              : 'El apellido solo puede contener letras'
+        lastName: validateLastName(formData.lastName)
       }))
     }
 
     if (field === 'phone') {
       setErrors((prev) => ({
         ...prev,
-        phone:
-          formData.phone.trim() === ''
-            ? 'El campo no puede estar vacío'
-            : onlyNumbersRegex.test(formData.phone)
-              ? undefined
-              : 'El teléfono solo permite números'
+        phone: validatePhone(formData.phone)
       }))
     }
 
     if (field === 'password') {
-      const passwordError = validatePassword(formData.password)
-
       setErrors((prev) => ({
         ...prev,
-        password: passwordError || undefined
+        password: validatePassword(formData.password) || undefined
       }))
     }
 
     if (field === 'confirmPassword') {
       setErrors((prev) => ({
         ...prev,
-        confirmPassword:
-          formData.confirmPassword.trim() === ''
-            ? 'El campo no puede estar vacío'
-            : formData.confirmPassword !== formData.password
-              ? 'Las contraseñas no coinciden'
-              : undefined
+        confirmPassword: validateConfirmPassword(
+          formData.confirmPassword,
+          formData.password
+        )
       }))
     }
   }
@@ -274,7 +286,6 @@ export default function SignUpForm() {
     setTouched({})
     setShowPassword(false)
     setShowConfirmPassword(false)
-    setServerMessage('')
     setServerError('')
     setIsSubmitting(false)
     router.push('/')
@@ -292,61 +303,31 @@ export default function SignUpForm() {
     return (
       requiredFieldsCompleted &&
       !validateEmail(formData.email) &&
+      !validateFirstName(formData.firstName) &&
+      !validateLastName(formData.lastName) &&
+      !validatePhone(formData.phone) &&
       !validatePassword(formData.password) &&
-      onlyLettersRegex.test(formData.firstName) &&
-      onlyLettersRegex.test(formData.lastName) &&
-      onlyNumbersRegex.test(formData.phone) &&
-      formData.confirmPassword === formData.password
+      !validateConfirmPassword(formData.confirmPassword, formData.password)
     )
   }, [formData])
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    setServerMessage('')
-    setServerError('')
-
     if (isSubmitting) return
 
-    const emailError = validateEmail(formData.email)
-
-    const firstNameError =
-      formData.firstName.trim() === ''
-        ? 'El campo no puede estar vacío'
-        : onlyLettersRegex.test(formData.firstName)
-          ? undefined
-          : 'El nombre solo puede contener letras'
-
-    const lastNameError =
-      formData.lastName.trim() === ''
-        ? 'El campo no puede estar vacío'
-        : onlyLettersRegex.test(formData.lastName)
-          ? undefined
-          : 'El apellido solo puede contener letras'
-
-    const passwordError = validatePassword(formData.password)
-
-    const confirmPasswordError =
-      formData.confirmPassword.trim() === ''
-        ? 'El campo no puede estar vacío'
-        : formData.confirmPassword !== formData.password
-          ? 'Las contraseñas no coinciden'
-          : undefined
-
-    const phoneError =
-      formData.phone.trim() === ''
-        ? 'El campo no puede estar vacío'
-        : onlyNumbersRegex.test(formData.phone)
-          ? undefined
-          : 'El teléfono solo permite números'
+    setServerError('')
 
     const newErrors: FormErrors = {
-      email: emailError || undefined,
-      firstName: firstNameError,
-      lastName: lastNameError,
-      phone: phoneError,
-      password: passwordError || undefined,
-      confirmPassword: confirmPasswordError || undefined
+      email: validateEmail(formData.email) || undefined,
+      firstName: validateFirstName(formData.firstName),
+      lastName: validateLastName(formData.lastName),
+      phone: validatePhone(formData.phone),
+      password: validatePassword(formData.password) || undefined,
+      confirmPassword: validateConfirmPassword(
+        formData.confirmPassword,
+        formData.password
+      )
     }
 
     setErrors(newErrors)
@@ -359,14 +340,7 @@ export default function SignUpForm() {
       confirmPassword: true
     })
 
-    if (
-      emailError ||
-      firstNameError ||
-      lastNameError ||
-      passwordError ||
-      confirmPasswordError ||
-      phoneError
-    ) {
+    if (Object.values(newErrors).some(Boolean)) {
       return
     }
 
@@ -406,11 +380,12 @@ export default function SignUpForm() {
         localStorage.setItem('token', data.token)
       }
 
-      setServerMessage(data?.message || 'Usuario registrado correctamente')
+      sessionStorage.setItem(
+        'register_success_message',
+        data?.message || 'Usuario registrado correctamente'
+      )
 
-      setTimeout(() => {
-        router.replace('/')
-      }, 1500)
+      router.replace('/')
     } catch (error) {
       const message =
         error instanceof TypeError
@@ -434,16 +409,6 @@ export default function SignUpForm() {
           <div>
             <p className="text-sm font-semibold text-[#292524]">Error</p>
             <p className="text-xs text-[#57534e]">{serverError}</p>
-          </div>
-        </div>
-      ) : null}
-
-      {serverMessage ? (
-        <div className="fixed bottom-6 right-6 z-50 flex min-w-[280px] items-start gap-3 border-l-4 border-emerald-400 bg-white px-4 py-3 shadow-lg">
-          <CheckCircle className="mt-0.5 text-emerald-500" size={18} />
-          <div>
-            <p className="text-sm font-semibold text-[#292524]">Éxito</p>
-            <p className="text-xs text-[#57534e]">{serverMessage}</p>
           </div>
         </div>
       ) : null}
@@ -494,7 +459,6 @@ export default function SignUpForm() {
                   onChange={handleChange('firstName')}
                   onBlur={handleBlur('firstName')}
                   placeholder="Ingresa tu nombre"
-                  maxLength={30}
                   className={getInputClasses(
                     Boolean(touched.firstName && errors.firstName)
                   )}
@@ -520,7 +484,6 @@ export default function SignUpForm() {
                   onChange={handleChange('lastName')}
                   onBlur={handleBlur('lastName')}
                   placeholder="Ingresa tu apellido"
-                  maxLength={30}
                   className={getInputClasses(
                     Boolean(touched.lastName && errors.lastName)
                   )}
@@ -546,7 +509,6 @@ export default function SignUpForm() {
                   onChange={handleChange('phone')}
                   onBlur={handleBlur('phone')}
                   placeholder="Ingresa tu numero de telefono"
-                  maxLength={20}
                   className={getInputClasses(Boolean(touched.phone && errors.phone))}
                   aria-invalid={Boolean(touched.phone && errors.phone)}
                   aria-describedby="phone-error"

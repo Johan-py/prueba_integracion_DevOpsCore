@@ -4,8 +4,7 @@ import {
   createUser,
   desactiveSessionByToken,
   findActiveSessionByToken,
-  findUser,
-  findUserByCorreo
+  findUser
 } from './auth.repository.js'
 
 type LoginDTO = {
@@ -22,8 +21,12 @@ type RegisterDTO = {
   telefono?: string
 }
 
+const MAX_NOMBRE = 30
+const MAX_APELLIDO = 30
+
 export const loginService = async (payload: LoginDTO) => {
-  const { email, password } = payload
+  const email = payload.email?.trim().toLowerCase()
+  const password = payload.password?.trim()
 
   if (!email || !password) {
     throw new Error('Correo y contraseña son obligatorios')
@@ -35,7 +38,7 @@ export const loginService = async (payload: LoginDTO) => {
     throw new Error('User not found')
   }
 
-  const isValidPassword = user.password === password.trim()
+  const isValidPassword = user.password === password
 
   if (!isValidPassword) {
     throw new Error('Invalid credentials')
@@ -47,7 +50,6 @@ export const loginService = async (payload: LoginDTO) => {
   }
 
   const token = generateToken(jwtPayload)
-
   const fechaExpiracion = new Date(Date.now() + 60 * 60 * 1000)
 
   await createSession({
@@ -66,21 +68,27 @@ export const loginService = async (payload: LoginDTO) => {
 }
 
 export const registerUser = async (payload: RegisterDTO) => {
-  const { nombre, apellido, correo, password, confirmPassword, telefono } =
-    payload
+  const nombre = payload.nombre?.trim()
+  const apellido = payload.apellido?.trim()
+  const correo = payload.correo?.trim().toLowerCase()
+  const password = payload.password?.trim()
+  const confirmPassword = payload.confirmPassword?.trim()
+  const telefono = payload.telefono?.trim() || undefined
 
   if (!nombre || !apellido || !correo || !password || !confirmPassword) {
     throw new Error('Todos los campos obligatorios deben ser completados')
   }
 
-  if (password !== confirmPassword) {
-    throw new Error('Las contraseñas no coinciden')
+  if (nombre.length > MAX_NOMBRE) {
+    throw new Error(`El nombre no puede superar ${MAX_NOMBRE} caracteres`)
   }
 
-  const existingUser = await findUserByCorreo(correo)
+  if (apellido.length > MAX_APELLIDO) {
+    throw new Error(`El apellido no puede superar ${MAX_APELLIDO} caracteres`)
+  }
 
-  if (existingUser) {
-    throw new Error('El correo ya está registrado')
+  if (password !== confirmPassword) {
+    throw new Error('Las contraseñas no coinciden')
   }
 
   const newUser = await createUser({
@@ -88,16 +96,32 @@ export const registerUser = async (payload: RegisterDTO) => {
     apellido,
     correo,
     password,
-    rolId: 2,
     telefono
   })
 
-  return {
+  const jwtPayload: JwtPayload = {
     id: newUser.id,
-    nombre: newUser.nombre,
-    apellido: newUser.apellido,
-    correo: newUser.correo,
-    telefonos: newUser.telefonos
+    correo: newUser.correo
+  }
+
+  const token = generateToken(jwtPayload)
+  const fechaExpiracion = new Date(Date.now() + 60 * 60 * 1000)
+
+  await createSession({
+    token,
+    usuarioId: newUser.id,
+    fechaExpiracion
+  })
+
+  return {
+    user: {
+      id: newUser.id,
+      nombre: newUser.nombre,
+      apellido: newUser.apellido,
+      correo: newUser.correo,
+      telefonos: newUser.telefonos
+    },
+    token
   }
 }
 
