@@ -129,6 +129,9 @@ export default function Navbar() {
 
     setIsPanelOpen((prev) => !prev)
   }
+   const handleLoginRedirect = () => {
+   router.push('/sign-in')
+  }
 
   const handleLoginMock = () => {
     const mockUser: User = {
