@@ -1,6 +1,8 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 type FooterAction = {
   href?: string
@@ -16,9 +18,9 @@ const exploreActions: FooterAction[] = [
 ]
 
 const companyActions: FooterAction[] = [
-  { label: 'Sobre Nosotros' }, // TODO: '/sobre-nosotros'
-  { label: 'Términos y Condiciones' }, // TODO: '/terminos-y-condiciones'
-  { label: 'Políticas de Privacidad' } // TODO: '/politicas-de-privacidad'
+  { label: 'Sobre Nosotros', href: '/sobre-nosotros' },
+  { label: 'Términos y Condiciones', href: '/terminos-y-condiciones' },
+  { label: 'Políticas de Privacidad', href: '/politicas-privacidad' }
 ]
 
 const socialActions: FooterAction[] = [
@@ -55,19 +57,26 @@ function scrollToHomeTop() {
 }
 
 function FooterBrand() {
+  const pathname = usePathname()
+
   return (
     <section className="border-t border-amber-600 pt-4">
-      <button
-        type="button"
-        onClick={scrollToHomeTop}
+      <Link
+        href="/"
+        onClick={(event) => {
+          if (pathname === '/') {
+            event.preventDefault()
+            scrollToHomeTop()
+          }
+        }}
         className="inline-flex items-center gap-3 transition-colors hover:text-amber-600"
       >
         <Image src="/icons/temp-icon.svg" alt="Logo temporal de PropBol" width={44} height={44} />
         <span className="text-2xl font-bold text-stone-900">PropBol</span>
-      </button>
+      </Link>
       <p className="mt-4 max-w-xs text-sm leading-8 text-stone-600">
-        Revolucionando el mercado inmobiliario con tecnología de punta y diseño centrado en
-        el usuario.
+        Revolucionando el mercado inmobiliario con tecnología de punta y diseño centrado en el
+        usuario.
       </p>
     </section>
   )
@@ -107,10 +116,10 @@ function FooterSection({ actions, title }: { actions: FooterAction[]; title: str
 function FooterBottomBar() {
   return (
     <div className="border-t border-stone-200">
-      <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-5 text-sm text-stone-600 sm:px-8 lg:flex-row lg:items-center lg:px-10">
+      <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-5 text-sm text-stone-600 sm:flex-row sm:flex-wrap sm:items-center sm:px-8 lg:px-10">
         <span className="h-4 w-4 rounded-md border border-stone-400" aria-hidden="true" />
         <span>2026 PropBol Inmobiliaria.</span>
-        <span className="hidden h-1 w-1 rounded-full bg-stone-300 lg:block" aria-hidden="true" />
+        <span className="hidden h-1 w-1 rounded-full bg-stone-300 sm:block" aria-hidden="true" />
         <span>Todos los derechos reservados</span>
       </div>
     </div>
@@ -121,7 +130,7 @@ export default function Footer() {
   return (
     <footer className="mt-auto border-t border-stone-200 bg-stone-50">
       <div className="mx-auto max-w-6xl px-6 py-10 sm:px-8 lg:px-10">
-        <div className="grid gap-10 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-8 [grid-template-columns:repeat(auto-fit,minmax(180px,1fr))]">
           <FooterBrand />
           <FooterSection actions={exploreActions} title="Explorar" />
           <FooterSection actions={companyActions} title="Conócenos" />

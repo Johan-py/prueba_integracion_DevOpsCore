@@ -8,12 +8,16 @@ export const metadata: Metadata = {
   description: 'Descripción de mi aplicación'
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="es">
       <body className="min-h-screen flex flex-col">
         <Navbar />
-        <main className="flex-grow container mx-auto px-4 py-8">{children}</main>
+        <main className="flex-grow">{children}</main>
         <Footer />
       </body>
     </html>
