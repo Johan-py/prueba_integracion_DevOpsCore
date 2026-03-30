@@ -59,6 +59,8 @@ app.post('/api/users', (req, res) => {
 app.post('/api/auth/register', registerController)
 app.post('/api/auth/login', loginController)
 
+app.use('/api/perfil', correoverificacionRoutes);
+
 app.get('/api/filters', filtersController.getFilters)
 app.get('/api/banners', (req, res) => bannersController.getBanners(req, res))
 app.get('/api/locations/search', async (req, res) => {

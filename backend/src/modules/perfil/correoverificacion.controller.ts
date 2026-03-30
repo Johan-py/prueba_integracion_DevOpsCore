@@ -1,33 +1,35 @@
+// correoverificacion.controller.ts
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
-const bcrypt = require('bcryptjs');
+import { prisma } from '../../lib/prisma.js'; // ✅ Importar el prisma que ellos ya usan
 
-const prisma = new PrismaClient();
-
-/**
- * Extendemos la interfaz de Express para que TypeScript reconozca 'usuario'.
- * Esto asume que tu middleware de JWT inyecta el objeto usuario en el request.
- */
 interface AuthRequest extends Request {
   usuario?: {
     id: number;
-    // añade más propiedades si tu JWT las incluye
   };
 }
 
-// 1. Validar contraseña actual para habilitar edición
 export const verificarPassword = async (req: AuthRequest, res: Response) => {
-  const { passwordActual } = req.body;
-  const usuarioId = req.usuario?.id;
-
-  if (!usuarioId) return res.status(401).json({ ok: false, msg: 'No hay token válido' });
-
   try {
-    const usuario = await prisma.usuario.findUnique({ where: { id: usuarioId } });
+    const { passwordActual } = req.body;
+    const usuarioId = req.usuario?.id;
 
-    if (!usuario) return res.status(404).json({ ok: false, msg: 'Usuario no encontrado' });
+    if (!usuarioId) {
+      return res.status(401).json({ ok: false, msg: 'No hay token válido' });
+    }
 
-    const validPassword = bcrypt.compareSync(passwordActual, usuario.password);
+    if (!passwordActual) {
+      return res.status(400).json({ ok: false, msg: 'Password requerido' });
+    }
+
+    const usuario = await prisma.usuario.findUnique({
+      where: { id: usuarioId }
+    });
+
+    if (!usuario) {
+      return res.status(404).json({ ok: false, msg: 'Usuario no encontrado' });
+    }
+
+    const validPassword = passwordActual === usuario.password;
 
     if (!validPassword) {
       return res.status(401).json({ ok: false, msg: 'Contraseña incorrecta' });
@@ -35,25 +37,38 @@ export const verificarPassword = async (req: AuthRequest, res: Response) => {
 
     return res.json({ ok: true, msg: 'Identidad verificada' });
   } catch (error) {
-    return res.status(500).json({ ok: false, msg: 'Error al verificar identidad' });
+    console.error('Error en verificarPassword:', error);
+    return res.status(500).json({
+      ok: false,
+      msg: 'Error al verificar identidad'
+    });
   }
 };
 
-// 2. Validar nuevo email y enviar OTP
 export const solicitarCambioEmail = async (req: AuthRequest, res: Response) => {
-  const { emailNuevo } = req.body;
-  const usuarioId = req.usuario?.id;
-
-  if (!usuarioId) return res.status(401).json({ ok: false, msg: 'No autorizado' });
-
   try {
-    // Criterio: Verificar si el correo ya existe
-    const existeEmail = await prisma.usuario.findUnique({ where: { correo: emailNuevo } });
-    if (existeEmail) {
-      return res.status(400).json({ ok: false, msg: 'El correo ya está registrado' });
+    const { emailNuevo } = req.body;
+    const usuarioId = req.usuario?.id;
+
+    if (!usuarioId) {
+      return res.status(401).json({ ok: false, msg: 'No autorizado' });
     }
 
-    // Generar OTP de 4 dígitos y expiración de 5 min
+    if (!emailNuevo) {
+      return res.status(400).json({ ok: false, msg: 'Email requerido' });
+    }
+
+    const existeEmail = await prisma.usuario.findUnique({
+      where: { correo: emailNuevo }
+    });
+
+    if (existeEmail) {
+      return res.status(400).json({
+        ok: false,
+        msg: 'El correo ya está registrado'
+      });
+    }
+
     const otp = Math.floor(1000 + Math.random() * 9000).toString();
     const expiraEn = new Date(Date.now() + 5 * 60 * 1000);
 
@@ -66,40 +81,62 @@ export const solicitarCambioEmail = async (req: AuthRequest, res: Response) => {
       }
     });
 
-    // TODO: Llamar servicio de correos aquí
-    return res.json({ ok: true, msg: 'Código enviado al nuevo correo' });
+    return res.json({
+      ok: true,
+      msg: 'Código enviado al nuevo correo',
+      otp
+    });
   } catch (error) {
-    return res.status(500).json({ ok: false, msg: 'Error al solicitar cambio' });
+    console.error('Error en solicitarCambioEmail:', error);
+    return res.status(500).json({
+      ok: false,
+      msg: 'Error al solicitar cambio'
+    });
   }
 };
 
-// 3. Validar OTP y ejecutar cambio en DB
 export const confirmarCambioEmail = async (req: AuthRequest, res: Response) => {
-  const { otp } = req.body;
-  const usuarioId = req.usuario?.id;
-
-  if (!usuarioId) return res.status(401).json({ ok: false, msg: 'No autorizado' });
-
   try {
+    const { otp } = req.body;
+    const usuarioId = req.usuario?.id;
+
+    if (!usuarioId) {
+      return res.status(401).json({ ok: false, msg: 'No autorizado' });
+    }
+
+    if (!otp) {
+      return res.status(400).json({ ok: false, msg: 'Código requerido' });
+    }
+
     const solicitud = await prisma.cambioEmail.findFirst({
-      where: { usuarioId, completadoEn: null },
+      where: {
+        usuarioId,
+        completadoEn: null
+      },
       orderBy: { creadoEn: 'desc' }
     });
 
     if (!solicitud) {
-      return res.status(404).json({ ok: false, msg: 'No hay solicitudes pendientes' });
+      return res.status(404).json({
+        ok: false,
+        msg: 'No hay solicitudes pendientes'
+      });
     }
 
-    // Criterios de aceptación: Expiración
     if (new Date() > solicitud.expiraEn) {
-      return res.status(410).json({ ok: false, msg: 'Código expirado' });
+      return res.status(410).json({
+        ok: false,
+        msg: 'Código expirado'
+      });
     }
 
     if (solicitud.token !== otp) {
-      return res.status(400).json({ ok: false, msg: 'Código incorrecto' });
+      return res.status(400).json({
+        ok: false,
+        msg: 'Código incorrecto'
+      });
     }
 
-    // Transacción de Prisma: Actualiza usuario y marca la solicitud como completada
     const [usuarioActualizado] = await prisma.$transaction([
       prisma.usuario.update({
         where: { id: usuarioId },
@@ -116,8 +153,11 @@ export const confirmarCambioEmail = async (req: AuthRequest, res: Response) => {
       msg: 'Correo actualizado exitosamente',
       nuevoCorreo: usuarioActualizado.correo
     });
-
   } catch (error) {
-    return res.status(500).json({ ok: false, msg: 'Error al confirmar cambio' });
+    console.error('Error en confirmarCambioEmail:', error);
+    return res.status(500).json({
+      ok: false,
+      msg: 'Error al confirmar cambio'
+    });
   }
 };
