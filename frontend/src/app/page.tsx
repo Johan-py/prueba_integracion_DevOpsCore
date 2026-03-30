@@ -1,9 +1,12 @@
-import GestionTelefonos from '@/features/telefonos/GestionTelefonos';
+import ProfileCard from "@/components/profile/ProfileCard";
 
-export default function Home() {
+export default function ProfilePage() {
     return (
-        <div className="flex justify-center items-center min-h-screen bg-stone-50">
-            <GestionTelefonos />
-        </div>
+        // Usamos min-h-screen y un fondo claro para que la tarjeta resalte
+        <main className="min-h-screen bg-gray-50 p-4 md:p-10 flex justify-center items-start">
+            <div className="w-full max-w-5xl">
+                <ProfileCard />
+            </div>
+        </main>
     );
 }
