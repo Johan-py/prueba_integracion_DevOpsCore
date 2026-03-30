@@ -11,7 +11,9 @@ export const listarMisPublicacionesService = async (usuarioId: number) => {
 
   const publicaciones = await buscarPublicacionesPorUsuarioRepository(usuarioId)
 
-  return publicaciones.map((publicacion) => ({
+  type PublicacionesPorUsuario = Awaited<ReturnType<typeof buscarPublicacionesPorUsuarioRepository>>
+
+  return publicaciones.map((publicacion: PublicacionesPorUsuario[number]) => ({
     id: publicacion.id,
     titulo: publicacion.titulo,
     precio: Number(publicacion.inmueble.precio),
