@@ -40,10 +40,13 @@ export default [
       '@typescript-eslint': tsPlugin
     },
     rules: {
-      '@typescript-eslint/no-unused-vars': ['warn', { 
-        argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_'
-      }],
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_'
+        }
+      ],
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-require-imports': 'off',
       'no-console': 'off',
@@ -69,10 +72,13 @@ export default [
       '@next/next': nextPlugin
     },
     rules: {
-      '@typescript-eslint/no-unused-vars': ['warn', { 
-        argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_'
-      }],
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_'
+        }
+      ],
       '@typescript-eslint/no-explicit-any': 'warn',
       '@next/next/no-html-link-for-pages': ['error', 'frontend/src/app'],
       '@next/next/no-img-element': 'warn',

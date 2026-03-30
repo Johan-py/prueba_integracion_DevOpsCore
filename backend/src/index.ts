@@ -1,23 +1,24 @@
 import express from 'express'
-import cors from 'cors';
-import { FiltersHomepageController } from './modules/filtershomepage/filtershomepage.controller.js';
 
 const app = express()
-app.use(cors());
+
 app.use(express.json())
 
 
 const filtersController = new FiltersHomepageController();
 app.get('/api/filters', filtersController.getFilters);
 
-// ✅ ENDPOINT
+const bannersController = new BannersController()
+
 app.post('/api/users', (req, res) => {
   const user = req.body
+  res.json({ message: 'User created', user })
+})
 
-  res.json({
-    message: 'User created',
-    user
-  })
+app.get('/api/banners', (req, res) => bannersController.getBanners(req, res))
+
+app.get('/api/locations/search', async (req, res) => {
+  await locationSearchHandler(req as any, res as any)
 })
 
 const PORT = 5000

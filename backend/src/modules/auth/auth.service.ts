@@ -10,9 +10,7 @@ type User = {
   email: string
 }
 
-export const loginService = async (
-  payload: LoginDTO
-): Promise<{ user: User; token: string }> => {
+export const loginService = async (payload: LoginDTO): Promise<{ user: User; token: string }> => {
   const { email } = payload
 
   const user = await findUser(email)
