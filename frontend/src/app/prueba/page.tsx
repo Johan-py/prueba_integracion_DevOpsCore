@@ -5,15 +5,24 @@ export default function ResumenCompra() {
   return (
     <div>
       {/* ================ PARTE SUPERIOR ================ */}
-      <div className="flex justify-center gap-4 mb-6">
-        <div className="px-4 py-2 bg-blue-500 text-white rounded-lg">
-          Resumen
+       <div className="flex justify-between items-center mb-8 border-b pb-4">
+        <div className="flex-1 text-center">
+          <div className="text-sm text-gray-500 mb-1">Resumen</div>
+          <div className="w-8 h-8 mx-auto rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-semibold">
+            1
+          </div>
         </div>
-        <div className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg">
-          Pagar
+        <div className="flex-1 text-center">
+          <div className="text-sm text-gray-500 mb-1">Pagar</div>
+          <div className="w-8 h-8 mx-auto rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-sm font-semibold">
+            2
+          </div>
         </div>
-        <div className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg">
-          Confirmación
+        <div className="flex-1 text-center">
+          <div className="text-sm text-gray-500 mb-1">Confirmación</div>
+          <div className="w-8 h-8 mx-auto rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-sm font-semibold">
+            3
+          </div>
         </div>
       </div>
       {/* ================ FIN PARTE SUPERIOR ================ */}
