@@ -89,10 +89,7 @@ export default function BusquedaMapaPage() {
           </button>
 
           <div className="absolute inset-0">
-            <MapView
-              selectedId={selectedPropertyId}
-              onSelect={setSelectedPropertyId}
-            />
+            <MapView selectedId={selectedPropertyId} onSelect={setSelectedPropertyId} />
           </div>
         </section>
       </div>

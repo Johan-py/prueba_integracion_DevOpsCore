@@ -16,7 +16,7 @@ export default function UserMenu({
   onTogglePanel,
   onClosePanel,
   onLogin,
-  onOpenLogoutModal,
+  onOpenLogoutModal
 }: UserMenuProps) {
   return (
     <>
@@ -105,9 +105,7 @@ export default function UserMenu({
               </svg>
             </div>
 
-            <p className="text-sm text-gray-600 mb-5 px-2">
-              Encuentra tu hogar ideal hoy mismo.
-            </p>
+            <p className="text-sm text-gray-600 mb-5 px-2">Encuentra tu hogar ideal hoy mismo.</p>
 
             <button
               onClick={onLogin}
@@ -119,5 +117,5 @@ export default function UserMenu({
         )}
       </div>
     </>
-  );
+  )
 }

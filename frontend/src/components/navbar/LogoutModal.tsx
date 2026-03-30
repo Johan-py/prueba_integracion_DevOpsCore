@@ -5,12 +5,7 @@ type LogoutModalProps = {
   onConfirm: () => void;
 };
 
-export default function LogoutModal({
-  show,
-  isLoggingOut,
-  onCancel,
-  onConfirm,
-}: LogoutModalProps) {
+export default function LogoutModal({ show, isLoggingOut, onCancel, onConfirm }: LogoutModalProps) {
   return (
     <div
       className={`fixed inset-0 z-[100] flex items-center justify-center bg-black/40 transition-opacity duration-200 ${
@@ -22,9 +17,7 @@ export default function LogoutModal({
           show ? "scale-100 translate-y-0" : "scale-95 translate-y-2"
         }`}
       >
-        <h2 className="text-[18px] font-bold text-gray-900 mb-2">
-          ¿Cerrar Sesión?
-        </h2>
+        <h2 className="text-[18px] font-bold text-gray-900 mb-2">¿Cerrar Sesión?</h2>
 
         <p className="text-sm text-gray-600 mb-6">
           Se finalizará tu sesión actual en este dispositivo.
@@ -49,5 +42,5 @@ export default function LogoutModal({
         </div>
       </div>
     </div>
-  );
+  )
 }

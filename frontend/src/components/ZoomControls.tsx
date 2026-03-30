@@ -82,9 +82,7 @@ export default function ZoomControls() {
         +
       </button>
 
-      <div
-        style={{ height: "1px", backgroundColor: "#e5e7eb", margin: "0 6px" }}
-      />
+      <div style={{ height: '1px', backgroundColor: '#e5e7eb', margin: '0 6px' }} />
 
       <button
         onClick={handleZoomOut}

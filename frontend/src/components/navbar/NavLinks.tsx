@@ -24,5 +24,5 @@ export default function NavLinks() {
         Sobre Nosotros
       </Link>
     </div>
-  );
+  )
 }

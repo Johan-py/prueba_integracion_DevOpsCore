@@ -31,5 +31,5 @@ export default function RegisterSuccessToast() {
         <p className="text-xs text-[#57534e]">{message}</p>
       </div>
     </div>
-  );
+  )
 }
