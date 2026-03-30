@@ -1,5 +1,8 @@
 import { loginService } from './auth.service.js'
-
-export const loginController = async (body: any) => {
+type payload = {
+  name: string
+  email: string
+}
+export const loginController = async (body: payload) => {
   return loginService(body)
 }

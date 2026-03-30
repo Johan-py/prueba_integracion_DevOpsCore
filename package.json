@@ -12,10 +12,10 @@
     "dev:front": "cd frontend && bun run dev",
     "dev": "concurrently \"bun run dev:back\" \"bun run dev:front\"",
     "lab:chaos": "cd scripts && sh chaos_devs.sh",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
-    "lint:back": "eslint backend --ext .ts,.js",
-    "lint:front": "eslint frontend --ext .ts,.tsx,.js,.jsx"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "lint:back": "eslint backend",
+    "lint:front": "eslint frontend"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -26,8 +26,9 @@
     "eslint": "^10.1.0"
   },
   "dependencies": {
-    "tailwind": "^4.0.0",
+    "@prisma/adapter-pg": "^7.6.0",
     "leaflet": "^1.9.4",
-    "react-leaflet": "4.2.1"
+    "react-leaflet": "4.2.1",
+    "tailwind": "^4.0.0"
   }
 }
