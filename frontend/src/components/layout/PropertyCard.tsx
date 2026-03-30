@@ -1,6 +1,7 @@
 // frontend/src/components/layout/PropertyCard.tsx
 import Image from 'next/image'; 
-import { BedDouble, Bath, Square, MessageSquareText, ImageOff } from 'lucide-react'; 
+import { BedDouble, Bath, Square, ImageOff } from 'lucide-react'; // Quité MessageSquareText porque ya viene en tu botón
+import ContactButton from '../galeria/ContactButton'; // <-- Tu botón modular importado
 
 type PropsTarjeta = {
   imagen?: string;
@@ -69,11 +70,10 @@ export default function PropertyCard({
           </span>
         </div>
 
-        {/* 3. Botón de contacto habilitado (Misión Día 3/4) */}
-        <button className="w-full mt-1 bg-[#25D366] hover:bg-[#128C7E] text-white font-semibold py-2.5 rounded-lg transition-colors flex justify-center items-center gap-2">
-          <MessageSquareText className="w-5 h-5" /> 
-          Contactar
-        </button>
+        {/* 3. Botón de contacto modular */}
+        <div className="mt-1 w-full">
+           <ContactButton type="whatsapp" variant="grid" />
+        </div>
       </div>
     </div>
   );
