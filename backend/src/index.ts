@@ -1,15 +1,16 @@
+import * as dotenv from 'dotenv'
+import path from 'path'
+dotenv.config({ path: path.join(__dirname, '../.env') })
+
 import express from 'express'
 import cors from 'cors'
+import { propertiesController } from './modules/properties/properties.controller.js'
 import { BannersController } from './modules/banners/banners.controller.js'
 import locationSearchHandler from '../api/locations/search.js'
 // Importamos el manejador de popularidad -- BitPro 
 import popularidadHandler from '../api/locations/popularidad.js'
 import {registerController,loginController,} from "./modules/auth/auth.controller.js";
-import * as dotenv from "dotenv"
 dotenv.config()
-
-// Importar solo después de que dotenv esté cargado
-import { propertiesController } from "./modules/properties_f/properties.controller"
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(cors({
 }))
 
 app.use(cors())
+app.use(cors({ origin: 'http://localhost:3000' }))
 app.use(express.json())
 
 const bannersController = new BannersController()
@@ -46,6 +48,7 @@ app.get("/health", (req, res) => {
 })
 
 app.get("/api/properties/search", propertiesController.search)
+app.get('/api/inmuebles', propertiesController.getAll)
 
 const PORT = 5000
 
