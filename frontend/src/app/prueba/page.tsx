@@ -28,9 +28,17 @@ export default function ResumenCompra() {
       {/* ================ FIN PARTE SUPERIOR ================ */}
 
       {/* ================ PARTE INTERMEDIA ================ */}
+        {/* RESUMEN DE COMPRA */}
        <div className="bg-white p-6 rounded-xl shadow-md">
-        <h1 className="text-2xl font-bold text-center">
+        <h1 className="text-2xl font-bold text-left">
           Resumen de compra
+        </h1>
+      </div>
+
+       {/* METODOS DE PAGO */}
+      <div className="bg-white p-6 rounded-xl shadow-md">
+        <h1 className="text-2xl font-bold text-left">
+          Metodos de pago
         </h1>
       </div>
       {/* ================ FIN PARTE INTERMEDIA ================ */}
