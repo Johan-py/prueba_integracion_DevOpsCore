@@ -1,40 +1,44 @@
-'use client'
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { mockNotifications } from '@/data/mockNotifications'
+"use client";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { mockNotifications } from "@/data/mockNotifications";
 
 export default function NotificationsPage() {
-  const router = useRouter()
-  const [notifications, setNotifications] = useState(mockNotifications)
+  const router = useRouter();
+  const [notifications, setNotifications] = useState(mockNotifications);
 
   const handleDelete = (id: number) => {
-    const updated = notifications.filter((n) => n.id !== id)
-    setNotifications(updated)
-  }
+    const updated = notifications.filter((n) => n.id !== id);
+    setNotifications(updated);
+  };
   const markAllAsRead = () => {
     setNotifications((prev) =>
-      prev.map((n) => (n.status === 'no leida' ? { ...n, status: 'leida' } : n))
-    )
-  }
+      prev.map((n) =>
+        n.status === "no leida" ? { ...n, status: "leida" } : n,
+      ),
+    );
+  };
 
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        router.back()
+      if (event.key === "Escape") {
+        router.back();
       }
-    }
+    };
 
-    window.addEventListener('keydown', handleEsc)
+    window.addEventListener("keydown", handleEsc);
 
     return () => {
-      window.removeEventListener('keydown', handleEsc)
-    }
-  }, [router])
+      window.removeEventListener("keydown", handleEsc);
+    };
+  }, [router]);
 
   return (
     <section className="mx-auto max-w-3xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Todas las notificaciones</h1>
+        <h1 className="text-2xl font-bold text-gray-800">
+          Todas las notificaciones
+        </h1>
         <button
           onClick={markAllAsRead}
           className="mt-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
@@ -65,27 +69,32 @@ export default function NotificationsPage() {
               tabIndex={0}
               aria-label={`Notificación: ${notification.title}`}
               className={`border-b border-gray-100 px-4 py-4 last:border-b-0 ${
-                notification.status === 'no leida' ? 'bg-blue-50' : 'bg-white'
+                notification.status === "no leida" ? "bg-blue-50" : "bg-white"
               }`}
             >
               <div className="flex items-center justify-between gap-3">
                 <h2 className="text-sm font-semibold text-gray-800">
-                  {notification.title?.trim() || '(Sin título)'}
+                  {notification.title?.trim() || "(Sin título)"}
                 </h2>
-                <span className="text-[10px] uppercase text-gray-400">{notification.status}</span>
+                <span className="text-[10px] uppercase text-gray-400">
+                  {notification.status}
+                </span>
               </div>
               <p className="mt-1 text-sm text-gray-600">
-                {notification.description?.trim() || '(Sin descripción disponible)'}
+                {notification.description?.trim() ||
+                  "(Sin descripción disponible)"}
               </p>
 
               <div className="mt-2 flex items-center justify-between">
-                {notification.status !== 'archivada' ? (
+                {notification.status !== "archivada" ? (
                   <button
                     onClick={() =>
                       setNotifications((prev) =>
                         prev.map((n) =>
-                          n.id === notification.id ? { ...n, status: 'archivada' } : n
-                        )
+                          n.id === notification.id
+                            ? { ...n, status: "archivada" }
+                            : n,
+                        ),
                       )
                     }
                     className="text-xs text-amber-500 transition hover:text-amber-600 hover:underline"
@@ -107,5 +116,5 @@ export default function NotificationsPage() {
         )}
       </div>
     </section>
-  )
+  );
 }

@@ -1,32 +1,32 @@
-'use client'
+"use client";
 
-import { useEffect, useRef, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
-import Logo from '../navbar/Logo'
-import NavLinks from '../navbar/NavLinks'
-import UserMenu from '../navbar/UserMenu'
-import LogoutModal from '../navbar/LogoutModal'
-import { useNotifications } from '@/hooks/useNotifications'
+import Logo from "../navbar/Logo";
+import NavLinks from "../navbar/NavLinks";
+import UserMenu from "../navbar/UserMenu";
+import LogoutModal from "../navbar/LogoutModal";
+import { useNotifications } from "@/hooks/useNotifications";
 
 export type User = {
-  name: string
-  email: string
-}
+  name: string;
+  email: string;
+};
 
-const USER_STORAGE_KEY = 'propbol_user'
-const SESSION_EXPIRES_KEY = 'propbol_session_expires'
-const SESSION_DURATION_MS = 60 * 60 * 1000 // 1 hora
+const USER_STORAGE_KEY = "propbol_user";
+const SESSION_EXPIRES_KEY = "propbol_session_expires";
+const SESSION_DURATION_MS = 60 * 60 * 1000; // 1 hora
 
 export default function Navbar() {
-  const router = useRouter()
-  const panelRef = useRef<HTMLDivElement | null>(null)
+  const router = useRouter();
+  const panelRef = useRef<HTMLDivElement | null>(null);
 
-  const [user, setUser] = useState<User | null>(null)
-  const [isPanelOpen, setIsPanelOpen] = useState(false)
-  const [showLogoutModal, setShowLogoutModal] = useState(false)
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [user, setUser] = useState<User | null>(null);
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const {
     open,
@@ -42,107 +42,109 @@ export default function Navbar() {
     loadMoreNotifications,
     isLoggedIn,
     setIsLoggedIn,
-  } = useNotifications()
+  } = useNotifications();
 
-  const unreadCount = notifications.filter((n) => n.status === 'no leida').length
+  const unreadCount = notifications.filter(
+    (n) => n.status === "no leida",
+  ).length;
 
   const clearSession = () => {
-    localStorage.removeItem(USER_STORAGE_KEY)
-    localStorage.removeItem(SESSION_EXPIRES_KEY)
-    setUser(null)
-    setIsPanelOpen(false)
-    setShowLogoutModal(false)
-  }
+    localStorage.removeItem(USER_STORAGE_KEY);
+    localStorage.removeItem(SESSION_EXPIRES_KEY);
+    setUser(null);
+    setIsPanelOpen(false);
+    setShowLogoutModal(false);
+  };
 
   const isSessionExpired = () => {
-    const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY)
-    if (!expiresAt) return true
-    return Date.now() > Number(expiresAt)
-  }
+    const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY);
+    if (!expiresAt) return true;
+    return Date.now() > Number(expiresAt);
+  };
 
   const restoreSession = () => {
-    const savedUser = localStorage.getItem(USER_STORAGE_KEY)
-    const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY)
+    const savedUser = localStorage.getItem(USER_STORAGE_KEY);
+    const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY);
 
     if (!savedUser || !expiresAt) {
-      clearSession()
-      return
+      clearSession();
+      return;
     }
 
     if (Date.now() > Number(expiresAt)) {
-      clearSession()
-      return
+      clearSession();
+      return;
     }
 
-    setUser(JSON.parse(savedUser))
-  }
+    setUser(JSON.parse(savedUser));
+  };
 
   useEffect(() => {
-    restoreSession()
-  }, [])
+    restoreSession();
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (!panelRef.current) return
+      if (!panelRef.current) return;
 
       if (!panelRef.current.contains(event.target as Node)) {
-        setIsPanelOpen(false)
+        setIsPanelOpen(false);
       }
-    }
+    };
 
-    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [])
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
       if (user && isSessionExpired()) {
-        clearSession()
-        router.push('/')
+        clearSession();
+        router.push("/");
       }
-    }, 10000)
+    }, 10000);
 
-    return () => clearInterval(interval)
-  }, [user, router])
+    return () => clearInterval(interval);
+  }, [user, router]);
 
   const togglePanel = () => {
     if (user && isSessionExpired()) {
-      clearSession()
-      router.push('/')
-      return
+      clearSession();
+      router.push("/");
+      return;
     }
 
-    setIsPanelOpen(!isPanelOpen)
-  }
+    setIsPanelOpen(!isPanelOpen);
+  };
 
   const handleLoginRedirect = () => {
-    setIsPanelOpen(false)
-    router.push('/sign-in')
-  }
+    setIsPanelOpen(false);
+    router.push("/sign-in");
+  };
 
   const handleOpenLogoutModal = () => {
-    setShowLogoutModal(true)
-  }
+    setShowLogoutModal(true);
+  };
 
   const handleCancelLogout = () => {
-    if (isLoggingOut) return
-    setShowLogoutModal(false)
-  }
+    if (isLoggingOut) return;
+    setShowLogoutModal(false);
+  };
 
   const handleConfirmLogout = () => {
-    if (isLoggingOut) return
+    if (isLoggingOut) return;
 
-    setIsLoggingOut(true)
+    setIsLoggingOut(true);
 
     setTimeout(() => {
-      clearSession()
-      setIsLoggingOut(false)
-      router.push('/')
-    }, 400)
-  }
+      clearSession();
+      setIsLoggingOut(false);
+      router.push("/");
+    }, 400);
+  };
 
   return (
     <>
@@ -187,7 +189,9 @@ export default function Navbar() {
                 {open && (
                   <div className="absolute right-0 top-12 z-50 w-80 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
                     <div className="border-b border-gray-100 px-4 py-3">
-                      <h3 className="text-sm font-semibold text-gray-800">Notificaciones</h3>
+                      <h3 className="text-sm font-semibold text-gray-800">
+                        Notificaciones
+                      </h3>
                     </div>
 
                     {!isLoggedIn ? (
@@ -210,44 +214,44 @@ export default function Navbar() {
                         <div className="flex flex-wrap gap-2 border-b border-gray-100 px-4 py-3">
                           <button
                             type="button"
-                            onClick={() => setFilter('todas')}
+                            onClick={() => setFilter("todas")}
                             className={`rounded-full px-3 py-1 text-xs font-medium transition ${
-                              filter === 'todas'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                              filter === "todas"
+                                ? "bg-blue-600 text-white"
+                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                             }`}
                           >
                             Todas
                           </button>
                           <button
                             type="button"
-                            onClick={() => setFilter('leida')}
+                            onClick={() => setFilter("leida")}
                             className={`rounded-full px-3 py-1 text-xs font-medium transition ${
-                              filter === 'leida'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                              filter === "leida"
+                                ? "bg-blue-600 text-white"
+                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                             }`}
                           >
                             Leídas
                           </button>
                           <button
                             type="button"
-                            onClick={() => setFilter('no leida')}
+                            onClick={() => setFilter("no leida")}
                             className={`rounded-full px-3 py-1 text-xs font-medium transition ${
-                              filter === 'no leida'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                              filter === "no leida"
+                                ? "bg-blue-600 text-white"
+                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                             }`}
                           >
                             No leídas
                           </button>
                           <button
                             type="button"
-                            onClick={() => setFilter('archivada')}
+                            onClick={() => setFilter("archivada")}
                             className={`rounded-full px-3 py-1 text-xs font-medium transition ${
-                              filter === 'archivada'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                              filter === "archivada"
+                                ? "bg-blue-600 text-white"
+                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                             }`}
                           >
                             Archivadas
@@ -257,12 +261,13 @@ export default function Navbar() {
                         <div
                           className="max-h-80 overflow-y-auto"
                           onScroll={(e) => {
-                            const target = e.currentTarget
+                            const target = e.currentTarget;
                             const reachedBottom =
-                              target.scrollTop + target.clientHeight >= target.scrollHeight - 10
+                              target.scrollTop + target.clientHeight >=
+                              target.scrollHeight - 10;
 
                             if (reachedBottom) {
-                              loadMoreNotifications()
+                              loadMoreNotifications();
                             }
                           }}
                         >
@@ -276,19 +281,20 @@ export default function Navbar() {
                                 <div
                                   key={notification.id}
                                   onClick={() => {
-                                    if (notification.status !== 'archivada') {
-                                      markAsRead(notification.id)
+                                    if (notification.status !== "archivada") {
+                                      markAsRead(notification.id);
                                     }
                                   }}
                                   className={`cursor-pointer border-b border-gray-100 px-4 py-3 transition hover:bg-gray-50 ${
-                                    notification.status === 'no leida'
-                                      ? 'bg-blue-50'
-                                      : 'bg-white'
+                                    notification.status === "no leida"
+                                      ? "bg-blue-50"
+                                      : "bg-white"
                                   }`}
                                 >
                                   <div className="flex items-center justify-between gap-3">
                                     <p className="text-sm font-semibold text-gray-800">
-                                      {notification.title?.trim() || '(Sin título)'}
+                                      {notification.title?.trim() ||
+                                        "(Sin título)"}
                                     </p>
                                     <span className="text-[10px] uppercase text-gray-400">
                                       {notification.status}
@@ -297,16 +303,16 @@ export default function Navbar() {
 
                                   <p className="mt-1 text-sm text-gray-600">
                                     {notification.description?.trim() ||
-                                      '(Sin descripción disponible)'}
+                                      "(Sin descripción disponible)"}
                                   </p>
 
-                                  {notification.status !== 'archivada' && (
+                                  {notification.status !== "archivada" && (
                                     <div className="mt-2 flex justify-end">
                                       <button
                                         type="button"
                                         onClick={(e) => {
-                                          e.stopPropagation()
-                                          archiveNotification(notification.id)
+                                          e.stopPropagation();
+                                          archiveNotification(notification.id);
                                         }}
                                         className="text-xs text-gray-400 transition hover:text-gray-600"
                                       >
@@ -317,7 +323,8 @@ export default function Navbar() {
                                 </div>
                               ))}
 
-                              {visibleNotifications.length < filteredNotifications.length && (
+                              {visibleNotifications.length <
+                                filteredNotifications.length && (
                                 <p className="px-4 py-3 text-center text-xs text-gray-400">
                                   Cargando más notificaciones...
                                 </p>
@@ -362,5 +369,5 @@ export default function Navbar() {
         onConfirm={handleConfirmLogout}
       />
     </>
-  )
+  );
 }
