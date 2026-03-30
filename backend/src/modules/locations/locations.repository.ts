@@ -25,4 +25,15 @@ export class LocationsRepository {
       take: 5,
     });
   }
+  //Incrementa la popularidad de una ubicación dada su ID -- BitPro
+  async incrementPopularity(id: number) {
+    return await prisma.ubicacion_maestra.update({
+      where: { id: id },
+      data: {
+        popularidad: {
+          increment: 1
+        }
+      }
+    });
+  }
 }

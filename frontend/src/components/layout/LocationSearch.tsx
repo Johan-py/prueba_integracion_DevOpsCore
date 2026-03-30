@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { MapPin, Search, Loader2, X } from 'lucide-react'
+import { usePopularidad } from '@/hooks/usePopularidad'
 
 type Location = {
   id: string | number
@@ -20,6 +21,8 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+
+  const { registrarConsulta } = usePopularidad();
 
   const isSelected = value.includes('Bolivia')
 
@@ -118,6 +121,7 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
               onClick={() => {
                 onChange(`${loc.nombre} - ${loc.departamento} - Bolivia`)
                 setIsOpen(false)
+                registrarConsulta(loc.id)
               }}
               className="w-full px-4 py-3 flex items-center justify-between hover:bg-amber-50 transition-colors text-left border-b border-stone-50 last:border-0"
             >

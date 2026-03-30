@@ -2,6 +2,8 @@ import express from 'express'
 import cors from 'cors'
 import { BannersController } from './modules/banners/banners.controller.js'
 import locationSearchHandler from '../api/locations/search.js'
+// Importamos el manejador de popularidad -- BitPro 
+import popularidadHandler from '../api/locations/popularidad.js'
 
 const app = express()
 
@@ -24,6 +26,11 @@ app.get('/api/banners', (req, res) => bannersController.getBanners(req, res))
 
 app.get('/api/locations/search', async (req, res) => {
   await locationSearchHandler(req as any, res as any)
+})
+
+// Usamos POST porque así lo definimos en tu Hook del frontend
+app.post('/api/locations/popularidad', async (req, res) => {
+  await popularidadHandler(req as any, res as any)
 })
 
 const PORT = 5000
