@@ -48,6 +48,7 @@
       "name": "social-is-frontend",
       "version": "0.1.0",
       "dependencies": {
+        "social-is-frontend": ".",
         "clsx": "^2.1.0",
         "framer-motion": "^11.0.3",
         "leaflet": "^1.9.4",
