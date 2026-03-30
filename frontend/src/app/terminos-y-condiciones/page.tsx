@@ -83,10 +83,10 @@ export default function TermsAndConditionsPage() {
                 TÉRMINOS Y CONDICIONES
               </h1>
               <p className="max-w-3xl text-sm leading-7 text-stone-600 sm:text-base">
-                Este documento establece las condiciones generales de uso del portal
-                inmobiliario de PropBol. Su lectura permite comprender el alcance del
-                servicio, las responsabilidades del usuario y los criterios bajo los cuales
-                se presenta la información del sistema.
+                Este documento establece las condiciones generales de uso del portal inmobiliario de
+                PropBol. Su lectura permite comprender el alcance del servicio, las
+                responsabilidades del usuario y los criterios bajo los cuales se presenta la
+                información del sistema.
               </p>
             </div>
           </header>

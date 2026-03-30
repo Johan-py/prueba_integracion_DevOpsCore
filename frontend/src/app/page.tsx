@@ -1,6 +1,7 @@
 import { HomeBanner } from '@/components/home/HomeBanner'
 import ExploreSection from '@/components/layout/ExploreSection'
-
+import FilterPanel from '@/components/rentals/FilterPanel'
+import RegisterSuccessToast from '@/components/layout/RegisterSuccessToast'
 interface BannerData {
   id: number
   urlImagen: string
@@ -30,10 +31,11 @@ const fetchBanners = async (): Promise<BannerData[]> => {
 
 export default async function Home() {
   const banners = await fetchBanners()
-  const mainBanner = banners[0] // Tomamos el primero por ahora de la base de datos
+  const mainBanner = banners[0] // Tomamos el primero de la base de datos
 
   return (
-    <main className="flex min-h-screen flex-col items-center">
+    <main className="flex min-h-screen flex-col items-center bg-gray-50">
+      {/* Banner de tus compañeros */}
       {mainBanner && (
         <HomeBanner
           url={mainBanner.urlImagen}
@@ -44,8 +46,19 @@ export default async function Home() {
         />
       )}
 
-      <div className="container mx-auto px-4 py-8">
-        <ExploreSection />
+      {/* Contenido Unificado: Tu FilterPanel + ExploreSection */}
+      <div className="container mx-auto px-4 py-12">
+        <div className="flex flex-col lg:flex-row gap-8 items-start">
+          {/* Tu sección de Filtros (Columna Izquierda) */}
+          <aside className="w-full lg:w-80 shrink-0 sticky top-24">
+            <FilterPanel />
+          </aside>
+
+          {/* Sección de Explorar (Columna Derecha) */}
+          <section className="flex-1 w-full">
+            <ExploreSection />
+          </section>
+        </div>
       </div>
     </main>
   )
