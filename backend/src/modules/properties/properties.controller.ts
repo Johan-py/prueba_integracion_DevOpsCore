@@ -1,22 +1,15 @@
 import { Request, Response } from "express";
-import { propertyService } from "./properties.service.js";
-import { PropertyFilters } from "./properties.types.js";
+import { propertyRepository } from "./properties.repository.js";
+import type { PropertyFilters } from "./properties.types.js";
 
 export const getProperties = async (req: Request, res: Response) => {
-    try {
-        const filters: PropertyFilters = {
-            categoria: req.query.categoria as string | undefined,
-            tipoAccion: req.query.tipoAccion as string | undefined,
-            ciudad: req.query.ciudad as string | undefined,
-        };
+    const filters: PropertyFilters = {
+        categoria: req.query.categoria as string | undefined,
+        tipoAccion: req.query.tipoAccion as string | undefined,
+        ciudad: req.query.ciudad as string | undefined,
+    };
 
-        const data = await propertyService.getFilteredProperties(filters);
+    const properties = await propertyRepository.findWithFilters(filters);
 
-        return res.json(data);
-    } catch {
-        // 👈 quitamos el "error" para evitar warning
-        return res.status(500).json({
-            message: "Error al obtener propiedades",
-        });
-    }
+    res.json(properties);
 };

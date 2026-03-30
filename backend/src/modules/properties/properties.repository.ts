@@ -1,24 +1,18 @@
-import { PrismaClient, Categoria, TipoAccion } from "@prisma/client";
-import { PropertyFilters } from "./properties.types.js";
-
-const prisma = new PrismaClient();
+//import { PropertyFilters, Property } from "./properties.types.js";
+import type { PropertyFilters, Property } from "./properties.types.js";
 
 class PropertyRepository {
-  async findWithFilters(filters: PropertyFilters) {
-    return prisma.inmueble.findMany({
-      where: {
-        categoria: filters.categoria as Categoria | undefined,
-        tipoAccion: filters.tipoAccion as TipoAccion | undefined,
-        ubicacion: filters.ciudad
-          ? {
-              ciudad: filters.ciudad,
-            }
-          : undefined,
+  async findWithFilters(filters: PropertyFilters): Promise<Property[]> {
+    return [
+      {
+        id: 1,
+        categoria: filters.categoria ?? "casa",
+        tipoAccion: filters.tipoAccion ?? "venta",
+        ubicacion: {
+          ciudad: filters.ciudad ?? "La Paz",
+        },
       },
-      include: {
-        ubicacion: true,
-      },
-    });
+    ];
   }
 }
 
