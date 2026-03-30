@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState, useCallback, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import RegisterSuccessToast from "@/components/layout/RegisterSuccessToast";
 import { useInactivityLogout } from "@/hooks/useInactivityLogout";
 
 const AUTH_ROUTES = ["/sign-in", "/sign-up"];
@@ -56,7 +57,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       const token = localStorage.getItem(TOKEN_STORAGE_KEY);
       const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY);
 
-      if (!token || expiresAt) {
+      if (!token || !expiresAt) {
         clearSession();
         window.dispatchEvent(new Event("propbol:session-changed"));
         return;
@@ -75,6 +76,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             authorization: `Bearer ${token}`,
           },
         });
+
         if (!response.ok) {
           clearSession();
           window.dispatchEvent(new Event("propbol:session-changed"));
@@ -84,9 +86,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         const data = await response.json();
 
         const userName =
-          data.user?.nombre && data.ser?.apellido
+          data.user?.nombre && data.user?.apellido
             ? `${data.user.nombre} ${data.user.apellido}`
-            : (data.ser?.correo ?? "");
+            : (data.user?.correo ?? "");
 
         localStorage.setItem(
           USER_STORAGE_KEY,
@@ -118,8 +120,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <>
       <SessionManager />
+      <RegisterSuccessToast />
       <Navbar />
-      <main className="container mx-auto flex-grow px-4 py-8">{children}</main>
+      <main className="flex-grow">{children}</main>
       <Footer />
     </>
   );

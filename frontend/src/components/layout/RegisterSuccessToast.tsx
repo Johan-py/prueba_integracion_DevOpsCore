@@ -3,23 +3,30 @@
 import { useEffect, useState } from "react";
 import { CheckCircle } from "lucide-react";
 
+const STORAGE_KEY = "register_success_message";
+const TOAST_DURATION_MS = 5000;
+
 export default function RegisterSuccessToast() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    const savedMessage = sessionStorage.getItem("register_success_message");
+    const savedMessage = sessionStorage.getItem(STORAGE_KEY);
 
-    if (!savedMessage) return;
+    if (savedMessage) {
+      setMessage(savedMessage);
+      sessionStorage.removeItem(STORAGE_KEY);
+    }
+  }, []);
 
-    setMessage(savedMessage);
-    sessionStorage.removeItem("register_success_message");
+  useEffect(() => {
+    if (!message) return;
 
     const timeout = window.setTimeout(() => {
       setMessage("");
-    }, 3500);
+    }, TOAST_DURATION_MS);
 
     return () => window.clearTimeout(timeout);
-  }, []);
+  }, [message]);
 
   if (!message) return null;
 
