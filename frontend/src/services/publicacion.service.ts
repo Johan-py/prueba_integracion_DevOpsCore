@@ -1,17 +1,23 @@
 import type { MisPublicacionesItem } from '@/types/publicacion'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL
+function getApiUrl() {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL
 
-if (!API_URL) {
-  throw new Error('Falta NEXT_PUBLIC_API_URL en el entorno')
+  if (!apiUrl) {
+    throw new Error('Falta NEXT_PUBLIC_API_URL en el entorno')
+  }
+
+  return apiUrl
 }
 
 export async function obtenerMisPublicaciones(): Promise<MisPublicacionesItem[]> {
-  const response = await fetch(`${API_URL}/api/publicaciones/mias`, {
+  const apiUrl = getApiUrl()
+
+  const response = await fetch(`${apiUrl}/api/publicaciones/mias`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'x-user-id': '1' // temporal hasta integrar auth/perfil
+      'x-user-id': '1'
     },
     cache: 'no-store'
   })
@@ -26,11 +32,13 @@ export async function obtenerMisPublicaciones(): Promise<MisPublicacionesItem[]>
 }
 
 export async function eliminarPublicacion(id: number) {
-  const response = await fetch(`${API_URL}/api/publicaciones/${id}`, {
+  const apiUrl = getApiUrl()
+
+  const response = await fetch(`${apiUrl}/api/publicaciones/${id}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
-      'x-user-id': '1' // temporal hasta integrar auth/perfil
+      'x-user-id': '1'
     }
   })
 
