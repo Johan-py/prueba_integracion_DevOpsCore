@@ -1,22 +1,28 @@
 import express from 'express'
+import cors from 'cors'
+import { BannersController } from './modules/banners/banners.controller.js'
+import locationSearchHandler from '../api/locations/search.js'
+import { FiltersHomepageController } from './modules/filtershomepage/filtershomepage.controller.js'  
 
 const app = express()
+app.use(cors({
+  origin: 'http://localhost:3000',
+  methods: ['GET', 'POST'],
+  credentials: true
+}))
 
 app.use(express.json())
 
-
+const bannersController = new BannersController();
 const filtersController = new FiltersHomepageController();
-app.get('/api/filters', filtersController.getFilters);
-
-const bannersController = new BannersController()
 
 app.post('/api/users', (req, res) => {
   const user = req.body
   res.json({ message: 'User created', user })
 })
 
+app.get('/api/filters', filtersController.getFilters);
 app.get('/api/banners', (req, res) => bannersController.getBanners(req, res))
-
 app.get('/api/locations/search', async (req, res) => {
   await locationSearchHandler(req as any, res as any)
 })
