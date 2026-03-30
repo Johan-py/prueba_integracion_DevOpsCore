@@ -2,20 +2,23 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-
+import { useState } from 'react'
+import PlanModal from '../ui/PlanModal'
+// import { usePathname } from 'next/navigation'  COMENTADA PARA IMPLEMENTAR LA FUNCIÓN DEL HU1 EPIC PUBLICACIÓN
+import { usePathname, useRouter } from 'next/navigation'
 type FooterAction = {
   href?: string
   isExternal?: boolean
   label: string
+  onClick?: () => void // Modificación de botón hu1 pubicación
 }
 
-const exploreActions: FooterAction[] = [
-  { label: 'Comprar Propiedad' }, // TODO: users -> '/propiedades/en-venta' | visitors -> '/auth/login'
-  { label: 'Alquilar Inmueble' }, // TODO: users -> '/propiedades/alquiler' | visitors -> '/auth/login'
-  { label: 'Anticrético' }, // TODO: users -> '/propiedades/anticretico' | visitors -> '/auth/login'
-  { label: 'Publica tu inmueble' } // TODO: users -> '/publicar' | visitors -> '/auth/login'
-]
+//const exploreActions: FooterAction[] = [
+  //{ label: 'Comprar Propiedad' }, // TODO: users -> '/propiedades/en-venta' | visitors -> '/auth/login'
+  //{ label: 'Alquilar Inmueble' }, // TODO: users -> '/propiedades/alquiler' | visitors -> '/auth/login'
+  //{ label: 'Anticrético' }, // TODO: users -> '/propiedades/anticretico' | visitors -> '/auth/login'
+  //{ label: 'Publica tu inmueble' } // TODO: users -> '/publicar' | visitors -> '/auth/login'
+//]
 
 const companyActions: FooterAction[] = [
   { label: 'Sobre Nosotros', href: '/sobre-nosotros' },
@@ -101,6 +104,7 @@ function FooterSection({ actions, title }: { actions: FooterAction[]; title: str
             ) : (
               <button
                 type="button"
+                onClick={action.onClick} // Modificación de botón hu1 pubicación
                 className="text-left text-sm text-stone-600 transition-colors hover:text-amber-600"
               >
                 {action.label}
@@ -126,18 +130,63 @@ function FooterBottomBar() {
   )
 }
 
-export default function Footer() {
+//export default function Footer() {
+  //return (
+    //<footer className="mt-auto border-t border-stone-200 bg-stone-50">
+      //<div className="mx-auto max-w-6xl px-6 py-10 sm:px-8 lg:px-10">
+        //<div className="grid gap-10 md:grid-cols-2 xl:grid-cols-4">
+          //<FooterBrand />
+          //<FooterSection actions={exploreActions} title="Explorar" />
+          //<FooterSection actions={companyActions} title="Conócenos" />
+          //<FooterSection actions={socialActions} title="Redes Sociales" />
+        //</div>
+      //</div>
+      //<FooterBottomBar />
+    //</footer>
+  //)
+//}
+export default function Footer() {    //funcion agregada por HU1 EPIC PUBLICACIÓN
+  const router = useRouter()
+  // 1. Estado para controlar si el modal está abierto o cerrado
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const handlePublicarClick = () => {
+    const session = localStorage.getItem('userSession')
+    
+    if (session === 'activa') {
+      // SIMULADOR: En lugar de ir a /publicar, abrimos el modal para probarlo
+      setIsModalOpen(true) 
+    } else {
+      router.push('/login')
+    }
+  }
+
+  const exploreActions: FooterAction[] = [
+    { label: 'Comprar Propiedad' }, 
+    { label: 'Alquilar Inmueble' }, 
+    { label: 'Anticrético' }, 
+    { label: 'Publica tu inmueble', onClick: handlePublicarClick }
+  ]
+
   return (
-    <footer className="mt-auto border-t border-stone-200 bg-stone-50">
-      <div className="mx-auto max-w-6xl px-6 py-10 sm:px-8 lg:px-10">
-        <div className="grid gap-10 md:grid-cols-2 xl:grid-cols-4">
-          <FooterBrand />
-          <FooterSection actions={exploreActions} title="Explorar" />
-          <FooterSection actions={companyActions} title="Conócenos" />
-          <FooterSection actions={socialActions} title="Redes Sociales" />
+    <>
+      <footer className="mt-auto border-t border-stone-200 bg-stone-50">
+        <div className="mx-auto max-w-6xl px-6 py-10 sm:px-8 lg:px-10">
+          <div className="grid gap-10 md:grid-cols-2 xl:grid-cols-4">
+            <FooterBrand />
+            <FooterSection actions={exploreActions} title="Explorar" />
+            <FooterSection actions={companyActions} title="Conócenos" />
+            <FooterSection actions={socialActions} title="Redes Sociales" />
+          </div>
         </div>
-      </div>
-      <FooterBottomBar />
-    </footer>
+        <FooterBottomBar />
+      </footer>
+
+      {/* 2. Inyectamos el Modal aquí abajo. Solo se verá si isModalOpen es true */}
+      <PlanModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
+    </>
   )
 }
