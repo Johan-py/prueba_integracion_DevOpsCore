@@ -24,6 +24,17 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
 
   const { registrarConsulta } = usePopularidad();
 
+  // --- LÓGICA DE LIMPIEZA (HU 2) --- --BitPro
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value;
+    
+    // Filtro: Solo letras (incluye tildes y ñ), números, espacios y guiones.
+    // Todo lo demás (emojis, @, #, $, etc.) se elimina al instante.
+    const cleanValue = rawValue.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s\-]/gi, '');
+    
+    onChange(cleanValue);
+  };
+
   const isSelected = value.includes('Bolivia')
 
   useEffect(() => {
@@ -95,7 +106,7 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
           <input
             type="text"
             value={value}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={handleInputChange}
             placeholder="Cochabamba, La Paz..."
             className="w-full bg-transparent outline-none text-sm text-stone-900 placeholder:text-stone-400 font-inter relative z-10"
           />
