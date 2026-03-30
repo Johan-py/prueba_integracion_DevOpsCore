@@ -39,3 +39,127 @@
     color: hsl(var(--foreground));
   }
 }
+
+.cluster-bubble {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  color: #ffffff;
+  border: 3px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  cursor: pointer;
+  user-select: none;
+}
+
+.cluster-bubble:hover {
+  transform: scale(1.12);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.cluster-bubble--high {
+  /* verde   ≥ 10 */
+}
+.cluster-bubble--medium {
+  /* naranja 2-9  */
+}
+.cluster-bubble--low {
+  /* azul    1    */
+}
+
+.leaflet-cluster-anim .leaflet-marker-icon,
+.leaflet-cluster-anim .leaflet-marker-shadow {
+  transition:
+    transform 400ms ease,
+    opacity 400ms ease !important;
+}
+
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+  transition:
+    transform 400ms ease,
+    opacity 400ms ease;
+}
+
+.leaflet-cluster-spider-leg {
+  stroke: #64748b;
+  stroke-opacity: 0.5;
+  stroke-width: 1.5;
+}
+
+.leaflet-popup {
+  z-index: 1001 !important;
+}
+/* Commit 1: tamaño clusters móvil */
+@media (max-width: 768px) {
+  .cluster-bubble {
+    min-width: 36px;
+    min-height: 36px;
+    font-size: 12px;
+    border-width: 2px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
+  }
+}
+/* Commit 2: sin hover en touch */
+@media (max-width: 768px) {
+  .cluster-bubble:hover {
+    transform: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
+  }
+}
+/* Commit 3: popup móvil */
+@media (max-width: 768px) {
+  .leaflet-popup-content-wrapper {
+    max-width: 220px;
+    border-radius: 12px;
+  }
+  .leaflet-popup-content {
+    margin: 10px 12px;
+    font-size: 13px;
+    line-height: 1.4;
+    word-break: break-word;
+  }
+  .leaflet-popup-tip {
+    width: 10px;
+    height: 10px;
+  }
+}
+/* Commit 4: controles y animaciones */
+@media (max-width: 768px) {
+  .leaflet-control-zoom {
+    transform: scale(0.9);
+    transform-origin: bottom right;
+  }
+  .leaflet-marker-icon,
+  .leaflet-marker-shadow,
+  .leaflet-cluster-anim .leaflet-marker-icon,
+  .leaflet-cluster-anim .leaflet-marker-shadow {
+    transition:
+      transform 250ms ease,
+      opacity 250ms ease;
+  }
+}
+/* Commit 5: celulares pequeños ≤480px */
+@media (max-width: 480px) {
+  .cluster-bubble {
+    min-width: 32px;
+    min-height: 32px;
+    font-size: 11px;
+    border-width: 2px;
+  }
+  .leaflet-popup-content-wrapper {
+    max-width: 180px;
+  }
+  .leaflet-popup-content {
+    margin: 8px 10px;
+    font-size: 12px;
+  }
+  .leaflet-control-zoom {
+    transform: scale(0.85);
+  }
+}
