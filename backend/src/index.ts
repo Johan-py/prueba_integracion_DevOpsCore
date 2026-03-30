@@ -5,6 +5,7 @@ import locationSearchHandler from '../api/locations/search.js'
 // Importamos el manejador de popularidad -- BitPro 
 import popularidadHandler from '../api/locations/popularidad.js'
 import {registerController,loginController,} from "./modules/auth/auth.controller.js";
+import { getPropertiesMapController } from './modules/properties/properties.controller.js'
 
 const app = express();
 
@@ -15,6 +16,9 @@ app.use(cors({
 }))
 
 app.use(express.json())
+app.use(cors())
+
+app.get('/api/properties/map', getPropertiesMapController)
 
 const bannersController = new BannersController()
 

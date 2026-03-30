@@ -1,10 +1,10 @@
 const users = [
-  { id: 1, name: "User 1" },
-  { id: 2, name: "User 2" },
-];
+  { id: 1, name: 'User 1' },
+  { id: 2, name: 'User 2' }
+]
 type payload = {
-  name: string;
-};
+  name: string
+}
 export const getUsersRepository = async () => {
   return users;
 };
