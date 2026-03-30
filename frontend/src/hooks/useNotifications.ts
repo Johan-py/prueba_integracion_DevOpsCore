@@ -61,13 +61,23 @@ const requestJson = async <T>(url: string, init?: RequestInit): Promise<T> => {
     const data = await response.json().catch(() => null)
 
     if (!response.ok) {
-      throw new Error(data?.message ?? 'No se pudo completar la solicitud')
+      const error = new Error(data?.message ?? 'No se pudo completar la solicitud') as Error & {
+        status?: number
+      }
+
+      error.status = response.status
+      throw error
     }
 
     return data as T
   } catch (error) {
     if (error instanceof DOMException && error.name === 'AbortError') {
-      throw new Error('No se pudieron cargar las notificaciones.')
+      const timeoutError = new Error('No se pudieron cargar las notificaciones.') as Error & {
+        status?: number
+      }
+
+      timeoutError.status = 408
+      throw timeoutError
     }
 
     throw error
@@ -115,13 +125,18 @@ export function useNotifications() {
       setUnreadCount(unreadCountResponse.unreadCount)
       setIsLoggedIn(true)
     } catch (err) {
-      const technicalMessage = err instanceof Error ? err.message.toLowerCase() : ''
+      const error = err as Error & { status?: number }
+      const technicalMessage = error.message.toLowerCase()
 
       if (technicalMessage.includes('no autorizado') || technicalMessage.includes('token')) {
         setIsLoggedIn(false)
       }
 
-      setError('No se pudieron cargar las notificaciones.')
+      if (error.status === 500) {
+        setError('Ocurrió un problema al cargar las notificaciones.')
+      } else {
+        setError('No se pudieron cargar las notificaciones.')
+      }
     } finally {
       setIsLoading(false)
     }

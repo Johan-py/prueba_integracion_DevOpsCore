@@ -20,7 +20,8 @@ export default function NotificationsPage() {
     loadMoreNotifications,
     markAsRead,
     markAllAsRead,
-    deleteNotification
+    deleteNotification,
+    refreshNotifications
   } = useNotifications()
 
   useEffect(() => {
@@ -80,7 +81,15 @@ export default function NotificationsPage() {
         {isLoading ? (
           <p className="px-4 py-6 text-center text-sm text-gray-500">Cargando notificaciones...</p>
         ) : error ? (
-          <p className="px-4 py-6 text-center text-sm text-red-500">{error}</p>
+          <div className="px-4 py-6 text-center">
+            <p className="text-sm text-red-500">{error}</p>
+            <button
+              onClick={() => void refreshNotifications(filter)}
+              className="mt-3 rounded border border-gray-300 px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-50"
+            >
+              Reintentar
+            </button>
+          </div>
         ) : visibleNotifications.length === 0 ? (
           <p
             role="status"

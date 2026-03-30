@@ -22,7 +22,8 @@ export default function Navbar() {
     markAllAsRead,
     deleteNotification,
     loadMoreNotifications,
-    hasMore
+    hasMore,
+    refreshNotifications
   } = useNotifications()
 
   return (
@@ -88,7 +89,15 @@ export default function Navbar() {
                     Cargando notificaciones...
                   </div>
                 ) : error ? (
-                  <p className="px-4 py-8 text-center text-sm text-red-500">{error}</p>
+                  <div className="px-4 py-8 text-center">
+                    <p className="text-sm text-red-500">{error}</p>
+                    <button
+                      onClick={() => void refreshNotifications(filter)}
+                      className="mt-3 rounded border border-gray-300 px-3 py-1 text-sm text-gray-700 transition hover:bg-gray-50"
+                    >
+                      Reintentar
+                    </button>
+                  </div>
                 ) : visibleNotifications.length === 0 ? (
                   <p className="px-4 py-8 text-center text-sm text-gray-500">
                     No hay notificaciones
