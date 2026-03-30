@@ -1,19 +1,28 @@
 'use client'
+
 import { useMap } from 'react-leaflet'
 import { useEffect, useState, useCallback } from 'react'
+
 const MIN_ZOOM = 3
 const MAX_ZOOM = 18
+
+type ZoomAction = 'in' | 'out'
+
 export default function ZoomControls() {
   const map = useMap()
   const [zoom, setZoom] = useState(map.getZoom())
-  const [active, setActive] = useState(null)
+  const [active, setActive] = useState<ZoomAction | null>(null)
+
   useEffect(() => {
     const handleZoom = () => setZoom(map.getZoom())
+
     map.on('zoomend', handleZoom)
+
     return () => {
       map.off('zoomend', handleZoom)
     }
   }, [map])
+
   const handleZoomIn = useCallback(() => {
     if (zoom < MAX_ZOOM) {
       setActive('in')
@@ -21,6 +30,7 @@ export default function ZoomControls() {
       setTimeout(() => setActive(null), 300)
     }
   }, [map, zoom])
+
   const handleZoomOut = useCallback(() => {
     if (zoom > MIN_ZOOM) {
       setActive('out')
@@ -28,9 +38,11 @@ export default function ZoomControls() {
       setTimeout(() => setActive(null), 300)
     }
   }, [map, zoom])
+
   const isMaxZoom = zoom >= MAX_ZOOM
   const isMinZoom = zoom <= MIN_ZOOM
-  const btnStyle = (type, disabled) => ({
+
+  const btnStyle = (type: ZoomAction, disabled: boolean) => ({
     width: '36px',
     height: '36px',
     border: 'none',
@@ -44,6 +56,7 @@ export default function ZoomControls() {
     backgroundColor: active === type ? '#F97316' : '#ffffff',
     color: disabled ? '#d1d5db' : active === type ? '#ffffff' : '#374151'
   })
+
   return (
     <div
       style={{
@@ -68,7 +81,11 @@ export default function ZoomControls() {
       >
         +
       </button>
-      <div style={{ height: '1px', backgroundColor: '#e5e7eb', margin: '0 6px' }} />
+
+      <div
+        style={{ height: '1px', backgroundColor: '#e5e7eb', margin: '0 6px' }}
+      />
+
       <button
         onClick={handleZoomOut}
         disabled={isMinZoom}

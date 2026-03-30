@@ -8,7 +8,11 @@ export const metadata: Metadata = {
   description: 'Descripción de mi aplicación'
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="es">
       <body className="min-h-screen flex flex-col">

@@ -6,9 +6,9 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env') })
 
 export default defineConfig({
   migrations: {
-    seed: 'bun ./prisma/seed.ts'
+    seed: "bun ./prisma/seed.ts",
   },
   datasource: {
     url: process.env.DATABASE_URL
-  }
-})
+  },
+});

@@ -1,5 +1,6 @@
 import { HomeBanner } from '@/components/home/HomeBanner'
 import ExploreSection from '@/components/layout/ExploreSection'
+import RegisterSuccessToast from '@/components/layout/RegisterSuccessToast'
 
 interface BannerData {
   id: number

@@ -1,28 +1,20 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node'
+import express from "express";
+import cors from "cors";
 import {
-  getUsersController,
-  createUserController
-} from '../../src/modules/users/users.controller.js'
+  registerController,
+  loginController,
+} from "../../src/modules/auth/auth.controller.js";
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  try {
-    switch (req.method) {
-      case 'GET':
-        const users = await getUsersController()
-        return res.json(users)
+const app = express();
 
-      case 'POST':
-        const newUser = await createUserController(req.body)
-        return res.status(201).json(newUser)
+app.use(express.json());
+app.use(cors());
 
-      default:
-        res.status(405).json({ message: 'Method not allowed' })
-    }
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return res.status(500).json({ error: error.message })
-    }
+app.post("/api/auth/register", registerController);
+app.post("/api/auth/login", loginController);
 
-    return res.status(500).json({ error: 'Internal server error' })
-  }
-}
+const PORT = 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
