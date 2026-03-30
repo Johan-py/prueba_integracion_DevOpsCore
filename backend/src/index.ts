@@ -10,16 +10,18 @@ import {
 } from './modules/notificaciones/notificaciones.controller.js'
 import { BannersController } from './modules/banners/banners.controller.js'
 import locationSearchHandler from '../api/locations/search.js'
-import { FiltersHomepageController } from './modules/filtershomepage/filtershomepage.controller.js'  
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-import {registerController,loginController,} from "./modules/auth/auth.controller.js";
+import { FiltersHomepageController } from './modules/filtershomepage/filtershomepage.controller.js'
+import type { VercelRequest, VercelResponse } from '@vercel/node'
+import { registerController, loginController } from './modules/auth/auth.controller.js'
 
-const app = express();
-app.use(cors({
-  origin: 'http://localhost:3000',
-  methods: ['GET', 'POST'],
-  credentials: true
-}))
+const app = express()
+app.use(
+  cors({
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+    credentials: true
+  })
+)
 
 app.use(
   cors({
@@ -46,24 +48,21 @@ const fakeAuth = (req: Request, _res: Response, next: NextFunction) => {
 
   next()
 }
-const bannersController = new BannersController();
-const filtersController = new FiltersHomepageController();
+const bannersController = new BannersController()
+const filtersController = new FiltersHomepageController()
 
 app.post('/api/users', (req, res) => {
   const user = req.body
   res.json({ message: 'User created', user })
 })
-app.post("/api/auth/register", registerController);
-app.post("/api/auth/login", loginController);
+app.post('/api/auth/register', registerController)
+app.post('/api/auth/login', loginController)
 
-app.get('/api/filters', filtersController.getFilters);
+app.get('/api/filters', filtersController.getFilters)
 app.get('/api/banners', (req, res) => bannersController.getBanners(req, res))
 app.get('/api/locations/search', async (req, res) => {
-  await locationSearchHandler(
-    (req as unknown) as VercelRequest, 
-    (res as unknown) as VercelResponse
-  );
-});
+  await locationSearchHandler(req as unknown as VercelRequest, res as unknown as VercelResponse)
+})
 
 app.get('/notificaciones', fakeAuth, getNotificationsController)
 app.get('/notificaciones/unread-count', fakeAuth, getUnreadCountController)

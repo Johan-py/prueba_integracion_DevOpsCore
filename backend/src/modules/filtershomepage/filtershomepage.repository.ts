@@ -1,6 +1,6 @@
 // 1. Importamos $Enums (con el signo $) desde el cliente generado
-import { $Enums } from '@prisma/client'; 
-import prisma from '../../config/prisma.js';
+import { $Enums } from '@prisma/client'
+import prisma from '../../config/prisma.js'
 
 export class FiltersHomepageRepository {
   // 2. Usamos $Enums.TipoAccion para el tipado
@@ -11,24 +11,24 @@ export class FiltersHomepageRepository {
         inmueble: {
           tipoAccion: tipoAccion,
           // 3. Usamos $Enums.EstadoInmueble para el valor
-          estado: $Enums.EstadoInmueble.ACTIVO, 
-        },
+          estado: $Enums.EstadoInmueble.ACTIVO
+        }
       },
       _count: {
-        id: true,
-      },
-    });
+        id: true
+      }
+    })
   }
 
   async getCountsByCategoria() {
     return await prisma.inmueble.groupBy({
       by: ['categoria'],
       where: {
-        estado: $Enums.EstadoInmueble.ACTIVO,
+        estado: $Enums.EstadoInmueble.ACTIVO
       },
       _count: {
-        id: true,
-      },
-    });
+        id: true
+      }
+    })
   }
 }
