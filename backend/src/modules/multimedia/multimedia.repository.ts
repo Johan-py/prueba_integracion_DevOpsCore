@@ -1,0 +1,97 @@
+import { TipoMultimedia } from '@prisma/client'
+import { prisma } from '../../lib/prisma.js'
+import { MultimediaRecord, MultimediaType, PublicacionRecord } from './multimedia.types.js'
+
+const mapPublicationRecord = (publication: {
+  id: number
+  usuarioId: number
+  titulo: string
+}): PublicacionRecord => {
+  return {
+    id: publication.id,
+    usuarioId: publication.usuarioId,
+    titulo: publication.titulo
+  }
+}
+
+const mapMultimediaRecord = (multimedia: {
+  id: number
+  publicacionId: number
+  tipo: TipoMultimedia
+  url: string
+  pesoMb: unknown
+}): MultimediaRecord => {
+  return {
+    id: multimedia.id,
+    publicacionId: multimedia.publicacionId,
+    tipo: multimedia.tipo as MultimediaType,
+    url: multimedia.url,
+    pesoMb:
+      multimedia.pesoMb === null || multimedia.pesoMb === undefined
+        ? null
+        : Number(multimedia.pesoMb)
+  }
+}
+
+export const findPublicationByIdRepository = async (publicacionId: number) => {
+  const publication = await prisma.publicacion.findUnique({
+    where: { id: publicacionId },
+    select: {
+      id: true,
+      usuarioId: true,
+      titulo: true
+    }
+  })
+
+  return publication ? mapPublicationRecord(publication) : null
+}
+
+export const getMultimediaByPublicationIdRepository = async (publicacionId: number) => {
+  const multimedia = await prisma.multimedia.findMany({
+    where: { publicacionId },
+    orderBy: { id: 'asc' },
+    select: {
+      id: true,
+      publicacionId: true,
+      tipo: true,
+      url: true,
+      pesoMb: true
+    }
+  })
+
+  return multimedia.map(mapMultimediaRecord)
+}
+
+export const countMultimediaByPublicationIdAndTypeRepository = async (
+  publicacionId: number,
+  tipo: MultimediaType
+) => {
+  return prisma.multimedia.count({
+    where: {
+      publicacionId,
+      tipo: tipo as TipoMultimedia
+    }
+  })
+}
+
+export const createMultimediaRepository = async (
+  data: Omit<MultimediaRecord, 'id'>
+) => {
+  const created = await prisma.multimedia.create({
+    data: {
+      publicacionId: data.publicacionId,
+      tipo: data.tipo as TipoMultimedia,
+      url: data.url,
+      pesoMb: data.pesoMb
+    },
+    select: {
+      id: true,
+      publicacionId: true,
+      tipo: true,
+      url: true,
+      pesoMb: true
+    }
+  })
+
+  return mapMultimediaRecord(created)
+}
