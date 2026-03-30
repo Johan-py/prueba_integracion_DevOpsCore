@@ -26,13 +26,12 @@ export default function ResumenCompra() {
         </div>
       </div>
       {/* ================ FIN PARTE SUPERIOR ================ */}
-      <div className="bg-white p-6 rounded-xl shadow-md">
+
+      {/* ================ PARTE INTERMEDIA ================ */}
+       <div className="bg-white p-6 rounded-xl shadow-md">
         <h1 className="text-2xl font-bold text-center">
           Resumen de compra
         </h1>
-      </div>
-      {/* ================ PARTE INTERMEDIA ================ */}
-      <div>
       </div>
       {/* ================ FIN PARTE INTERMEDIA ================ */}
 
