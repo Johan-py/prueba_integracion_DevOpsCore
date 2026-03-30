@@ -1,37 +1,33 @@
-import express, { Application, Request, Response } from 'express'
+import express from 'express'
 import cors from 'cors'
-import helmet from 'helmet'
-import morgan from 'morgan'
+import { BannersController } from './modules/banners/banners.controller.js'
+import locationSearchHandler from '../api/locations/search.js'
 
-// Import routes
-import healthRoutes from './modules/health/health.routes'
+const app = express()
 
-const app: Application = express()
-const PORT = process.env.PORT || 5000
+app.use(cors({
+  origin: 'http://localhost:3000',
+  methods: ['GET', 'POST'],
+  credentials: true
+}))
 
-// Middlewares
-app.use(helmet())
-app.use(cors())
 app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
-app.use(morgan('dev'))
 
-// Routes
-app.use('/api/health', healthRoutes)
+const bannersController = new BannersController()
 
-// 404 handler
-app.use((req: Request, res: Response) => {
-  res.status(404).json({ message: 'Route not found' })
+app.post('/api/users', (req, res) => {
+  const user = req.body
+  res.json({ message: 'User created', user })
 })
 
-// Error handler
-app.use((err: Error, req: Request, res: Response) => {
-  console.error(err.stack)
-  res.status(500).json({ message: 'Internal server error' })
+app.get('/api/banners', (req, res) => bannersController.getBanners(req, res))
+
+app.get('/api/locations/search', async (req, res) => {
+  await locationSearchHandler(req as any, res as any)
 })
 
-// Start server
+const PORT = 5000
+
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`)
-  console.log(`📊 Health check: http://localhost:${PORT}/api/health`)
+  console.log(`Server running on http://localhost:${PORT}`)
 })

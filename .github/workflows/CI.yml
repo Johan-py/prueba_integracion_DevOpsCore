@@ -1,4 +1,4 @@
-name: Validador de IDs - Práctica Git
+name: 🚀 CI Monorepo
 
 on:
   push:
@@ -7,11 +7,12 @@ on:
     branches: [develop, main]
 
 jobs:
-  validate-unique-ids:
-    name: 🔍 Verificar IDs únicos en posts.json
+  lint:
+    name: 🧹 Lint
     runs-on: ubuntu-latest
 
     steps:
+<<<<<<< HEAD
       - name: 📥 Clonar repositorio
         uses: actions/checkout@v3
 
@@ -38,3 +39,100 @@ jobs:
           TOTAL=$(jq length backend/src/modules/posts/data/posts.json)
           echo "📊 Total de posts en el feed: $TOTAL"
           echo "🎉 Validación completada exitosamente."
+=======
+      - uses: actions/checkout@v3
+
+      - name: Instalar Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Cache Bun
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.bun
+            node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+
+      - name: Instalar dependencias
+        run: bun install
+
+      - name: Lint general
+        run: bun run lint
+
+  type-check:
+    name: 🔎 TypeScript Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Instalar Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Cache Bun
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.bun
+            node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+
+      - name: Instalar deps
+        run: bun install
+
+      - name: Type check backend
+        run: cd backend && bunx tsc --noEmit
+
+      - name: Type check frontend
+        run: cd frontend && bunx tsc --noEmit
+
+  build-backend:
+    name: ⚙️ Build Backend
+    runs-on: ubuntu-latest
+    needs: [lint, type-check]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Instalar Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Cache Bun
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.bun
+            node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+
+      - name: Instalar deps
+        run: bun install
+
+      - name: Build backend
+        run: cd backend && bun run build
+
+  build-frontend:
+    name: 🌐 Build Frontend
+    runs-on: ubuntu-latest
+    needs: [lint, type-check]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Instalar Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Cache Bun
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.bun
+            node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+
+      - name: Instalar deps
+        run: bun install
+
+      - name: Build frontend
+        run: cd frontend && bun run build
+>>>>>>> 84448d89714560d514d37a9cf4fa1f046e2ebab1

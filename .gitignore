@@ -14,6 +14,11 @@ out/
 .next/
 .nx/
 
+.next
+node_modules
+.env
+
+
 # Backend - Prisma
 prisma/*.db
 prisma/*.db-journal
