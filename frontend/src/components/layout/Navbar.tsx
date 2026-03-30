@@ -63,9 +63,7 @@ export default function Navbar() {
 
   const isSessionExpired = () => {
     const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY)
-
     if (!expiresAt) return true
-
     return Date.now() > Number(expiresAt)
   }
 
@@ -147,7 +145,6 @@ export default function Navbar() {
 
   const handleCancelLogout = () => {
     if (isLoggingOut) return
-
     setShowLogoutModal(false)
   }
 
