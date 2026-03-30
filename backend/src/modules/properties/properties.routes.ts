@@ -1,9 +1,8 @@
 import { Router } from "express";
-import { getProperties } from "./properties.controller";
+import { getProperties } from "./properties.controller.js";
 
 const router = Router();
 
-// 👇 esto evita el error de TS sin romper runtime
-router.get("/", getProperties as any);
+router.get("/", getProperties);
 
 export default router;
