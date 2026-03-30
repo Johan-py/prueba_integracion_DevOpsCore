@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import AppShell from '@/components/layout/AppShell'
+import Navbar from '@/components/layout/Navbar'
+import Footer from '@/components/layout/Footer'
 
 export const metadata: Metadata = {
   title: 'PropBol',
@@ -14,8 +15,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className="flex min-h-screen flex-col">
-        <AppShell>{children}</AppShell>
+      <body className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-grow">{children}</main>
+        <Footer />
       </body>
     </html>
   )

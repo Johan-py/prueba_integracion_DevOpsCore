@@ -1,3 +1,5 @@
+import Image from 'next/image'
+
 type AboutUsImageProps = {
   alt: string
   className: string
@@ -6,13 +8,8 @@ type AboutUsImageProps = {
 
 export default function AboutUsImage({ alt, className, src }: AboutUsImageProps) {
   return (
-    <img
-      src={src}
-      alt={alt}
-      className={className}
-      loading="lazy"
-      decoding="async"
-      referrerPolicy="no-referrer"
-    />
+    <div className={className} style={{ position: 'relative' }}>
+      <Image src={src} alt={alt} fill sizes="100vw" />
+    </div>
   )
 }
