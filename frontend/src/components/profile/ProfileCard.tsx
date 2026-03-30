@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type FormData = {
   nombre: string;
@@ -14,6 +15,8 @@ type FormData = {
 type FormErrors = Partial<Record<keyof FormData, string>>;
 
 export default function ProfileCard() {
+  const router = useRouter();
+
   const [form, setForm] = useState<FormData>({
     nombre: "Perfil1",
     email: "perfil1@gmail.com",
@@ -25,6 +28,15 @@ export default function ProfileCard() {
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [message, setMessage] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    const isAuthenticated = true;
+
+    if (!isAuthenticated) {
+      router.push("/login");
+    }
+  }, [router]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -77,13 +89,24 @@ export default function ProfileCard() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const isValid = validate();
 
-    if (isValid) {
-      setMessage("Datos guardados correctamente.");
-    } else {
+    if (!isValid) {
       setMessage("Corrige los errores del formulario.");
+      return;
+    }
+
+    setIsSaving(true);
+    setMessage("");
+
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      setMessage("Datos guardados correctamente.");
+    } catch {
+      setMessage("Ocurrió un error al guardar.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -247,11 +270,16 @@ export default function ProfileCard() {
                 {message}
               </p>
             )}
+
             <button
               onClick={handleSubmit}
-              className="rounded-lg bg-blue-600 px-6 py-2 font-medium text-white transition hover:bg-blue-700"
+              disabled={isSaving}
+              className={`rounded-lg px-6 py-2 font-medium text-white transition ${isSaving
+                  ? "cursor-not-allowed bg-gray-400"
+                  : "bg-blue-600 hover:bg-blue-700"
+                }`}
             >
-              Guardar cambios
+              {isSaving ? "Guardando..." : "Guardar cambios"}
             </button>
           </div>
         </div>
