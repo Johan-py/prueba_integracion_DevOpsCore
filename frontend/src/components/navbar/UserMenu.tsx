@@ -10,6 +10,16 @@ type UserMenuProps = {
   onOpenLogoutModal: () => void
 }
 
+const MenuLink = ({ label, href, onClick }: { label: string; href: string; onClick: () => void }) => (
+  <Link
+    href={href}
+    onClick={onClick}
+    className="py-2 px-2 text-gray-500 text-sm hover:bg-black/5 hover:text-[#E68B25] transition-colors rounded"
+  >
+    {label}
+  </Link>
+);
+
 export default function UserMenu({
   user,
   isPanelOpen,
@@ -54,24 +64,32 @@ export default function UserMenu({
 
         {user ? (
           <>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center text-white font-bold">
-                {user.name.charAt(0)}
+            {/* PERFIL CON ICONO CIRCULAR Y TEXTO AL LADO */}
+            <div className="flex items-center gap-3 mb-4 px-1">
+              <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                {user.name.charAt(0).toUpperCase()}
               </div>
-
-              <div>
-                <p className="font-bold text-gray-800 text-sm">{user.name}</p>
+              <div className="flex flex-col">
+                <p className="font-bold text-gray-800 text-sm leading-tight">{user.name}</p>
                 <p className="text-xs text-gray-500">{user.email}</p>
               </div>
             </div>
 
             <Link
-              href="/perfil"
-              className="flex justify-between w-full text-black font-bold mb-4 hover:bg-black/5 p-2 rounded transition text-sm"
+              href="/profile"
+              className="flex justify-between items-center w-full text-black font-bold py-3 border-t border-b border-gray-200 hover:bg-black/5 px-2 mb-2 transition text-sm"
               onClick={onClosePanel}
             >
-              Mi perfil <span>&gt;</span>
+              Mi perfil <span className="text-lg">›</span>
             </Link>
+
+            <div className="flex flex-col mb-4">
+              <MenuLink label="Mi cuenta" href="/cuenta" onClick={onClosePanel} />
+              <MenuLink label="Mis propiedades vistas" href="/vistas" onClick={onClosePanel} />
+              <MenuLink label="Mis publicaciones" href="/publicaciones" onClick={onClosePanel} />
+              <MenuLink label="Mis zonas" href="/zonas" onClick={onClosePanel} />
+              <MenuLink label="Mis comparaciones" href="/comparaciones" onClick={onClosePanel} />
+            </div>
 
             <button
               onClick={onOpenLogoutModal}
@@ -83,23 +101,11 @@ export default function UserMenu({
         ) : (
           <div className="text-center py-2 flex flex-col items-center">
             <div className="w-12 h-12 bg-[#E68B25]/10 rounded-full flex items-center justify-center mb-3">
-              <svg
-                className="w-6 h-6 text-[#E68B25]"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
+              <svg className="w-6 h-6 text-[#E68B25]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-
             <p className="text-sm text-gray-600 mb-5 px-2">Encuentra tu hogar ideal hoy mismo.</p>
-
             <button
               onClick={onLogin}
               className="w-full bg-[#E68B25] text-white py-2.5 rounded-xl text-sm font-bold shadow-md hover:bg-[#cf7b1f] transition-all active:scale-95"
