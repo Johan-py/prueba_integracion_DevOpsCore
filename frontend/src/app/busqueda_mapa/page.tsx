@@ -1,13 +1,15 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import dynamic from 'next/dynamic'
+import { useState } from "react";
+import dynamic from "next/dynamic";
 
-const MapView = dynamic(() => import('./MapView'), { ssr: false })
+const MapView = dynamic(() => import("./MapView"), { ssr: false });
 
 export default function BusquedaMapaPage() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
-  const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(
+    null,
+  );
 
   return (
     <div className="flex flex-col w-full min-h-[calc(100vh-theme(spacing.32))] border rounded-lg overflow-hidden shadow-sm bg-white">
@@ -31,15 +33,15 @@ export default function BusquedaMapaPage() {
             bg-white transition-all duration-300 ease-in-out z-10 border-gray-200 overflow-hidden
             ${
               isSidebarOpen
-                ? 'w-full h-[40vh] md:w-[30%] md:h-auto border-b md:border-b-0 md:border-r opacity-100'
-                : 'w-0 h-0 md:w-0 md:h-auto opacity-0'
+                ? "w-full h-[40vh] md:w-[30%] md:h-auto border-b md:border-b-0 md:border-r opacity-100"
+                : "w-0 h-0 md:w-0 md:h-auto opacity-0"
             }
           `}
         >
           <div
             className={`
             p-4 h-full overflow-y-auto transition-opacity duration-200
-            ${isSidebarOpen ? 'opacity-100 delay-100' : 'opacity-0'}
+            ${isSidebarOpen ? "opacity-100 delay-100" : "opacity-0"}
             md:w-[30vw] min-w-[250px]
           `}
           >
@@ -68,7 +70,7 @@ export default function BusquedaMapaPage() {
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             className="absolute left-0 top-4 z-[1000] bg-white border border-gray-300 shadow-md p-2 rounded-r-md hover:bg-gray-50 flex items-center justify-center transition-colors focus:outline-none hidden md:flex"
-            title={isSidebarOpen ? 'Contraer panel' : 'Expandir panel'}
+            title={isSidebarOpen ? "Contraer panel" : "Expandir panel"}
           >
             <svg
               className="w-5 h-5 text-gray-600"
@@ -81,16 +83,19 @@ export default function BusquedaMapaPage() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d={isSidebarOpen ? 'M15 19l-7-7 7-7' : 'M9 5l7 7-7 7'}
+                d={isSidebarOpen ? "M15 19l-7-7 7-7" : "M9 5l7 7-7 7"}
               />
             </svg>
           </button>
 
           <div className="absolute inset-0">
-            <MapView selectedId={selectedPropertyId} onSelect={setSelectedPropertyId} />
+            <MapView
+              selectedId={selectedPropertyId}
+              onSelect={setSelectedPropertyId}
+            />
           </div>
         </section>
       </div>
     </div>
-  )
+  );
 }

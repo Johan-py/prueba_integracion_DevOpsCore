@@ -183,7 +183,9 @@ export const loginService = async (payload: LoginDTO) => {
   return {
     user: {
       id: user.id,
-      correo: user.correo
+      correo: user.correo,
+      nombre: user.nombre,
+      apellido: user.apellido
     },
     token
   }

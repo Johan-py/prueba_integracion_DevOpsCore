@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { AuthError, loginService, registerUser } from './auth.service.js'
+import { AuthError, loginService, logoutService, registerUser } from './auth.service.js'
 
 type RegisterBody = {
   nombre: string
@@ -66,5 +66,23 @@ export const registerController = async (
     const message = error instanceof Error ? error.message : 'Error interno del servidor'
 
     return res.status(getRegisterErrorStatus(message)).json({ message })
+  }
+}
+
+export const logoutController = async (req: Request, res: Response) => {
+  const authHeader = req.headers.authorization
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'Token no proporcionado' })
+  }
+
+  const token = authHeader.split(' ')[1]
+
+  try {
+    const result = await logoutService(token)
+    return res.status(200).json(result)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Error al cerrar sesión'
+    return res.status(400).json({ message })
   }
 }

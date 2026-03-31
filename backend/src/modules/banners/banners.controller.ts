@@ -9,7 +9,7 @@ export class BannersController {
       const banners = await this.service.getAllActive()
       return res.json(banners)
     } catch (_error) {
-      return res.status(500).json({ error: `Internal Server Error: ${_error}` })
+      return res.status(500).json({ error: 'Internal Server Error' })
     }
   }
 }

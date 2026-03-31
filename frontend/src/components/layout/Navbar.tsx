@@ -1,156 +1,199 @@
-'use client'
+"use client";
 
-import { useEffect, useRef, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Bell, CheckCheck, Loader2, Trash2 } from "lucide-react";
 
-import Logo from '../navbar/Logo'
-import NavLinks from '../navbar/NavLinks'
-import UserMenu from '../navbar/UserMenu'
-import LogoutModal from '../navbar/LogoutModal'
-import { useNotifications } from '@/hooks/useNotifications'
+import Logo from "../navbar/Logo";
+import NavLinks from "../navbar/NavLinks";
+import UserMenu from "../navbar/UserMenu";
+import LogoutModal from "../navbar/LogoutModal";
+import { useNotifications } from "@/hooks/useNotifications";
+import type { NotificationFilter } from "@/types/notification";
 
 export type User = {
-  name: string
-  email: string
-}
+  name: string;
+  email: string;
+};
 
-const USER_STORAGE_KEY = 'propbol_user'
-const SESSION_EXPIRES_KEY = 'propbol_session_expires'
-const SESSION_DURATION_MS = 60 * 60 * 1000 // 1 hora
+const USER_STORAGE_KEY = "propbol_user";
+const SESSION_EXPIRES_KEY = "propbol_session_expires";
+const SESSION_DURATION_MS = 60 * 60 * 1000;
+
+const filters: NotificationFilter[] = ["todas", "leida", "no leida"];
 
 export default function Navbar() {
-  const router = useRouter()
-  const panelRef = useRef<HTMLDivElement | null>(null)
+  const router = useRouter();
+  const panelRef = useRef<HTMLDivElement | null>(null);
 
-  const [user, setUser] = useState<User | null>(null)
-  const [isPanelOpen, setIsPanelOpen] = useState(false)
-  const [showLogoutModal, setShowLogoutModal] = useState(false)
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [user, setUser] = useState<User | null>(null);
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const {
     open,
     filter,
-    notifications,
-    filteredNotifications,
     visibleNotifications,
+    unreadCount,
+    isLoading,
+    isLoadingMore,
+    error,
     notificationRef,
     toggleNotifications,
     setFilter,
     markAsRead,
-    archiveNotification,
+    markAllAsRead,
+    deleteNotification,
     loadMoreNotifications,
+    hasMore,
+    refreshNotifications,
     isLoggedIn,
-    setIsLoggedIn
-  } = useNotifications()
-
-  const unreadCount = notifications.filter((n) => n.status === 'no leida').length
+    setIsLoggedIn,
+  } = useNotifications();
 
   const clearSession = () => {
-    localStorage.removeItem(USER_STORAGE_KEY)
-    localStorage.removeItem(SESSION_EXPIRES_KEY)
-    setUser(null)
-    setIsPanelOpen(false)
-    setShowLogoutModal(false)
-  }
+    localStorage.removeItem(USER_STORAGE_KEY);
+    localStorage.removeItem(SESSION_EXPIRES_KEY);
+    localStorage.removeItem("token");
+    setUser(null);
+    setIsPanelOpen(false);
+    setShowLogoutModal(false);
+    window.dispatchEvent(new Event("propbol:session-changed"));
+  };
 
   const isSessionExpired = () => {
-    const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY)
-    if (!expiresAt) return true
-    return Date.now() > Number(expiresAt)
-  }
+    const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY);
+    if (!expiresAt) return true;
+    return Date.now() > Number(expiresAt);
+  };
 
   const restoreSession = () => {
-    const savedUser = localStorage.getItem(USER_STORAGE_KEY)
-    const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY)
+    const savedUser = localStorage.getItem(USER_STORAGE_KEY);
+    const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY);
 
     if (!savedUser || !expiresAt) {
-      clearSession()
-      return
+      clearSession();
+      return;
     }
 
     if (Date.now() > Number(expiresAt)) {
-      clearSession()
-      return
+      clearSession();
+      return;
     }
-
-    setUser(JSON.parse(savedUser))
-  }
+    try {
+      setUser(JSON.parse(savedUser));
+    } catch {
+      clearSession();
+    }
+  };
 
   useEffect(() => {
-    restoreSession()
-  }, [])
+    restoreSession();
+
+    const handleSessionChange = () => restoreSession();
+
+    window.addEventListener("propbol:login", handleSessionChange);
+    window.addEventListener("propbol:session-changed", handleSessionChange);
+
+    return () => {
+      window.removeEventListener("propbol:login", handleSessionChange);
+      window.removeEventListener(
+        "propbol:session-changed",
+        handleSessionChange,
+      );
+    };
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (!panelRef.current) return
+      if (!panelRef.current) return;
 
       if (!panelRef.current.contains(event.target as Node)) {
-        setIsPanelOpen(false)
+        setIsPanelOpen(false);
       }
-    }
+    };
 
-    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [])
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
       if (user && isSessionExpired()) {
-        clearSession()
-        router.push('/')
+        clearSession();
+        router.push("/");
       }
-    }, 10000)
+    }, 10000);
 
-    return () => clearInterval(interval)
-  }, [user, router])
+    return () => clearInterval(interval);
+  }, [user, router]);
 
   const togglePanel = () => {
     if (user && isSessionExpired()) {
-      clearSession()
-      router.push('/')
-      return
+      clearSession();
+      router.push("/");
+      return;
     }
 
-    setIsPanelOpen(!isPanelOpen)
-  }
+    setIsPanelOpen((prev) => !prev);
+  };
+  const handleLoginRedirect = () => {
+    router.push("/sign-in");
+  };
 
   const handleLoginMock = () => {
     const mockUser: User = {
-      name: 'Juan Perez',
-      email: 'juan.perez@gmail.com'
-    }
+      name: "Juan Perez",
+      email: "juan.perez@gmail.com",
+    };
 
-    const expiresAt = Date.now() + SESSION_DURATION_MS
+    const expiresAt = Date.now() + SESSION_DURATION_MS;
 
-    setUser(mockUser)
-    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(mockUser))
-    localStorage.setItem(SESSION_EXPIRES_KEY, String(expiresAt))
-  }
+    setUser(mockUser);
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(mockUser));
+    localStorage.setItem(SESSION_EXPIRES_KEY, String(expiresAt));
+    setIsLoggedIn(true);
+  };
 
   const handleOpenLogoutModal = () => {
-    setShowLogoutModal(true)
-  }
+    setShowLogoutModal(true);
+  };
 
   const handleCancelLogout = () => {
-    if (isLoggingOut) return
-    setShowLogoutModal(false)
-  }
+    if (isLoggingOut) return;
+    setShowLogoutModal(false);
+  };
 
-  const handleConfirmLogout = () => {
-    if (isLoggingOut) return
+  const handleConfirmLogout = async () => {
+    if (isLoggingOut) return;
 
-    setIsLoggingOut(true)
+    setIsLoggingOut(true);
 
-    setTimeout(() => {
-      clearSession()
-      setIsLoggingOut(false)
-      router.push('/')
-    }, 400)
-  }
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      try {
+        await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000"}/api/auth/logout`,
+          {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+      } catch {
+        // si falla la red igual limpiamos la sesión local
+      }
+    }
+
+    clearSession();
+    setIsLoggingOut(false);
+    router.push("/");
+  };
 
   return (
     <>
@@ -170,32 +213,32 @@ export default function Navbar() {
                   className="relative rounded-full p-2 transition hover:bg-gray-100"
                   aria-label="Abrir notificaciones"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6 text-gray-600"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                    />
-                  </svg>
+                  <Bell className="h-6 w-6 text-gray-600" />
 
-                  {unreadCount > 0 && (
+                  {unreadCount > 0 ? (
                     <span className="absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1 text-xs font-semibold text-white">
-                      {unreadCount}
+                      {unreadCount > 99 ? "99+" : unreadCount}
                     </span>
-                  )}
+                  ) : null}
                 </button>
 
-                {open && (
+                {open ? (
                   <div className="absolute right-0 top-12 z-50 w-80 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
-                    <div className="border-b border-gray-100 px-4 py-3">
-                      <h3 className="text-sm font-semibold text-gray-800">Notificaciones</h3>
+                    <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
+                      <h3 className="text-sm font-semibold text-gray-800">
+                        Notificaciones
+                      </h3>
+
+                      {isLoggedIn ? (
+                        <button
+                          type="button"
+                          onClick={() => void markAllAsRead()}
+                          className="inline-flex items-center gap-1 text-xs text-blue-600 transition hover:text-blue-700"
+                        >
+                          <CheckCheck className="h-4 w-4" />
+                          Marcar todas
+                        </button>
+                      ) : null}
                     </div>
 
                     {!isLoggedIn ? (
@@ -206,7 +249,7 @@ export default function Navbar() {
                         <div className="mt-3 flex justify-center">
                           <button
                             type="button"
-                            onClick={() => setIsLoggedIn(true)}
+                            onClick={handleLoginMock}
                             className="rounded-full bg-blue-600 px-4 py-1.5 text-xs font-medium text-white transition hover:bg-blue-700"
                           >
                             Iniciar sesión
@@ -216,65 +259,58 @@ export default function Navbar() {
                     ) : (
                       <>
                         <div className="flex flex-wrap gap-2 border-b border-gray-100 px-4 py-3">
-                          <button
-                            type="button"
-                            onClick={() => setFilter('todas')}
-                            className={`rounded-full px-3 py-1 text-xs font-medium transition ${
-                              filter === 'todas'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
-                          >
-                            Todas
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setFilter('leida')}
-                            className={`rounded-full px-3 py-1 text-xs font-medium transition ${
-                              filter === 'leida'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
-                          >
-                            Leídas
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setFilter('no leida')}
-                            className={`rounded-full px-3 py-1 text-xs font-medium transition ${
-                              filter === 'no leida'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
-                          >
-                            No leídas
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setFilter('archivada')}
-                            className={`rounded-full px-3 py-1 text-xs font-medium transition ${
-                              filter === 'archivada'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
-                          >
-                            Archivadas
-                          </button>
+                          {filters.map((item) => (
+                            <button
+                              key={item}
+                              type="button"
+                              onClick={() => setFilter(item)}
+                              className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+                                filter === item
+                                  ? "bg-blue-600 text-white"
+                                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                              }`}
+                            >
+                              {item === "todas"
+                                ? "Todas"
+                                : item === "leida"
+                                  ? "Leídas"
+                                  : "No leídas"}
+                            </button>
+                          ))}
                         </div>
 
                         <div
                           className="max-h-80 overflow-y-auto"
                           onScroll={(e) => {
-                            const target = e.currentTarget
+                            const target = e.currentTarget;
                             const reachedBottom =
-                              target.scrollTop + target.clientHeight >= target.scrollHeight - 10
+                              target.scrollTop + target.clientHeight >=
+                              target.scrollHeight - 10;
 
-                            if (reachedBottom) {
-                              loadMoreNotifications()
+                            if (reachedBottom && hasMore && !isLoadingMore) {
+                              void loadMoreNotifications();
                             }
                           }}
                         >
-                          {filteredNotifications.length === 0 ? (
+                          {isLoading ? (
+                            <div className="flex items-center justify-center gap-2 px-4 py-8 text-sm text-gray-500">
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                              Cargando notificaciones...
+                            </div>
+                          ) : error ? (
+                            <div className="px-4 py-6 text-center">
+                              <p className="text-sm text-red-500">{error}</p>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  void refreshNotifications(filter)
+                                }
+                                className="mt-3 rounded border border-gray-300 px-3 py-1 text-sm text-gray-700 transition hover:bg-gray-50"
+                              >
+                                Reintentar
+                              </button>
+                            </div>
+                          ) : visibleNotifications.length === 0 ? (
                             <p className="px-4 py-6 text-center text-sm text-gray-500">
                               No hay notificaciones
                             </p>
@@ -283,51 +319,64 @@ export default function Navbar() {
                               {visibleNotifications.map((notification) => (
                                 <div
                                   key={notification.id}
-                                  onClick={() => {
-                                    if (notification.status !== 'archivada') {
-                                      markAsRead(notification.id)
-                                    }
-                                  }}
-                                  className={`cursor-pointer border-b border-gray-100 px-4 py-3 transition hover:bg-gray-50 ${
-                                    notification.status === 'no leida' ? 'bg-blue-50' : 'bg-white'
+                                  className={`border-b border-gray-100 px-4 py-3 transition hover:bg-gray-50 ${
+                                    notification.status === "no leida"
+                                      ? "bg-blue-50"
+                                      : "bg-white"
                                   }`}
                                 >
-                                  <div className="flex items-center justify-between gap-3">
-                                    <p className="text-sm font-semibold text-gray-800">
-                                      {notification.title?.trim() || '(Sin título)'}
-                                    </p>
-                                    <span className="text-[10px] uppercase text-gray-400">
-                                      {notification.status}
-                                    </span>
-                                  </div>
+                                  <div className="flex items-start justify-between gap-3">
+                                    <div className="min-w-0 flex-1">
+                                      <p className="text-sm font-semibold text-gray-800">
+                                        {notification.title?.trim() ||
+                                          "(Sin título)"}
+                                      </p>
 
-                                  <p className="mt-1 text-sm text-gray-600">
-                                    {notification.description?.trim() ||
-                                      '(Sin descripción disponible)'}
-                                  </p>
+                                      <p className="mt-1 text-sm text-gray-600">
+                                        {notification.description?.trim() ||
+                                          "(Sin descripción disponible)"}
+                                      </p>
 
-                                  {notification.status !== 'archivada' && (
-                                    <div className="mt-2 flex justify-end">
+                                      <span className="mt-2 inline-block text-[10px] uppercase text-gray-400">
+                                        {notification.status}
+                                      </span>
+                                    </div>
+
+                                    <div className="flex shrink-0 items-center gap-2">
+                                      {notification.status === "no leida" ? (
+                                        <button
+                                          type="button"
+                                          onClick={() =>
+                                            void markAsRead(notification.id)
+                                          }
+                                          className="text-xs text-blue-500 transition hover:text-blue-600"
+                                        >
+                                          Leer
+                                        </button>
+                                      ) : null}
+
                                       <button
                                         type="button"
-                                        onClick={(e) => {
-                                          e.stopPropagation()
-                                          archiveNotification(notification.id)
-                                        }}
-                                        className="text-xs text-gray-400 transition hover:text-gray-600"
+                                        onClick={() =>
+                                          void deleteNotification(
+                                            notification.id,
+                                          )
+                                        }
+                                        className="text-xs text-red-500 transition hover:text-red-600"
+                                        aria-label="Eliminar notificación"
                                       >
-                                        Archivar
+                                        <Trash2 className="h-4 w-4" />
                                       </button>
                                     </div>
-                                  )}
+                                  </div>
                                 </div>
                               ))}
 
-                              {visibleNotifications.length < filteredNotifications.length && (
+                              {isLoadingMore ? (
                                 <p className="px-4 py-3 text-center text-xs text-gray-400">
                                   Cargando más notificaciones...
                                 </p>
-                              )}
+                              ) : null}
                             </>
                           )}
                         </div>
@@ -337,13 +386,13 @@ export default function Navbar() {
                             href="/notificaciones"
                             className="text-sm font-medium text-blue-600 transition hover:text-blue-700"
                           >
-                            Ver todo
+                            Ver todas las notificaciones
                           </Link>
                         </div>
                       </>
                     )}
                   </div>
-                )}
+                ) : null}
               </div>
 
               <div className="relative" ref={panelRef}>
@@ -352,7 +401,7 @@ export default function Navbar() {
                   isPanelOpen={isPanelOpen}
                   onTogglePanel={togglePanel}
                   onClosePanel={() => setIsPanelOpen(false)}
-                  onLogin={handleLoginMock}
+                  onLogin={handleLoginRedirect}
                   onOpenLogoutModal={handleOpenLogoutModal}
                 />
               </div>
@@ -368,5 +417,5 @@ export default function Navbar() {
         onConfirm={handleConfirmLogout}
       />
     </>
-  )
+  );
 }
