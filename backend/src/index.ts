@@ -6,19 +6,15 @@ import {
   getNotificationsController,
   getUnreadCountController,
   markAllNotificationsAsReadController,
-  markNotificationAsReadController,
-} from "./modules/notificaciones/notificaciones.controller.js";
-import { BannersController } from "./modules/banners/banners.controller.js";
-import locationSearchHandler from "../api/locations/search.js";
-import { FiltersHomepageController } from "./modules/filtershomepage/filtershomepage.controller.js";
-import type { VercelRequest, VercelResponse } from "@vercel/node";
-import {
-  registerController,
-  loginController,
-  logoutController,
-} from "./modules/auth/auth.controller.js";
+  markNotificationAsReadController
+} from './modules/notificaciones/notificaciones.controller.js'
+import { BannersController } from './modules/banners/banners.controller.js'
+import locationSearchHandler from '../api/locations/search.js'
+import { FiltersHomepageController } from './modules/filtershomepage/filtershomepage.controller.js'
+import type { VercelRequest, VercelResponse } from '@vercel/node'
+import { registerController, loginController, logoutController } from './modules/auth/auth.controller.js'
 import meHandler from "../api/auth/me.js";
-
+import correoverificacionRoutes from './modules/perfil/correoverificacion.routes.js';
 const app = express();
 app.use(
   cors({
@@ -47,45 +43,35 @@ type AuthenticatedRequest = Request & {
 
 // auth temporal para pruebas
 const fakeAuth = (req: Request, _res: Response, next: NextFunction) => {
-  (req as AuthenticatedRequest).user = {
-    id: 1,
-  };
+  ; (req as AuthenticatedRequest).user = {
+    id: 1
+  }
 
   next();
 };
 const bannersController = new BannersController();
 const filtersController = new FiltersHomepageController();
 
-app.post("/api/users", (req, res) => {
-  const user = req.body;
-  res.json({ message: "User created", user });
-});
-app.post("/api/auth/register", registerController);
-app.post("/api/auth/login", loginController);
+app.post('/api/users', (req, res) => {
+  const user = req.body
+  res.json({ message: 'User created', user })
+})
+app.post('/api/auth/register', registerController)
+app.post('/api/auth/login', loginController)
 app.post("/api/auth/logout", logoutController);
+app.use('/api/perfil', correoverificacionRoutes);
 
-app.get("/api/filters", filtersController.getFilters);
-app.get("/api/banners", (req, res) => bannersController.getBanners(req, res));
-app.get("/api/locations/search", async (req, res) => {
-  await locationSearchHandler(
-    req as unknown as VercelRequest,
-    res as unknown as VercelResponse,
-  );
-});
+app.get('/api/filters', filtersController.getFilters)
+app.get('/api/banners', (req, res) => bannersController.getBanners(req, res))
+app.get('/api/locations/search', async (req, res) => {
+  await locationSearchHandler(req as unknown as VercelRequest, res as unknown as VercelResponse)
+})
 
-app.get("/notificaciones", fakeAuth, getNotificationsController);
-app.get("/notificaciones/unread-count", fakeAuth, getUnreadCountController);
-app.patch(
-  "/notificaciones/:id/read",
-  fakeAuth,
-  markNotificationAsReadController,
-);
-app.patch(
-  "/notificaciones/read-all",
-  fakeAuth,
-  markAllNotificationsAsReadController,
-);
-app.delete("/notificaciones/:id", fakeAuth, deleteNotificationController);
+app.get('/notificaciones', fakeAuth, getNotificationsController)
+app.get('/notificaciones/unread-count', fakeAuth, getUnreadCountController)
+app.patch('/notificaciones/:id/read', fakeAuth, markNotificationAsReadController)
+app.patch('/notificaciones/read-all', fakeAuth, markAllNotificationsAsReadController)
+app.delete('/notificaciones/:id', fakeAuth, deleteNotificationController)
 
 
 app.post("/api/publicaciones", (req, res) => {
