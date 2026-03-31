@@ -42,7 +42,7 @@ const DEFAULT_COMPLEMENTARY_DATA: ComplementaryData = {
   direccion: "",
 };
 
-export default function ProfileCard() {
+export default function ExtraInf() {
   const router = useRouter();
 
   const [sessionData, setSessionData] =
@@ -79,7 +79,13 @@ export default function ProfileCard() {
     }
 
     if (savedComplementaryData) {
-      setForm(JSON.parse(savedComplementaryData));
+      const parsedData: ComplementaryData = JSON.parse(savedComplementaryData);
+
+      setForm({
+        pais: parsedData.pais ?? "",
+        genero: parsedData.genero ?? "",
+        direccion: parsedData.direccion ?? "",
+      });
     } else {
       localStorage.setItem(
         "profileComplementaryData",
@@ -106,20 +112,29 @@ export default function ProfileCard() {
     setMessage("");
   };
 
-  const validate = () => {
+  const isDireccionValida = (direccion: string) => {
+    const valor = direccion.trim();
+
+    if (!valor) return false;
+
+    // Debe tener al menos una letra o un número
+    return /[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ]/.test(valor);
+  };
+
+  const validate = (data: ComplementaryData) => {
     const newErrors: FormErrors = {};
 
-    if (!form.pais) {
+    if (!data.pais) {
       newErrors.pais = "Debes seleccionar un país.";
     }
 
-    if (!form.genero) {
+    if (!data.genero) {
       newErrors.genero = "Debes seleccionar un género.";
     }
 
-    if (!form.direccion.trim()) {
+    if (!isDireccionValida(data.direccion)) {
       newErrors.direccion =
-        "La dirección es obligatoria y no puede contener solo espacios.";
+        "La dirección es obligatoria y debe contener letras o números válidos.";
     }
 
     setErrors(newErrors);
@@ -129,7 +144,15 @@ export default function ProfileCard() {
   const handleSubmit = async () => {
     setMessage("");
 
-    if (!validate()) {
+    const cleanedForm: ComplementaryData = {
+      pais: form.pais.trim(),
+      genero: form.genero.trim(),
+      direccion: form.direccion.trim(),
+    };
+
+    const isValid = validate(cleanedForm);
+
+    if (!isValid) {
       setMessage("Corrige los errores del formulario.");
       return;
     }
@@ -139,12 +162,15 @@ export default function ProfileCard() {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      localStorage.setItem("profileComplementaryData", JSON.stringify(form));
+      localStorage.setItem(
+        "profileComplementaryData",
+        JSON.stringify(cleanedForm)
+      );
+
+      setForm(cleanedForm);
       setMessage("Datos actualizados correctamente.");
     } catch {
-      setMessage(
-        "No se pudo guardar la información. Intenta nuevamente sin cerrar la página."
-      );
+      setMessage("No se pudo guardar la información.");
     } finally {
       setIsSaving(false);
     }
@@ -156,129 +182,125 @@ export default function ProfileCard() {
   const editableStyles = `${inputBaseStyles} focus:border-orange-400`;
 
   return (
-    <div className="min-h-screen bg-[#ececec] px-3 py-4 sm:px-4 md:px-8 md:py-6">
-      <div className="mx-auto max-w-5xl">
-        <section className="rounded-2xl bg-white p-4 shadow sm:p-6 md:p-10">
-          <h1 className="mb-6 text-center text-2xl font-bold text-gray-900 md:mb-10 md:text-3xl">
-            Datos Personales
-          </h1>
+    <section className="rounded-2xl bg-white p-4 shadow sm:p-6 md:p-10">
+      <h1 className="mb-6 text-center text-2xl font-bold text-gray-900 md:mb-10 md:text-3xl">
+        Datos Personales
+      </h1>
 
-          <div className="flex flex-col gap-8 md:flex-row md:items-start md:gap-12">
-            <aside className="flex w-full flex-col items-center md:w-1/3">
-              <div className="flex h-28 w-28 items-center justify-center rounded-full bg-[#f7f0ec] text-5xl text-gray-500 sm:h-32 sm:w-32">
-                👤
-              </div>
-
-              <p className="mt-4 text-center text-xl font-bold text-gray-900">
-                {sessionData.nombre}
-              </p>
-              <p className="break-all text-center text-sm text-gray-600">
-                {sessionData.email}
-              </p>
-            </aside>
-
-            <div className="w-full md:w-2/3">
-              <div className="space-y-4 sm:space-y-5">
-                <FieldRow label="Nombre Completo">
-                  <input
-                    type="text"
-                    value={sessionData.nombre}
-                    disabled
-                    className={readonlyStyles}
-                  />
-                </FieldRow>
-
-                <FieldRow label="E-mail">
-                  <input
-                    type="email"
-                    value={sessionData.email}
-                    disabled
-                    className={readonlyStyles}
-                  />
-                </FieldRow>
-
-                <FieldRow label="Teléfono">
-                  <input
-                    type="text"
-                    value={sessionData.telefono}
-                    disabled
-                    className={readonlyStyles}
-                  />
-                </FieldRow>
-
-                <FieldRow label="País" error={errors.pais}>
-                  <select
-                    name="pais"
-                    value={form.pais}
-                    onChange={handleChange}
-                    className={editableStyles}
-                  >
-                    <option value="">Selecciona un país</option>
-                    {PAISES.map((pais) => (
-                      <option key={pais} value={pais}>
-                        {pais}
-                      </option>
-                    ))}
-                  </select>
-                </FieldRow>
-
-                <FieldRow label="Género" error={errors.genero}>
-                  <select
-                    name="genero"
-                    value={form.genero}
-                    onChange={handleChange}
-                    className={editableStyles}
-                  >
-                    <option value="">Selecciona un género</option>
-                    {GENEROS.map((genero) => (
-                      <option key={genero} value={genero}>
-                        {genero}
-                      </option>
-                    ))}
-                  </select>
-                </FieldRow>
-
-                <FieldRow label="Dirección" error={errors.direccion}>
-                  <input
-                    name="direccion"
-                    type="text"
-                    value={form.direccion}
-                    onChange={handleChange}
-                    placeholder="Ingresa tu dirección"
-                    className={editableStyles}
-                  />
-                </FieldRow>
-              </div>
-
-              <div className="mt-8 flex flex-col items-center gap-3 md:items-end">
-                {message && (
-                  <p
-                    className={`text-center text-sm font-medium md:text-right ${message.includes("correctamente")
-                        ? "text-green-600"
-                        : "text-red-500"
-                      }`}
-                  >
-                    {message}
-                  </p>
-                )}
-
-                <button
-                  type="button"
-                  onClick={handleSubmit}
-                  disabled={isSaving}
-                  className={`w-full rounded-md px-6 py-3 text-sm font-semibold text-white sm:w-auto ${isSaving
-                      ? "cursor-not-allowed bg-gray-400"
-                      : "bg-orange-500 hover:bg-orange-600"
-                    }`}
-                >
-                  {isSaving ? "Guardando..." : "Guardar Cambios"}
-                </button>
-              </div>
-            </div>
+      <div className="flex flex-col gap-8 md:flex-row md:items-start md:gap-12">
+        <aside className="flex w-full flex-col items-center md:w-1/3">
+          <div className="flex h-28 w-28 items-center justify-center rounded-full bg-[#f7f0ec] text-5xl text-gray-500 sm:h-32 sm:w-32">
+            👤
           </div>
-        </section>
+
+          <p className="mt-4 text-center text-xl font-bold text-gray-900">
+            {sessionData.nombre}
+          </p>
+          <p className="break-all text-center text-sm text-gray-600">
+            {sessionData.email}
+          </p>
+        </aside>
+
+        <div className="w-full md:w-2/3">
+          <div className="space-y-4 sm:space-y-5">
+            <FieldRow label="Nombre Completo">
+              <input
+                type="text"
+                value={sessionData.nombre}
+                disabled
+                className={readonlyStyles}
+              />
+            </FieldRow>
+
+            <FieldRow label="E-mail">
+              <input
+                type="email"
+                value={sessionData.email}
+                disabled
+                className={readonlyStyles}
+              />
+            </FieldRow>
+
+            <FieldRow label="Teléfono">
+              <input
+                type="text"
+                value={sessionData.telefono}
+                disabled
+                className={readonlyStyles}
+              />
+            </FieldRow>
+
+            <FieldRow label="País" error={errors.pais}>
+              <select
+                name="pais"
+                value={form.pais}
+                onChange={handleChange}
+                className={editableStyles}
+              >
+                <option value="">Selecciona un país</option>
+                {PAISES.map((pais) => (
+                  <option key={pais} value={pais}>
+                    {pais}
+                  </option>
+                ))}
+              </select>
+            </FieldRow>
+
+            <FieldRow label="Género" error={errors.genero}>
+              <select
+                name="genero"
+                value={form.genero}
+                onChange={handleChange}
+                className={editableStyles}
+              >
+                <option value="">Selecciona un género</option>
+                {GENEROS.map((genero) => (
+                  <option key={genero} value={genero}>
+                    {genero}
+                  </option>
+                ))}
+              </select>
+            </FieldRow>
+
+            <FieldRow label="Dirección" error={errors.direccion}>
+              <input
+                name="direccion"
+                type="text"
+                value={form.direccion}
+                onChange={handleChange}
+                placeholder="Ingresa tu dirección"
+                className={editableStyles}
+              />
+            </FieldRow>
+          </div>
+
+          <div className="mt-8 flex flex-col items-center gap-3 md:items-end">
+            {message && (
+              <p
+                className={`text-center text-sm font-medium md:text-right ${message.includes("correctamente")
+                    ? "text-green-600"
+                    : "text-red-500"
+                  }`}
+              >
+                {message}
+              </p>
+            )}
+
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={isSaving}
+              className={`w-full rounded-md px-6 py-3 text-sm font-semibold text-white sm:w-auto ${isSaving
+                  ? "cursor-not-allowed bg-gray-400"
+                  : "bg-orange-500 hover:bg-orange-600"
+                }`}
+            >
+              {isSaving ? "Guardando..." : "Guardar Cambios"}
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
 
