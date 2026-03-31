@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "dev:bun": "bun --hot src/index.ts",
     "dev": "bun --hot src/index.ts",
     "build": "tsc",
     "lint": "eslint .",
