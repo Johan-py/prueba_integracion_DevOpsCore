@@ -10,8 +10,11 @@ interface BannerData {
 }
 
 const fetchBanners = async (): Promise<BannerData[]> => {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-
+  const apiUrl =
+  process.env.NEXT_PUBLIC_API_URL ??
+  (process.env.NODE_ENV === "development"
+    ? "http://localhost:5000"
+    : "https://prop-bol-backend.vercel.app");
   try {
     const response = await fetch(`${apiUrl}/api/banners`, {
       // Revalidación ISR

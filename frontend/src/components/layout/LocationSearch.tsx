@@ -19,6 +19,7 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
   const [suggestions, setSuggestions] = useState<Location[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const isSelected = value.includes("Bolivia");
@@ -37,28 +38,56 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
   }, []);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const fetchLocations = async () => {
       if (value.trim().length < 2 || isSelected) {
         setSuggestions([]);
+        setError(null);
+        setIsOpen(false);
         return;
       }
+
       setIsLoading(true);
+      setError(null);
+
       try {
+        const apiBaseUrl =
+  process.env.NEXT_PUBLIC_API_URL ??
+  (process.env.NODE_ENV === "development"
+    ? "http://localhost:5000"
+    : "https://prop-bol-backend.vercel.app");
+
         const res = await fetch(
-          `http://localhost:5000/api/locations/search?q=${encodeURIComponent(value)}`,
+          `${apiBaseUrl}/api/locations/search?q=${encodeURIComponent(value)}`,
+          { signal: controller.signal }
         );
-        if (res.ok) {
-          const data = await res.json();
-          setSuggestions(data);
-          setIsOpen(true);
+
+        if (!res.ok) {
+          throw new Error(`Error HTTP ${res.status}`);
         }
-      } catch {
+
+        const data = await res.json();
+        setSuggestions(data);
+        setIsOpen(true);
+      } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") {
+          return;
+        }
+        console.error(err);
+        setError("No se pudieron obtener ubicaciones. Intenta nuevamente.");
+        setSuggestions([]);
+        setIsOpen(false);
       } finally {
         setIsLoading(false);
       }
     };
+
     const timer = setTimeout(fetchLocations, 300);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
   }, [value, isSelected]);
 
   return (
@@ -111,6 +140,10 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
           )
         )}
       </div>
+
+      {error && (
+        <p className="text-xs text-red-500 mt-1 px-2">{error}</p>
+      )}
 
       {isOpen && suggestions.length > 0 && (
         <div className="absolute z-[100] w-full mt-2 bg-white border border-stone-200 rounded-xl shadow-xl overflow-hidden">
