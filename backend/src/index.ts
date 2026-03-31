@@ -87,6 +87,20 @@ app.patch(
 );
 app.delete("/notificaciones/:id", fakeAuth, deleteNotificationController);
 
+
+app.post("/api/publicaciones", (req, res) => {
+  const nuevaPublicacion = req.body
+  res.json({ message: "Publicación creada", publicacion: nuevaPublicacion });
+});
+
+app.get("/api/publicaciones", (req, res) => {
+  res.json({ message: "Listado de publicaciones" });
+})
+
+app.get("/api/publicaciones/gratis", (req, res) => {
+  res.json({ message: "Listado de publicaciones gratuitas" });
+});
+
 const PORT = 5000;
 
 app.listen(PORT, () => {
