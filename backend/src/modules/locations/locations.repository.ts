@@ -1,28 +1,49 @@
-import { PrismaClient } from "@prisma/client";
-import { Pool } from "pg";
-import { PrismaPg } from "@prisma/adapter-pg";
+import { prisma } from "../../lib/prisma.js";
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
+type LocationSearchResult = {
+  id: number;
+  nombre: string;
+  municipio: string;
+  departamento: string;
+};
+
+type LocationRow = {
+  id: number;
+  zona: string | null;
+  ciudad: string | null;
+  direccion: string | null;
+};
 
 export class LocationsRepository {
-  async findByName(query: string) {
-    return await prisma.ubicacion_maestra.findMany({
+  async findByName(query: string): Promise<LocationSearchResult[]> {
+    const trimmedQuery = query.trim();
+
+    if (!trimmedQuery) {
+      return [];
+    }
+
+    const locations: LocationRow[] = await prisma.ubicacionInmueble.findMany({
       where: {
         OR: [
-          { nombre: { contains: query, mode: "insensitive" } }, //Esta es la zona porsiacaso en la bd esta como nombre
-          { municipio: { contains: query, mode: "insensitive" } },
+          { zona: { contains: trimmedQuery, mode: "insensitive" } },
+          { ciudad: { contains: trimmedQuery, mode: "insensitive" } },
+          { direccion: { contains: trimmedQuery, mode: "insensitive" } },
         ],
       },
       select: {
         id: true,
-        nombre: true,
-        municipio: true,
-        departamento: true,
+        zona: true,
+        ciudad: true,
+        direccion: true,
       },
-      orderBy: { popularidad: "desc" },
       take: 5,
     });
+
+    return locations.map((location: LocationRow) => ({
+      id: location.id,
+      nombre: location.zona ?? location.direccion ?? location.ciudad ?? "",
+      municipio: location.ciudad ?? "",
+      departamento: "",
+    }));
   }
 }
