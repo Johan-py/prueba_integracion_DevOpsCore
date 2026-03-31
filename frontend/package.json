@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.101.0",
-    
     "@prisma/adapter-pg": "^7.6.0",
     "@prisma/client": "^7.6.0",
     "clsx": "^2.1.0",
