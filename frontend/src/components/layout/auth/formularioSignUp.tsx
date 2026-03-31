@@ -637,13 +637,13 @@ export default function SignUpForm() {
               </button>
             </div>
 
-            <button
-              type="button"
-              className="flex w-full items-center justify-center gap-2 rounded-md border border-[#d6d3d1] bg-white px-4 py-2.5 text-[12px] font-medium text-[#292524] transition hover:bg-[#fafaf9]"
-            >
-              <Chrome size={14} />
-              Regístrate con Google
-            </button>
+          <button
+            type="button"
+            className="flex w-full items-center justify-center gap-2 rounded-md border border-gray-300 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+          <span className="text-base font-bold">G</span>
+            Continuar con Google
+          </button>
 
             <button
               type="button"
