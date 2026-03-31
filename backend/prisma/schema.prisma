@@ -15,6 +15,7 @@ model Rol {
 }
 
 model Usuario {
+<<<<<<< HEAD
   id                    Int                     @id @default(autoincrement())
   nombre                String
   apellido              String
@@ -42,6 +43,31 @@ model Usuario {
   rol                   Rol                     @relation(fields: [rolId], references: [id])
   verificacion_pago     verificacion_pago[]
   visitas               Visitor[]
+=======
+  id             Int            @id @default(autoincrement())
+  nombre         String
+  apellido       String
+  pais           String?
+  avatar         String?
+  genero         Genero?
+  direccion      String?
+  correo         String         @unique
+  password       String
+  activo         Boolean        @default(true)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  fechaRegistro  DateTime       @default(now())
+  rolId          Int
+  cambioEmails   CambioEmail[]
+  inmuebles      Inmueble[]
+  notificaciones Notificacion[]
+  perfil         Perfil?
+  publicaciones  Publicacion[]
+  sesiones       Sesion[]
+  telefonos      Telefono[]
+  rol            Rol            @relation(fields: [rolId], references: [id])
+  visitas        Visitor[]
+>>>>>>> 39081d342c5d75c0db87b1b0a3fb0b9c3d750d0d
 
   @@index([correo])
   @@map("usuario")
@@ -79,7 +105,10 @@ model Notificacion {
   fechaLectura  DateTime?
   id            Int       @id @default(autoincrement())
   usuarioId     Int
+<<<<<<< HEAD
   archivada     Boolean   @default(false)
+=======
+>>>>>>> 39081d342c5d75c0db87b1b0a3fb0b9c3d750d0d
   usuario       Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
   @@map("notificacion")
@@ -297,6 +326,7 @@ model public_Telefono {
   @@map("Telefono")
 }
 
+<<<<<<< HEAD
 model bitacora_pagos {
   id               Int               @id @default(autoincrement())
   id_usuario       Int?
@@ -363,6 +393,8 @@ model transacciones {
   @@index([id_usuario], map: "idx_transacciones_usuario_id")
 }
 
+=======
+>>>>>>> 39081d342c5d75c0db87b1b0a3fb0b9c3d750d0d
 model ubicacion_maestra {
   id                 Int                 @id @default(autoincrement())
   departamento       String
@@ -376,6 +408,7 @@ model ubicacion_maestra {
 
   @@index([nombre])
 }
+<<<<<<< HEAD
 
 model verificacion_pago {
   id                     Int            @id @default(autoincrement())
@@ -386,6 +419,8 @@ model verificacion_pago {
   usuario                Usuario        @relation(fields: [id_admin], references: [id], onDelete: NoAction, onUpdate: NoAction)
   transacciones          transacciones? @relation(fields: [id_transaccion], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
+=======
+>>>>>>> 39081d342c5d75c0db87b1b0a3fb0b9c3d750d0d
 
 enum Genero {
   MASCULINO
