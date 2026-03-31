@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 type ProfileSessionData = {
@@ -66,7 +65,9 @@ export default function ProfileCard() {
     }
 
     const savedSessionData = localStorage.getItem("profileSessionData");
-    const savedComplementaryData = localStorage.getItem("profileComplementaryData");
+    const savedComplementaryData = localStorage.getItem(
+      "profileComplementaryData"
+    );
 
     if (savedSessionData) {
       setSessionData(JSON.parse(savedSessionData));
@@ -139,7 +140,6 @@ export default function ProfileCard() {
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
       localStorage.setItem("profileComplementaryData", JSON.stringify(form));
-
       setMessage("Datos actualizados correctamente.");
     } catch {
       setMessage(
@@ -156,28 +156,29 @@ export default function ProfileCard() {
   const editableStyles = `${inputBaseStyles} focus:border-orange-400`;
 
   return (
-    <div className="min-h-screen bg-[#ececec] px-4 py-6 md:px-8">
-      <div className="mx-auto max-w-6xl">
-
-        <section className="rounded-2xl bg-white p-6 shadow md:p-10">
-          <h1 className="mb-8 text-center text-2xl font-bold text-gray-900">
+    <div className="min-h-screen bg-[#ececec] px-3 py-4 sm:px-4 md:px-8 md:py-6">
+      <div className="mx-auto max-w-5xl">
+        <section className="rounded-2xl bg-white p-4 shadow sm:p-6 md:p-10">
+          <h1 className="mb-6 text-center text-2xl font-bold text-gray-900 md:mb-10 md:text-3xl">
             Datos Personales
           </h1>
 
-          <div className="flex flex-col gap-10 md:flex-row md:items-start">
+          <div className="flex flex-col gap-8 md:flex-row md:items-start md:gap-12">
             <aside className="flex w-full flex-col items-center md:w-1/3">
-              <div className="flex h-32 w-32 items-center justify-center rounded-full bg-[#f7f0ec] text-5xl text-gray-500">
+              <div className="flex h-28 w-28 items-center justify-center rounded-full bg-[#f7f0ec] text-5xl text-gray-500 sm:h-32 sm:w-32">
                 👤
               </div>
 
-              <p className="mt-4 text-lg font-bold text-gray-900">
+              <p className="mt-4 text-center text-xl font-bold text-gray-900">
                 {sessionData.nombre}
               </p>
-              <p className="text-sm text-gray-600">{sessionData.email}</p>
+              <p className="break-all text-center text-sm text-gray-600">
+                {sessionData.email}
+              </p>
             </aside>
 
             <div className="w-full md:w-2/3">
-              <div className="space-y-4">
+              <div className="space-y-4 sm:space-y-5">
                 <FieldRow label="Nombre Completo">
                   <input
                     type="text"
@@ -252,7 +253,7 @@ export default function ProfileCard() {
               <div className="mt-8 flex flex-col items-center gap-3 md:items-end">
                 {message && (
                   <p
-                    className={`text-sm font-medium ${message.includes("correctamente")
+                    className={`text-center text-sm font-medium md:text-right ${message.includes("correctamente")
                         ? "text-green-600"
                         : "text-red-500"
                       }`}
@@ -265,7 +266,7 @@ export default function ProfileCard() {
                   type="button"
                   onClick={handleSubmit}
                   disabled={isSaving}
-                  className={`rounded-md px-6 py-2 text-sm font-semibold text-white transition ${isSaving
+                  className={`w-full rounded-md px-6 py-3 text-sm font-semibold text-white sm:w-auto ${isSaving
                       ? "cursor-not-allowed bg-gray-400"
                       : "bg-orange-500 hover:bg-orange-600"
                     }`}
@@ -291,15 +292,15 @@ function FieldRow({ label, children, error }: FieldRowProps) {
   return (
     <div>
       <div className="flex flex-col gap-2 md:flex-row md:items-center">
-        <label className="text-sm font-semibold text-gray-800 md:w-40">
+        <label className="text-sm font-semibold text-gray-800 md:w-44 md:shrink-0">
           {label}:
         </label>
 
-        <div className="flex-1">{children}</div>
+        <div className="w-full flex-1">{children}</div>
       </div>
 
       {error && (
-        <p className="mt-1 text-sm text-red-500 md:ml-40">
+        <p className="mt-1 text-sm text-red-500 md:ml-44">
           {error}
         </p>
       )}
