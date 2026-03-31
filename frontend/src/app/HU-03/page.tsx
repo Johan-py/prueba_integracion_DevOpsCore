@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function Page() {
+export default function Page({ usadas = 0, total = 3 }) {
   const router = useRouter();
   const [visible, setVisible] = useState(false);
 
@@ -54,8 +54,8 @@ export default function Page() {
               Tus publicaciones restantes:
               </p>
               <p className="text-red-500 font-semibold text-sm">
-              0 de 3 restantes
-             </p>
+              {usadas} de {total} utilizadas
+              </p>
              </div>
             <div className="w-8 h-8 flex items-center justify-center bg-orange-200 rounded-md">
               🔒
