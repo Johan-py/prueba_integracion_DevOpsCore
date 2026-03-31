@@ -1,5 +1,6 @@
 import express from 'express'
 import cors from 'cors'
+import type { VercelRequest, VercelResponse } from '@vercel/node'
 import {
   deleteNotificationController,
   getNotificationsController,
@@ -10,13 +11,12 @@ import {
 import { BannersController } from './modules/banners/banners.controller.js'
 import locationSearchHandler from '../api/locations/search.js'
 import { FiltersHomepageController } from './modules/filtershomepage/filtershomepage.controller.js'
-import type { VercelRequest, VercelResponse } from '@vercel/node'
 import {
   registerController,
   loginController,
   logoutController
 } from './modules/auth/auth.controller.js'
-import { requireAuth } from './modules/auth/auth.middleware.js'
+import { requireAuth } from './middleware/auth.middleware.js'
 import meHandler from '../api/auth/me.js'
 
 const app = express()
@@ -46,6 +46,7 @@ app.post('/api/auth/logout', logoutController)
 
 app.get('/api/filters', filtersController.getFilters)
 app.get('/api/banners', (req, res) => bannersController.getBanners(req, res))
+
 app.get('/api/locations/search', async (req, res) => {
   await locationSearchHandler(req as unknown as VercelRequest, res as unknown as VercelResponse)
 })
