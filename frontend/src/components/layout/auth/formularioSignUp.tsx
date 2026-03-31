@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Eye,
   EyeOff,
@@ -9,11 +9,11 @@ import {
   Phone,
   Lock,
   AlertCircle,
-  Chrome,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { validateEmail, validatePassword } from "@/lib/validators/auth";
+import GoogleRegisterButton from "@/components/layout/auth/google/GoogleRegisterButton";
 
 type FormData = {
   email: string;
@@ -379,7 +379,6 @@ export default function SignUpForm() {
         localStorage.setItem("token", data.token);
       }
 
-      // Guardar usuario para que el Navbar lo detecte
       if (data?.user) {
         const userData = {
           name: `${data.user.nombre} ${data.user.apellido}`,
@@ -413,6 +412,59 @@ export default function SignUpForm() {
       setIsSubmitting(false);
     }
   };
+
+  const handleGoogleCredential = useCallback(
+    async (credential: string) => {
+      setServerError("");
+      setIsSubmitting(true);
+
+      try {
+        console.log("Credencial JWT de Google:", credential);
+
+        // Aquí luego conectarás con tu backend.
+        // Ejemplo futuro:
+        // const response = await fetch(`${API_URL}/api/auth/google/register`, {
+        //   method: "POST",
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //   },
+        //   body: JSON.stringify({ credential }),
+        // });
+        //
+        // const data = await response.json();
+        //
+        // if (!response.ok) {
+        //   throw new Error(data?.message || "No se pudo registrar con Google");
+        // }
+        //
+        // if (data?.token) {
+        //   localStorage.setItem("token", data.token);
+        // }
+        //
+        // if (data?.user) {
+        //   localStorage.setItem("propbol_user", JSON.stringify(data.user));
+        //   localStorage.setItem(
+        //     "propbol_session_expires",
+        //     String(Date.now() + 60 * 60 * 1000),
+        //   );
+        // }
+        //
+        // window.dispatchEvent(new Event("propbol:login"));
+        // router.replace("/");
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "No se pudo completar el registro con Google";
+
+        setServerError(message);
+        console.error("Error con Google:", error);
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [],
+  );
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#f5f5f4] px-4 py-8">
@@ -637,13 +689,10 @@ export default function SignUpForm() {
               </button>
             </div>
 
-          <button
-            type="button"
-            className="flex w-full items-center justify-center gap-2 rounded-md border border-gray-300 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
-          <span className="text-base font-bold">G</span>
-            Continuar con Google
-          </button>
+            <GoogleRegisterButton
+              onCredentialReceived={handleGoogleCredential}
+              disabled={isSubmitting}
+            />
 
             <button
               type="button"
