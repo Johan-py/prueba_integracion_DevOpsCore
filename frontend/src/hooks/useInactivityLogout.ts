@@ -3,8 +3,8 @@
 import { useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
-const INACTIVITY_LIMIT_MS = 2* 60 * 1000;
-const WARNING_BEFORE_MS = 1 * 60 * 1000; 
+const INACTIVITY_LIMIT_MS = 20 * 60 * 1000;
+const WARNING_BEFORE_MS = 1 * 60 * 1000;  
 
 const TOKEN_STORAGE_KEY = "token";
 const USER_STORAGE_KEY = "propbol_user";
