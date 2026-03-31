@@ -1,7 +1,8 @@
 'use client'
 import { useState } from 'react'
-export default function MiRegistroPage() {
-  const [datos, setDatos] = useState({
+
+export default function PaginaRegistroInmueble() {
+  const [formulario, setFormulario] = useState({
     titulo: 'Tropico 6 Federaciones',
     operacion: 'ANTICRETO',
     tipoInmueble: '',
@@ -27,7 +28,7 @@ export default function MiRegistroPage() {
       if (value !== '' && Number(value) < 0) return
     }
 
-    setDatos({ ...datos, [name]: value })
+    setFormulario({ ...formulario, [name]: value })
   }
 
   const guardarPropiedad = async () => {
@@ -35,11 +36,11 @@ export default function MiRegistroPage() {
     setMensajeError('')
 
     const incompleto =
-      !datos.titulo.trim() ||
-      !datos.tipoInmueble ||
-      !datos.precio ||
-      !datos.direccion.trim() ||
-      !datos.descripcion.trim()
+      !formulario.titulo.trim() ||
+      !formulario.tipoInmueble ||
+      !formulario.precio ||
+      !formulario.direccion.trim() ||
+      !formulario.descripcion.trim()
 
     if (incompleto) {
       setMensajeError('DEBE LLENAR TODOS LOS CAMPOS OBLIGATORIOS')
@@ -47,44 +48,44 @@ export default function MiRegistroPage() {
       return
     }
 
-    const payload = {
-      titulo: datos.titulo.trim(),
-      tipoAccion: datos.operacion,
-      categoria: datos.tipoInmueble,
-      precio: Number(datos.precio),
-      superficieM2: datos.area ? Number(datos.area) : undefined,
-      nroCuartos: datos.habitaciones ? Number(datos.habitaciones) : undefined,
-      nroBanos: datos.banos ? Number(datos.banos) : 1,
-      descripcion: datos.descripcion.trim(),
-      direccion: datos.direccion.trim(),
-      zona: datos.zona.trim() || 'CENTRO',
-      ciudad: datos.ciudad
+    const datosAEnviar = {
+      titulo: formulario.titulo.trim(),
+      tipoAccion: formulario.operacion,
+      categoria: formulario.tipoInmueble,
+      precio: Number(formulario.precio),
+      superficieM2: formulario.area ? Number(formulario.area) : undefined,
+      nroCuartos: formulario.habitaciones ? Number(formulario.habitaciones) : undefined,
+      nroBanos: formulario.banos ? Number(formulario.banos) : 1,
+      descripcion: formulario.descripcion.trim(),
+      direccion: formulario.direccion.trim(),
+      zona: formulario.zona.trim() || 'CENTRO',
+      ciudad: formulario.ciudad
     }
 
-    console.log('📤 Payload enviado al backend:', payload)
+    console.log('📤 Datos enviados al servidor:', datosAEnviar)
 
     try {
-      const response = await fetch('http://localhost:5000/api/properties', {
+      const respuesta = await fetch('http://localhost:5000/api/properties', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(datosAEnviar)
       })
 
-      const result = await response.json()
+      const resultado = await respuesta.json()
 
-      console.log('📥 Respuesta backend:', result)
+      console.log('📥 Respuesta del servidor:', resultado)
 
-      if (!response.ok) {
-        const erroresBackend =
-          result.errores?.map((e: any) => `• ${e.mensaje}`).join('\n') ||
-          result.mensaje ||
+      if (!respuesta.ok) {
+        const erroresServidor =
+          resultado.errores?.map((e: any) => `• ${e.mensaje}`).join('\n') ||
+          resultado.mensaje ||
           'ERROR AL GUARDAR LA PROPIEDAD'
 
-        console.error('❌ Error backend:', erroresBackend)
+        console.error('❌ Error del servidor:', erroresServidor)
 
-        setMensajeError(erroresBackend)
+        setMensajeError(erroresServidor)
         setEstado('error')
         return
       }
@@ -93,8 +94,8 @@ export default function MiRegistroPage() {
       setEstado('exito')
       setMensajeError('')
     } catch (error) {
-      console.error('🔥 Error fetch:', error)
-      setMensajeError('NO SE PUDO CONECTAR CON EL BACKEND')
+      console.error('🔥 Error de conexión:', error)
+      setMensajeError('NO SE PUDO CONECTAR CON EL SERVIDOR')
       setEstado('error')
     }
   }
@@ -122,7 +123,7 @@ export default function MiRegistroPage() {
             <div className="space-y-10">
               <section>
                 <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] border-b border-gray-200 pb-2 mb-6">
-                  INFORMACION PRINCIPAL
+                  INFORMACIÓN PRINCIPAL
                 </h3>
 
                 <div className="space-y-6">
@@ -132,7 +133,7 @@ export default function MiRegistroPage() {
                     </label>
                     <input
                       name="titulo"
-                      value={datos.titulo}
+                      value={formulario.titulo}
                       onChange={manejarCambio}
                       className="w-full p-3 rounded-xl border border-gray-200 bg-white/70"
                     />
@@ -145,7 +146,7 @@ export default function MiRegistroPage() {
                       </label>
                       <select
                         name="operacion"
-                        value={datos.operacion}
+                        value={formulario.operacion}
                         onChange={manejarCambio}
                         className="w-full p-3 rounded-xl border border-gray-200 bg-white"
                       >
@@ -161,7 +162,7 @@ export default function MiRegistroPage() {
                       </label>
                       <select
                         name="tipoInmueble"
-                        value={datos.tipoInmueble}
+                        value={formulario.tipoInmueble}
                         onChange={manejarCambio}
                         className="w-full p-3 rounded-xl border border-gray-200 bg-white"
                       >
@@ -181,7 +182,7 @@ export default function MiRegistroPage() {
                     <input
                       name="precio"
                       type="number"
-                      value={datos.precio}
+                      value={formulario.precio}
                       onChange={manejarCambio}
                       className="w-full p-3 rounded-xl border border-gray-200"
                     />
@@ -200,7 +201,7 @@ export default function MiRegistroPage() {
                     <input
                       name="area"
                       type="number"
-                      value={datos.area}
+                      value={formulario.area}
                       onChange={manejarCambio}
                       className="w-full p-3 rounded-xl border border-gray-200"
                     />
@@ -211,7 +212,7 @@ export default function MiRegistroPage() {
                     <input
                       name="habitaciones"
                       type="number"
-                      value={datos.habitaciones}
+                      value={formulario.habitaciones}
                       onChange={manejarCambio}
                       className="w-full p-3 rounded-xl border border-gray-200"
                     />
@@ -224,7 +225,7 @@ export default function MiRegistroPage() {
                     <input
                       name="banos"
                       type="number"
-                      value={datos.banos}
+                      value={formulario.banos}
                       onChange={manejarCambio}
                       className="w-full p-3 rounded-xl border border-gray-200"
                     />
@@ -234,7 +235,7 @@ export default function MiRegistroPage() {
                     <label className="block text-[15px] font-bold mb-2">Dirección *</label>
                     <input
                       name="direccion"
-                      value={datos.direccion}
+                      value={formulario.direccion}
                       onChange={manejarCambio}
                       className="w-full p-3 rounded-xl border border-gray-200"
                     />
@@ -245,7 +246,7 @@ export default function MiRegistroPage() {
                   <label className="block text-[15px] font-bold mb-2">Zona</label>
                   <input
                     name="zona"
-                    value={datos.zona}
+                    value={formulario.zona}
                     onChange={manejarCambio}
                     className="w-full p-3 rounded-xl border border-gray-200"
                   />
@@ -256,11 +257,11 @@ export default function MiRegistroPage() {
             <div className="flex flex-col h-full">
               <div className="flex-grow">
                 <label className="block text-[15px] font-bold text-gray-900 mb-2">
-                  DESCRIPCION DETALLADA *
+                  DESCRIPCIÓN DETALLADA *
                 </label>
                 <textarea
                   name="descripcion"
-                  value={datos.descripcion}
+                  value={formulario.descripcion}
                   onChange={manejarCambio}
                   className="w-full p-4 rounded-2xl border border-gray-300 h-72 bg-white"
                   placeholder="Casa de dos plantas, amplia y moderna ubicada en una zona tranquila..."
