@@ -3,11 +3,11 @@ import FilterBar from "@/components/filters/FilterBar";
 
 export default function FiltersPage() {
 
-  const handleSearch = async (filtros: { tipos: string[]; modo: string }) => {
+  const handleSearch = async (filtros: { tipos: string[]; modo: string[] }) => {
 
     const params = new URLSearchParams();
     filtros.tipos.forEach(tipo => params.append("categoria", tipo));
-    params.append("tipoAccion", filtros.modo);
+    filtros.modo.forEach(modo => params.append("tipoAccion", modo));
 
     const response = await fetch(
       `http://localhost:5000/api/properties/search?${params.toString()}`
