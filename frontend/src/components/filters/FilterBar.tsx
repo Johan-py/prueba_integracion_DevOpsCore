@@ -22,7 +22,11 @@ export default function FilterBar({ onSearch }: FilterBarProps) {
     if (saved) {
       const parsed = JSON.parse(saved)
       if (parsed.tipoInmueble) setTipoInmueble(parsed.tipoInmueble[0] || "Cualquier tipo")
-      if (parsed.modoInmueble) setModosSeleccionados([parsed.modoInmueble])
+      if (parsed.modoInmueble) {
+      setModosSeleccionados(Array.isArray(parsed.modoInmueble) 
+        ? parsed.modoInmueble 
+        : [parsed.modoInmueble])
+    }
       if (parsed.query) setUbicacionTexto(parsed.query)
     }
   }, [])
@@ -35,7 +39,7 @@ export default function FilterBar({ onSearch }: FilterBarProps) {
 
     updateFilters({
       tipoInmueble: [tipoInmueble.toUpperCase()],
-      modoInmueble: modosSeleccionados[0], // Enviamos el primero para compatibilidad
+      modoInmueble: modosSeleccionados, // Enviamos el primero para compatibilidad
       query: ubicacionTexto,
       updatedAt: new Date().toISOString()
     })

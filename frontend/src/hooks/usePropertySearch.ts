@@ -21,8 +21,10 @@ export function usePropertySearch() {
       })
     }
 
-    if (filters.modoInmueble) {
-      params.append("tipoAccion", filters.modoInmueble)
+    if (filters.modoInmueble && Array.isArray(filters.modoInmueble)) {
+      filters.modoInmueble.forEach(modo => {
+        params.append("tipoAccion", modo)
+      })
     }
 
     try {
