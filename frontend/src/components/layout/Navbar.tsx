@@ -1,36 +1,36 @@
-'use client'
+"use client";
 
-import { useEffect, useRef, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { Bell, CheckCheck, Loader2, Trash2 } from 'lucide-react'
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Bell, CheckCheck, Loader2, Trash2 } from "lucide-react";
 
-import Logo from '../navbar/Logo'
-import NavLinks from '../navbar/NavLinks'
-import UserMenu from '../navbar/UserMenu'
-import LogoutModal from '../navbar/LogoutModal'
-import { useNotifications } from '@/hooks/useNotifications'
-import type { NotificationFilter } from '@/types/notification'
+import Logo from "../navbar/Logo";
+import NavLinks from "../navbar/NavLinks";
+import UserMenu from "../navbar/UserMenu";
+import LogoutModal from "../navbar/LogoutModal";
+import { useNotifications } from "@/hooks/useNotifications";
+import type { NotificationFilter } from "@/types/notification";
 
 export type User = {
-  name: string
-  email: string
-}
+  name: string;
+  email: string;
+};
 
-const USER_STORAGE_KEY = 'propbol_user'
-const SESSION_EXPIRES_KEY = 'propbol_session_expires'
-const SESSION_DURATION_MS = 60 * 60 * 1000
+const USER_STORAGE_KEY = "propbol_user";
+const SESSION_EXPIRES_KEY = "propbol_session_expires";
+const SESSION_DURATION_MS = 60 * 60 * 1000;
 
-const filters: NotificationFilter[] = ['todas', 'leida', 'no leida']
+const filters: NotificationFilter[] = ["todas", "leida", "no leida"];
 
 export default function Navbar() {
-  const router = useRouter()
-  const panelRef = useRef<HTMLDivElement | null>(null)
+  const router = useRouter();
+  const panelRef = useRef<HTMLDivElement | null>(null);
 
-  const [user, setUser] = useState<User | null>(null)
-  const [isPanelOpen, setIsPanelOpen] = useState(false)
-  const [showLogoutModal, setShowLogoutModal] = useState(false)
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [user, setUser] = useState<User | null>(null);
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const {
     open,
@@ -50,116 +50,150 @@ export default function Navbar() {
     hasMore,
     refreshNotifications,
     isLoggedIn,
-    setIsLoggedIn
-  } = useNotifications()
+    setIsLoggedIn,
+  } = useNotifications();
 
   const clearSession = () => {
-    localStorage.removeItem(USER_STORAGE_KEY)
-    localStorage.removeItem(SESSION_EXPIRES_KEY)
-    setUser(null)
-    setIsPanelOpen(false)
-    setShowLogoutModal(false)
-  }
+    localStorage.removeItem(USER_STORAGE_KEY);
+    localStorage.removeItem(SESSION_EXPIRES_KEY);
+    localStorage.removeItem("token");
+    setUser(null);
+    setIsPanelOpen(false);
+    setShowLogoutModal(false);
+    window.dispatchEvent(new Event("propbol:session-changed"));
+  };
 
   const isSessionExpired = () => {
-    const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY)
-    if (!expiresAt) return true
-    return Date.now() > Number(expiresAt)
-  }
+    const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY);
+    if (!expiresAt) return true;
+    return Date.now() > Number(expiresAt);
+  };
 
   const restoreSession = () => {
-    const savedUser = localStorage.getItem(USER_STORAGE_KEY)
-    const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY)
+    const savedUser = localStorage.getItem(USER_STORAGE_KEY);
+    const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY);
 
     if (!savedUser || !expiresAt) {
-      clearSession()
-      return
+      clearSession();
+      return;
     }
 
     if (Date.now() > Number(expiresAt)) {
-      clearSession()
-      return
+      clearSession();
+      return;
     }
-
-    setUser(JSON.parse(savedUser))
-  }
+    try {
+      setUser(JSON.parse(savedUser));
+    } catch {
+      clearSession();
+    }
+  };
 
   useEffect(() => {
-    restoreSession()
-  }, [])
+    restoreSession();
+
+    const handleSessionChange = () => restoreSession();
+
+    window.addEventListener("propbol:login", handleSessionChange);
+    window.addEventListener("propbol:session-changed", handleSessionChange);
+
+    return () => {
+      window.removeEventListener("propbol:login", handleSessionChange);
+      window.removeEventListener(
+        "propbol:session-changed",
+        handleSessionChange,
+      );
+    };
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (!panelRef.current) return
+      if (!panelRef.current) return;
 
       if (!panelRef.current.contains(event.target as Node)) {
-        setIsPanelOpen(false)
+        setIsPanelOpen(false);
       }
-    }
+    };
 
-    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [])
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
       if (user && isSessionExpired()) {
-        clearSession()
-        router.push('/')
+        clearSession();
+        router.push("/");
       }
-    }, 10000)
+    }, 10000);
 
-    return () => clearInterval(interval)
-  }, [user, router])
+    return () => clearInterval(interval);
+  }, [user, router]);
 
   const togglePanel = () => {
     if (user && isSessionExpired()) {
-      clearSession()
-      router.push('/')
-      return
+      clearSession();
+      router.push("/");
+      return;
     }
 
-    setIsPanelOpen((prev) => !prev)
-  }
+    setIsPanelOpen((prev) => !prev);
+  };
+  const handleLoginRedirect = () => {
+    router.push("/sign-in");
+  };
 
   const handleLoginMock = () => {
     const mockUser: User = {
-      name: 'Juan Perez',
-      email: 'juan.perez@gmail.com'
-    }
+      name: "Juan Perez",
+      email: "juan.perez@gmail.com",
+    };
 
-    const expiresAt = Date.now() + SESSION_DURATION_MS
+    const expiresAt = Date.now() + SESSION_DURATION_MS;
 
-    setUser(mockUser)
-    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(mockUser))
-    localStorage.setItem(SESSION_EXPIRES_KEY, String(expiresAt))
-    setIsLoggedIn(true)
-  }
+    setUser(mockUser);
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(mockUser));
+    localStorage.setItem(SESSION_EXPIRES_KEY, String(expiresAt));
+    setIsLoggedIn(true);
+  };
 
   const handleOpenLogoutModal = () => {
-    setShowLogoutModal(true)
-  }
+    setShowLogoutModal(true);
+  };
 
   const handleCancelLogout = () => {
-    if (isLoggingOut) return
-    setShowLogoutModal(false)
-  }
+    if (isLoggingOut) return;
+    setShowLogoutModal(false);
+  };
 
-  const handleConfirmLogout = () => {
-    if (isLoggingOut) return
+  const handleConfirmLogout = async () => {
+    if (isLoggingOut) return;
 
-    setIsLoggingOut(true)
+    setIsLoggingOut(true);
 
-    setTimeout(() => {
-      clearSession()
-      setIsLoggedIn(false)
-      setIsLoggingOut(false)
-      router.push('/')
-    }, 400)
-  }
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      try {
+        await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000"}/api/auth/logout`,
+          {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+      } catch {
+        // si falla la red igual limpiamos la sesión local
+      }
+    }
+
+    clearSession();
+    setIsLoggingOut(false);
+    router.push("/");
+  };
 
   return (
     <>
@@ -183,7 +217,7 @@ export default function Navbar() {
 
                   {unreadCount > 0 ? (
                     <span className="absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1 text-xs font-semibold text-white">
-                      {unreadCount > 99 ? '99+' : unreadCount}
+                      {unreadCount > 99 ? "99+" : unreadCount}
                     </span>
                   ) : null}
                 </button>
@@ -191,7 +225,9 @@ export default function Navbar() {
                 {open ? (
                   <div className="absolute right-0 top-12 z-50 w-80 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
                     <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
-                      <h3 className="text-sm font-semibold text-gray-800">Notificaciones</h3>
+                      <h3 className="text-sm font-semibold text-gray-800">
+                        Notificaciones
+                      </h3>
 
                       {isLoggedIn ? (
                         <button
@@ -230,15 +266,15 @@ export default function Navbar() {
                               onClick={() => setFilter(item)}
                               className={`rounded-full px-3 py-1 text-xs font-medium transition ${
                                 filter === item
-                                  ? 'bg-blue-600 text-white'
-                                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                  ? "bg-blue-600 text-white"
+                                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                               }`}
                             >
-                              {item === 'todas'
-                                ? 'Todas'
-                                : item === 'leida'
-                                  ? 'Leídas'
-                                  : 'No leídas'}
+                              {item === "todas"
+                                ? "Todas"
+                                : item === "leida"
+                                  ? "Leídas"
+                                  : "No leídas"}
                             </button>
                           ))}
                         </div>
@@ -246,13 +282,13 @@ export default function Navbar() {
                         <div
                           className="max-h-80 overflow-y-auto"
                           onScroll={(e) => {
-                            const target = e.currentTarget
+                            const target = e.currentTarget;
                             const reachedBottom =
                               target.scrollTop + target.clientHeight >=
-                              target.scrollHeight - 10
+                              target.scrollHeight - 10;
 
                             if (reachedBottom && hasMore && !isLoadingMore) {
-                              void loadMoreNotifications()
+                              void loadMoreNotifications();
                             }
                           }}
                         >
@@ -266,7 +302,9 @@ export default function Navbar() {
                               <p className="text-sm text-red-500">{error}</p>
                               <button
                                 type="button"
-                                onClick={() => void refreshNotifications(filter)}
+                                onClick={() =>
+                                  void refreshNotifications(filter)
+                                }
                                 className="mt-3 rounded border border-gray-300 px-3 py-1 text-sm text-gray-700 transition hover:bg-gray-50"
                               >
                                 Reintentar
@@ -282,20 +320,21 @@ export default function Navbar() {
                                 <div
                                   key={notification.id}
                                   className={`border-b border-gray-100 px-4 py-3 transition hover:bg-gray-50 ${
-                                    notification.status === 'no leida'
-                                      ? 'bg-blue-50'
-                                      : 'bg-white'
+                                    notification.status === "no leida"
+                                      ? "bg-blue-50"
+                                      : "bg-white"
                                   }`}
                                 >
                                   <div className="flex items-start justify-between gap-3">
                                     <div className="min-w-0 flex-1">
                                       <p className="text-sm font-semibold text-gray-800">
-                                        {notification.title?.trim() || '(Sin título)'}
+                                        {notification.title?.trim() ||
+                                          "(Sin título)"}
                                       </p>
 
                                       <p className="mt-1 text-sm text-gray-600">
                                         {notification.description?.trim() ||
-                                          '(Sin descripción disponible)'}
+                                          "(Sin descripción disponible)"}
                                       </p>
 
                                       <span className="mt-2 inline-block text-[10px] uppercase text-gray-400">
@@ -304,10 +343,12 @@ export default function Navbar() {
                                     </div>
 
                                     <div className="flex shrink-0 items-center gap-2">
-                                      {notification.status === 'no leida' ? (
+                                      {notification.status === "no leida" ? (
                                         <button
                                           type="button"
-                                          onClick={() => void markAsRead(notification.id)}
+                                          onClick={() =>
+                                            void markAsRead(notification.id)
+                                          }
                                           className="text-xs text-blue-500 transition hover:text-blue-600"
                                         >
                                           Leer
@@ -316,7 +357,11 @@ export default function Navbar() {
 
                                       <button
                                         type="button"
-                                        onClick={() => void deleteNotification(notification.id)}
+                                        onClick={() =>
+                                          void deleteNotification(
+                                            notification.id,
+                                          )
+                                        }
                                         className="text-xs text-red-500 transition hover:text-red-600"
                                         aria-label="Eliminar notificación"
                                       >
@@ -356,7 +401,7 @@ export default function Navbar() {
                   isPanelOpen={isPanelOpen}
                   onTogglePanel={togglePanel}
                   onClosePanel={() => setIsPanelOpen(false)}
-                  onLogin={handleLoginMock}
+                  onLogin={handleLoginRedirect}
                   onOpenLogoutModal={handleOpenLogoutModal}
                 />
               </div>
@@ -372,5 +417,5 @@ export default function Navbar() {
         onConfirm={handleConfirmLogout}
       />
     </>
-  )
+  );
 }

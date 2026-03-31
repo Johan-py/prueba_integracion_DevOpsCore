@@ -1,27 +1,34 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { CheckCircle } from 'lucide-react'
+import { useEffect, useState } from "react";
+import { CheckCircle } from "lucide-react";
+
+const STORAGE_KEY = "register_success_message";
+const TOAST_DURATION_MS = 5000;
 
 export default function RegisterSuccessToast() {
-  const [message, setMessage] = useState('')
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
-    const savedMessage = sessionStorage.getItem('register_success_message')
+    const savedMessage = sessionStorage.getItem(STORAGE_KEY);
 
-    if (!savedMessage) return
+    if (savedMessage) {
+      setMessage(savedMessage);
+      sessionStorage.removeItem(STORAGE_KEY);
+    }
+  }, []);
 
-    setMessage(savedMessage)
-    sessionStorage.removeItem('register_success_message')
+  useEffect(() => {
+    if (!message) return;
 
     const timeout = window.setTimeout(() => {
-      setMessage('')
-    }, 3500)
+      setMessage("");
+    }, TOAST_DURATION_MS);
 
-    return () => window.clearTimeout(timeout)
-  }, [])
+    return () => window.clearTimeout(timeout);
+  }, [message]);
 
-  if (!message) return null
+  if (!message) return null;
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex min-w-[280px] items-start gap-3 border-l-4 border-emerald-400 bg-white px-4 py-3 shadow-lg">
@@ -31,5 +38,5 @@ export default function RegisterSuccessToast() {
         <p className="text-xs text-[#57534e]">{message}</p>
       </div>
     </div>
-  )
+  );
 }

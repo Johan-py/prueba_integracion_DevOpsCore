@@ -1,6 +1,6 @@
-import express from 'express'
-import cors from 'cors'
-import type { NextFunction, Request, Response } from 'express'
+import express from "express";
+import cors from "cors";
+import type { NextFunction, Request, Response } from "express";
 import {
   deleteNotificationController,
   getNotificationsController,
@@ -12,44 +12,45 @@ import { BannersController } from './modules/banners/banners.controller.js'
 import locationSearchHandler from '../api/locations/search.js'
 import { FiltersHomepageController } from './modules/filtershomepage/filtershomepage.controller.js'
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { registerController, loginController } from './modules/auth/auth.controller.js'
-
-const app = express()
+import { registerController, loginController, logoutController } from './modules/auth/auth.controller.js'
+import meHandler from "../api/auth/me.js";
+import correoverificacionRoutes from './modules/perfil/correoverificacion.routes.js';
+const app = express();
 app.use(
   cors({
-    origin: 'http://localhost:3000',
-    methods: ['GET', 'POST'],
-    credentials: true
-  })
-)
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+    credentials: true,
+  }),
+);
 
 app.use(
   cors({
-    origin: ['http://localhost:3000', 'http://localhost:3001'],
-    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-  })
-)
+    origin: ["http://localhost:3000", "http://localhost:3001"],
+    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
 
-app.use(express.json())
+app.use(express.json());
 
 type AuthenticatedRequest = Request & {
   user?: {
-    id: number
-    email?: string
-  }
-}
+    id: number;
+    email?: string;
+  };
+};
 
 // auth temporal para pruebas
 const fakeAuth = (req: Request, _res: Response, next: NextFunction) => {
-  ;(req as AuthenticatedRequest).user = {
+  ; (req as AuthenticatedRequest).user = {
     id: 1
   }
 
-  next()
-}
-const bannersController = new BannersController()
-const filtersController = new FiltersHomepageController()
+  next();
+};
+const bannersController = new BannersController();
+const filtersController = new FiltersHomepageController();
 
 app.post('/api/users', (req, res) => {
   const user = req.body
@@ -57,6 +58,8 @@ app.post('/api/users', (req, res) => {
 })
 app.post('/api/auth/register', registerController)
 app.post('/api/auth/login', loginController)
+app.post("/api/auth/logout", logoutController);
+app.use('/api/perfil', correoverificacionRoutes);
 
 app.get('/api/filters', filtersController.getFilters)
 app.get('/api/banners', (req, res) => bannersController.getBanners(req, res))
@@ -70,8 +73,26 @@ app.patch('/notificaciones/:id/read', fakeAuth, markNotificationAsReadController
 app.patch('/notificaciones/read-all', fakeAuth, markAllNotificationsAsReadController)
 app.delete('/notificaciones/:id', fakeAuth, deleteNotificationController)
 
-const PORT = 5000
+
+app.post("/api/publicaciones", (req, res) => {
+  const nuevaPublicacion = req.body
+  res.json({ message: "Publicación creada", publicacion: nuevaPublicacion });
+});
+
+app.get("/api/publicaciones", (req, res) => {
+  res.json({ message: "Listado de publicaciones" });
+})
+
+app.get("/api/publicaciones/gratis", (req, res) => {
+  res.json({ message: "Listado de publicaciones gratuitas" });
+});
+
+const PORT = 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`)
-})
+  console.log(`Server running on http://localhost:${PORT}`);
+});
+
+app.get("/api/auth/me", async (req, res) => {
+  await meHandler(req as any, res as any);
+});
