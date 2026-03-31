@@ -7,6 +7,15 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 export class LocationsRepository {
+  // Función auxiliar para generar variaciones con tildes (RegEx simple) --BitPro
+  private normalizeQuery(query: string) {
+    return query
+      .replace(/[aá]/gi, '[aá]')
+      .replace(/[eé]/gi, '[eé]')
+      .replace(/[ií]/gi, '[ií]')
+      .replace(/[oó]/gi, '[oó]')
+      .replace(/[uú]/gi, '[uú]');
+  }
   async findByName(query: string) {
     return await prisma.ubicacion_maestra.findMany({
       where: {
@@ -23,6 +32,17 @@ export class LocationsRepository {
       },
       orderBy: { popularidad: "desc" },
       take: 5,
+    });
+  }
+
+  async incrementPopularity(id: number) {
+    return await prisma.ubicacion_maestra.update({
+      where: { id: id },
+      data: {
+        popularidad: {
+          increment: 1
+        }
+      }
     });
   }
 }
