@@ -1,6 +1,6 @@
 // app/pago/page.tsx
 'use client';
-
+//borrar
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
