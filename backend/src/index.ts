@@ -18,8 +18,10 @@ import {
   logoutController,
 } from "./modules/auth/auth.controller.js";
 import meHandler from "../api/auth/me.js";
+import multimediaRoutes from "./modules/multimedia/multimedia.routes.js";
 
 const app = express();
+
 app.use(
   cors({
     origin: "http://localhost:3000",
@@ -38,6 +40,8 @@ app.use(
 
 app.use(express.json());
 
+app.use("/api/publicaciones", multimediaRoutes);
+
 type AuthenticatedRequest = Request & {
   user?: {
     id: number;
@@ -53,6 +57,7 @@ const fakeAuth = (req: Request, _res: Response, next: NextFunction) => {
 
   next();
 };
+
 const bannersController = new BannersController();
 const filtersController = new FiltersHomepageController();
 
@@ -60,9 +65,14 @@ app.post("/api/users", (req, res) => {
   const user = req.body;
   res.json({ message: "User created", user });
 });
+
 app.post("/api/auth/register", registerController);
 app.post("/api/auth/login", loginController);
 app.post("/api/auth/logout", logoutController);
+
+app.get("/api/auth/me", async (req, res) => {
+  await meHandler(req as any, res as any);
+});
 
 app.get("/api/filters", filtersController.getFilters);
 app.get("/api/banners", (req, res) => bannersController.getBanners(req, res));
@@ -87,12 +97,8 @@ app.patch(
 );
 app.delete("/notificaciones/:id", fakeAuth, deleteNotificationController);
 
-const PORT = 5000;
+const PORT = Number(process.env.PORT) || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
-});
-
-app.get("/api/auth/me", async (req, res) => {
-  await meHandler(req as any, res as any);
 });
