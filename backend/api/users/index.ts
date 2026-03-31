@@ -1,8 +1,11 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node'
+import express from "express";
+import cors from "cors";
+import type { VercelRequest, VercelResponse } from "@vercel/node";
+
 import {
   getUsersController,
   createUserController
-} from '../../src/modules/users/users.controller.js'
+} from "../../src/modules/users/users.controller.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
@@ -18,11 +21,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       default:
         res.status(405).json({ message: 'Method not allowed' })
     }
-} catch (error: unknown) {
-  if (error instanceof Error) {
-    return res.status(500).json({ error: error.message })
-  }
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return res.status(500).json({ error: error.message })
+    }
 
-  return res.status(500).json({ error: 'Internal server error' })
-}
+    return res.status(500).json({ error: 'Internal server error' })
+  }
 }
