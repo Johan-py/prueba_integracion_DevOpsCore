@@ -319,6 +319,7 @@ model plan_suscripcion {
   precio_plan            Decimal                 @db.Decimal(10, 2)
   duracion_plan_dias     Int
   nro_publicaciones_plan Int
+  imagen_gr_url          String?                 @db.VarChar(255)
   bitacora_pagos         bitacora_pagos[]
   suscripciones_activas  suscripciones_activas[]
   transacciones          transacciones[]
@@ -346,8 +347,6 @@ model transacciones {
   iva_monto              Decimal                 @db.Decimal(10, 2)
   total                  Decimal                 @db.Decimal(10, 2)
   metodo_pago            String?                 @default("QR_BANCARIO") @db.VarChar(30)
-  qr_texto               String?
-  qr_url                 String?
   fecha_intento          DateTime?               @default(now()) @db.Timestamp(6)
   fecha_completado       DateTime?               @db.Timestamp(6)
   estado                 String?                 @default("PENDIENTE") @db.VarChar(20)
@@ -385,15 +384,6 @@ model verificacion_pago {
   resultado_verificacion String?        @default("VERIFICADO") @db.VarChar(20)
   usuario                Usuario        @relation(fields: [id_admin], references: [id], onDelete: NoAction, onUpdate: NoAction)
   transacciones          transacciones? @relation(fields: [id_transaccion], references: [id], onDelete: NoAction, onUpdate: NoAction)
-}
-
-model PagoQr {
-  id               Int      @id @default(autoincrement())
-  monto            Float
-  codigoReferencia String   @unique
-  estado           String
-  usuarioId        Int
-  fechaCreacion    DateTime @default(now())
 }
 
 enum Genero {
