@@ -1,16 +1,19 @@
-import { getUsersRepository, createUserRepository } from './users.repository.js'
+import {
+  getUsersRepository,
+  createUserRepository,
+} from "./users.repository.js";
 type payload = {
-  name: string
-}
+  name: string;
+};
 export const getUsersService = async () => {
-  return getUsersRepository()
-}
+  return getUsersRepository();
+};
 
 export const createUserService = async (data: payload) => {
   // 🔥 lógica de negocio (validaciones, reglas, etc.)
   if (!data.name) {
-    throw new Error('Name is required')
+    throw new Error("Name is required");
   }
 
-  return createUserRepository(data)
-}
+  return createUserRepository(data);
+};
