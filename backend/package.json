@@ -7,7 +7,7 @@
     "dev": "bun --hot src/index.ts",
     "build": "tsc",
     "lint": "eslint .",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate --schema=./prisma/schema.prisma"
   },
   "prisma": {
     "schema": "prisma/schema.prisma"
