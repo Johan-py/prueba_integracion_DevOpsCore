@@ -60,8 +60,19 @@ export default function Page() {
             <div className="w-8 h-8 flex items-center justify-center bg-orange-200 rounded-md">🔒</div>
           </div>
 
-          <button onClick={() => router.push("/planes")} className="mt-5 w-full py-2.5 rounded-lg text-white font-medium bg-orange-500 hover:bg-orange-600 transition">
+            {/* BOTÓN PRINCIPAL */}
+          <button
+            onClick={() => router.push("/planes")}
+            className="mt-5 w-full py-2.5 rounded-lg text-white font-medium bg-orange-500 hover:bg-orange-600 transition"   
+          >
             💳 ¡Ver mis planes y ampliar cupo!
+          </button>
+          {/* BOTÓN SECUNDARIO */}
+          <button
+            onClick={() => router.push("/mis-publicaciones")}
+            className="mt-3 w-full py-2.5 rounded-lg border border-gray-400 text-gray-700 hover:bg-gray-200 transition"
+          >
+            🏠 Volver a mis publicaciones
           </button>
         </div>
       </div>
