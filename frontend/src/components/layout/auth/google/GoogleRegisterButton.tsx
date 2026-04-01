@@ -47,6 +47,8 @@ interface GoogleAccountsId {
     parent: HTMLElement,
     options: GoogleRenderButtonOptions,
   ) => void;
+  prompt: () => void;
+  disableAutoSelect: () => void;
 }
 
 interface GoogleNamespace {
@@ -82,6 +84,8 @@ export default function GoogleRegisterButton({
       if (!containerRef.current || !window.google) return;
 
       containerRef.current.innerHTML = "";
+
+      window.google.accounts.id.disableAutoSelect();
 
       window.google.accounts.id.initialize({
         client_id: clientId,
