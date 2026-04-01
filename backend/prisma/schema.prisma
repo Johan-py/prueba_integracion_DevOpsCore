@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+
 }
 
 model Rol {
@@ -18,16 +19,16 @@ model Usuario {
   id             Int            @id @default(autoincrement())
   nombre         String
   apellido       String
-  correo         String         @unique
-  password       String
   pais           String?
   avatar         String?
   genero         Genero?
   direccion      String?
+  correo         String         @unique
+  password       String
   activo         Boolean        @default(true)
-  fechaRegistro  DateTime       @default(now())
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
+  fechaRegistro  DateTime       @default(now())
   rolId          Int
   cambioEmails   CambioEmail[]
   inmuebles      Inmueble[]
@@ -44,10 +45,10 @@ model Usuario {
 }
 
 model Telefono {
-  id         Int     @id @default(autoincrement())
-  codigoPais String
   numero     String
   principal  Boolean @default(false)
+  codigoPais String
+  id         Int     @id @default(autoincrement())
   usuarioId  Int
   usuario    Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
@@ -55,11 +56,11 @@ model Telefono {
 }
 
 model Sesion {
-  id              Int      @id @default(autoincrement())
   token           String   @unique
-  fechaInicio     DateTime @default(now())
-  fechaExpiracion DateTime
   estado          Boolean  @default(true)
+  fechaExpiracion DateTime
+  fechaInicio     DateTime @default(now())
+  id              Int      @id @default(autoincrement())
   usuarioId       Int
   usuario         Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
@@ -67,13 +68,13 @@ model Sesion {
 }
 
 model Notificacion {
-  id            Int       @id @default(autoincrement())
   titulo        String
   mensaje       String
   leida         Boolean   @default(false)
+  eliminada     Boolean   @default(false)
   fechaCreacion DateTime  @default(now())
   fechaLectura  DateTime?
-  eliminada     Boolean   @default(false)
+  id            Int       @id @default(autoincrement())
   usuarioId     Int
   usuario       Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
@@ -82,11 +83,11 @@ model Notificacion {
 
 model CambioEmail {
   id           Int       @id @default(autoincrement())
-  emailNuevo   String
   token        String    @unique
-  expiraEn     DateTime
-  creadoEn     DateTime  @default(now())
   completadoEn DateTime?
+  creadoEn     DateTime  @default(now())
+  emailNuevo   String
+  expiraEn     DateTime
   usuarioId    Int
   usuario      Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
@@ -94,9 +95,9 @@ model CambioEmail {
 }
 
 model Perfil {
+  datos          Json?
   id             Int     @id @default(autoincrement())
   nombreCompleto String
-  datos          Json?
   usuarioId      Int     @unique
   usuario        Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
@@ -104,20 +105,20 @@ model Perfil {
 }
 
 model Inmueble {
-  id               Int                @id @default(autoincrement())
   titulo           String
-  tipoAccion       TipoAccion
-  categoria        Categoria?
   precio           Decimal            @db.Decimal(12, 2)
-  superficieM2     Decimal?           @db.Decimal(10, 2)
-  nroCuartos       Int?
-  nroBanos         Int?
   descripcion      String?
   estado           EstadoInmueble     @default(ACTIVO)
-  fechaPublicacion DateTime           @default(now())
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
+  fechaPublicacion DateTime           @default(now())
+  id               Int                @id @default(autoincrement())
+  nroBanos         Int?
+  nroCuartos       Int?
   propietarioId    Int
+  superficieM2     Decimal?           @db.Decimal(10, 2)
+  tipoAccion       TipoAccion
+  categoria        Categoria?
   propietario      Usuario            @relation(fields: [propietarioId], references: [id], onDelete: Cascade)
   etiquetas        InmuebleEtiqueta[]
   marcadores       MarcadorMapa[]
@@ -129,31 +130,32 @@ model Inmueble {
 }
 
 model UbicacionInmueble {
-  id         Int            @id @default(autoincrement())
-  latitud    Decimal        @db.Decimal(10, 7)
-  longitud   Decimal        @db.Decimal(10, 7)
-  direccion  String?
-  zona       String?
-  ciudad     String
-  inmuebleId Int            @unique
-  marcadores MarcadorMapa[]
-  inmueble   Inmueble       @relation(fields: [inmuebleId], references: [id], onDelete: Cascade)
+  id                 Int                @id @default(autoincrement())
+  latitud            Decimal            @db.Decimal(10, 7)
+  longitud           Decimal            @db.Decimal(10, 7)
+  direccion          String?
+  zona               String?
+  ciudad             String
+  inmuebleId         Int                @unique
+  ubicacionMaestraId Int?
+  marcadores         MarcadorMapa[]
+  inmueble           Inmueble           @relation(fields: [inmuebleId], references: [id], onDelete: Cascade)
   ubicacion_maestra  ubicacion_maestra? @relation(fields: [ubicacionMaestraId], references: [id])
 
   @@map("ubicacion_inmueble")
 }
 
 model Etiqueta {
-  id        Int                @id @default(autoincrement())
   nombre    String             @unique
+  id        Int                @id @default(autoincrement())
   inmuebles InmuebleEtiqueta[]
 
   @@map("etiqueta")
 }
 
 model InmuebleEtiqueta {
-  inmuebleId Int
   etiquetaId Int
+  inmuebleId Int
   etiqueta   Etiqueta @relation(fields: [etiquetaId], references: [id], onDelete: Cascade)
   inmueble   Inmueble @relation(fields: [inmuebleId], references: [id], onDelete: Cascade)
 
@@ -260,21 +262,21 @@ model InteraccionMapa {
 
 model BannerHome {
   id            Int      @id @default(autoincrement())
-  urlImagen     String
-  orden         Int
   activo        Boolean  @default(true)
-  fechaCreacion DateTime @default(now())
-  titulo        String?
   subtitulo     String?
+  fechaCreacion DateTime @default(now())
+  orden         Int
+  titulo        String?
+  urlImagen     String
 
   @@map("banner_home")
 }
 
 model Visitor {
   id          Int      @id @default(autoincrement())
+  fechaVisita DateTime @default(now())
   ip          String
   metaData    Json?
-  fechaVisita DateTime @default(now())
   usuarioId   Int?
   usuario     Usuario? @relation(fields: [usuarioId], references: [id])
 
@@ -341,8 +343,8 @@ enum Categoria {
 enum RolNombre {
   ADMIN
   PROPIETARIO
-  AGENTE
   VISITANTE
+  AGENTE
 }
 
 enum TipoMultimedia {
