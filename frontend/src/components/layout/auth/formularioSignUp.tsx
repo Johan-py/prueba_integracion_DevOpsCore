@@ -691,6 +691,7 @@ export default function SignUpForm() {
 
             <GoogleRegisterButton
               onCredentialReceived={handleGoogleCredential}
+              onError={setServerError}
               disabled={isSubmitting}
             />
 
