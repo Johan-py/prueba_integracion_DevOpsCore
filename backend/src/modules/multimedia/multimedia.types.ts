@@ -36,3 +36,11 @@ export interface RegisterImagesInput {
   usuarioId: number
   images: ImageUploadItemInput[]
 }
+
+export interface RegisterVideoLinkBody {
+  videoUrl: string
+}
+
+export interface RegisterImagesBody {
+  images: ImageUploadItemInput[]
+}
