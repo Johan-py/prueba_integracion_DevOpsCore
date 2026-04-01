@@ -14,18 +14,21 @@ export default function ProfileCard() {
 
         <div className="flex flex-col gap-4">
           {[
-            'Nombre Completo',
-            'E-mail',
-            'Teléfono',
-            'Teléfono 2',
-            'País',
-            'Género',
-            'Dirección'
+            "Nombre Completo",
+            "E-mail",
+            "Teléfono",
+            "Teléfono 2",
+            "País",
+            "Género",
+            "Dirección",
           ].map((label, index) => (
             <div key={index} className="flex items-center gap-4">
               <label className="w-40 font-medium">{label}:</label>
 
-              <input type="text" className="flex-1 bg-gray-200 px-3 py-2 rounded" />
+              <input
+                type="text"
+                className="flex-1 bg-gray-200 px-3 py-2 rounded"
+              />
 
               <div className="w-10"></div>
             </div>
@@ -33,5 +36,5 @@ export default function ProfileCard() {
         </div>
       </div>
     </div>
-  )
+  );
 }

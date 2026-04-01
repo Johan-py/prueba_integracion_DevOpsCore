@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from "next/link";
 
 export default function Logo() {
   return (
@@ -9,5 +9,5 @@ export default function Logo() {
       <div className="w-8 h-8 bg-black rounded-sm"></div>
       Prop<span className="text-[#E68B25]">Bol</span>
     </Link>
-  )
+  );
 }
