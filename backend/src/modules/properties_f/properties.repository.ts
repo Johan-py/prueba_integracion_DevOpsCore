@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client"
+import { PrismaClient } from '@prisma/client'
 
 // Crear cliente lazily cuando se necesite
 async function getPrismaClient(): Promise<PrismaClient> {
@@ -8,23 +8,21 @@ async function getPrismaClient(): Promise<PrismaClient> {
 
   try {
     const prisma = new PrismaClient({
-      log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+      log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error']
     })
 
     // Test de conexión
     await prisma.$connect()
-    console.log("✓ Conexión a Prisma exitosa")
+    console.log('✓ Conexión a Prisma exitosa')
     return prisma
   } catch (error) {
-    console.error("✗ Error conectando a Prisma:", error)
+    console.error('✗ Error conectando a Prisma:', error)
     throw error
   }
 }
 
 export const propertiesRepository = {
-
   async search(filtros: any) {
-
     const prisma = await getPrismaClient()
 
     try {
@@ -35,9 +33,11 @@ export const propertiesRepository = {
           ? filtros.categoria
           : [filtros.categoria]
 
-        const categoriasValidas = categorias.filter((c: string) =>
-          ['CASA', 'DEPARTAMENTO', 'TERRENO', 'OFICINA'].includes(c.toUpperCase())
-        ).map((c: string) => c.toUpperCase())
+        const categoriasValidas = categorias
+          .filter((c: string) =>
+            ['CASA', 'DEPARTAMENTO', 'TERRENO', 'OFICINA'].includes(c.toUpperCase())
+          )
+          .map((c: string) => c.toUpperCase())
 
         if (categoriasValidas.length > 0) {
           whereClause.categoria = {
@@ -53,9 +53,9 @@ export const propertiesRepository = {
         }
       }
 
-      whereClause.estado = "ACTIVO"
+      whereClause.estado = 'ACTIVO'
 
-      console.log("🔍 Buscando propiedades con filtros:", whereClause)
+      console.log('🔍 Buscando propiedades con filtros:', whereClause)
 
       const properties = await prisma.inmueble.findMany({
         where: whereClause,
@@ -63,17 +63,14 @@ export const propertiesRepository = {
           ubicacion: true
         },
         orderBy: {
-          fechaPublicacion: "desc"
+          fechaPublicacion: 'desc'
         }
       })
 
       console.log(`✓ Se encontraron ${properties.length} propiedades`)
       return properties
-
     } finally {
       await prisma.$disconnect()
     }
-
   }
-
 }

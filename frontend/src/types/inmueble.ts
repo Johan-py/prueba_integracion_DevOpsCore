@@ -28,7 +28,7 @@ export interface EstadoOrdenamiento {
 
 export const OPCIONES_FECHA: Array<{ value: OrdenFecha; label: string }> = [
   { value: 'mas-recientes', label: 'Más recientes' },
-   { value: 'mas-antiguos', label: 'Más antiguos' },
+  { value: 'mas-antiguos', label: 'Más antiguos' },
   { value: 'mas-populares', label: 'Más populares' }
 ]
 

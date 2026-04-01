@@ -1,4 +1,4 @@
-import { getUsersService, createUserService } from "./users.service.js";
+import { getUsersService, createUserService } from './users.service.js'
 type payload = {
   name: string
 }
@@ -7,11 +7,11 @@ export const getUsersController = async () => {
 }
 
 type CreateUserBody = {
-  name: string;
-  password: string;
-  confirmPassword: string;
-};
+  name: string
+  password: string
+  confirmPassword: string
+}
 
 export const createUserController = async (data: CreateUserBody) => {
-  return createUserService(data);
-};
+  return createUserService(data)
+}

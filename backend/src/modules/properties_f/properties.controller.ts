@@ -1,12 +1,9 @@
-import { Request, Response } from "express"
-import { propertiesService } from "./properties.service"
+import { Request, Response } from 'express'
+import { propertiesService } from './properties.service'
 
 export const propertiesController = {
-
   async search(req: Request, res: Response) {
-
     try {
-
       const { categoria, tipoAccion } = req.query
 
       const filtros = {
@@ -14,7 +11,7 @@ export const propertiesController = {
         tipoAccion
       }
 
-      console.log("Parámetros recibidos:", { categoria, tipoAccion })
+      console.log('Parámetros recibidos:', { categoria, tipoAccion })
 
       const properties = await propertiesService.search(filtros)
 
@@ -24,14 +21,12 @@ export const propertiesController = {
         data: properties || []
       }
 
-      console.log("Response enviado:", response)
+      console.log('Response enviado:', response)
       res.json(response)
-
     } catch (error) {
+      console.error('Error en properties.controller:', error)
 
-      console.error("Error en properties.controller:", error)
-
-      const message = error instanceof Error ? error.message : "Error desconocido"
+      const message = error instanceof Error ? error.message : 'Error desconocido'
 
       res.status(500).json({
         ok: false,
@@ -39,9 +34,6 @@ export const propertiesController = {
         data: [],
         message: message
       })
-
     }
-
   }
-
 }

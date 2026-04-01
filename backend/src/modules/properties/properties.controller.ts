@@ -21,11 +21,11 @@ export const propertiesController = {
   },
   search: async (req: Request, res: Response) => {
     try {
-      const { search } = req.query;
+      const { search } = req.query
       // Aquí iría tu lógica de Prisma para buscar en PROPBOL
-      res.json({ data: [] }); 
+      res.json({ data: [] })
     } catch (error) {
-      res.status(500).json({ error: "Error en la búsqueda" });
+      res.status(500).json({ error: 'Error en la búsqueda' })
     }
   }
-};
+}
