@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev:bun": "bun --hot src/index.ts",
-    "dev": "nodemon --watch src --exec ts-node src/index.ts",
+    "dev": "bun --hot src/index.ts",
     "build": "tsc",
     "lint": "eslint .",
     "postinstall": "prisma generate"

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Trash2 } from "lucide-react";
+import { Trash2, WifiOff } from "lucide-react";
 import { useNotifications } from "@/hooks/useNotifications";
 import type { NotificationFilter } from "@/types/notification";
 
@@ -20,6 +20,7 @@ export default function NotificationsPage() {
     isLoadingMore,
     error,
     hasMore,
+    isOnline,
     loadMoreNotifications,
     markAsRead,
     markAllAsRead,
@@ -72,7 +73,13 @@ export default function NotificationsPage() {
 
   return (
     <section className="mx-auto max-w-3xl px-4 py-6">
-      {/* Header */}
+      {!isOnline && (
+        <div className="mb-4 flex items-center gap-2 rounded-lg bg-stone-100 px-4 py-3 text-sm text-stone-600">
+          <WifiOff className="h-4 w-4 shrink-0 text-stone-400" />
+          <span>Sin conexión. Las notificaciones se actualizarán cuando vuelvas a conectarte.</span>
+        </div>
+      )}
+
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-stone-900">
@@ -92,7 +99,6 @@ export default function NotificationsPage() {
         </button>
       </div>
 
-      {/* Filters */}
       <div className="mb-4 flex flex-wrap gap-2">
         {filters.map((item) => (
           <button
@@ -109,7 +115,6 @@ export default function NotificationsPage() {
         ))}
       </div>
 
-      {/* List */}
       <div
         role="list"
         aria-label="Lista de notificaciones"
@@ -120,7 +125,7 @@ export default function NotificationsPage() {
           <p className="px-4 py-6 text-center text-sm text-stone-500">
             Cargando notificaciones...
           </p>
-        ) : error ? (
+        ) : error && isOnline ? (
           <div className="px-4 py-6 text-center">
             <p className="text-sm text-red-500">{error}</p>
             <button

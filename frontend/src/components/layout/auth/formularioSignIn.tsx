@@ -239,10 +239,11 @@ export default function LoginForm() {
         </button>
 
         <button
-          type="button"
-          className="mx-auto block w-fit rounded-md bg-gray-700 px-4 py-1.5 text-xs font-medium text-white hover:bg-gray-800"
-        >
-          Cancelar Inicio de sesión
+            type="button"
+            onClick={() => router.push("/")}
+            className="mx-auto block w-fit rounded-md bg-gray-700 px-4 py-1.5 text-xs font-medium text-white hover:bg-gray-800"
+          >
+            Cancelar Inicio de sesión
         </button>
       </form>
 
