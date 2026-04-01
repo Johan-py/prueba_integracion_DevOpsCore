@@ -1,45 +1,35 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { verifyJwtToken } from "../utils/jwt.js";
-import { findActiveSessionByToken } from "../modules/auth/auth.repository.js";
+import type { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
 
-export const verifyAuth = async (req: VercelRequest, res: VercelResponse) => {
-  const authHeader = req.headers.authorization;
+export interface AuthenticatedRequest extends Request {
+  user?: {
+    id: number;
+    email?: string;
+  };
+}
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    res.status(401).json({
-      message: "Token no proporcionado",
-    });
-    return null;
-  }
-
-  const token = authHeader.split(" ")[1];
-
-  if (!token) {
-    res.status(401).json({
-      message: "Token no proporcionado",
-    });
-    return null;
-  }
-
+export const authMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    verifyJwtToken(token);
-    const session = await findActiveSessionByToken(token);
-
-    if (!session) {
-      res.status(401).json({
-        message: "Sesión inválida o expirada",
-      });
-      return null;
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ message: "No autorizado: falta token." });
     }
 
-    return {
-      token,
-      user: session.usuario,
-    };
-  } catch {
-    res.status(401).json({
-      message: "Token Inválido",
-    });
-    return null;
+    const token = authHeader.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({ message: "No autorizado: token inválido." });
+    }
+
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      throw new Error("JWT_SECRET no configurado en .env");
+    }
+
+    const decoded = jwt.verify(token, secret) as { id: number; email?: string };
+    req.user = { id: decoded.id, email: decoded.email };
+
+    next();
+  } catch (error) {
+    return res.status(403).json({ message: "Token inválido o expirado." });
   }
 };
