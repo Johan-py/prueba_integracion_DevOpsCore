@@ -32,11 +32,11 @@ export default function ProfileCard() {
     const [campoEditando, setCampoEditando] = useState<string | null>(null);
 
     return (
-  <div className="bg-gray-100 p-6 md:p-8 rounded-xl flex flex-col md:flex-row gap-8 md:gap-10 items-center">
+  <div className="bg-[#fdf8ec] p-6 md:p-8 rounded-xl flex flex-col md:flex-row gap-8 md:gap-10 items-center">
 
     {/* LADO IZQUIERDO (Identidad) */}
     <div className="flex flex-col items-center justify-center w-full md:w-1/3 text-center md:text-left">
-      <div className="w-28 h-28 rounded-full bg-gray-300 flex items-center justify-center">
+      <div className="w-28 h-28 rounded-full bg-white border border-black flex items-center justify-center">
         <span className="text-gray-500 text-xs uppercase">Imagen</span>
       </div>
       <p className="mt-4 font-semibold text-lg text-gray-800 uppercase tracking-tight">Perfil 1</p>
@@ -157,8 +157,8 @@ export default function ProfileCard() {
 
       {/* BOTÓN GUARDAR */}
       <div className="mt-8 flex justify-end">
-        <button className="bg-gray-800 text-white px-8 py-2 rounded-lg font-bold hover:bg-black transition-all active:scale-95 shadow-md">
-          Guardar Cambios
+        <button className="bg-[#D97706] text-white px-8 py-2 rounded-lg font-bold hover:bg-[#b85f05] transition-all active:scale-95 shadow-md">
+           Guardar Cambios
         </button>
       </div>
     </div>

@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-// Agrega una variable no usada
-// const variableSinUsar = "test"
-=======
 "use client";
 
 import Image from "next/image";
@@ -146,8 +142,6 @@ function FooterBottomBar() {
     </div>
   );
 }
-
->>>>>>> b8a6a277af70c2aedd8db08c7fc49c65b1b8fce2
 export default function Footer() {
   return (
     <footer className="bg-gray-800 text-white mt-auto">

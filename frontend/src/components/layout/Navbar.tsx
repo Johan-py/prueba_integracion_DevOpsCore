@@ -1,21 +1,4 @@
-<<<<<<< HEAD
-import Link from 'next/link'
 
-export default function Navbar() {
-  return (
-    <nav className="bg-white shadow-md">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex justify-between items-center">
-          <Link href="/" className="text-xl font-bold text-blue-600">
-            PropBol
-          </Link>
-
-          <div className="space-x-4">
-            <Link href="/" className="hover:text-blue-600 transition">
-              Inicio
-            </Link>
-            {/* Agrega más links según necesites */}
-=======
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -424,7 +407,7 @@ export default function Navbar() {
                 />
               </div>
             </div>
->>>>>>> b8a6a277af70c2aedd8db08c7fc49c65b1b8fce2
+
           </div>
         </div>
       </nav>
