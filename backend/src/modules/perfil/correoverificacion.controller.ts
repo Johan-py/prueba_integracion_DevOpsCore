@@ -1,15 +1,19 @@
-// TODO: Implementar controlador de verificación de correo
-export const verifyEmailController = async () => {
-  // Placeholder para futuras implementaciones
-}
 // correoverificacion.controller.ts
 import { Request, Response } from 'express'
-import { prisma } from '../../lib/prisma.js' // ✅ Importar el prisma que ellos ya usan
+import { PrismaClient } from '@prisma/client'
+
+// Crear instancia de PrismaClient
+const prisma = new PrismaClient()
 
 interface AuthRequest extends Request {
   usuario?: {
     id: number
   }
+}
+
+// TODO: Implementar controlador de verificación de correo
+export const verifyEmailController = async () => {
+  // Placeholder para futuras implementaciones
 }
 
 export const verificarPassword = async (req: AuthRequest, res: Response) => {
