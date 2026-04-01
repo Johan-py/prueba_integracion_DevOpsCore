@@ -1,14 +1,70 @@
-import { Request, Response } from 'express'
+import type { Request, Response } from 'express'
 import {
   getPublicationMultimediaService,
   registerImagesService,
   registerVideoLinkService
 } from './multimedia.service.js'
+import type {
+  ImageUploadItemInput,
+  RegisterImagesBody,
+  RegisterVideoLinkBody
+} from './multimedia.types.js'
 
-export const getPublicationMultimediaController = async (req: Request, res: Response) => {
+type AuthenticatedRequest = Request & {
+  user?: {
+    id?: number
+    email?: string
+  }
+}
+
+const parsePublicacionId = (req: Request): number => {
+  const publicacionId = Number(req.params.publicacionId)
+
+  if (!Number.isInteger(publicacionId) || publicacionId <= 0) {
+    throw new Error('ID de publicación no válido')
+  }
+
+  return publicacionId
+}
+
+const getAuthenticatedUserId = (req: AuthenticatedRequest): number => {
+  const usuarioId = Number(req.user?.id)
+
+  if (!Number.isInteger(usuarioId) || usuarioId <= 0) {
+    throw new Error('Usuario no autenticado')
+  }
+
+  return usuarioId
+}
+
+const getErrorStatus = (message: string): number => {
+  switch (message) {
+    case 'Usuario no autenticado':
+      return 401
+    case 'La publicación no existe':
+      return 404
+    case 'La publicación no pertenece al usuario autenticado':
+      return 403
+    default:
+      return 400
+  }
+}
+
+const handleControllerError = (error: unknown, res: Response) => {
+  const message =
+    error instanceof Error ? error.message : 'Error interno del servidor'
+
+  const status = getErrorStatus(message)
+  res.status(status).json({ message })
+}
+
+export const getPublicationMultimediaController = async (
+  req: Request,
+  res: Response
+) => {
   try {
-    const publicacionId = Number(req.params.publicacionId)
-    const usuarioId = Number(req.query.usuarioId)
+    const publicacionId = parsePublicacionId(req)
+    const usuarioId = getAuthenticatedUserId(req as AuthenticatedRequest)
 
     const result = await getPublicationMultimediaService({
       publicacionId,
@@ -20,61 +76,58 @@ export const getPublicationMultimediaController = async (req: Request, res: Resp
       data: result
     })
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : 'Error interno del servidor'
-
-    res.status(400).json({ message })
+    handleControllerError(error, res)
   }
 }
 
-export const registerVideoLinkController = async (req: Request, res: Response) => {
+export const registerVideoLinkController = async (
+  req: Request,
+  res: Response
+) => {
   try {
-    const publicacionId = Number(req.params.publicacionId)
-    const { usuarioId, videoUrl } = req.body as {
-      usuarioId: number
-      videoUrl: string
-    }
+    const publicacionId = parsePublicacionId(req)
+    const usuarioId = getAuthenticatedUserId(req as AuthenticatedRequest)
+    const { videoUrl } = req.body as Partial<RegisterVideoLinkBody>
 
     const result = await registerVideoLinkService({
       publicacionId,
-      usuarioId: Number(usuarioId),
-      videoUrl
+      usuarioId,
+      videoUrl: typeof videoUrl === 'string' ? videoUrl : ''
     })
 
-    res.json({
+    res.status(201).json({
       message: 'Video registrado correctamente',
       data: result
     })
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : 'Error interno del servidor'
-
-    res.status(400).json({ message })
+    handleControllerError(error, res)
   }
 }
 
-export const registerImagesController = async (req: Request, res: Response) => {
+export const registerImagesController = async (
+  req: Request,
+  res: Response
+) => {
   try {
-    const publicacionId = Number(req.params.publicacionId)
-    const { usuarioId, images } = req.body as {
-      usuarioId: number
-      images: { url: string; extension: string; pesoMb: number }[]
-    }
+    const publicacionId = parsePublicacionId(req)
+    const usuarioId = getAuthenticatedUserId(req as AuthenticatedRequest)
+    const { images } = req.body as Partial<RegisterImagesBody>
+
+    const normalizedImages: ImageUploadItemInput[] = Array.isArray(images)
+      ? images
+      : []
 
     const result = await registerImagesService({
       publicacionId,
-      usuarioId: Number(usuarioId),
-      images
+      usuarioId,
+      images: normalizedImages
     })
 
-    res.json({
+    res.status(201).json({
       message: 'Imágenes registradas correctamente',
       data: result
     })
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : 'Error interno del servidor'
-
-    res.status(400).json({ message })
+    handleControllerError(error, res)
   }
 }
