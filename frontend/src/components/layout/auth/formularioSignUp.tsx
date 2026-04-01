@@ -16,7 +16,9 @@ import { validateEmail, validatePassword } from "@/lib/validators/auth";
 import GoogleRegisterButton from "@/components/layout/auth/google/GoogleRegisterButton";
 import {
   consumeGoogleSignupPrefill,
-  extractGooglePrefillFromCredential,
+  extractGooglePrefillValidationFromCredential,
+  getMissingGoogleSignupFields,
+  type GoogleSignupMissingField,
 } from "@/lib/auth/google";
 
 type FormData = {
@@ -58,6 +60,46 @@ const initialFormData: FormData = {
   password: "",
   confirmPassword: "",
 };
+
+function buildGoogleMissingFieldsMessage(
+  missingFields: GoogleSignupMissingField[],
+) {
+  if (missingFields.length === 0) {
+    return "";
+  }
+
+  const labels: Record<GoogleSignupMissingField, string> = {
+    email: "el correo electrónico",
+    firstName: "el nombre",
+    lastName: "el apellido",
+  };
+
+  if (missingFields.length === 1) {
+    return `Google no devolvió ${labels[missingFields[0]]} de la cuenta.`;
+  }
+
+  if (missingFields.length === 2) {
+    return `Google no devolvió ${labels[missingFields[0]]} ni ${labels[missingFields[1]]} de la cuenta.`;
+  }
+
+  return "Google no devolvió el correo electrónico, el nombre ni el apellido de la cuenta.";
+}
+
+function buildGoogleFieldErrors(
+  missingFields: GoogleSignupMissingField[],
+): Pick<FormErrors, "email" | "firstName" | "lastName"> {
+  return {
+    email: missingFields.includes("email")
+      ? "Google no devolvió el correo electrónico"
+      : undefined,
+    firstName: missingFields.includes("firstName")
+      ? "Google no devolvió el nombre"
+      : undefined,
+    lastName: missingFields.includes("lastName")
+      ? "Google no devolvió el apellido"
+      : undefined,
+  };
+}
 
 function getInputClasses(hasError?: boolean, hasRightIcon?: boolean) {
   return [
@@ -125,26 +167,35 @@ export default function SignUpForm() {
   }, [router]);
 
   useEffect(() => {
-    const googlePrefill = consumeGoogleSignupPrefill();
+  const googlePrefill = consumeGoogleSignupPrefill();
 
-    if (!googlePrefill) {
-      return;
-    }
+  if (!googlePrefill) {
+    return;
+  }
 
-    setFormData((prev) => ({
-      ...prev,
-      email: googlePrefill.email?.trim() || prev.email,
-      firstName: googlePrefill.firstName?.trim() || prev.firstName,
-      lastName: googlePrefill.lastName?.trim() || prev.lastName,
-    }));
+  const missingFields = getMissingGoogleSignupFields(googlePrefill);
 
-    setErrors((prev) => ({
-      ...prev,
-      email: undefined,
-      firstName: undefined,
-      lastName: undefined,
-    }));
-  }, []);
+  setFormData((prev) => ({
+    ...prev,
+    email: googlePrefill.email?.trim() || prev.email,
+    firstName: googlePrefill.firstName?.trim() || prev.firstName,
+    lastName: googlePrefill.lastName?.trim() || prev.lastName,
+  }));
+
+  setErrors((prev) => ({
+    ...prev,
+    ...buildGoogleFieldErrors(missingFields),
+  }));
+
+  setTouched((prev) => ({
+    ...prev,
+    email: missingFields.includes("email"),
+    firstName: missingFields.includes("firstName"),
+    lastName: missingFields.includes("lastName"),
+  }));
+
+  setServerError(buildGoogleMissingFieldsMessage(missingFields));
+}, []);
 
   const validateFirstName = (value: string) => {
     const trimmed = value.trim();
@@ -440,31 +491,39 @@ export default function SignUpForm() {
   };
 
   const handleGoogleCredential = useCallback((credential: string) => {
-    setServerError("");
+  setServerError("");
 
-    const googlePrefill = extractGooglePrefillFromCredential(credential);
+  const { prefill: googlePrefill, missingFields } =
+    extractGooglePrefillValidationFromCredential(credential);
 
-    if (!googlePrefill) {
-      setServerError(
-        "No se pudieron obtener los datos de la cuenta de Google.",
-      );
-      return;
-    }
+  if (!googlePrefill) {
+    setServerError(
+      "No se pudieron obtener los datos de la cuenta de Google.",
+    );
+    return;
+  }
 
-    setFormData((prev) => ({
-      ...prev,
-      email: googlePrefill.email || prev.email,
-      firstName: googlePrefill.firstName || prev.firstName,
-      lastName: googlePrefill.lastName || prev.lastName,
-    }));
+  setFormData((prev) => ({
+    ...prev,
+    email: googlePrefill.email || prev.email,
+    firstName: googlePrefill.firstName || prev.firstName,
+    lastName: googlePrefill.lastName || prev.lastName,
+  }));
 
-    setErrors((prev) => ({
-      ...prev,
-      email: undefined,
-      firstName: undefined,
-      lastName: undefined,
-    }));
-  }, []);
+  setErrors((prev) => ({
+    ...prev,
+    ...buildGoogleFieldErrors(missingFields),
+  }));
+
+  setTouched((prev) => ({
+    ...prev,
+    email: missingFields.includes("email"),
+    firstName: missingFields.includes("firstName"),
+    lastName: missingFields.includes("lastName"),
+  }));
+
+  setServerError(buildGoogleMissingFieldsMessage(missingFields));
+}, []);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#f5f5f4] px-4 py-8">
