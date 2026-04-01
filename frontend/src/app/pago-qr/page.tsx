@@ -1,7 +1,7 @@
 "use client";
 // de aqui vienen
 import { useState, useEffect } from "react";
-import { useCurrentPayment } from "@/hooks/useCurrentPayment";
+import { useCurrentPayment } from "@/hooks/cobros_hu-05/useCurrentPayment";
 import { usePaymentStatus } from "@/hooks/usePaymentStatus";
 import { Timer } from "@/components/payment/Timer";
 import { QRDisplay } from "@/components/payment/QRDisplay";
