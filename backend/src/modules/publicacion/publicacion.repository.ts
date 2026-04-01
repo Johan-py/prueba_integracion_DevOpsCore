@@ -15,7 +15,16 @@ export const buscarPublicacionesPorUsuarioRepository = async (usuarioId: number)
       multimedia: true,
       inmueble: {
         include: {
-          ubicacion: true
+          ubicacion: {
+            select: {
+              id: true,
+              direccion: true,
+              latitud: true,
+              longitud: true,
+              inmuebleId: true,
+              ubicacionMaestraId: true
+            }
+          }
         }
       }
     },

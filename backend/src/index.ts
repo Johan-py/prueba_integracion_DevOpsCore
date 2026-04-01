@@ -25,15 +25,15 @@ import publicacionRoutes from './modules/publicacion/publicacion.routes.js'
 
 const app = express()
 
-app.use(
-  cors({
-    origin: ['http://localhost:3000', 'http://localhost:3001'],
-    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
-  })
-)
+const corsOptions = {
+  origin: ['http://localhost:3000', 'http://localhost:3001'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-user-id'],
+  credentials: true
+}
 
+app.use(cors(corsOptions))
+app.options(/.*/, cors(corsOptions))
 app.use(express.json())
 
 const bannersController = new BannersController()

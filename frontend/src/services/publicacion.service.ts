@@ -17,7 +17,7 @@ export async function obtenerMisPublicaciones(): Promise<MisPublicacionesItem[]>
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'x-user-id': '1' // Simulamos un usuario autenticado con ID 1
+      'x-user-id': '3' // Simulamos un usuario autenticado con ID 1
     },
     cache: 'no-store'
   })
@@ -38,7 +38,7 @@ export async function eliminarPublicacion(id: number) {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
-      'x-user-id': '1' // Simulamos un usuario autenticado con ID 1
+      'x-user-id': '3' // Simulamos un usuario autenticado con ID 3
     }
   })
 
