@@ -15,29 +15,33 @@ model Rol {
 }
 
 model Usuario {
-  id             Int            @id @default(autoincrement())
-  nombre         String
-  apellido       String
-  correo         String         @unique
-  password       String
-  pais           String?
-  avatar         String?
-  genero         Genero?
-  direccion      String?
-  activo         Boolean        @default(true)
-  fechaRegistro  DateTime       @default(now())
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  rolId          Int
-  cambioEmails   CambioEmail[]
-  inmuebles      Inmueble[]
-  notificaciones Notificacion[]
-  perfil         Perfil?
-  publicaciones  Publicacion[]
-  sesiones       Sesion[]
-  telefonos      Telefono[]
-  rol            Rol            @relation(fields: [rolId], references: [id])
-  visitas        Visitor[]
+  id                    Int                     @id @default(autoincrement())
+  nombre                String
+  apellido              String
+  correo                String                  @unique
+  password              String
+  pais                  String?
+  avatar                String?
+  genero                Genero?
+  direccion             String?
+  activo                Boolean                 @default(true)
+  fechaRegistro         DateTime                @default(now())
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  rolId                 Int
+  bitacora_pagos        bitacora_pagos[]
+  cambioEmails          CambioEmail[]
+  inmuebles             Inmueble[]
+  notificaciones        Notificacion[]
+  perfil                Perfil?
+  publicaciones         Publicacion[]
+  sesiones              Sesion[]
+  suscripciones_activas suscripciones_activas[]
+  telefonos             Telefono[]
+  transacciones         transacciones[]
+  rol                   Rol                     @relation(fields: [rolId], references: [id])
+  verificacion_pago     verificacion_pago[]
+  visitas               Visitor[]
 
   @@index([correo])
   @@map("usuario")
@@ -129,15 +133,16 @@ model Inmueble {
 }
 
 model UbicacionInmueble {
-  id         Int            @id @default(autoincrement())
-  latitud    Decimal        @db.Decimal(10, 7)
-  longitud   Decimal        @db.Decimal(10, 7)
-  direccion  String?
-  zona       String?
-  ciudad     String
-  inmuebleId Int            @unique
-  marcadores MarcadorMapa[]
-  inmueble   Inmueble       @relation(fields: [inmuebleId], references: [id], onDelete: Cascade)
+  id                 Int                @id @default(autoincrement())
+  latitud            Decimal            @db.Decimal(10, 7)
+  longitud           Decimal            @db.Decimal(10, 7)
+  direccion          String?
+  
+  inmuebleId         Int                @unique
+  ubicacionMaestraId Int?
+  marcadores         MarcadorMapa[]
+  inmueble           Inmueble           @relation(fields: [inmuebleId], references: [id], onDelete: Cascade)
+  ubicacion_maestra  ubicacion_maestra? @relation(fields: [ubicacionMaestraId], references: [id])
 
   @@map("ubicacion_inmueble")
 }
@@ -278,6 +283,107 @@ model Visitor {
   usuario     Usuario? @relation(fields: [usuarioId], references: [id])
 
   @@map("visitor")
+}
+
+model public_Telefono {
+  id         Int     @id @default(autoincrement())
+  numero     String
+  usuarioId  Int
+  codigoPais String
+  principal  Boolean
+
+  @@map("Telefono")
+}
+
+model ubicacion_maestra {
+  id                 Int                 @id @default(autoincrement())
+  departamento       String
+  provincia          String?
+  municipio          String?
+  nombre             String
+  latitud            Decimal             @db.Decimal(10, 7)
+  longitud           Decimal             @db.Decimal(10, 7)
+  popularidad        Int                 @default(0)
+  ubicacion_inmueble UbicacionInmueble[]
+
+  @@index([nombre])
+}
+
+model bitacora_pagos {
+  id               Int               @id @default(autoincrement())
+  id_usuario       Int?
+  id_suscripcion   Int?
+  id_transaccion   Int?
+  evento           String            @db.VarChar(100)
+  mensaje          String?
+  fecha_evento     DateTime?         @default(now()) @db.Timestamp(6)
+  plan_suscripcion plan_suscripcion? @relation(fields: [id_suscripcion], references: [id], onUpdate: NoAction)
+  transacciones    transacciones?    @relation(fields: [id_transaccion], references: [id], onUpdate: NoAction)
+  usuario          Usuario?          @relation(fields: [id_usuario], references: [id], onUpdate: NoAction)
+
+  @@index([fecha_evento], map: "idx_bitacora_fecha_evento")
+  @@index([id_transaccion], map: "idx_bitacora_transaccion_id")
+}
+
+model plan_suscripcion {
+  id                     Int                     @id @default(autoincrement())
+  nombre_plan            String                  @db.VarChar(50)
+  descripcion_plan       String?
+  precio_plan            Decimal                 @db.Decimal(10, 2)
+  duracion_plan_dias     Int
+  nro_publicaciones_plan Int
+  bitacora_pagos         bitacora_pagos[]
+  suscripciones_activas  suscripciones_activas[]
+  transacciones          transacciones[]
+}
+
+model suscripciones_activas {
+  id               Int               @id @default(autoincrement())
+  id_usuario       Int?
+  id_suscripcion   Int?
+  id_transaccion   Int?
+  fecha_inicio     DateTime          @db.Timestamp(6)
+  fecha_fin        DateTime          @db.Timestamp(6)
+  estado           String?           @default("INACTIVA") @db.VarChar(20)
+  plan_suscripcion plan_suscripcion? @relation(fields: [id_suscripcion], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  transacciones    transacciones?    @relation(fields: [id_transaccion], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuario          Usuario?          @relation(fields: [id_usuario], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model transacciones {
+  id                     Int                     @id @default(autoincrement())
+  id_usuario             Int
+  id_suscripcion         Int
+  subtotal               Decimal                 @db.Decimal(10, 2)
+  iva_porcentaje         Decimal                 @db.Decimal(5, 2)
+  iva_monto              Decimal                 @db.Decimal(10, 2)
+  total                  Decimal                 @db.Decimal(10, 2)
+  metodo_pago            String?                 @default("QR_BANCARIO") @db.VarChar(30)
+  qr_texto               String?
+  qr_url                 String?
+  fecha_intento          DateTime?               @default(now()) @db.Timestamp(6)
+  fecha_completado       DateTime?               @db.Timestamp(6)
+  estado                 String?                 @default("PENDIENTE") @db.VarChar(20)
+  verificacion_requerida Boolean?                @default(true)
+  tiempo_activacion      DateTime?               @db.Timestamp(6)
+  bitacora_pagos         bitacora_pagos[]
+  suscripciones_activas  suscripciones_activas[]
+  plan_suscripcion       plan_suscripcion        @relation(fields: [id_suscripcion], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuario                Usuario                 @relation(fields: [id_usuario], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  verificacion_pago      verificacion_pago[]
+
+  @@index([estado], map: "idx_transacciones_estado")
+  @@index([id_usuario], map: "idx_transacciones_usuario_id")
+}
+
+model verificacion_pago {
+  id                     Int            @id @default(autoincrement())
+  id_transaccion         Int?
+  id_admin               Int
+  fecha_verificacion     DateTime?      @default(now()) @db.Timestamp(6)
+  resultado_verificacion String?        @default("VERIFICADO") @db.VarChar(20)
+  usuario                Usuario        @relation(fields: [id_admin], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  transacciones          transacciones? @relation(fields: [id_transaccion], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 enum Genero {

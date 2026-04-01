@@ -1,30 +1,31 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useOrdenamiento } from '../../hooks/useOrdenamiento'
-import { MenuOrdenamiento } from './ordenamiento/MenuOrdenamiento'
-import { TarjetaInmueble } from './TarjetaInmueble'
-import { Inmueble } from '../../types/inmueble'
+import { useState, useEffect } from "react";
+import { useOrdenamiento } from "../../hooks/useOrdenamiento";
+import { MenuOrdenamiento } from "./ordenamiento/MenuOrdenamiento";
+import { TarjetaInmueble } from "./TarjetaInmueble";
+import { Inmueble } from "../../types/inmueble";
 
 export const ResultadosBusqueda = () => {
-  const [inmuebles, setInmuebles] = useState<Inmueble[]>([])
-  const [cargando, setCargando] = useState(true)
+  const [inmuebles, setInmuebles] = useState<Inmueble[]>([]);
+  const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/inmuebles')
+    fetch("http://localhost:5000/api/inmuebles")
       .then((res) => res.json())
       .then((data) => {
-        if (data.ok) setInmuebles(data.data)
-        setCargando(false)
+        if (data.ok) setInmuebles(data.data);
+        setCargando(false);
       })
-      .catch(() => setCargando(false))
-  }, [])
+      .catch(() => setCargando(false));
+  }, []);
 
   const { ordenActual, cambiarOrden, inmueblesOrdenados } = useOrdenamiento({
-    inmuebles
-  })
+    inmuebles,
+  });
 
-  if (cargando) return <p className="p-8 text-gray-500">Cargando propiedades...</p>
+  if (cargando)
+    return <p className="p-8 text-gray-500">Cargando propiedades...</p>;
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -45,5 +46,5 @@ export const ResultadosBusqueda = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};

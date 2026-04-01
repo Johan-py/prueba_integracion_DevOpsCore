@@ -1,21 +1,25 @@
-import { useState, useMemo, useCallback } from 'react'
-import { Inmueble, EstadoOrdenamiento, ORDENAMIENTO_DEFAULT } from '../types/inmueble'
-import { ordenarInmuebles } from '../utils/ordenarInmuebles'
+import { useState, useMemo, useCallback } from "react";
+import {
+  Inmueble,
+  EstadoOrdenamiento,
+  ORDENAMIENTO_DEFAULT,
+} from "../types/inmueble";
+import { ordenarInmuebles } from "../utils/ordenarInmuebles";
 
 interface UseOrdenamientoProps {
   /** Array de inmuebles a ordenar (puede estar pre-filtrado) */
-  inmuebles: Inmueble[]
+  inmuebles: Inmueble[];
   /** Estado de ordenamiento inicial (opcional) */
-  ordenInicial?: EstadoOrdenamiento
+  ordenInicial?: EstadoOrdenamiento;
 }
 
 interface UseOrdenamientoResult {
   /** Estado actual del ordenamiento */
-  ordenActual: EstadoOrdenamiento
+  ordenActual: EstadoOrdenamiento;
   /** Función para actualizar el ordenamiento */
-  cambiarOrden: (nuevoOrden: EstadoOrdenamiento) => void
+  cambiarOrden: (nuevoOrden: EstadoOrdenamiento) => void;
   /** Inmuebles ordenados según los criterios actuales */
-  inmueblesOrdenados: Inmueble[]
+  inmueblesOrdenados: Inmueble[];
 }
 
 /**
@@ -34,25 +38,26 @@ interface UseOrdenamientoResult {
  */
 export const useOrdenamiento = ({
   inmuebles,
-  ordenInicial = ORDENAMIENTO_DEFAULT
+  ordenInicial = ORDENAMIENTO_DEFAULT,
 }: UseOrdenamientoProps): UseOrdenamientoResult => {
   // Estado del ordenamiento actual
-  const [ordenActual, setOrdenActual] = useState<EstadoOrdenamiento>(ordenInicial)
+  const [ordenActual, setOrdenActual] =
+    useState<EstadoOrdenamiento>(ordenInicial);
 
   // Callback memoizado para cambiar el orden
   const cambiarOrden = useCallback((nuevoOrden: EstadoOrdenamiento) => {
-    setOrdenActual(nuevoOrden)
-  }, [])
+    setOrdenActual(nuevoOrden);
+  }, []);
 
   // Ordenar inmuebles reactivamente
   // Se re-ejecuta cuando cambian los inmuebles O el estado de ordenamiento
   const inmueblesOrdenados = useMemo(() => {
-    return ordenarInmuebles(inmuebles, ordenActual)
-  }, [inmuebles, ordenActual])
+    return ordenarInmuebles(inmuebles, ordenActual);
+  }, [inmuebles, ordenActual]);
 
   return {
     ordenActual,
     cambiarOrden,
-    inmueblesOrdenados
-  }
-}
+    inmueblesOrdenados,
+  };
+};

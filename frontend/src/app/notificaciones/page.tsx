@@ -76,7 +76,10 @@ export default function NotificationsPage() {
       {!isOnline && (
         <div className="mb-4 flex items-center gap-2 rounded-lg bg-stone-100 px-4 py-3 text-sm text-stone-600">
           <WifiOff className="h-4 w-4 shrink-0 text-stone-400" />
-          <span>Sin conexión. Las notificaciones se actualizarán cuando vuelvas a conectarte.</span>
+          <span>
+            Sin conexión. Las notificaciones se actualizarán cuando vuelvas a
+            conectarte.
+          </span>
         </div>
       )}
 

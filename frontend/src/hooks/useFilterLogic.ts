@@ -16,14 +16,19 @@ export const useFilterLogic = <T extends FilterItem>(
 
   // El ordenamiento ahora depende del "globalSortOrder" que viene del padre
   const visibleData = useMemo(() => {
-    if (!data) return [];
+    if (!data || !Array.isArray(data)) return [];
     const processed = [...data];
 
-    if (globalSortOrder === "asc") {
-      processed.sort((a, b) => a.name.localeCompare(b.name));
-    } else {
-      processed.sort((a, b) => b.name.localeCompare(a.name));
-    }
+    // Ordenamiento con protección contra valores undefined/null
+    processed.sort((a, b) => {
+      // Usamos el operador "Nullish coalescing" o un string vacío como backup
+      const nameA = a?.name ?? "";
+      const nameB = b?.name ?? "";
+
+      return globalSortOrder === "asc"
+        ? nameA.localeCompare(nameB)
+        : nameB.localeCompare(nameA);
+    });
 
     if (viewLevel === 1) return processed.slice(0, 2);
     if (viewLevel === 2) return processed.slice(0, 5);

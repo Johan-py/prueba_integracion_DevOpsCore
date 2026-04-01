@@ -279,7 +279,9 @@ export default function Navbar() {
                     {!isOnline ? (
                       <div className="flex items-center gap-2 border-b border-stone-100 bg-stone-50 px-4 py-2 text-xs text-stone-500">
                         <WifiOff className="h-3 w-3 shrink-0" />
-                        <span>Sin conexión. Se actualizará al reconectarte.</span>
+                        <span>
+                          Sin conexión. Se actualizará al reconectarte.
+                        </span>
                       </div>
                     ) : null}
 

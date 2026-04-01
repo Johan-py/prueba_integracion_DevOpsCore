@@ -13,7 +13,6 @@ export default function Page() {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/25 z-50">
-
       {/* OVERLAY */}
       <div className="absolute inset-0 backdrop-blur-sm"></div>
 
@@ -22,13 +21,11 @@ export default function Page() {
 
       {/* CONTENEDOR */}
       <div className="relative flex items-center justify-center w-full h-full">
-
         {/* MODAL */}
         <div
           className={`bg-[#eeeeee] rounded-2xl px-7 py-8 w-[360px] text-center shadow-md transform transition-all duration-300
           ${visible ? "scale-100 opacity-100" : "scale-95 opacity-0"}`}
         >
-
           {/* ICONO */}
           <div className="flex justify-center mb-5">
             <div className="w-14 h-14 flex items-center justify-center rounded-full bg-red-100">
@@ -44,19 +41,20 @@ export default function Page() {
           {/* TEXTO */}
           <p className="text-sm text-gray-600 mt-3 leading-relaxed px-2">
             Has alcanzado el límite de tus publicaciones gratuitas de este mes.
-            Para continuar, amplía tu plan de membresía o revisa tus planes disponibles.
+            Para continuar, amplía tu plan de membresía o revisa tus planes
+            disponibles.
           </p>
 
           {/* CAJA INTERNA */}
           <div className="mt-5 bg-[#e5e5e5] rounded-lg px-4 py-3 flex items-center justify-between">
             <div className="text-left">
-            <p className="text-gray-700 text-sm">
-              Tus publicaciones restantes:
+              <p className="text-gray-700 text-sm">
+                Tus publicaciones restantes:
               </p>
               <p className="text-red-500 font-semibold text-sm">
-              0 de 3 restantes
-             </p>
-             </div>
+                0 de 3 restantes
+              </p>
+            </div>
             <div className="w-8 h-8 flex items-center justify-center bg-orange-200 rounded-md">
               🔒
             </div>

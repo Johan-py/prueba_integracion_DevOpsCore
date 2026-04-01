@@ -12,19 +12,18 @@ export class FiltersHomepageService {
       this.repository.getCountsByCity($Enums.TipoAccion.VENTA),
       this.repository.getCountsByCategoria(),
     ]);
-
+    // Función auxiliar para evitar repetir lógica y manejar el tipado
+    const mapToHomeFilter = (item: any) => ({
+      // Si el repo ya trae el nombre por un Join, lo usamos. 
+      // Si no, usamos el ID o un placeholder hasta que el repo incluya el nombre.
+      name: item.ubicacionMaestra?.nombre || item.ciudad || `Zona ${item.ubicacionMaestraId}`, 
+      count: item._count.id,
+    });
     return {
-      // TypeScript ahora sabrá que 'r', 's' y 'c' tienen la estructura de Prisma
-      rentals: rentalsRaw.map((r) => ({
-        name: r.ciudad,
-        count: r._count.id,
-      })),
-      sales: salesRaw.map((s) => ({
-        name: s.ciudad,
-        count: s._count.id,
-      })),
-      categories: categoriesRaw.map((c) => ({
-        name: c.categoria || "Otros", // 'categoria' puede ser null en tu Schema
+      rentals: rentalsRaw.map(mapToHomeFilter),
+      sales: salesRaw.map(mapToHomeFilter),
+      categories: categoriesRaw.map((c: any) => ({
+        name: c.categoria || "Otros",
         count: c._count.id,
       })),
     };

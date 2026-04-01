@@ -1,4 +1,3 @@
-
 "use client";
 
 interface TransactionModeFilterProps {
@@ -6,15 +5,18 @@ interface TransactionModeFilterProps {
   onModoChange: (modo: string[]) => void;
 }
 
-export default function TransactionModeFilter({ modoSeleccionado, onModoChange }: TransactionModeFilterProps) {
+export default function TransactionModeFilter({
+  modoSeleccionado,
+  onModoChange,
+}: TransactionModeFilterProps) {
   const modos = [
-  { id: "VENTA", label: "Venta" },
-  { id: "ALQUILER", label: "Alquiler" },
-  { id: "ANTICRETO", label: "Anticrético" }
+    { id: "VENTA", label: "Venta" },
+    { id: "ALQUILER", label: "Alquiler" },
+    { id: "ANTICRETO", label: "Anticrético" },
   ];
   const handleToggle = (id: string) => {
     const nuevos = modoSeleccionado.includes(id)
-      ? modoSeleccionado.filter(m => m !== id)
+      ? modoSeleccionado.filter((m) => m !== id)
       : [...modoSeleccionado, id];
     onModoChange(nuevos);
   };
@@ -22,8 +24,11 @@ export default function TransactionModeFilter({ modoSeleccionado, onModoChange }
   return (
     <div className="flex gap-16">
       {modos.map((modo) => (
-        <label key={modo.id} className="flex items-center gap-8 text-sm text-stone-900 font-medium cursor-pointer">
-          <div className="relative inline-flex shadow-xl"> 
+        <label
+          key={modo.id}
+          className="flex items-center gap-8 text-sm text-stone-900 font-medium cursor-pointer"
+        >
+          <div className="relative inline-flex shadow-xl">
             <input
               type="checkbox"
               name="modoTransaccion"
@@ -38,9 +43,10 @@ export default function TransactionModeFilter({ modoSeleccionado, onModoChange }
               }}
               className={`
                 w-[35px] h-[23px] rounded border cursor-pointer appearance-none
-                ${modoSeleccionado.includes(modo.id) 
-                  ? 'bg-[#d97706] border-[#d97706]' 
-                  : 'bg-white border-gray-400'
+                ${
+                  modoSeleccionado.includes(modo.id)
+                    ? "bg-[#d97706] border-[#d97706]"
+                    : "bg-white border-gray-400"
                 }
               `}
             />

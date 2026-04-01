@@ -37,7 +37,9 @@ export default function GoogleCallbackPage() {
 
     if (prefill) {
       saveGoogleSignupPrefill(prefill);
-      setMessage("Datos obtenidos correctamente. Redirigiendo al formulario...");
+      setMessage(
+        "Datos obtenidos correctamente. Redirigiendo al formulario...",
+      );
     } else {
       setMessage(
         "No se recibieron datos para autocompletar el formulario. Redirigiendo...",
