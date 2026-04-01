@@ -1,15 +1,18 @@
-// TODO: Implementar controlador de verificación de correo
-export const verifyEmailController = async () => {
-  // Placeholder para futuras implementaciones
-};
 // correoverificacion.controller.ts
 import { Request, Response } from 'express'
-import { prisma } from "../../db"; // ✅ Importar el prisma que ellos ya usan
+import { prisma } from "../../db";
+import { enviarCodigoCambioEmail } from '../../lib/email.service.js'
 
 interface AuthRequest extends Request {
   usuario?: {
-    id: number;
-  };
+    id: number
+    nombre?: string
+  }
+}
+
+// TODO: Implementar controlador de verificación de correo
+export const verifyEmailController = async () => {
+  // Placeholder para futuras implementaciones
 }
 
 export const verificarPassword = async (req: AuthRequest, res: Response) => {
@@ -51,8 +54,9 @@ export const verificarPassword = async (req: AuthRequest, res: Response) => {
 
 export const solicitarCambioEmail = async (req: AuthRequest, res: Response) => {
   try {
-    const { emailNuevo } = req.body;
-    const usuarioId = req.usuario?.id;
+    const { emailNuevo } = req.body
+    const usuarioId = req.usuario?.id
+    const nombreUsuario = req.usuario?.nombre
 
     if (!usuarioId) {
       return res.status(401).json({ ok: false, msg: "No autorizado" });
@@ -85,11 +89,21 @@ export const solicitarCambioEmail = async (req: AuthRequest, res: Response) => {
       },
     });
 
+    // Enviar el código por email
+    const emailEnviado = await enviarCodigoCambioEmail({
+      emailDestino: emailNuevo,
+      codigo: otp,
+      nombreUsuario
+    })
+
+    if (!emailEnviado.success) {
+      console.error(`❌ Error al enviar email a ${emailNuevo}, pero el OTP fue guardado`)
+    }
+
     return res.json({
       ok: true,
-      msg: "Código enviado al nuevo correo",
-      otp,
-    });
+      msg: 'Código enviado al nuevo correo'
+    })
   } catch (error) {
     console.error("Error en solicitarCambioEmail:", error);
     return res.status(500).json({
@@ -130,8 +144,8 @@ export const confirmarCambioEmail = async (req: AuthRequest, res: Response) => {
     if (new Date() > solicitud.expiraEn) {
       return res.status(410).json({
         ok: false,
-        msg: "Código expirado",
-      });
+        msg: 'Código expirado. Solicita un nuevo código'
+      })
     }
 
     if (solicitud.token !== otp) {
@@ -164,4 +178,4 @@ export const confirmarCambioEmail = async (req: AuthRequest, res: Response) => {
       msg: "Error al confirmar cambio",
     });
   }
-};
+}
