@@ -6,8 +6,11 @@
     "dev:bun": "bun --hot src/index.ts",
     "dev": "bun --hot src/index.ts",
     "build": "tsc",
-    "lint": "eslint .",
-    "postinstall": "prisma generate"
+    "lint": "eslint . --quiet", 
+    "postinstall": "prisma generate --schema=./prisma/schema.prisma"
+  },
+  "prisma": {
+    "schema": "prisma/schema.prisma"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.6.0",

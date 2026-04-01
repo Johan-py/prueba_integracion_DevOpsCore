@@ -1,12 +1,12 @@
 // 1. Importamos $Enums (con el signo $) desde el cliente generado
-import { $Enums } from "@prisma/client";
-import prisma from "../../config/prisma.js";
+import { $Enums, Prisma } from "@prisma/client";
+import { prisma } from "../../db";
 
 export class FiltersHomepageRepository {
   // 2. Usamos $Enums.TipoAccion para el tipado
   async getCountsByCity(tipoAccion: $Enums.TipoAccion) {
     return await prisma.ubicacionInmueble.groupBy({
-      by: ["ciudad"],
+      by: [Prisma.UbicacionInmuebleScalarFieldEnum.ubicacionMaestraId],
       where: {
         inmueble: {
           tipoAccion: tipoAccion,

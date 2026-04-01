@@ -14,8 +14,8 @@ export default function BusquedaMapaPage() {
   const { data, loading, searchProperties } = usePropertySearch();
 
   useEffect(() => {
-    searchProperties();
-  }, [searchProperties]);
+    searchProperties()
+  }, [])
 
   return (
     <div className="flex flex-col w-full min-h-[calc(100vh-theme(spacing.32))] border rounded-lg overflow-hidden shadow-sm bg-white">
@@ -94,11 +94,15 @@ export default function BusquedaMapaPage() {
           </button>
 
           <div className="absolute inset-0">
+          {!loading && (
             <MapView
               properties={data || []}
               selectedId={selectedPropertyId}
               onSelect={setSelectedPropertyId}
+              isLoading={loading}
+              error={null}
             />
+            )}
           </div>
         </section>
       </div>
