@@ -29,3 +29,5 @@ bun.lockb
 # OS
 .DS_Store
 Thumbs.db
+
+seed-datos_ub_maestra.ts

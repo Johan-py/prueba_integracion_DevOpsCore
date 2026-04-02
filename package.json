@@ -26,9 +26,8 @@
     "eslint": "^10.1.0"
   },
   "dependencies": {
-    "@prisma/adapter-pg": "^7.6.0",
-    "leaflet": "^1.9.4",
-    "react-leaflet": "4.2.1",
+    "@prisma/config": "^7.5.0",
+    "cors": "^2.8.6",
     "tailwind": "^4.0.0"
   }
 }

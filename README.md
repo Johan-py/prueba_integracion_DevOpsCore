@@ -2,16 +2,12 @@
 
 ## 📌 Descripción General
 
-<<<<<<< HEAD
-**PropBol** es una plataforma web enfocada en la **compra, venta y gestión de inmuebles** en Bolivia.
-=======
-
 - Frontend y Backend en **Next.js + TSX** (App Router)
 - API REST simple (`/api/calculator`)
 - Tests con **Bun**
 - Docker para contenedores
 - Scripts de desarrollo y CI/CD listos para pipelines
-  > > > > > > > 56a083c5ffa951ac8667ced549881cfd37d5c116
+  **PropBol** es una plataforma web enfocada en la **compra, venta y gestión de inmuebles** en Bolivia.
 
 Permite a usuarios:
 
@@ -33,12 +29,6 @@ El proyecto sigue un enfoque **monorepo** con separación clara por capas:
 - **Infraestructura** → Docker + CI/CD (GitHub Actions)
 
 ---
-
-<<<<<<< HEAD
-
-## 📂 Estructura del Proyecto
-
-=======
 
 ## ⚡ Requisitos
 
@@ -99,7 +89,7 @@ GET /api/calculator?a=10&b=2&op=divide
 
 Levantar contenedor de desarrollo:
 
-> > > > > > > 56a083c5ffa951ac8667ced549881cfd37d5c116
+## 📂 Estructura del Proyecto
 
 ```bash
 .
@@ -110,19 +100,24 @@ Levantar contenedor de desarrollo:
 └── .github/      # pipelines CI/CD
 ```
 
-# <<<<<<< HEAD
-
 - Acceder a `http://localhost:3000/`
 - API: `http://localhost:3000/api/calculator`
 
-> > > > > > > 56a083c5ffa951ac8667ced549881cfd37d5c116
+=======
+
+- Acceder a `http://localhost:3000/`
+- API: `http://localhost:3000/api/calculator`
 
 ---
 
 ## ⚙️ Requisitos
 
-<<<<<<< HEAD
-Asegúrate de tener instalado:
+- Usa `bun test` para todos los tests; no es necesario configurar Jest manualmente
+- Toda la lógica de API está en `app/api/calculator/route.ts`
+- Layout obligatorio en `app/layout.tsx` para evitar errores de Next.js con App Router
+
+> Este repositorio sirve como **base para construir escenarios de estrés realistas para el equipo de DevOps**.
+> Asegúrate de tener instalado:
 
 - Bun >= 1.x
 - Node.js >= 18
@@ -273,12 +268,4 @@ Para contribuir:
 
 ## 📄 Licencia
 
-# Pendiente de definición.
-
-- Usa `bun test` para todos los tests; no es necesario configurar Jest manualmente
-- Toda la lógica de API está en `app/api/calculator/route.ts`
-- Layout obligatorio en `app/layout.tsx` para evitar errores de Next.js con App Router
-
-> Este repositorio sirve como **base para construir escenarios de estrés realistas para el equipo de DevOps**.
->
-> > > > > > > 56a083c5ffa951ac8667ced549881cfd37d5c116
+Pendiente de definición.
