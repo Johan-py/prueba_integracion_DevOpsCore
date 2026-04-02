@@ -212,91 +212,100 @@ export default function LoginForm() {
     window.addEventListener("message", handleMessage);
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault()
 
-    const trimmedCorreo = correo.trim().toLowerCase();
-    const trimmedPassword = password.trim();
+  const trimmedCorreo = correo.trim().toLowerCase()
+  const trimmedPassword = password.trim()
 
-    const newErrors: { correo?: string; password?: string } = {};
+  const newErrors: { correo?: string; password?: string } = {}
 
-    if (!trimmedCorreo) {
-      newErrors.correo = "El correo es obligatorio";
-    } else if (!/\S+@\S+\.\S+/.test(trimmedCorreo)) {
-      newErrors.correo = "Formato de correo inválido";
+  if (!trimmedCorreo) {
+    newErrors.correo = 'El correo es obligatorio'
+  } else if (!/\S+@\S+\.\S+/.test(trimmedCorreo)) {
+    newErrors.correo = 'Formato de correo inválido'
+  }
+
+  if (!trimmedPassword) {
+    newErrors.password = 'La contraseña es obligatoria'
+  }
+
+  setErrors(newErrors)
+  setErrorMessage('')
+  setSuccessMessage('')
+
+  if (Object.keys(newErrors).length > 0) return
+
+  setIsLoading(true)
+
+  try {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), LOGIN_TIMEOUT_MS)
+
+    const response = await fetch('http://localhost:5000/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        correo: trimmedCorreo,
+        password: trimmedPassword
+      }),
+      signal: controller.signal
+    })
+
+    clearTimeout(timeoutId)
+
+    const data: LoginResponse = await response.json()
+
+    if (!response.ok) {
+      setPassword('')
+      if (response.status === 404) {
+        setErrorMessage('Esta cuenta no está registrada. Puedes registrarte para crear una cuenta.')
+        return
+      }
+      setErrorMessage(data.message || 'Error al iniciar sesión')
+      return
     }
 
-    if (!trimmedPassword) {
-      newErrors.password = "La contraseña es obligatoria";
+    if (data.token) {
+      localStorage.setItem('token', data.token)
     }
 
-    setErrors(newErrors);
-    setErrorMessage("");
-    setSuccessMessage("");
-    setGoogleError("");
+    const userName =
+      data.user?.nombre && data.user?.apellido
+        ? `${data.user.nombre} ${data.user.apellido}`
+        : (data.user?.correo ?? trimmedCorreo)
 
-    if (Object.keys(newErrors).length > 0) return;
+    localStorage.setItem(
+      'propbol_user',
+      JSON.stringify({
+        name: userName,
+        email: data.user?.correo ?? trimmedCorreo
+      })
+    )
+    localStorage.setItem('propbol_session_expires', String(Date.now() + 60 * 60 * 1000))
 
-    setIsLoading(true);
+    setSuccessMessage(data.message || 'Inicio de sesión exitoso')
 
-    const controller = new AbortController();
-    const timeoutId = window.setTimeout(() => {
-      controller.abort();
-    }, LOGIN_TIMEOUT_MS);
+    window.dispatchEvent(new Event('propbol:login'))
+    window.dispatchEvent(new Event('propbol:session-changed'))
 
-    try {
-      const response = await fetch(`${API_URL}/api/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          correo: trimmedCorreo,
-          password: trimmedPassword,
-        }),
-        signal: controller.signal,
-      });
+    setTimeout(() => {
+      router.push('/')
+    }, 1000)
 
-      const data: LoginResponse = await response.json();
-
-      if (!response.ok) {
-        setPassword("");
-
-        if (response.status === 404) {
-          setErrorMessage(
-            "Esta cuenta no está registrada. Puedes registrarte para crear una cuenta.",
-          );
-          return;
-        }
-
-        setErrorMessage(data.message || "Error al iniciar sesión");
-        return;
-      }
-
-      if (data.token) {
-        saveSession(data.token, data.user);
-      }
-
-      setSuccessMessage(data.message || "Inicio de sesión exitoso");
-
-      window.setTimeout(() => {
-        router.push("/");
-      }, 1000);
-    } catch (error) {
-      setPassword("");
-
-      if (error instanceof Error && error.name === "AbortError") {
-        setErrorMessage(
-          "La solicitud tardó demasiado. Por favor intenta nuevamente.",
-        );
-      } else {
-        setErrorMessage("No se pudo conectar con el servidor");
-      }
-    } finally {
-      window.clearTimeout(timeoutId);
-      setIsLoading(false);
+  } catch (error) {
+    setPassword('')
+    if (error instanceof Error && error.name === 'AbortError') {
+      setErrorMessage('La solicitud tardó demasiado. Por favor intenta nuevamente.')
+    } else if (!navigator.onLine) {
+      setErrorMessage('Sin conexión a internet. Verifica tu red e intenta nuevamente.')
+    } else {
+      setErrorMessage('No se pudo conectar con el servidor. Intenta nuevamente.')
     }
-  };
+  } finally {
+    setIsLoading(false)
+  }
+}
 
   return (
     <div className="w-full max-w-sm rounded-md bg-white p-6 shadow-md">
