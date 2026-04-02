@@ -71,43 +71,46 @@ export default function LoginForm() {
   }
 
   const handleGoogleLogin = () => {
-    setGoogleError('')
-    setIsLoadingGoogle(true)
+  setGoogleError('')
+  setErrorMessage('')
+  setSuccessMessage('')
 
-    const popup = window.open(
-      `${API_URL}/api/auth/google/login`,
-      'google-login',
-      'width=500,height=600'
+  const popupWidth = 500
+  const popupHeight = 600
+  const left = window.screenX + (window.outerWidth - popupWidth) / 2
+  const top = window.screenY + (window.outerHeight - popupHeight) / 2
+
+  setIsLoadingGoogle(true)
+
+  const popup = window.open(
+    `${API_URL}/api/auth/google/login`,
+    'google-login',
+    `width=${popupWidth},height=${popupHeight},left=${left},top=${top}`
+  )
+
+  if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+    setGoogleError(
+      'El navegador bloqueó la ventana emergente. Habilita los pop-ups para continuar.'
     )
-
-    if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-      setGoogleError(
-        'El navegador bloqueó la ventana emergente. Habilita los pop-ups para continuar.'
-      )
-      setIsLoadingGoogle(false)
-      return
-    }
-
-    const googleTimeoutId = setTimeout(() => {
-      clearInterval(checkPopup)
-      if (!popup.closed) popup.close()
-      setIsLoadingGoogle(false)
-      setGoogleError('La autenticación con Google tardó demasiado. Por favor intenta nuevamente.')
-    }, 2 * 60 * 1000)
-
-    const checkPopup = setInterval(() => {
-      if (popup.closed) {
-        clearInterval(checkPopup)
-        clearTimeout(googleTimeoutId)
-        setIsLoadingGoogle(false)
-
-        const tokenGuardado = localStorage.getItem('token')
-        if (!tokenGuardado) {
-          setGoogleError('Cancelaste el inicio de sesión con Google. Puedes intentarlo nuevamente.')
-        }
-      }
-    }, 500)
+    setIsLoadingGoogle(false)
+    return
   }
+
+  popup.focus()
+
+  const checkPopup = window.setInterval(() => {
+    if (popup.closed) {
+      window.clearInterval(checkPopup)
+      setIsLoadingGoogle(false)
+
+      const tokenGuardado = localStorage.getItem('token')
+
+      if (!tokenGuardado) {
+        setGoogleError('Cancelaste el inicio de sesión con Google. Puedes intentarlo nuevamente.')
+      }
+    }
+  }, 500)
+}
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
