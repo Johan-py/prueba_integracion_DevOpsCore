@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
@@ -28,6 +28,19 @@ export default function LoginForm() {
   const [successMessage, setSuccessMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [googleError, setGoogleError] = useState('')
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const motivo = params.get('motivo')
+    const reason = params.get('reason')
+
+    if (motivo === 'no-autenticado') {
+      setErrorMessage('Debes iniciar sesión para acceder a esa página.')
+    } else if (motivo === 'sesion-expirada' || reason === 'inactivity') {
+      setErrorMessage('Tu sesión expiró. Por favor inicia sesión nuevamente.')
+    }
+  }, [])
+
   const isFormValid = correo.length > 0 && password.length > 0 && !errors.correo && !errors.password
 
   const validate = (field: string, value: string) => {
@@ -55,8 +68,6 @@ export default function LoginForm() {
 
     setErrors(newErrors)
   }
-
-
 
   const handleGoogleLogin = () => {
     setGoogleError('')
