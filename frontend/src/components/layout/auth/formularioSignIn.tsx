@@ -131,6 +131,12 @@ export default function LoginForm() {
 
       if (!response.ok) {
         setPassword('')
+              if (response.status === 404) {
+               setErrorMessage(
+               'Esta cuenta no está registrada. Puedes registrarte para crear una cuenta.'
+              )
+              return
+              }
         setErrorMessage(data.message || 'Error al iniciar sesión')
         return
       }
