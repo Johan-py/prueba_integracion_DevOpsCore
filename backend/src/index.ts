@@ -131,59 +131,6 @@ app.post("/api/locations/popularidad", async (req, res) => {
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", message: "Backend is running" });
 });
-app.get("/api/auth/google/callback", async (req, res) => {
-  const rawCode = req.query.code;
-  const rawError = req.query.error;
-
-  if (typeof rawError === "string") {
-    const message =
-      rawError === "access_denied"
-        ? "Cancelaste el inicio de sesión con Google."
-        : "No se pudo iniciar sesión con Google.";
-
-    return res.status(200).send(
-      buildGooglePopupResponseHtml({
-        type: "GOOGLE_AUTH_ERROR",
-        error: message,
-      }),
-    );
-  }
-
-  if (typeof rawCode !== "string" || !rawCode.trim()) {
-    return res.status(200).send(
-      buildGooglePopupResponseHtml({
-        type: "GOOGLE_AUTH_ERROR",
-        error: "Google no devolvió un código válido.",
-      }),
-    );
-  }
-
-  try {
-    const result = await loginWithGoogleCodeService(rawCode);
-
-    return res.status(200).send(
-      buildGooglePopupResponseHtml({
-        type: "GOOGLE_AUTH_SUCCESS",
-        token: result.token,
-        user: result.user,
-      }),
-    );
-  } catch (error) {
-    const message =
-      error instanceof AuthError
-        ? error.message
-        : error instanceof Error
-          ? error.message
-          : "No se pudo iniciar sesión con Google.";
-
-    return res.status(200).send(
-      buildGooglePopupResponseHtml({
-        type: "GOOGLE_AUTH_ERROR",
-        error: message,
-      }),
-    );
-  }
-});
 
 app.get("/api/properties/search", propertiesController.search);
 app.get("/api/inmuebles", propertiesController.getAll);
