@@ -6,31 +6,31 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'via.placeholder.com',
         port: '',
-        pathname: '/**',
+        pathname: '/**'
       },
       //pare permitir cargar las imágenes desde Supabase Storage
       {
         protocol: 'https',
         hostname: 'yiwjlbpbziydpkowvfmd.supabase.co',
         port: '',
-        pathname: '/storage/v1/object/**',
+        pathname: '/storage/v1/object/**'
       },
       // para permitir imágenes externas de banderas
       {
         protocol: 'https',
         hostname: 'flagcdn.com',
         port: '',
-        pathname: '/**',
+        pathname: '/**'
       },
       // para permitir imágenes de Unsplash
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
         port: '',
-        pathname: '/**',
-      },
-    ],
-  },
-};
+        pathname: '/**'
+      }
+    ]
+  }
+}
 
-export default nextConfig;
+export default nextConfig
