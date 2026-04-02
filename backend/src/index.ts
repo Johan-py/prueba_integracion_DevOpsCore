@@ -53,7 +53,6 @@ app.post("/api/auth/register", registerController);
 app.post("/api/auth/login", loginController);
 app.post("/api/auth/logout", logoutController);
 app.post("/api/auth/verify-register", verifyRegisterCodeController);
-
 app.get("/api/auth/google/login", StratGoogleLoginController);
 
 app.get("/api/auth/google/callback", googleCallbackController);
