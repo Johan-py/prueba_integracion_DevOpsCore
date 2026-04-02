@@ -20,7 +20,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
 export default function LoginForm() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-
+const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
   const [correo, setCorreo] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<{ correo?: string; password?: string }>(
@@ -65,23 +65,27 @@ export default function LoginForm() {
 
 const handleGoogleLogin = () => {
   setGoogleError("");
+  setIsLoadingGoogle(true);
 
   const popup = window.open(
     `${API_URL}/api/auth/google`,
     "_blank",
-    "width=500,height=600",
+    "width=500,height=600"
   );
 
   if (!popup || popup.closed || typeof popup.closed === "undefined") {
     setGoogleError(
-      "El navegador bloqueó la ventana emergente. Habilita los pop-ups para continuar.",
+      "El navegador bloqueó la ventana emergente. Habilita los pop-ups para continuar."
     );
+    setIsLoadingGoogle(false);
     return;
   }
 
-  const popupMonitor = setInterval(() => {
+  
+  const checkPopup = setInterval(() => {
     if (popup.closed) {
-      clearInterval(popupMonitor)
+      clearInterval(checkPopup);
+      setIsLoadingGoogle(false); 
  
       const tokenGuardado = localStorage.getItem("token")
       if (!tokenGuardado) {
@@ -90,8 +94,8 @@ const handleGoogleLogin = () => {
         )
       }
     }
-  }, 500)
-}
+  }, 500);
+};
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -263,10 +267,11 @@ const handleGoogleLogin = () => {
         <button
           type="button"
           onClick={handleGoogleLogin}
-          className="flex w-full items-center justify-center gap-2 rounded-md border border-gray-300 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          disabled={isLoadingGoogle} 
+          className="flex w-full items-center justify-center gap-2 rounded-md border border-gray-300 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
         >
           <span className="text-base font-bold">G</span>
-          Continuar con Google
+          {isLoadingGoogle ? "Autenticando..." : "Continuar con Google"}
         </button>
 
         {googleError && (
