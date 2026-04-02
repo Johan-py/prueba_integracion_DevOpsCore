@@ -36,6 +36,7 @@ type GooglePopupErrorMessage = {
 type GooglePopupMessage = GooglePopupSuccessMessage | GooglePopupErrorMessage;
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
+const LOGIN_TIMEOUT_MS = 10000;
 
 const saveSession = (token: string, user?: LoginResponse["user"]) => {
   localStorage.setItem("token", token);
@@ -57,6 +58,7 @@ const saveSession = (token: string, user?: LoginResponse["user"]) => {
     "propbol_session_expires",
     String(Date.now() + 60 * 60 * 1000),
   );
+
   window.dispatchEvent(new Event("propbol:login"));
   window.dispatchEvent(new Event("propbol:session-changed"));
 };
@@ -82,6 +84,7 @@ export default function LoginForm() {
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [googleError, setGoogleError] = useState("");
+
   const isFormValid =
     correo.length > 0 &&
     password.length > 0 &&
@@ -117,12 +120,19 @@ export default function LoginForm() {
 
   const handleGoogleLogin = () => {
     setGoogleError("");
+    setErrorMessage("");
+    setSuccessMessage("");
     setIsLoadingGoogle(true);
+
+    const popupWidth = 500;
+    const popupHeight = 600;
+    const left = window.screenX + (window.outerWidth - popupWidth) / 2;
+    const top = window.screenY + (window.outerHeight - popupHeight) / 2;
 
     const popup = window.open(
       `${API_URL}/api/auth/google/login`,
       "google-login",
-      "width=500,height=600",
+      `width=${popupWidth},height=${popupHeight},left=${left},top=${top}`,
     );
 
     if (!popup || popup.closed || typeof popup.closed === "undefined") {
@@ -132,6 +142,8 @@ export default function LoginForm() {
       setIsLoadingGoogle(false);
       return;
     }
+
+    popup.focus();
 
     const expectedOrigin = new URL(API_URL).origin;
     let authWasResolved = false;
@@ -187,9 +199,13 @@ export default function LoginForm() {
       cleanup();
 
       if (!authWasResolved) {
-        setGoogleError(
-          "Cancelaste el inicio de sesión con Google. Puedes intentarlo nuevamente.",
-        );
+        const tokenGuardado = localStorage.getItem("token");
+
+        if (!tokenGuardado) {
+          setGoogleError(
+            "Cancelaste el inicio de sesión con Google. Puedes intentarlo nuevamente.",
+          );
+        }
       }
     }, 500);
 
@@ -217,13 +233,19 @@ export default function LoginForm() {
     setErrors(newErrors);
     setErrorMessage("");
     setSuccessMessage("");
+    setGoogleError("");
 
     if (Object.keys(newErrors).length > 0) return;
 
     setIsLoading(true);
 
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => {
+      controller.abort();
+    }, LOGIN_TIMEOUT_MS);
+
     try {
-      const response = await fetch("http://localhost:5000/api/auth/login", {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -232,49 +254,46 @@ export default function LoginForm() {
           correo: trimmedCorreo,
           password: trimmedPassword,
         }),
+        signal: controller.signal,
       });
 
       const data: LoginResponse = await response.json();
 
       if (!response.ok) {
         setPassword("");
+
+        if (response.status === 404) {
+          setErrorMessage(
+            "Esta cuenta no está registrada. Puedes registrarte para crear una cuenta.",
+          );
+          return;
+        }
+
         setErrorMessage(data.message || "Error al iniciar sesión");
         return;
       }
 
       if (data.token) {
-        localStorage.setItem("token", data.token);
+        saveSession(data.token, data.user);
       }
-
-      const userName =
-        data.user?.nombre && data.user?.apellido
-          ? `${data.user.nombre} ${data.user.apellido}`
-          : (data.user?.correo ?? trimmedCorreo);
-
-      localStorage.setItem(
-        "propbol_user",
-        JSON.stringify({
-          name: userName,
-          email: data.user?.correo ?? trimmedCorreo,
-        }),
-      );
-      localStorage.setItem(
-        "propbol_session_expires",
-        String(Date.now() + 60 * 60 * 1000),
-      );
 
       setSuccessMessage(data.message || "Inicio de sesión exitoso");
 
-      window.dispatchEvent(new Event("propbol:login"));
-      window.dispatchEvent(new Event("propbol:session-changed"));
-
-      setTimeout(() => {
+      window.setTimeout(() => {
         router.push("/");
       }, 1000);
-    } catch {
+    } catch (error) {
       setPassword("");
-      setErrorMessage("No se pudo conectar con el servidor");
+
+      if (error instanceof Error && error.name === "AbortError") {
+        setErrorMessage(
+          "La solicitud tardó demasiado. Por favor intenta nuevamente.",
+        );
+      } else {
+        setErrorMessage("No se pudo conectar con el servidor");
+      }
     } finally {
+      window.clearTimeout(timeoutId);
       setIsLoading(false);
     }
   };

@@ -1,5 +1,7 @@
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import { env } from "./config/env.js";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { propertiesController } from "./modules/properties/properties.controller.js";
 import {
@@ -27,6 +29,11 @@ import {
   StratGoogleLoginController,
 } from "./modules/auth/google/google.controller.js";
 
+import {
+  AuthError,
+  loginWithGoogleCodeService,
+} from "./modules/auth/auth.service.js";
+
 const app = express();
 
 app.use(
@@ -47,12 +54,60 @@ app.post("/api/users", (req, res) => {
   const user = req.body;
   res.json({ message: "User created", user });
 });
-
 app.post("/api/auth/register", registerController);
 app.post("/api/auth/login", loginController);
 app.post("/api/auth/logout", logoutController);
 app.post("/api/auth/verify-register", verifyRegisterCodeController);
+const buildGooglePopupResponseHtml = (payload: {
+  type: "GOOGLE_AUTH_SUCCESS" | "GOOGLE_AUTH_ERROR";
+  token?: string;
+  user?: unknown;
+  error?: string;
+}) => {
+  return `
+    <!doctype html>
+    <html lang="es">
+      <head>
+        <meta charset="UTF-8" />
+        <title>Google Auth</title>
+      </head>
+      <body>
+        <script>
+          (function () {
+            const message = ${JSON.stringify({
+              source: "propbol-google-auth",
+              ...payload,
+            })};
+            const frontendOrigin = ${JSON.stringify(env.FRONTEND_URL)};
 
+            if (window.opener && !window.opener.closed) {
+              window.opener.postMessage(message, frontendOrigin);
+              window.close();
+              return;
+            }
+
+            const params = new URLSearchParams();
+
+            if (message.type === 'GOOGLE_AUTH_SUCCESS') {
+              params.set('google', 'success');
+              params.set('token', message.token || '');
+            } else {
+              params.set('google', 'error');
+              params.set(
+                'message',
+                typeof message.error === 'string'
+                  ? message.error
+                  : 'No se pudo iniciar sesión con Google'
+              );
+            }
+
+            window.location.href = frontendOrigin + '/sign-in?' + params.toString();
+          })();
+        </script>
+      </body>
+    </html>
+  `;
+};
 app.get("/api/auth/google/login", StratGoogleLoginController);
 
 app.get("/api/auth/google/callback", googleCallbackController);
@@ -75,6 +130,59 @@ app.post("/api/locations/popularidad", async (req, res) => {
 
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", message: "Backend is running" });
+});
+app.get("/api/auth/google/callback", async (req, res) => {
+  const rawCode = req.query.code;
+  const rawError = req.query.error;
+
+  if (typeof rawError === "string") {
+    const message =
+      rawError === "access_denied"
+        ? "Cancelaste el inicio de sesión con Google."
+        : "No se pudo iniciar sesión con Google.";
+
+    return res.status(200).send(
+      buildGooglePopupResponseHtml({
+        type: "GOOGLE_AUTH_ERROR",
+        error: message,
+      }),
+    );
+  }
+
+  if (typeof rawCode !== "string" || !rawCode.trim()) {
+    return res.status(200).send(
+      buildGooglePopupResponseHtml({
+        type: "GOOGLE_AUTH_ERROR",
+        error: "Google no devolvió un código válido.",
+      }),
+    );
+  }
+
+  try {
+    const result = await loginWithGoogleCodeService(rawCode);
+
+    return res.status(200).send(
+      buildGooglePopupResponseHtml({
+        type: "GOOGLE_AUTH_SUCCESS",
+        token: result.token,
+        user: result.user,
+      }),
+    );
+  } catch (error) {
+    const message =
+      error instanceof AuthError
+        ? error.message
+        : error instanceof Error
+          ? error.message
+          : "No se pudo iniciar sesión con Google.";
+
+    return res.status(200).send(
+      buildGooglePopupResponseHtml({
+        type: "GOOGLE_AUTH_ERROR",
+        error: message,
+      }),
+    );
+  }
 });
 
 app.get("/api/properties/search", propertiesController.search);

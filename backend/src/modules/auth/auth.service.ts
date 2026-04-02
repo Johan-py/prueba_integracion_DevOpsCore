@@ -445,3 +445,102 @@ export const logoutService = async (token: string) => {
     message: "Logout exitoso",
   };
 };
+
+type GoogleTokenResponse = {
+  access_token?: string;
+  expires_in?: number;
+  id_token?: string;
+  scope?: string;
+  token_type?: string;
+  error?: string;
+  error_description?: string;
+};
+
+type GoogleUserInfoResponse = {
+  id?: string;
+  email?: string;
+  verified_email?: boolean;
+  name?: string;
+  given_name?: string;
+  family_name?: string;
+  picture?: string;
+};
+
+export const loginWithGoogleCodeService = async (code: string) => {
+  const normalizedCode = code?.trim();
+
+  if (!normalizedCode) {
+    throw new Error("Google no devolvió un código válido");
+  }
+
+  const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: new URLSearchParams({
+      code: normalizedCode,
+      client_id: env.GOOGLE_CLIENT_ID,
+      client_secret: env.GOOGLE_CLIENT_SECRET,
+      redirect_uri: env.GOOGLE_CALLBACK_URL,
+      grant_type: "authorization_code",
+    }).toString(),
+  });
+
+  const tokenData = (await tokenResponse.json()) as GoogleTokenResponse;
+
+  if (!tokenResponse.ok || !tokenData.access_token) {
+    throw new Error("No se pudo validar la autenticación con Google");
+  }
+
+  const userInfoResponse = await fetch(
+    "https://www.googleapis.com/oauth2/v2/userinfo",
+    {
+      headers: {
+        Authorization: `Bearer ${tokenData.access_token}`,
+      },
+    },
+  );
+
+  const googleUser = (await userInfoResponse.json()) as GoogleUserInfoResponse;
+
+  if (!userInfoResponse.ok) {
+    throw new Error("No se pudo obtener la información de la cuenta de Google");
+  }
+
+  const correo = googleUser.email?.trim().toLowerCase();
+
+  if (!correo || googleUser.verified_email === false) {
+    throw new Error("Google no devolvió un correo válido");
+  }
+
+  const user = await findUserByCorreo(correo);
+
+  if (!user) {
+    throw new AuthError("La cuenta de Google no está asociada al sistema", 404);
+  }
+
+  const jwtPayload: JwtPayload = {
+    id: user.id,
+    correo: user.correo,
+  };
+
+  const token = generateToken(jwtPayload);
+  const fechaExpiracion = new Date(Date.now() + 60 * 60 * 1000);
+
+  await createSession({
+    token,
+    usuarioId: user.id,
+    fechaExpiracion,
+  });
+
+  return {
+    user: {
+      id: user.id,
+      correo: user.correo,
+      nombre: user.nombre,
+      apellido: user.apellido,
+    },
+    token,
+  };
+};
