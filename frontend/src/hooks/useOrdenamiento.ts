@@ -1,63 +1,81 @@
-import { useState, useMemo, useCallback } from "react";
-import {
-  Inmueble,
-  EstadoOrdenamiento,
-  ORDENAMIENTO_DEFAULT,
-} from "../types/inmueble";
-import { ordenarInmuebles } from "../utils/ordenarInmuebles";
+import { useState, useMemo, useCallback, useEffect } from 'react'
+import { Inmueble, EstadoOrdenamiento, ORDENAMIENTO_DEFAULT } from '../types/inmueble'
+import { ordenarInmuebles } from '../utils/ordenarInmuebles'
+
+const STORAGE_KEY = 'propbol:ordenamiento'
+
+function cargarOrdenGuardado(): EstadoOrdenamiento {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return ORDENAMIENTO_DEFAULT
+
+    const parsed = JSON.parse(raw) as EstadoOrdenamiento
+
+    const criteriosValidos = [null, 'fecha', 'precio', 'superficie']
+    if (!criteriosValidos.includes(parsed.criterioActivo)) return ORDENAMIENTO_DEFAULT
+
+    return parsed
+  } catch {
+    return ORDENAMIENTO_DEFAULT
+  }
+}
+
+function guardarOrden(orden: EstadoOrdenamiento): void {
+  try {
+    if (orden.criterioActivo === null) {
+      localStorage.removeItem(STORAGE_KEY)
+    } else {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(orden))
+    }
+  } catch {
+    // localStorage puede estar bloqueado (modo privado estricto, Safari, etc.)
+    // Fallamos silenciosamente — la app sigue funcionando sin persistencia.
+  }
+}
+
+// ── Hook ──────────────────────────────────────────────────────────────────────
 
 interface UseOrdenamientoProps {
-  /** Array de inmuebles a ordenar (puede estar pre-filtrado) */
-  inmuebles: Inmueble[];
-  /** Estado de ordenamiento inicial (opcional) */
-  ordenInicial?: EstadoOrdenamiento;
+  inmuebles: Inmueble[]
+  ordenInicial?: EstadoOrdenamiento
 }
 
 interface UseOrdenamientoResult {
-  /** Estado actual del ordenamiento */
-  ordenActual: EstadoOrdenamiento;
-  /** Función para actualizar el ordenamiento */
-  cambiarOrden: (nuevoOrden: EstadoOrdenamiento) => void;
-  /** Inmuebles ordenados según los criterios actuales */
-  inmueblesOrdenados: Inmueble[];
+  ordenActual: EstadoOrdenamiento
+  cambiarOrden: (nuevoOrden: EstadoOrdenamiento) => void
+  inmueblesOrdenados: Inmueble[]
 }
 
 /**
- * Hook para manejar el ordenamiento simultáneo de inmuebles.
+ * Hook para manejar el ordenamiento de inmuebles con persistencia.
  *
- * Características:
- * - Soporta ordenamiento por múltiples criterios simultáneos
- * - Estado por defecto: Más recientes, Precio menor a mayor, Superficie menor a mayor
- * - Se re-aplica automáticamente cuando cambian los inmuebles filtrados
- * - Ordena en cliente sin llamadas a API
- *
- * @example
- * const { ordenActual, cambiarOrden, inmueblesOrdenados } = useOrdenamiento({
- *   inmuebles: inmueblesFiltrados
- * })
+ * Comportamiento:
+ * - Primera visita o sin criterio guardado → ordena por fecha más recientes (default)
+ * - Si el usuario eligió un criterio antes → lo recupera al refrescar
+ * - Si el usuario limpia el ordenamiento → borra la preferencia guardada
+ * - Falla silenciosamente si localStorage no está disponible
  */
 export const useOrdenamiento = ({
   inmuebles,
-  ordenInicial = ORDENAMIENTO_DEFAULT,
+  ordenInicial
 }: UseOrdenamientoProps): UseOrdenamientoResult => {
-  // Estado del ordenamiento actual
-  const [ordenActual, setOrdenActual] =
-    useState<EstadoOrdenamiento>(ordenInicial);
+  const [ordenActual, setOrdenActual] = useState<EstadoOrdenamiento>(() => {
+    // Prioridad: ordenInicial (si se pasó explícitamente) → localStorage → default
+    return ordenInicial ?? cargarOrdenGuardado()
+  })
 
-  // Callback memoizado para cambiar el orden
+  // Persistir cada vez que el orden cambia
+  useEffect(() => {
+    guardarOrden(ordenActual)
+  }, [ordenActual])
+
   const cambiarOrden = useCallback((nuevoOrden: EstadoOrdenamiento) => {
-    setOrdenActual(nuevoOrden);
-  }, []);
+    setOrdenActual(nuevoOrden)
+  }, [])
 
-  // Ordenar inmuebles reactivamente
-  // Se re-ejecuta cuando cambian los inmuebles O el estado de ordenamiento
   const inmueblesOrdenados = useMemo(() => {
-    return ordenarInmuebles(inmuebles, ordenActual);
-  }, [inmuebles, ordenActual]);
+    return ordenarInmuebles(inmuebles, ordenActual)
+  }, [inmuebles, ordenActual])
 
-  return {
-    ordenActual,
-    cambiarOrden,
-    inmueblesOrdenados,
-  };
-};
+  return { ordenActual, cambiarOrden, inmueblesOrdenados }
+}

@@ -1,23 +1,23 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { registerUser } from "../../src/modules/auth/auth.service.js";
+import type { VercelRequest, VercelResponse } from '@vercel/node'
+import { registerUser } from '../../src/modules/auth/auth.service.js'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== "POST") {
+  if (req.method !== 'POST') {
     return res.status(405).json({
-      message: "Método no permitido",
-    });
+      message: 'Método no permitido'
+    })
   }
 
   try {
-    const result = await registerUser(req.body);
+    const result = await registerUser(req.body)
     return res.status(201).json({
-      message: "Usuario registrado correctamente",
+      message: 'Usuario registrado correctamente',
       user: result.user,
-      token: result.token,
-    });
+      token: result.token
+    })
   } catch (error) {
     return res.status(400).json({
-      message: error instanceof Error ? error.message : "Error en registro",
-    });
+      message: error instanceof Error ? error.message : 'Error en registro'
+    })
   }
 }

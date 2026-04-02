@@ -1,24 +1,20 @@
-import { Router } from "express";
+import { Router } from 'express'
 import {
   crearPublicacion,
   listarPublicaciones,
-  validarPublicacionesFree,
-} from "../controllers/publicacionesController.js";
-import { authMiddleware } from "../middleware/authMiddleware.js";
+  validarPublicacionesFree
+} from '../controllers/publicacionesController.js'
+import { authMiddleware } from '../middleware/authMiddleware.js'
 
-const router = Router();
+const router = Router()
 
 // Crear publicación
-router.post("/publicaciones", authMiddleware, crearPublicacion);
+router.post('/publicaciones', authMiddleware, crearPublicacion)
 
 // Listar publicaciones
-router.get("/publicaciones", listarPublicaciones);
+router.get('/publicaciones', listarPublicaciones)
 
 // Validar publicaciones gratuitas
-router.get(
-  "/users/:id/publicaciones/free",
-  authMiddleware,
-  validarPublicacionesFree,
-);
+router.get('/users/:id/publicaciones/free', authMiddleware, validarPublicacionesFree)
 
-export default router;
+export default router
