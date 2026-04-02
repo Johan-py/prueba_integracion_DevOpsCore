@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer';
+import nodemailer from 'nodemailer'
 
 // Configuración del transporter
 const transporter = nodemailer.createTransport({
@@ -7,21 +7,21 @@ const transporter = nodemailer.createTransport({
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASSWORD
   }
-});
+})
 
 // Verificar conexión
 transporter.verify((error, success) => {
   if (error) {
-    console.error('❌ Error en configuración de email:', error);
+    console.error('❌ Error en configuración de email:', error)
   } else {
-    console.log('✅ Servicio de email listo');
+    console.log('✅ Servicio de email listo')
   }
-});
+})
 
 interface EnviarCodigoParams {
-  emailDestino: string;
-  codigo: string;
-  nombreUsuario?: string;
+  emailDestino: string
+  codigo: string
+  nombreUsuario?: string
 }
 
 export const enviarCodigoCambioEmail = async ({
@@ -93,12 +93,12 @@ export const enviarCodigoCambioEmail = async ({
         ---
         Este es un mensaje automático, por favor no responder.
       `
-    });
+    })
 
-    console.log(`✅ Email enviado a ${emailDestino} - ID: ${info.messageId}`);
-    return { success: true, messageId: info.messageId };
+    console.log(`✅ Email enviado a ${emailDestino} - ID: ${info.messageId}`)
+    return { success: true, messageId: info.messageId }
   } catch (error) {
-    console.error('❌ Error al enviar email:', error);
-    return { success: false, error };
+    console.error('❌ Error al enviar email:', error)
+    return { success: false, error }
   }
-};
+}

@@ -1,22 +1,16 @@
-import Image from "next/image";
-import FilterBar from "../filters/FilterBar";
+import Image from 'next/image'
+import FilterBar from '../filters/FilterBar'
 
 interface BannerProps {
-  url: string;
-  title?: string;
-  subtitle?: string;
+  url: string
+  title?: string
+  subtitle?: string
 }
 
 export const HomeBanner = ({ url, title, subtitle }: BannerProps) => {
   return (
     <div className="relative w-full h-[60vh] min-h-[300px] bg-slate-100 flex items-center justify-center">
-      <Image
-        src={url}
-        alt="Portada principal"
-        fill
-        className="object-cover"
-        priority
-      />
+      <Image src={url} alt="Portada principal" fill className="object-cover" priority />
 
       {/* Capa oscura para que el texto blanco siempre se lea bien */}
       <div className="absolute inset-0 bg-black/45 z-0" />
@@ -47,5 +41,5 @@ export const HomeBanner = ({ url, title, subtitle }: BannerProps) => {
         {/* Aquí podrías poner una versión simplificada o la misma FilterBar ajustada */}
       </div>
     </div>
-  );
-};
+  )
+}
