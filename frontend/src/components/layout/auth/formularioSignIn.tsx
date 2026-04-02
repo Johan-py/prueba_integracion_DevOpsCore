@@ -135,10 +135,22 @@ export default function LoginForm() {
     setIsLoadingGoogle(true)
     googleAuthResolvedRef.current = false
 
-    const popup = window.open(
-      `${API_URL}/api/auth/google/login`,
-      'google-login',
-      'width=500,height=600'
+  const popupWidth = 500
+  const popupHeight = 600
+  const left = window.screenX + (window.outerWidth - popupWidth) / 2
+  const top = window.screenY + (window.outerHeight - popupHeight) / 2
+
+  setIsLoadingGoogle(true)
+
+  const popup = window.open(
+    `${API_URL}/api/auth/google/login`,
+    'google-login',
+    `width=${popupWidth},height=${popupHeight},left=${left},top=${top}`
+  )
+
+  if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+    setGoogleError(
+      'El navegador bloqueó la ventana emergente. Habilita los pop-ups para continuar.'
     )
 
     if (!popup || popup.closed || typeof popup.closed === 'undefined') {
@@ -168,6 +180,22 @@ export default function LoginForm() {
       }
     }, 500)
   }
+
+  popup.focus()
+
+  const checkPopup = window.setInterval(() => {
+    if (popup.closed) {
+      window.clearInterval(checkPopup)
+      setIsLoadingGoogle(false)
+
+      const tokenGuardado = localStorage.getItem('token')
+
+      if (!tokenGuardado) {
+        setGoogleError('Cancelaste el inicio de sesión con Google. Puedes intentarlo nuevamente.')
+      }
+    }
+  }, 500)
+}
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
