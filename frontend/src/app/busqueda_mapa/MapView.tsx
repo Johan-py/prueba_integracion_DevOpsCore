@@ -103,6 +103,7 @@ function formatPrice(price: number, currency: 'USD' | 'BOB'): string {
 }
 
 interface MapViewProps {
+  properties?: any
   center?: [number, number]
   zoom?: number
   selectedId?: string | null

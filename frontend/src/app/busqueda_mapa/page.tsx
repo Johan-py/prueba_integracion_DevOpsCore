@@ -1,181 +1,185 @@
 'use client'
 
-import { useState,useEffect} from 'react'
+import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
-import { Search, MapPin, DollarSign, Home, Building, Square, ChevronRight, List } from 'lucide-react';
+import { ChevronLeft, ChevronRight, List as ListIcon, LayoutGrid } from 'lucide-react'
+
+// === HOOKS (Lógica Backend de tu compañero) ===
 import { useProperties } from '@/hooks/useProperties'
 
+// === COMPONENTES (Tu diseño Frontend) ===
+import FilterBar from '@/components/FilterBar' 
+import PropertyCard from '@/components/layout/PropertyCard'
+import PropertyRow from '@/components/galeria/PropertyRow'
+import EmptyState from '@/components/galeria/EmptyState'
+
+// Carga dinámica del mapa para evitar errores de SSR en Next.js
 const MapView = dynamic(() => import('./MapView'), { ssr: false })
 
 export default function BusquedaMapaPage() {
+  // Estados de UI (Frontend)
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+
+  // Estados de Lógica (Backend / Mapas)
+  const { properties, isLoading } = useProperties()
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null)
-  const { properties } = useProperties()
   const [hoveredId, setHoveredId] = useState<string | null>(null)
-   useEffect(() => {
-  if (!hoveredId) return
 
-  const timeout = setTimeout(() => {
-    setSelectedPropertyId(hoveredId)
-  }, 200)
-
-  return () => clearTimeout(timeout)
-}, [hoveredId])
+  // Efecto original del equipo de mapas: Retraso sutil al hacer hover para no saturar el mapa
+  useEffect(() => {
+    if (!hoveredId) return
+    const timeout = setTimeout(() => {
+      setSelectedPropertyId(hoveredId)
+    }, 200)
+    return () => clearTimeout(timeout)
+  }, [hoveredId])
 
   return (
-    <div className="flex flex-col w-full min-h-[calc(100vh-theme(spacing.32))] border rounded-lg overflow-hidden shadow-sm bg-white">
-      {/* Barra Superior */}
-      <header className="w-full p-4 border-b border-gray-200 bg-white shrink-0 z-10 shadow-sm">
-        {/* Fila superior: Tipos de contrato */}
-        <div className="flex items-center justify-center gap-8 mb-4 text-sm">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <div className="w-5 h-5 bg-[#ea580c] rounded-sm flex items-center justify-center"></div>
-            <span className="text-[#ea580c] font-medium">Venta</span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <div className="w-5 h-5 border-2 border-gray-300 rounded-sm hover:border-gray-400 transition-colors"></div>
-            <span className="text-gray-600">Alquiler</span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <div className="w-5 h-5 border-2 border-gray-300 rounded-sm hover:border-gray-400 transition-colors"></div>
-            <span className="text-gray-600">Anticrético</span>
-          </label>
-        </div>
+    // Contenedor principal con h-screen y overflow-hidden para evitar scroll global
+    <div className="flex flex-col h-screen bg-white overflow-hidden">
+      
+      {/* 1. BARRA DE FILTROS SUPERIOR (Tu componente limpio) */}
+      <FilterBar />
 
-        {/* Fila inferior: Filtros principales */}
-        <div className="flex flex-wrap md:flex-nowrap items-center justify-center gap-3">
-          <button className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-600 hover:bg-gray-50 transition-colors">
-            <Building className="w-4 h-4" />
-            <span className="font-medium text-sm">Casas</span>
-          </button>
-
-          <div className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md flex-grow min-w-[200px] max-w-md focus-within:border-[#ea580c] focus-within:ring-1 focus-within:ring-[#ea580c] transition-all">
-            <Search className="w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Buscar"
-              className="outline-none w-full text-gray-700 placeholder-gray-400 text-sm bg-transparent"
-            />
-          </div>
-
-          <button className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-600 hover:bg-gray-50 transition-colors">
-            <MapPin className="w-4 h-4" />
-            <span className="font-medium text-sm">Zona</span>
-          </button>
-
-          <button className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-600 hover:bg-gray-50 transition-colors">
-            <DollarSign className="w-4 h-4" />
-            <span className="font-medium text-sm">Precio</span>
-          </button>
-
-          <button className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-600 hover:bg-gray-50 transition-colors">
-            <Home className="w-4 h-4" />
-            <span className="font-medium text-sm">Capacidad</span>
-          </button>
-
-          <button className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-600 hover:bg-gray-50 transition-colors">
-            <Square className="w-4 h-4" />
-            <span className="font-medium text-sm">Metros²</span>
-          </button>
-
-          <button className="px-5 py-2 bg-[#ea580c] text-white font-medium text-sm rounded-md hover:bg-[#c2410c] transition-colors whitespace-nowrap">
-            Más Filtros
-          </button>
-        </div>
-      </header>
-
-      {/* Contenedor Principal (Resultados y Mapa) */}
-      <div className="flex flex-col md:flex-row flex-grow relative overflow-hidden">
-        {/* Panel Lateral Colapsable */}
+      {/* 2. ÁREA CENTRAL (Lista + Mapa) */}
+      <main className="flex flex-1 overflow-hidden relative">
+        
+        {/* PANEL LATERAL COLAPSABLE */}
         <aside
-          className={`
-            bg-white transition-all duration-300 ease-in-out z-10 border-gray-200 overflow-hidden
-            ${
-              isSidebarOpen
-                ? 'w-full h-[40vh] md:w-[30%] md:h-auto border-b md:border-b-0 md:border-r opacity-100'
-                : 'w-0 h-0 md:w-0 md:h-auto opacity-0'
-            }
-          `}
+          className={`bg-white border-r border-stone-200 flex flex-col z-10 transition-all duration-300 ${
+            isSidebarOpen ? 'w-full md:w-[450px]' : 'w-0'
+          }`}
         >
-          <div
-            className={`
-            p-4 h-full overflow-y-auto transition-opacity duration-200
-            ${isSidebarOpen ? 'opacity-100 delay-100' : 'opacity-0'}
-            md:w-[30vw] min-w-[250px]
-          `}
-          >
-            {/* Encabezado con el texto y flecha */}
-            <div className="flex items-center gap-2 mb-4">
-              <button
-                onClick={() => setIsSidebarOpen(false)}
-                className="flex items-center gap-2 text-gray-700 hover:text-gray-900 font-medium group"
-              >
-                <span className="text-lg">←</span>
-                <span>Lista de inmuebles</span>
-              </button>
-            </div>
-              {/* Esta es una implementación temporal (mock visual) de la lista de inmuebles */}
-              <div className="space-y-3">
-                {properties.map((property) => (
-                 <div
-                   key={property.id}
-                   onMouseEnter={() => setHoveredId(property.id)}
-              
-                   onClick={() => setSelectedPropertyId(property.id)}
-                   className={`
-                    p-3 border rounded-lg cursor-pointer transition-all
-                     ${
-                      selectedPropertyId === property.id
-                       ? 'border-red-500 bg-red-50'
-                      : 'border-gray-200 hover:border-gray-400'
-                     }
-                   `}
-                  >
-                   <p className="font-semibold text-sm text-gray-800">
-                     {property.title}
-                   </p>
+          {isSidebarOpen && (
+            <>
+              {/* Botón de ocultar Panel */}
+              <div className="p-3 border-b border-stone-200 flex items-center bg-stone-50 shrink-0">
+                <button
+                  onClick={() => setIsSidebarOpen(false)}
+                  className="flex items-center text-xs font-medium text-stone-500 hover:text-stone-700 transition-colors"
+                >
+                  <ChevronLeft className="w-4 h-4 mr-1" /> Ocultar
+                </button>
+              </div>
 
-                   <p className="text-sm text-gray-600">
-                     ${property.price}
-                   </p>
-
-                   <p className="text-xs text-gray-400 capitalize">
-                     {property.type}
-                   </p>
+              {/* Cabecera de la Lista (Resultados y Toggle de vistas) */}
+              <div className="p-4 border-b border-stone-100 flex items-center justify-between bg-white shrink-0">
+                <div className="flex flex-col">
+                  <h2 className="text-xl font-bold text-slate-900">Lista de Inmuebles</h2>
+                  <p className="text-xs text-stone-400 font-medium mt-0.5">
+                    {properties.length} encontrado{properties.length !== 1 ? 's' : ''}
+                  </p>
                 </div>
-              ))}
-            </div>
-            {/* Fin de codigo temporal  */}
-          </div>
+
+                {/* Se mantiene este toggle aquí para controlar el state 'viewMode' directamente */}
+                <div className="flex bg-stone-100 p-1 rounded-md border border-stone-200 shadow-inner">
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className={`p-1.5 rounded transition-colors ${
+                      viewMode === 'grid' ? 'bg-white text-[#ea580c] shadow-sm' : 'text-stone-400 hover:text-stone-600'
+                    }`}
+                  >
+                    <LayoutGrid size={18} />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`p-1.5 rounded transition-colors ${
+                      viewMode === 'list' ? 'bg-white text-[#ea580c] shadow-sm' : 'text-stone-400 hover:text-stone-600'
+                    }`}
+                  >
+                    <ListIcon size={18} />
+                  </button>
+                </div>
+              </div>
+
+              {/* CONTENIDO SCROLLEABLE (Aquí solucionamos el problema de que se iba hasta abajo) */}
+              <div className="flex-1 overflow-y-auto p-4 bg-stone-50 no-scrollbar">
+                {isLoading ? (
+                  <div className="flex justify-center items-center h-full text-stone-500 text-sm font-medium animate-pulse">
+                    Cargando propiedades de la base de datos...
+                  </div>
+                ) : properties.length === 0 ? (
+                  <EmptyState />
+                ) : (
+                  <div
+                    className={`gap-4 ${
+                      viewMode === 'grid'
+                        ? 'flex flex-col'
+                        : 'divide-y divide-gray-100 flex flex-col bg-white border border-gray-100 rounded-xl shadow-sm'
+                    }`}
+                  >
+                    {/* Renderizamos las propiedades del BACKEND en tus componentes de FRONTEND */}
+                    {properties.map((property) => {
+                      const isSelected = selectedPropertyId === property.id
+
+                      return (
+                        <div
+                          key={property.id}
+                          onMouseEnter={() => setHoveredId(property.id)}
+                          onClick={() => setSelectedPropertyId(property.id)}
+                          // El div reacciona si el pin del mapa está seleccionado
+                          className={`cursor-pointer transition-all duration-200 rounded-xl ${
+                            viewMode === 'list' ? 'py-1 px-2' : ''
+                          } ${
+                            isSelected
+                              ? 'ring-2 ring-[#ea580c] shadow-md bg-orange-50/50' // Highlight si está seleccionado
+                              : 'hover:border-stone-300 hover:shadow-sm'
+                          }`}
+                        >
+                          {viewMode === 'grid' ? (
+                            <PropertyCard
+                              imagen="" // Mandamos vacío para que active tu COLOR_GRIS_PLACEHOLDER
+                              estado={property.type} // casa, terreno, etc.
+                              precio={property.currency === 'USD' ? `$${property.price.toLocaleString("es-BO")} USD` : `Bs ${property.price.toLocaleString("es-BO")}`}
+                              descripcion={property.title}
+                              camas={3} // Mockeado porque PropertyMapPin no trae este dato
+                              banos={2} // Mockeado
+                              metros={150} // Mockeado
+                            />
+                          ) : (
+                            <PropertyRow
+                              title={property.title}
+                              price={property.currency === 'USD' ? `$${property.price.toLocaleString("es-BO")} USD` : `Bs ${property.price.toLocaleString("es-BO")}`}
+                              size="3 Dorm. • 150 m²"
+                              contactType="whatsapp"
+                              image=""
+                            />
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </aside>
 
-        {/* Área del Mapa */}
-        <section className="flex-grow bg-gray-100 relative w-full h-[60vh] md:h-auto transition-all duration-300">
-          {/* Botón flotante para expandir/contraer el panel */}
+        {/* ÁREA DEL MAPA */}
+        <section className="flex-1 relative bg-stone-200">
           {!isSidebarOpen && (
             <button
               onClick={() => setIsSidebarOpen(true)}
-              className="absolute left-0 top-4 z-[1000] bg-white text-black shadow-md rounded-r-md hover:bg-gray-100 transition-colors focus:outline-none flex flex-col items-center pt-3 pb-5 px-1.5 gap-4 border-l-0"
-              title="Mostrar Lista de Inmuebles"
+              className="absolute left-0 top-4 z-[1000] bg-white text-black shadow-md rounded-r-md flex flex-col items-center py-4 px-2 gap-4 hover:bg-stone-50 transition-colors"
             >
-              <ChevronRight className="w-4 h-4" />
-              <span 
-                className="[writing-mode:vertical-lr] rotate-180 text-xs font-bold tracking-widest whitespace-nowrap"
-              >
+              <ChevronRight size={16} />
+              <span className="[writing-mode:vertical-lr] rotate-180 text-[10px] font-bold tracking-widest uppercase text-stone-600">
                 Inmuebles
               </span>
-              <List className="w-4 h-4 text-black mt-1" />
+              <ListIcon size={16} className="text-stone-500" />
             </button>
           )}
 
           <div className="absolute inset-0">
-            <MapView 
+            <MapView
+              properties={properties} 
               selectedId={selectedPropertyId}
               onSelect={setSelectedPropertyId}
             />
           </div>
         </section>
-      </div>
+      </main>
     </div>
   )
 }
