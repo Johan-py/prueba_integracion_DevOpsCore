@@ -517,7 +517,10 @@ export const loginWithGoogleCodeService = async (code: string) => {
   const user = await findUserByCorreo(correo);
 
   if (!user) {
-    throw new AuthError("La cuenta de Google no está asociada al sistema", 404);
+    throw new AuthError(
+      "Esta cuenta de Google no está registrada. Regístrate primero.",
+      404,
+    );
   }
 
   const jwtPayload: JwtPayload = {

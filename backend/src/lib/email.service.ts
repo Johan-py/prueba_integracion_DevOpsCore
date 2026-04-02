@@ -1,8 +1,7 @@
 import nodemailer from "nodemailer";
 
-// Configuración del transporter
 const transporter = nodemailer.createTransport({
-  service: "gmail", // Puedes cambiar a 'hotmail', 'outlook', etc.
+  service: "gmail",
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASSWORD,
@@ -12,9 +11,9 @@ const transporter = nodemailer.createTransport({
 // Verificar conexión
 transporter.verify((error, success) => {
   if (error) {
-    console.error("❌ Error en configuración de email:", error);
+    console.error(" Error en configuración de email:", error);
   } else {
-    console.log("✅ Servicio de email listo");
+    console.log(" Servicio de email listo");
   }
 });
 
