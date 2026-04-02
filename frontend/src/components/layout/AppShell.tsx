@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState, useCallback, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -16,10 +16,15 @@ const TOKEN_STORAGE_KEY = "token";
 function SessionManager() {
   const [showWarning, setShowWarning] = useState(false);
 
-  const handleWarning = useCallback(() => setShowWarning(true), []);
-  const handleLogout = useCallback(() => setShowWarning(false), []);
+  const handleWarning = useCallback(() => {
+    setShowWarning(true);
+  }, []);
 
-  useInactivityLogout({
+  const handleLogout = useCallback(() => {
+    setShowWarning(false);
+  }, []);
+
+  const { resetInactivityTimer } = useInactivityLogout({
     onWarning: handleWarning,
     onLogout: handleLogout,
   });
@@ -31,8 +36,12 @@ function SessionManager() {
       <p className="text-sm font-medium text-gray-800">
         Tu sesión cerrará en 1 minuto por inactividad.
       </p>
+
       <button
-        onClick={() => setShowWarning(false)}
+        onClick={() => {
+          setShowWarning(false);
+          resetInactivityTimer();
+        }}
         className="mt-2 text-xs font-semibold text-orange-500 hover:underline"
       >
         Seguir conectado
@@ -50,7 +59,6 @@ const clearSession = () => {
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAuthRoute = AUTH_ROUTES.includes(pathname);
-  const router = useRouter();
 
   useEffect(() => {
     const validateSession = async () => {
@@ -98,11 +106,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           }),
         );
 
-        localStorage.setItem(
-          SESSION_EXPIRES_KEY,
-          String(Date.now() + 60 * 60 * 1000),
-        );
-
         window.dispatchEvent(new Event("propbol:session-changed"));
       } catch {
         clearSession();
@@ -111,7 +114,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     };
 
     validateSession();
-  }, [pathname, router]);
+  }, [pathname, API_URL]);
 
   if (isAuthRoute) {
     return <>{children}</>;

@@ -1,5 +1,5 @@
 import { Prisma, RolNombre } from "@prisma/client";
-import { prisma } from "../../lib/prisma.js";
+import { prisma } from "../../db";
 
 interface CreateUserInput {
   nombre: string;
@@ -9,14 +9,24 @@ interface CreateUserInput {
   telefono?: string;
 }
 
-export const createUser = async (data: CreateUserInput) => {
+const ensureVisitorRole = async () => {
   const rol = await prisma.rol.findUnique({
     where: { nombre: RolNombre.VISITANTE },
   });
 
-  if (!rol) {
-    throw new Error("Rol de usuario no encontrado");
+  if (rol) {
+    return rol;
   }
+
+  return await prisma.rol.create({
+    data: {
+      nombre: RolNombre.VISITANTE,
+    },
+  });
+};
+
+export const createUser = async (data: CreateUserInput) => {
+  const rol = await ensureVisitorRole();
 
   try {
     return await prisma.usuario.create({

@@ -1,5 +1,5 @@
-import { ResultadosBusqueda } from '../../components/busqueda/ResultadosBusqueda'
+import { ResultadosBusqueda } from "../../components/busqueda/ResultadosBusqueda";
 
 export default function BusquedaPage() {
-  return <ResultadosBusqueda />
+  return <ResultadosBusqueda />;
 }

@@ -1,5 +1,5 @@
-import Image from 'next/image'
-import FilterBar from '../filters/FilterBar'
+import Image from "next/image";
+import FilterBar from "../filters/FilterBar";
 
 interface BannerProps {
   url: string;
@@ -28,7 +28,7 @@ export const HomeBanner = ({ url, title, subtitle }: BannerProps) => {
             {title}
           </h1>
         )}
-        
+
         {subtitle && (
           <p className="text-xs md:text-xl lg:text-2xl text-stone-200 drop-shadow-lg font-medium max-w-[240px] md:max-w-2xl text-balance">
             {subtitle}
@@ -44,8 +44,8 @@ export const HomeBanner = ({ url, title, subtitle }: BannerProps) => {
       {/* En móvil, mostramos la barra de filtros debajo del banner */}
       {/* Versión móvil: La barra sale debajo en pantallas pequeñas para no tapar la foto */}
       <div className="md:hidden relative z-20 -mt-10 px-4 w-full">
-         {/* Aquí podrías poner una versión simplificada o la misma FilterBar ajustada */}
+        {/* Aquí podrías poner una versión simplificada o la misma FilterBar ajustada */}
       </div>
-      </div>
-  )
-}
+    </div>
+  );
+};

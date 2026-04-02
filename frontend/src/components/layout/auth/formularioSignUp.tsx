@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Eye,
   EyeOff,
@@ -9,11 +9,15 @@ import {
   Phone,
   Lock,
   AlertCircle,
-  Chrome,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { validateEmail, validatePassword } from "@/lib/validators/auth";
+import GoogleRegisterButton from "@/components/layout/auth/google/GoogleRegisterButton";
+import {
+  consumeGoogleSignupPrefill,
+  extractGooglePrefillFromCredential,
+} from "@/lib/auth/google";
 
 type FormData = {
   email: string;
@@ -119,6 +123,28 @@ export default function SignUpForm() {
       router.replace("/");
     }
   }, [router]);
+
+  useEffect(() => {
+    const googlePrefill = consumeGoogleSignupPrefill();
+
+    if (!googlePrefill) {
+      return;
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      email: googlePrefill.email?.trim() || prev.email,
+      firstName: googlePrefill.firstName?.trim() || prev.firstName,
+      lastName: googlePrefill.lastName?.trim() || prev.lastName,
+    }));
+
+    setErrors((prev) => ({
+      ...prev,
+      email: undefined,
+      firstName: undefined,
+      lastName: undefined,
+    }));
+  }, []);
 
   const validateFirstName = (value: string) => {
     const trimmed = value.trim();
@@ -379,7 +405,6 @@ export default function SignUpForm() {
         localStorage.setItem("token", data.token);
       }
 
-      // Guardar usuario para que el Navbar lo detecte
       if (data?.user) {
         const userData = {
           name: `${data.user.nombre} ${data.user.apellido}`,
@@ -413,6 +438,33 @@ export default function SignUpForm() {
       setIsSubmitting(false);
     }
   };
+
+  const handleGoogleCredential = useCallback((credential: string) => {
+    setServerError("");
+
+    const googlePrefill = extractGooglePrefillFromCredential(credential);
+
+    if (!googlePrefill) {
+      setServerError(
+        "No se pudieron obtener los datos de la cuenta de Google.",
+      );
+      return;
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      email: googlePrefill.email || prev.email,
+      firstName: googlePrefill.firstName || prev.firstName,
+      lastName: googlePrefill.lastName || prev.lastName,
+    }));
+
+    setErrors((prev) => ({
+      ...prev,
+      email: undefined,
+      firstName: undefined,
+      lastName: undefined,
+    }));
+  }, []);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#f5f5f4] px-4 py-8">
@@ -637,13 +689,10 @@ export default function SignUpForm() {
               </button>
             </div>
 
-            <button
-              type="button"
-              className="flex w-full items-center justify-center gap-2 rounded-md border border-[#d6d3d1] bg-white px-4 py-2.5 text-[12px] font-medium text-[#292524] transition hover:bg-[#fafaf9]"
-            >
-              <Chrome size={14} />
-              Regístrate con Google
-            </button>
+            <GoogleRegisterButton
+              onCredentialReceived={handleGoogleCredential}
+              disabled={isSubmitting}
+            />
 
             <button
               type="button"

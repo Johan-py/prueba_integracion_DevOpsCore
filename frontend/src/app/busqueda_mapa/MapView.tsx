@@ -8,15 +8,17 @@ import "leaflet/dist/leaflet.css";
 import ZoomControls from "@/components/ZoomControls";
 import { createGpsIcon } from "@/components/GpsPin";
 import { createClusterIcon, CLUSTER_CONFIG } from "@/lib/clusterIcon";
-import { useProperties } from "@/hooks/useProperties";
+
 import type { PropertyMapPin } from "@/types/property";
+import { useEffect, useState } from "react";
 
 // Fix íconos default de Leaflet en Next.js
+if (typeof window !== "undefined") {
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-});
+});}
 
 const PIN_FILL: Record<PropertyMapPin["type"], string> = {
   casa: "#3b82f6",
@@ -98,16 +100,26 @@ interface MapViewProps {
   zoom?: number
   selectedId?: string | null
   onSelect?: (id: string) => void
+  isLoading?: boolean
+  error?: string | null;
 }
 
 export default function MapView({
-  properties: initialProperties = [],
+  properties = [],
   center = [-17.392418841841394, -66.1461583463333],
   zoom = 12,
   selectedId,
   onSelect,
+  isLoading = false,
+  error = null,
 }: MapViewProps) {
-  const { properties, isLoading, error } = useProperties();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) return <div className="w-full h-full bg-gray-100 animate-pulse" />;
 
   return (
     <div className="relative w-full h-full">
@@ -145,7 +157,7 @@ export default function MapView({
         </Marker>
 
         <MarkerClusterGroup
-          iconCreateFunction={createClusterIcon}
+          iconCreateFunction={(cluster: any) => createClusterIcon(cluster)}
           maxClusterRadius={CLUSTER_CONFIG.maxClusterRadius}
           disableClusteringAtZoom={CLUSTER_CONFIG.disableClusteringAtZoom}
           animate={true}

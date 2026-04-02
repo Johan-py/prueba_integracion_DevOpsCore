@@ -71,8 +71,21 @@ const termsSections: TermsSection[] = [
 
 export default function TermsAndConditionsPage() {
   return (
-    <section className="mx-auto w-full max-w-5xl py-2 sm:py-4">
-      <div className="rounded-[28px] border border-stone-200 bg-stone-50 p-4 shadow-sm sm:p-6 lg:p-8">
+    <div
+      className="min-h-screen py-10"
+      style={{
+        width: "100vw",
+        marginLeft: "calc(-50vw + 50%)",
+        backgroundImage:
+          "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('/icons/fondoTerminos.jpg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundAttachment: "fixed"
+  }}
+    >
+    <section className="w-full min-h-screen flex justify-center py-2 sm:py-4">
+      <div className="w-full max-w-5xl rounded-[28px] border border-stone-200 bg-stone-50 p-4 shadow-sm sm:p-6 lg:p-8">
         <div className="rounded-[24px] bg-white p-5 sm:p-8 lg:p-10">
           <header className="space-y-4 border-b border-amber-200 pb-6">
             <p className="text-sm font-medium uppercase tracking-[0.28em] text-amber-600">
@@ -124,5 +137,6 @@ export default function TermsAndConditionsPage() {
         </div>
       </div>
     </section>
-  );
+    </div>
+  )
 }
