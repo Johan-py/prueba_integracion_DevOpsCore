@@ -94,12 +94,16 @@ export const registerController = async (
       ...result,
     });
   } catch (error) {
-    const rawMessage =
+    if (error instanceof AuthError) {
+      return res.status(error.statusCode).json({
+        message: error.message,
+      });
+    }
+
+    const message =
       error instanceof Error ? error.message : "Error interno del servidor";
 
-    return res.status(getRegisterErrorStatus(rawMessage)).json({
-      message: getRegisterErrorMessage(rawMessage),
-    });
+    return res.status(400).json({ message });
   }
 };
 
@@ -122,6 +126,12 @@ export const verifyRegisterCodeController = async (
       token: result.token,
     });
   } catch (error) {
+    if (error instanceof AuthError) {
+      return res.status(error.statusCode).json({
+        message: error.message,
+      });
+    }
+
     const message =
       error instanceof Error ? error.message : "Error al verificar código";
 
