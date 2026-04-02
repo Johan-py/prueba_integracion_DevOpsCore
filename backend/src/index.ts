@@ -17,6 +17,7 @@ import {
   registerController,
   loginController,
   logoutController,
+  verifyRegisterCodeController,
 } from "./modules/auth/auth.controller.js";
 import { requireAuth } from "./middleware/auth.middleware.js";
 import meHandler from "../api/auth/me.js";
@@ -46,6 +47,7 @@ app.post("/api/users", (req, res) => {
 app.post("/api/auth/register", registerController);
 app.post("/api/auth/login", loginController);
 app.post("/api/auth/logout", logoutController);
+app.post("/api/auth/verify-register", verifyRegisterCodeController);
 
 app.use("/api/perfil", correoverificacionRoutes);
 
