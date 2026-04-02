@@ -28,7 +28,7 @@ export const getPlanes = async (req: Request, res: Response) => {
     );
     
     res.json(planesValidos);
-  } catch (error) {
+  } catch  {
     res.status(500).json({
       error: 'Error del servidor',
       message: 'No se pudieron cargar los planes'
