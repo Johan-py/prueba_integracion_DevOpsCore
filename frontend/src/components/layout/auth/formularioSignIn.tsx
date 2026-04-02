@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
@@ -15,11 +15,25 @@ type LoginResponse = {
   }
 }
 
+type GoogleAuthMessage = {
+  source?: string
+  type?: 'GOOGLE_AUTH_SUCCESS' | 'GOOGLE_AUTH_ERROR'
+  token?: string
+  user?: {
+    id: number
+    correo: string
+    nombre?: string
+    apellido?: string
+  }
+  error?: string
+}
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000'
-const LOGIN_TIMEOUT_MS = 10000 
+const LOGIN_TIMEOUT_MS = 10000
 
 export default function LoginForm() {
   const router = useRouter()
+
   const [showPassword, setShowPassword] = useState(false)
   const [isLoadingGoogle, setIsLoadingGoogle] = useState(false)
   const [correo, setCorreo] = useState('')
@@ -30,17 +44,8 @@ export default function LoginForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [googleError, setGoogleError] = useState('')
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const motivo = params.get('motivo')
-    const reason = params.get('reason')
-
-    if (motivo === 'no-autenticado') {
-      setErrorMessage('Debes iniciar sesión para acceder a esa página.')
-    } else if (motivo === 'sesion-expirada' || reason === 'inactivity') {
-      setErrorMessage('Tu sesión expiró. Por favor inicia sesión nuevamente.')
-    }
-  }, [])
+  const googlePopupRef = useRef<Window | null>(null)
+  const googleAuthResolvedRef = useRef(false)
 
   const isFormValid = correo.length > 0 && password.length > 0 && !errors.correo && !errors.password
 
@@ -70,9 +75,65 @@ export default function LoginForm() {
     setErrors(newErrors)
   }
 
+  useEffect(() => {
+    const handleGoogleAuthMessage = (event: MessageEvent<GoogleAuthMessage>) => {
+      if (event.origin !== API_URL) {
+        return
+      }
+
+      const data = event.data
+
+      if (!data || data.source !== 'propbol-google-auth') {
+        return
+      }
+
+      googleAuthResolvedRef.current = true
+      setIsLoadingGoogle(false)
+      setGoogleError('')
+
+      if (data.type === 'GOOGLE_AUTH_SUCCESS' && data.token && data.user) {
+        localStorage.setItem('token', data.token)
+
+        const userName =
+          data.user.nombre && data.user.apellido
+            ? `${data.user.nombre} ${data.user.apellido}`
+            : data.user.correo
+
+        localStorage.setItem(
+          'propbol_user',
+          JSON.stringify({
+            name: userName,
+            email: data.user.correo
+          })
+        )
+
+        localStorage.setItem('propbol_session_expires', String(Date.now() + 60 * 60 * 1000))
+
+        window.dispatchEvent(new Event('propbol:login'))
+        window.dispatchEvent(new Event('propbol:session-changed'))
+
+        router.push('/')
+        return
+      }
+
+      if (data.type === 'GOOGLE_AUTH_ERROR') {
+        setGoogleError(data.error || 'No se pudo iniciar sesión con Google.')
+      }
+    }
+
+    window.addEventListener('message', handleGoogleAuthMessage)
+
+    return () => {
+      window.removeEventListener('message', handleGoogleAuthMessage)
+    }
+  }, [router])
+
   const handleGoogleLogin = () => {
     setGoogleError('')
+    setErrorMessage('')
+    setSuccessMessage('')
     setIsLoadingGoogle(true)
+    googleAuthResolvedRef.current = false
 
     const popup = window.open(
       `${API_URL}/api/auth/google/login`,
@@ -88,21 +149,20 @@ export default function LoginForm() {
       return
     }
 
-    const googleTimeoutId = setTimeout(() => {
-      clearInterval(checkPopup)
-      if (!popup.closed) popup.close()
-      setIsLoadingGoogle(false)
-      setGoogleError('La autenticación con Google tardó demasiado. Por favor intenta nuevamente.')
-    }, 2 * 60 * 1000)
+    googlePopupRef.current = popup
 
     const checkPopup = setInterval(() => {
-      if (popup.closed) {
+      if (!googlePopupRef.current) {
         clearInterval(checkPopup)
-        clearTimeout(googleTimeoutId)
+        return
+      }
+
+      if (googlePopupRef.current.closed) {
+        clearInterval(checkPopup)
+        googlePopupRef.current = null
         setIsLoadingGoogle(false)
 
-        const tokenGuardado = localStorage.getItem('token')
-        if (!tokenGuardado) {
+        if (!googleAuthResolvedRef.current) {
           setGoogleError('Cancelaste el inicio de sesión con Google. Puedes intentarlo nuevamente.')
         }
       }
@@ -130,16 +190,19 @@ export default function LoginForm() {
     setErrors(newErrors)
     setErrorMessage('')
     setSuccessMessage('')
+    setGoogleError('')
 
     if (Object.keys(newErrors).length > 0) return
 
     setIsLoading(true)
 
-    try {
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), LOGIN_TIMEOUT_MS)
+    const controller = new AbortController()
+    const timeoutId = window.setTimeout(() => {
+      controller.abort()
+    }, LOGIN_TIMEOUT_MS)
 
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+    try {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -157,12 +220,14 @@ export default function LoginForm() {
 
       if (!response.ok) {
         setPassword('')
-              if (response.status === 404) {
-                setErrorMessage(
-                'Esta cuenta no está registrada. Puedes registrarte para crear una cuenta.'
-              )
-              return
-              }
+
+        if (response.status === 404) {
+          setErrorMessage(
+            'Esta cuenta no está registrada. Puedes registrarte para crear una cuenta.'
+          )
+          return
+        }
+
         setErrorMessage(data.message || 'Error al iniciar sesión')
         return
       }
@@ -193,17 +258,19 @@ export default function LoginForm() {
       setTimeout(() => {
         router.push('/')
       }, 1000)
-      } catch (error) {
-        setPassword('')
-        if (error instanceof Error && error.name === 'AbortError') {
-          setErrorMessage('La solicitud tardó demasiado. Por favor intenta nuevamente.')
-        } else {
-          setErrorMessage('No se pudo conectar con el servidor')
-        }
-          } finally {
-            setIsLoading(false)
-          }
-        }
+    } catch (error) {
+      clearTimeout(timeoutId)
+      setPassword('')
+
+      if (error instanceof Error && error.name === 'AbortError') {
+        setErrorMessage('La solicitud tardó demasiado. Por favor intenta nuevamente.')
+      } else {
+        setErrorMessage('No se pudo conectar con el servidor')
+      }
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div className="w-full max-w-sm rounded-md bg-white p-6 shadow-md">
