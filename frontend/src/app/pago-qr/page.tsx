@@ -1,22 +1,23 @@
 "use client";
-// de aqui vienen
-import { useState, useEffect } from "react";
-import { useCurrentPayment } from "@/hooks/cobros_hu-05/useCurrentPayment";
-import { usePaymentStatus } from "@/hooks/usePaymentStatus";
-import { Timer } from "@/components/payment/Timer";
-import { QRDisplay } from "@/components/payment/QRDisplay";
-import { ExpiredView } from "@/components/payment/ExpiredView";
-import { SuccessView } from "@/components/payment/SuccessView";
-import { CancelPaymentModal } from "@/components/payment/CancelPaymentModal";
-import { useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
-// borrar esto mas tarde
+
+import { useState, useEffect } from 'react';
+import { useCurrentPayment } from '@/hooks/payment/useCurrentPayment';
+import { usePaymentStatus } from '@/hooks/payment/usePaymentStatus';
+import { useCancelPayment } from '@/hooks/payment/useCancelPayment';
+import { Timer } from '@/components/payment/Timer';
+import { QRDisplay } from '@/components/payment/QRDisplay';
+import { ExpiredView } from '@/components/payment/ExpiredView';
+import { SuccessView } from '@/components/payment/SuccessView';
+import { CancelPaymentModal } from '@/components/payment/CancelPaymentModal';
+import { useRouter } from 'next/navigation';
+import { ArrowLeft } from 'lucide-react';
+
 export default function PagoQRPage() {
   const router = useRouter();
   const { payment, loading, error } = useCurrentPayment();
+  const { isModalOpen, openModal, closeModal, confirmCancel } = useCancelPayment();
 
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
-  const [showCancelModal, setShowCancelModal] = useState(false);
 
   const getSecondsLeft = (expirationISO: string): number => {
     const expiration = new Date(expirationISO).getTime();
@@ -26,7 +27,7 @@ export default function PagoQRPage() {
 
   useEffect(() => {
     if (!payment?.fechaExpiracion) return;
-    if (payment.estado === "pagado" || payment.estado === "expirado") return;
+    if (payment.estado === 'pagado' || payment.estado === 'expirado') return;
 
     const updateCounter = () => {
       const remaining = getSecondsLeft(payment.fechaExpiracion);
@@ -41,14 +42,10 @@ export default function PagoQRPage() {
 
   const shouldPoll =
     payment?.id &&
-    payment?.estado === "pendiente" &&
+    payment?.estado === 'pendiente' &&
     (timeLeft === null || timeLeft > 0);
-  const { status } = usePaymentStatus(shouldPoll ? payment.id : null);
 
-  // ── Handlers del modal ──
-  const handleBackClick = () => setShowCancelModal(true);
-  const handleConfirmCancel = () => router.push("/");
-  const handleDismissModal = () => setShowCancelModal(false);
+  const { status } = usePaymentStatus(shouldPoll ? payment.id : null);
 
   if (loading) {
     return (
@@ -63,11 +60,10 @@ export default function PagoQRPage() {
       <div className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md text-center">
           <p className="text-red-600">
-            No se encontró un pago pendiente. Por favor, inicia una nueva
-            compra.
+            No se encontró un pago pendiente. Por favor, inicia una nueva compra.
           </p>
           <button
-            onClick={() => router.push("/")}
+            onClick={() => router.push('/')}
             className="mt-4 bg-amber-600 text-white px-6 py-2 rounded-lg"
           >
             Volver al inicio
@@ -77,18 +73,18 @@ export default function PagoQRPage() {
     );
   }
 
-  if (payment.estado === "expirado" || (timeLeft !== null && timeLeft <= 0)) {
+  if (payment.estado === 'expirado' || (timeLeft !== null && timeLeft <= 0)) {
     return <ExpiredView />;
   }
 
-  if (status === "pagado") {
+  if (status === 'pagado') {
     return <SuccessView />;
   }
 
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   if (timeLeft === null) {
@@ -101,19 +97,19 @@ export default function PagoQRPage() {
 
   return (
     <>
-      {/* Modal de confirmación */}
       <CancelPaymentModal
-        isOpen={showCancelModal}
-        onConfirm={handleConfirmCancel}
-        onCancel={handleDismissModal}
+        isOpen={isModalOpen}
+        onConfirm={confirmCancel}
+        onCancel={closeModal}
       />
 
       <div className="min-h-screen bg-white py-8 px-4">
         <div className="max-w-md mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
-          {/* ── Botón de retroceso ── */}
+
+          {/* Botón de retroceso — abre modal de confirmación */}
           <div className="px-6 pt-5">
             <button
-              onClick={handleBackClick}
+              onClick={openModal}
               className="flex items-center gap-1 text-stone-500 hover:text-stone-800 transition-colors text-sm"
             >
               <ArrowLeft size={18} />
@@ -132,7 +128,7 @@ export default function PagoQRPage() {
             <Timer timeLeft={timeLeft} formatTime={formatTime} />
           </div>
 
-          <div className="px-6 py-4 flex justify-center">
+          <div className="px-6 py-6 flex justify-center">
             <QRDisplay
               value={payment.qrContent}
               id={payment.referencia}
@@ -140,14 +136,6 @@ export default function PagoQRPage() {
             />
           </div>
 
-          <div className="px-6 py-4 flex justify-center">
-            <button
-              onClick={handleBackClick}
-              className="text-red-600 hover:text-red-700 text-sm underline"
-            >
-              Cancelar pago
-            </button>
-          </div>
         </div>
       </div>
     </>

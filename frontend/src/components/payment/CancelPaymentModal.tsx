@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { AlertTriangle, X, ArrowLeft } from "lucide-react";
+import React from 'react';
+import { AlertTriangle, X } from 'lucide-react';
 
 interface CancelPaymentModalProps {
   isOpen: boolean;
@@ -9,54 +9,21 @@ interface CancelPaymentModalProps {
   onCancel: () => void;
 }
 
-export function CancelPaymentModal({
-  isOpen,
-  onConfirm,
-  onCancel,
-}: CancelPaymentModalProps) {
-  // Cerrar con Escape
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onCancel();
-    };
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  }, [isOpen, onCancel]);
-
-  // Bloquear scroll del body cuando el modal está abierto
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isOpen]);
-
+export function CancelPaymentModal({ isOpen, onConfirm, onCancel }: CancelPaymentModalProps) {
   if (!isOpen) return null;
 
   return (
-    /* Overlay */
+    // Overlay
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{
-        backgroundColor: "rgba(0, 0, 0, 0.45)",
-        backdropFilter: "blur(4px)",
-      }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/45 backdrop-blur-sm"
       onClick={onCancel}
     >
-      {/* Card del modal */}
+      {/* Card — modal-enter definido en globals.css */}
       <div
-        className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-7 flex flex-col items-center text-center"
-        style={{
-          animation: "modalIn 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) both",
-        }}
-        onClick={(e) => e.stopPropagation()}
+        className="modal-enter relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-7 flex flex-col items-center text-center"
+        onClick={e => e.stopPropagation()}
       >
-        {/* Botón cerrar (X) */}
+        {/* Cerrar (X) */}
         <button
           onClick={onCancel}
           className="absolute top-4 right-4 text-stone-400 hover:text-stone-600 transition-colors"
@@ -65,7 +32,7 @@ export function CancelPaymentModal({
           <X size={18} />
         </button>
 
-        {/* Ícono de advertencia */}
+        {/* Ícono */}
         <div className="mb-4 flex items-center justify-center w-16 h-16 rounded-full bg-amber-50 border-2 border-amber-200">
           <AlertTriangle size={30} className="text-amber-500" />
         </div>
@@ -77,17 +44,15 @@ export function CancelPaymentModal({
 
         {/* Descripción */}
         <p className="text-sm text-stone-500 mb-1 leading-relaxed">
-          Si salís ahora,{" "}
-          <span className="font-medium text-stone-700">
-            se cancelará la transacción
-          </span>{" "}
+          Si salís ahora,{' '}
+          <span className="font-medium text-stone-700">se cancelará la transacción</span>{' '}
           y tendrás que iniciar una nueva compra.
         </p>
         <p className="text-xs text-stone-400 mb-7">
           El código QR dejará de ser válido.
         </p>
 
-        {/* Botones */}
+        {/* Acciones */}
         <div className="flex flex-col gap-3 w-full">
           <button
             onClick={onConfirm}
@@ -103,14 +68,6 @@ export function CancelPaymentModal({
           </button>
         </div>
       </div>
-
-      {/* Animación de entrada */}
-      <style>{`
-        @keyframes modalIn {
-          from { opacity: 0; transform: scale(0.88) translateY(12px); }
-          to   { opacity: 1; transform: scale(1)    translateY(0);     }
-        }
-      `}</style>
     </div>
   );
 }
