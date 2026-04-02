@@ -11,7 +11,8 @@ type ZoomAction = 'in' | 'out'
 export default function ZoomControls() {
   const map = useMap()
   const [zoom, setZoom] = useState(map.getZoom())
-  const [active, setActive] = useState<'in' | 'out' | null>(null);
+  const [active, setActive] = useState<ZoomAction | null>(null)
+
   useEffect(() => {
     const handleZoom = () => setZoom(map.getZoom())
 
@@ -37,9 +38,11 @@ export default function ZoomControls() {
       setTimeout(() => setActive(null), 300)
     }
   }, [map, zoom])
+
   const isMaxZoom = zoom >= MAX_ZOOM
   const isMinZoom = zoom <= MIN_ZOOM
-  const btnStyle = (type: 'in' | 'out', disabled: boolean)=> ({
+
+  const btnStyle = (type: ZoomAction, disabled: boolean) => ({
     width: '36px',
     height: '36px',
     border: 'none',
