@@ -51,11 +51,6 @@ export default async function Home() {
         <div className="flex flex-col-reverse lg:flex-row gap-8 items-start">
           {/* Sección de Filtros (Columna Izquierda) */}
           <FilterPanel />
-
-          {/* Sección de Explorar (Columna Derecha) */}
-          <section className="flex-1 w-full">
-            <ExploreSection />
-          </section>
         </div>
       </div>
     </main>
