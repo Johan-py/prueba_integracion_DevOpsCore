@@ -3,7 +3,15 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Bell, CheckCheck, Loader2, Trash2, WifiOff } from "lucide-react";
+import {
+  Bell,
+  CheckCheck,
+  Loader2,
+  Menu,
+  Trash2,
+  WifiOff,
+  X,
+} from "lucide-react";
 
 import Logo from "../navbar/Logo";
 import NavLinks from "../navbar/NavLinks";
@@ -31,6 +39,7 @@ export default function Navbar() {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const {
     open,
@@ -160,6 +169,10 @@ export default function Navbar() {
     }
 
     setIsPanelOpen((prev) => !prev);
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen((prev) => !prev);
   };
 
   const handleLoginRedirect = () => {
@@ -466,6 +479,17 @@ export default function Navbar() {
                   onOpenLogoutModal={handleOpenLogoutModal}
                 />
               </div>
+
+              {/* Botón de Hamburguesa para móvil */}
+              <button
+                type="button"
+                onClick={toggleMobileMenu}
+                className="rounded-full p-2 transition duration-200 hover:bg-black/5 hover:shadow-sm md:hidden"
+                aria-label="Abrir menú de navegación"
+                aria-expanded={isMobileMenuOpen}
+              >
+                <Menu className="h-6 w-6 text-stone-600" />
+              </button>
             </div>
           </div>
         </div>
@@ -477,6 +501,57 @@ export default function Navbar() {
         onCancel={handleCancelLogout}
         onConfirm={handleConfirmLogout}
       />
+
+      {/* Panel de Menú Móvil */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/40 md:hidden"
+          onClick={toggleMobileMenu}
+          aria-modal="true"
+          role="dialog"
+        >
+          <div
+            className="fixed right-0 top-0 h-full w-4/5 max-w-xs bg-[#F9F6EE] p-6 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <Logo />
+              <button
+                type="button"
+                onClick={toggleMobileMenu}
+                className="rounded-full p-2 transition duration-200 hover:bg-black/5"
+                aria-label="Cerrar menú"
+              >
+                <X className="h-6 w-6 text-stone-600" />
+              </button>
+            </div>
+
+            <nav className="mt-10 flex flex-col gap-4">
+              <Link
+                href="/"
+                onClick={toggleMobileMenu}
+                className="rounded-md px-3 py-2 text-lg font-medium text-gray-700 hover:bg-[#E68B25]/10 hover:text-[#E68B25]"
+              >
+                Inicio
+              </Link>
+              <Link
+                href="#contacto"
+                onClick={toggleMobileMenu}
+                className="rounded-md px-3 py-2 text-lg font-medium text-gray-700 hover:bg-[#E68B25]/10 hover:text-[#E68B25]"
+              >
+                Contáctanos
+              </Link>
+              <Link
+                href="#nosotros"
+                onClick={toggleMobileMenu}
+                className="rounded-md px-3 py-2 text-lg font-medium text-gray-700 hover:bg-[#E68B25]/10 hover:text-[#E68B25]"
+              >
+                Sobre Nosotros
+              </Link>
+            </nav>
+          </div>
+        </div>
+      )}
     </>
   );
 }
