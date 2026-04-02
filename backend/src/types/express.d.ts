@@ -1,9 +1,9 @@
-import { Request } from "express";
+import { Request } from 'express'
 
-declare module "express-serve-static-core" {
+declare module 'express-serve-static-core' {
   interface Request {
     user?: {
-      id: number;
-    };
+      id: number
+    }
   }
 }

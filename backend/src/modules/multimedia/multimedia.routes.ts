@@ -8,11 +8,7 @@ import {
 
 const multimediaRoutes = Router()
 
-multimediaRoutes.get(
-  '/:publicacionId/multimedia',
-  requireAuth,
-  getPublicationMultimediaController
-)
+multimediaRoutes.get('/:publicacionId/multimedia', requireAuth, getPublicationMultimediaController)
 
 multimediaRoutes.post(
   '/:publicacionId/multimedia/video-link',
@@ -20,10 +16,6 @@ multimediaRoutes.post(
   registerVideoLinkController
 )
 
-multimediaRoutes.post(
-  '/:publicacionId/multimedia/images',
-  requireAuth,
-  registerImagesController
-)
+multimediaRoutes.post('/:publicacionId/multimedia/images', requireAuth, registerImagesController)
 
 export default multimediaRoutes

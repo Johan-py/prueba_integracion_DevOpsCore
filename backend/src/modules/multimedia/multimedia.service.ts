@@ -38,10 +38,7 @@ const isValidYoutubeUrl = (videoUrl: string): boolean => {
     }
 
     if (host === 'youtube.com' || host === 'www.youtube.com') {
-      return (
-        parsedUrl.searchParams.has('v') ||
-        parsedUrl.pathname.startsWith('/shorts/')
-      )
+      return parsedUrl.searchParams.has('v') || parsedUrl.pathname.startsWith('/shorts/')
     }
 
     return false
@@ -50,10 +47,7 @@ const isValidYoutubeUrl = (videoUrl: string): boolean => {
   }
 }
 
-const validatePublicationOwnership = async (
-  publicacionId: number,
-  usuarioId: number
-) => {
+const validatePublicationOwnership = async (publicacionId: number, usuarioId: number) => {
   validatePositiveInteger(publicacionId, 'ID de publicación')
   validatePositiveInteger(usuarioId, 'Usuario')
 
@@ -100,11 +94,7 @@ const validateImagesInput = (images: RegisterImagesInput['images']) => {
       throw new Error('Formato no permitido. Solo PNG, JPG o JPEG')
     }
 
-    if (
-      typeof image.pesoMb !== 'number' ||
-      Number.isNaN(image.pesoMb) ||
-      image.pesoMb <= 0
-    ) {
+    if (typeof image.pesoMb !== 'number' || Number.isNaN(image.pesoMb) || image.pesoMb <= 0) {
       throw new Error(`El tamaño de la imagen ${imageIndex} no es válido`)
     }
 

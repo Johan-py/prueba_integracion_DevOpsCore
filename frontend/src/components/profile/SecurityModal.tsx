@@ -1,43 +1,37 @@
-"use client";
+'use client'
 
-import React, { useState } from "react";
-import { Lock } from "lucide-react";
+import React, { useState } from 'react'
+import { Lock } from 'lucide-react'
 
 interface SecurityModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (password: string) => void;
+  isOpen: boolean
+  onClose: () => void
+  onSubmit: (password: string) => void
 }
 
-export default function SecurityModal({
-  isOpen,
-  onClose,
-  onSubmit,
-}: SecurityModalProps) {
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+export default function SecurityModal({ isOpen, onClose, onSubmit }: SecurityModalProps) {
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (!password) {
-      setError("Por favor, ingresa tu contraseña para continuar.");
-      return;
+      setError('Por favor, ingresa tu contraseña para continuar.')
+      return
     }
-    setError("");
-    onSubmit(password);
-    setPassword("");
-  };
+    setError('')
+    onSubmit(password)
+    setPassword('')
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       {/* Fondo blanco, borde superior color Ámbar */}
       <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm mx-4 border-t-4 border-amber-600">
         {/* Título color Piedra 900 */}
-        <h2 className="text-xl font-bold mb-2 text-stone-900">
-          Seguridad Requerida
-        </h2>
+        <h2 className="text-xl font-bold mb-2 text-stone-900">Seguridad Requerida</h2>
 
         {/* Texto Secundario color Piedra 600 */}
         <p className="text-sm text-stone-600 mb-4">
@@ -83,5 +77,5 @@ export default function SecurityModal({
         </form>
       </div>
     </div>
-  );
+  )
 }
