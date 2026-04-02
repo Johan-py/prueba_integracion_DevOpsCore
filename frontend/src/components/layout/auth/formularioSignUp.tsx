@@ -41,12 +41,10 @@ type FormErrors = {
 
 interface RegisterResponse {
   message: string;
-  token?: string;
-  user?: {
-    nombre: string;
-    apellido: string;
-    correo: string;
-  };
+  verificationToken?: string;
+  email?: string;
+  requiresEmailVerification?: boolean;
+  expiresInMinutes?: number;
 }
 
 const MAX_NAME_LENGTH = 30;
@@ -167,35 +165,35 @@ export default function SignUpForm() {
   }, [router]);
 
   useEffect(() => {
-  const googlePrefill = consumeGoogleSignupPrefill();
+    const googlePrefill = consumeGoogleSignupPrefill();
 
-  if (!googlePrefill) {
-    return;
-  }
+    if (!googlePrefill) {
+      return;
+    }
 
-  const missingFields = getMissingGoogleSignupFields(googlePrefill);
+    const missingFields = getMissingGoogleSignupFields(googlePrefill);
 
-  setFormData((prev) => ({
-    ...prev,
-    email: googlePrefill.email?.trim() || prev.email,
-    firstName: googlePrefill.firstName?.trim() || prev.firstName,
-    lastName: googlePrefill.lastName?.trim() || prev.lastName,
-  }));
+    setFormData((prev) => ({
+      ...prev,
+      email: googlePrefill.email?.trim() || prev.email,
+      firstName: googlePrefill.firstName?.trim() || prev.firstName,
+      lastName: googlePrefill.lastName?.trim() || prev.lastName,
+    }));
 
-  setErrors((prev) => ({
-    ...prev,
-    ...buildGoogleFieldErrors(missingFields),
-  }));
+    setErrors((prev) => ({
+      ...prev,
+      ...buildGoogleFieldErrors(missingFields),
+    }));
 
-  setTouched((prev) => ({
-    ...prev,
-    email: missingFields.includes("email"),
-    firstName: missingFields.includes("firstName"),
-    lastName: missingFields.includes("lastName"),
-  }));
+    setTouched((prev) => ({
+      ...prev,
+      email: missingFields.includes("email"),
+      firstName: missingFields.includes("firstName"),
+      lastName: missingFields.includes("lastName"),
+    }));
 
-  setServerError(buildGoogleMissingFieldsMessage(missingFields));
-}, []);
+    setServerError(buildGoogleMissingFieldsMessage(missingFields));
+  }, []);
 
   const validateFirstName = (value: string) => {
     const trimmed = value.trim();
@@ -452,29 +450,22 @@ export default function SignUpForm() {
         throw new Error(data?.message || "No se pudo completar el registro");
       }
 
-      if (data?.token) {
-        localStorage.setItem("token", data.token);
+      if (!data?.verificationToken || !data?.email) {
+        throw new Error("No se recibió la verificación del registro");
       }
 
-      if (data?.user) {
-        const userData = {
-          name: `${data.user.nombre} ${data.user.apellido}`,
-          email: data.user.correo,
-        };
-        localStorage.setItem("propbol_user", JSON.stringify(userData));
-        localStorage.setItem(
-          "propbol_session_expires",
-          String(Date.now() + 60 * 60 * 1000),
-        );
-      }
-
+      sessionStorage.setItem("pendingRegisterToken", data.verificationToken);
+      sessionStorage.setItem(
+        "pendingRegisterPassword",
+        formData.password.trim(),
+      );
+      sessionStorage.setItem("pendingRegisterEmail", data.email);
       sessionStorage.setItem(
         "register_success_message",
-        data?.message || "Usuario registrado correctamente",
+        data.message || "Te enviamos un código de verificación a tu correo.",
       );
 
-      window.dispatchEvent(new Event("propbol:login"));
-      router.replace("/");
+      router.replace("/verify-email");
     } catch (error) {
       const message =
         error instanceof TypeError
@@ -491,39 +482,39 @@ export default function SignUpForm() {
   };
 
   const handleGoogleCredential = useCallback((credential: string) => {
-  setServerError("");
+    setServerError("");
 
-  const { prefill: googlePrefill, missingFields } =
-    extractGooglePrefillValidationFromCredential(credential);
+    const { prefill: googlePrefill, missingFields } =
+      extractGooglePrefillValidationFromCredential(credential);
 
-  if (!googlePrefill) {
-    setServerError(
-      "No se pudieron obtener los datos de la cuenta de Google.",
-    );
-    return;
-  }
+    if (!googlePrefill) {
+      setServerError(
+        "No se pudieron obtener los datos de la cuenta de Google.",
+      );
+      return;
+    }
 
-  setFormData((prev) => ({
-    ...prev,
-    email: googlePrefill.email || prev.email,
-    firstName: googlePrefill.firstName || prev.firstName,
-    lastName: googlePrefill.lastName || prev.lastName,
-  }));
+    setFormData((prev) => ({
+      ...prev,
+      email: googlePrefill.email || prev.email,
+      firstName: googlePrefill.firstName || prev.firstName,
+      lastName: googlePrefill.lastName || prev.lastName,
+    }));
 
-  setErrors((prev) => ({
-    ...prev,
-    ...buildGoogleFieldErrors(missingFields),
-  }));
+    setErrors((prev) => ({
+      ...prev,
+      ...buildGoogleFieldErrors(missingFields),
+    }));
 
-  setTouched((prev) => ({
-    ...prev,
-    email: missingFields.includes("email"),
-    firstName: missingFields.includes("firstName"),
-    lastName: missingFields.includes("lastName"),
-  }));
+    setTouched((prev) => ({
+      ...prev,
+      email: missingFields.includes("email"),
+      firstName: missingFields.includes("firstName"),
+      lastName: missingFields.includes("lastName"),
+    }));
 
-  setServerError(buildGoogleMissingFieldsMessage(missingFields));
-}, []);
+    setServerError(buildGoogleMissingFieldsMessage(missingFields));
+  }, []);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#f5f5f4] px-4 py-8">

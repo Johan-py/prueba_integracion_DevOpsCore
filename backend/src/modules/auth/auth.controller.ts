@@ -4,6 +4,7 @@ import {
   loginService,
   logoutService,
   registerUser,
+  verifyRegisterCodeService,
 } from "./auth.service.js";
 
 type RegisterBody = {
@@ -13,6 +14,12 @@ type RegisterBody = {
   password: string;
   confirmPassword: string;
   telefono?: string;
+};
+
+type VerifyRegisterBody = {
+  verificationToken: string;
+  codigo: string;
+  password: string;
 };
 
 const isDuplicateEmailError = (message: string) => {
@@ -82,10 +89,9 @@ export const registerController = async (
       telefono,
     });
 
-    return res.status(201).json({
-      message: "Usuario registrado correctamente",
-      user: result.user,
-      token: result.token,
+    return res.status(200).json({
+      message: "Te enviamos un código de verificación a tu correo.",
+      ...result,
     });
   } catch (error) {
     const rawMessage =
@@ -94,6 +100,32 @@ export const registerController = async (
     return res.status(getRegisterErrorStatus(rawMessage)).json({
       message: getRegisterErrorMessage(rawMessage),
     });
+  }
+};
+
+export const verifyRegisterCodeController = async (
+  req: Request<unknown, unknown, VerifyRegisterBody>,
+  res: Response,
+) => {
+  try {
+    const { verificationToken, codigo, password } = req.body;
+
+    const result = await verifyRegisterCodeService({
+      verificationToken,
+      codigo,
+      password,
+    });
+
+    return res.status(201).json({
+      message: "Correo verificado y usuario creado correctamente",
+      user: result.user,
+      token: result.token,
+    });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Error al verificar código";
+
+    return res.status(400).json({ message });
   }
 };
 

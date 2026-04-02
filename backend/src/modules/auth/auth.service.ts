@@ -1,3 +1,8 @@
+import crypto from "node:crypto";
+import jwt from "jsonwebtoken";
+
+import { env } from "../../config/env.js";
+import { enviarCodigoRegistro } from "../../lib/email.service.js";
 import { generateToken, type JwtPayload } from "../../utils/jwt.js";
 import {
   createSession,
@@ -5,6 +10,7 @@ import {
   desactiveSessionByToken,
   findActiveSessionByToken,
   findUser,
+  findUserByCorreo,
 } from "./auth.repository.js";
 
 type LoginDTO = {
@@ -19,6 +25,22 @@ type RegisterDTO = {
   password: string;
   confirmPassword: string;
   telefono?: string;
+};
+
+type VerifyRegisterCodeDTO = {
+  verificationToken: string;
+  codigo: string;
+  password: string;
+};
+
+type PendingRegisterPayload = {
+  purpose: "pending-register";
+  nombre: string;
+  apellido: string;
+  correo: string;
+  telefono?: string;
+  nonce: string;
+  codeSignature: string;
 };
 
 type LoginAttemptState = {
@@ -42,6 +64,9 @@ const MAX_NOMBRE = 30;
 const MAX_APELLIDO = 30;
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOGIN_BLOCK_TIME_MS = 15 * 60 * 1000;
+
+const REGISTER_CODE_TTL_MINUTES = 5;
+const REGISTER_CODE_TTL_SECONDS = REGISTER_CODE_TTL_MINUTES * 60;
 
 const loginAttempts = new Map<string, LoginAttemptState>();
 
@@ -115,6 +140,95 @@ const registerFailedAttempt = (correo: string) => {
 
 const clearFailedAttempts = (correo: string) => {
   loginAttempts.delete(correo);
+};
+
+const normalizeRegisterPayload = (payload: RegisterDTO) => {
+  const nombre = payload.nombre?.trim();
+  const apellido = payload.apellido?.trim();
+  const correo = payload.correo?.trim().toLowerCase();
+  const password = payload.password?.trim();
+  const confirmPassword = payload.confirmPassword?.trim();
+  const telefono = payload.telefono?.trim() || undefined;
+
+  if (!nombre || !apellido || !correo || !password || !confirmPassword) {
+    throw new Error("Todos los campos obligatorios deben ser completados");
+  }
+
+  if (nombre.length > MAX_NOMBRE) {
+    throw new Error(`El nombre no puede superar ${MAX_NOMBRE} caracteres`);
+  }
+
+  if (apellido.length > MAX_APELLIDO) {
+    throw new Error(`El apellido no puede superar ${MAX_APELLIDO} caracteres`);
+  }
+
+  if (password !== confirmPassword) {
+    throw new Error("Las contraseñas no coinciden");
+  }
+
+  return {
+    nombre,
+    apellido,
+    correo,
+    password,
+    telefono,
+  };
+};
+
+const generateRegisterCode = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+const signRegisterCode = ({
+  codigo,
+  correo,
+  nonce,
+}: {
+  codigo: string;
+  correo: string;
+  nonce: string;
+}) => {
+  return crypto
+    .createHmac("sha256", env.JWT_SECRET)
+    .update(`${codigo}:${correo}:${nonce}:pending-register`)
+    .digest("hex");
+};
+
+const isMatchingCodeSignature = (
+  expectedSignature: string,
+  currentSignature: string,
+) => {
+  const expectedBuffer = Buffer.from(expectedSignature, "utf8");
+  const currentBuffer = Buffer.from(currentSignature, "utf8");
+
+  if (expectedBuffer.length !== currentBuffer.length) {
+    return false;
+  }
+
+  return crypto.timingSafeEqual(expectedBuffer, currentBuffer);
+};
+
+const generatePendingRegisterToken = (payload: PendingRegisterPayload) => {
+  return jwt.sign(payload, env.JWT_SECRET, {
+    expiresIn: REGISTER_CODE_TTL_SECONDS,
+  });
+};
+
+const verifyPendingRegisterToken = (token: string) => {
+  try {
+    const decoded = jwt.verify(token, env.JWT_SECRET) as jwt.JwtPayload &
+      PendingRegisterPayload;
+
+    if (decoded.purpose !== "pending-register") {
+      throw new Error("Token de verificación inválido");
+    }
+
+    return decoded;
+  } catch {
+    throw new Error(
+      "El código expiró o ya no es válido. Vuelve a registrarte.",
+    );
+  }
 };
 
 export const loginService = async (payload: LoginDTO) => {
@@ -192,35 +306,86 @@ export const loginService = async (payload: LoginDTO) => {
 };
 
 export const registerUser = async (payload: RegisterDTO) => {
-  const nombre = payload.nombre?.trim();
-  const apellido = payload.apellido?.trim();
-  const correo = payload.correo?.trim().toLowerCase();
+  const normalized = normalizeRegisterPayload(payload);
+
+  const existingUser = await findUserByCorreo(normalized.correo);
+
+  if (existingUser) {
+    throw new Error("El correo ya está registrado");
+  }
+
+  const codigo = generateRegisterCode();
+  const nonce = crypto.randomUUID();
+
+  const verificationToken = generatePendingRegisterToken({
+    purpose: "pending-register",
+    nombre: normalized.nombre,
+    apellido: normalized.apellido,
+    correo: normalized.correo,
+    telefono: normalized.telefono,
+    nonce,
+    codeSignature: signRegisterCode({
+      codigo,
+      correo: normalized.correo,
+      nonce,
+    }),
+  });
+
+  const emailResult = await enviarCodigoRegistro({
+    emailDestino: normalized.correo,
+    codigo,
+    nombreUsuario: normalized.nombre,
+  });
+
+  if (!emailResult.success) {
+    throw new Error(
+      "No se pudo enviar el código de verificación. Intenta nuevamente.",
+    );
+  }
+
+  return {
+    email: normalized.correo,
+    verificationToken,
+    requiresEmailVerification: true,
+    expiresInMinutes: REGISTER_CODE_TTL_MINUTES,
+  };
+};
+
+export const verifyRegisterCodeService = async (
+  payload: VerifyRegisterCodeDTO,
+) => {
+  const verificationToken = payload.verificationToken?.trim();
+  const codigo = payload.codigo?.trim();
   const password = payload.password?.trim();
-  const confirmPassword = payload.confirmPassword?.trim();
-  const telefono = payload.telefono?.trim() || undefined;
 
-  if (!nombre || !apellido || !correo || !password || !confirmPassword) {
-    throw new Error("Todos los campos obligatorios deben ser completados");
+  if (!verificationToken || !codigo || !password) {
+    throw new Error("Token, código y contraseña son obligatorios");
   }
 
-  if (nombre.length > MAX_NOMBRE) {
-    throw new Error(`El nombre no puede superar ${MAX_NOMBRE} caracteres`);
+  const decoded = verifyPendingRegisterToken(verificationToken);
+
+  const expectedSignature = signRegisterCode({
+    codigo,
+    correo: decoded.correo,
+    nonce: decoded.nonce,
+  });
+
+  if (!isMatchingCodeSignature(expectedSignature, decoded.codeSignature)) {
+    throw new Error("El código ingresado no es válido");
   }
 
-  if (apellido.length > MAX_APELLIDO) {
-    throw new Error(`El apellido no puede superar ${MAX_APELLIDO} caracteres`);
-  }
+  const existingUser = await findUserByCorreo(decoded.correo);
 
-  if (password !== confirmPassword) {
-    throw new Error("Las contraseñas no coinciden");
+  if (existingUser) {
+    throw new Error("El correo ya está registrado");
   }
 
   const newUser = await createUser({
-    nombre,
-    apellido,
-    correo,
+    nombre: decoded.nombre,
+    apellido: decoded.apellido,
+    correo: decoded.correo,
     password,
-    telefono,
+    telefono: decoded.telefono,
   });
 
   const jwtPayload: JwtPayload = {
