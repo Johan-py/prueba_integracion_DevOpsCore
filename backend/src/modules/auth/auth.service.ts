@@ -70,6 +70,20 @@ const REGISTER_CODE_TTL_SECONDS = REGISTER_CODE_TTL_MINUTES * 60;
 
 const loginAttempts = new Map<string, LoginAttemptState>();
 
+const DUPLICATE_EMAIL_MESSAGE = "El correo ya está registrado";
+
+const isDuplicateEmailError = (error: unknown) => {
+  if (!(error instanceof Error)) return false;
+
+  const normalized = error.message.toLowerCase();
+
+  return (
+    normalized === DUPLICATE_EMAIL_MESSAGE.toLowerCase() ||
+    (normalized.includes("unique constraint failed") &&
+      normalized.includes("correo"))
+  );
+};
+
 const getAttemptState = (correo: string): LoginAttemptState => {
   const existingState = loginAttempts.get(correo);
 
@@ -377,16 +391,25 @@ export const verifyRegisterCodeService = async (
   const existingUser = await findUserByCorreo(decoded.correo);
 
   if (existingUser) {
-    throw new Error("El correo ya está registrado");
+    throw new AuthError(DUPLICATE_EMAIL_MESSAGE, 409);
   }
+  let newUser;
 
-  const newUser = await createUser({
-    nombre: decoded.nombre,
-    apellido: decoded.apellido,
-    correo: decoded.correo,
-    password,
-    telefono: decoded.telefono,
-  });
+  try {
+    newUser = await createUser({
+      nombre: decoded.nombre,
+      apellido: decoded.apellido,
+      correo: decoded.correo,
+      password,
+      telefono: decoded.telefono,
+    });
+  } catch (error) {
+    if (isDuplicateEmailError(error)) {
+      throw new AuthError(DUPLICATE_EMAIL_MESSAGE, 409);
+    }
+
+    throw error;
+  }
 
   const jwtPayload: JwtPayload = {
     id: newUser.id,
