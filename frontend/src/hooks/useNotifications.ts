@@ -343,7 +343,7 @@ export function useNotifications() {
     if (!isLoggedIn || !isOnline) return
     const interval = setInterval(() => {
       void refreshNotifications(filter)
-    }, 30000)
+    }, 15000)
     return () => clearInterval(interval)
   }, [isLoggedIn, isOnline, filter, refreshNotifications])
 
