@@ -30,9 +30,6 @@
   "dependencies": {
     "@prisma/config": "^7.5.0",
     "cors": "^2.8.6",
-    "leaflet": "^1.9.4",
-    "react-leaflet": "^5.0.0",
-    "nodemailer": "^8.0.4",
     "tailwind": "^4.0.0"
   }
 }
