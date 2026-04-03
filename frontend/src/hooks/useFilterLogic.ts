@@ -7,31 +7,37 @@ interface FilterItem {
 
 export const useFilterLogic = <T extends FilterItem>(
   data: T[],
-  globalSortOrder: 'asc' | 'desc'
+  globalSortOrder: 'asc' | 'desc',
+  sortBy: 'name' | 'count'
 ) => {
   const [viewLevel, setViewLevel] = useState(1)
 
   const handleSeeMore = () => setViewLevel((prev) => prev + 1)
   const handleSeeLess = () => setViewLevel(1)
 
-  // El ordenamiento ahora depende del "globalSortOrder" que viene del padre
   const visibleData = useMemo(() => {
     if (!data || !Array.isArray(data)) return []
     const processed = [...data]
 
-    // Ordenamiento con protección contra valores undefined/null
     processed.sort((a, b) => {
-      // Usamos el operador "Nullish coalescing" o un string vacío como backup
-      const nameA = a?.name ?? ''
-      const nameB = b?.name ?? ''
-
-      return globalSortOrder === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA)
+      if (sortBy === 'name') {
+        const nameA = a?.name ?? ''
+        const nameB = b?.name ?? ''
+        return globalSortOrder === 'asc' 
+          ? nameA.localeCompare(nameB) 
+          : nameB.localeCompare(nameA)
+      } else {
+        // Ordenar por Cantidad (count)
+        return globalSortOrder === 'asc' 
+          ? a.count - b.count 
+          : b.count - a.count
+      }
     })
 
-    if (viewLevel === 1) return processed.slice(0, 2)
-    if (viewLevel === 2) return processed.slice(0, 5)
+    if (viewLevel === 1) return processed.slice(0, 3)
+    if (viewLevel === 2) return processed.slice(0, 6)
     return processed
-  }, [data, globalSortOrder, viewLevel])
+  }, [data, globalSortOrder, viewLevel, sortBy])
 
   return {
     viewLevel,
