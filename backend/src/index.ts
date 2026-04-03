@@ -25,6 +25,7 @@ import {
 import { requireAuth } from "./middleware/auth.middleware.js";
 import meHandler from "../api/auth/me.js";
 import correoverificacionRoutes from "./modules/perfil/correoverificacion.routes.js";
+import perfilRoutes from "./modules/perfil/perfil.routes.js";
 import {
   googleCallbackController,
   StratGoogleLoginController,
@@ -46,6 +47,7 @@ app.use(
 app.use(express.json())
 
 app.use('/api/perfil', correoverificacionRoutes)
+app.use("/api/perfil/usuario", perfilRoutes)
 app.use('/api/publicaciones', multimediaRoutes)
 app.post("/api/users", (req, res) => {
   const user = req.body;

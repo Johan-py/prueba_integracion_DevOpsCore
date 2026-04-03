@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Plus, Trash2, Pencil } from 'lucide-react';
 import SecurityModal from "./SecurityModal";
 import OtpModal from "./OtpModal";
@@ -19,8 +19,9 @@ const PAISES = [
   { nombre: 'Perú', codigo: '+51', flag: '🇵🇪' },
 ];
 
-export default function ProfileCard() {
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
+export default function ProfileCard() {
   const [campoEditando, setCampoEditando] = useState<string | null>(null);
 
   const [nombre, setNombre] = useState("Condesa");
@@ -32,12 +33,240 @@ export default function ProfileCard() {
     return value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
   };
 
+  // ========== FUNCIONALIDAD DE EMAIL CON OTP ==========
   const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false);
   const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
   const [isEmailEditable, setIsEmailEditable] = useState(false);
   const [originalEmail, setOriginalEmail] = useState("perfil1@gmail.com");
   const [tempEmail, setTempEmail] = useState("perfil1@gmail.com");
+  const [otpError, setOtpError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [emailToUpdate, setEmailToUpdate] = useState(""); // Email nuevo a guardar
 
+  // Cargar datos del usuario desde localStorage
+  useEffect(() => {
+    const email = localStorage.getItem('correo');
+    const nombreStorage = localStorage.getItem('nombre');
+    if (email) {
+      setOriginalEmail(email);
+      setTempEmail(email);
+    }
+    if (nombreStorage) {
+      setNombre(nombreStorage);
+    }
+  }, []);
+
+  const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const hasEmailChanged = tempEmail !== originalEmail && isValidEmail(tempEmail);
+
+  // Obtener token
+  const getToken = () => localStorage.getItem('token');
+
+  // PASO 1: Verificar contraseña al hacer clic en el lápiz
+  const handlePasswordSubmit = async (passwordActual: string) => {
+    setIsLoading(true);
+    try {
+      const token = getToken();
+
+      if (!token) {
+        throw new Error("No hay sesión activa. Inicia sesión nuevamente.");
+      }
+
+      // Verificar contraseña
+      const verifyRes = await fetch(`${API_URL}/api/perfil/verificar-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ passwordActual })
+      });
+
+      if (!verifyRes.ok) {
+        const errorData = await verifyRes.json().catch(() => ({ msg: 'Error al verificar contraseña' }));
+        throw new Error(errorData.msg || 'Error al verificar contraseña');
+      }
+
+      const verifyData = await verifyRes.json();
+
+      if (!verifyData.ok) {
+        throw new Error(verifyData.msg);
+      }
+
+      // Contraseña correcta: habilitar edición de email
+      setIsSecurityModalOpen(false);
+      setIsEmailEditable(true);
+      setTempEmail(originalEmail); // Reset al valor original por si acaso
+
+    } catch (error: any) {
+      console.error("Error:", error);
+      alert(error.message || "Contraseña incorrecta");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // PASO 2: Solicitar cambio de email (envía OTP) - se llama al guardar
+  const solicitarCambioEmail = async (nuevoEmail: string) => {
+    setIsLoading(true);
+    try {
+      const token = getToken();
+
+      const solicitarRes = await fetch(`${API_URL}/api/perfil/solicitar-cambio-email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ emailNuevo: nuevoEmail })
+      });
+
+      if (!solicitarRes.ok) {
+        const errorData = await solicitarRes.json().catch(() => ({ msg: 'Error al solicitar cambio' }));
+        throw new Error(errorData.msg || 'Error al solicitar cambio de email');
+      }
+
+      const solicitarData = await solicitarRes.json();
+
+      if (!solicitarData.ok) {
+        throw new Error(solicitarData.msg);
+      }
+
+      // Guardar email que se va a actualizar
+      setEmailToUpdate(nuevoEmail);
+
+      // Abrir modal OTP
+      setIsOtpModalOpen(true);
+      setOtpError("");
+
+    } catch (error: any) {
+      console.error("Error:", error);
+      alert(error.message || "Error al solicitar cambio de email");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // PASO 3: Confirmar OTP y actualizar email
+  const handleOtpSubmit = async (otp: string) => {
+    setIsLoading(true);
+    try {
+      const token = getToken();
+
+      const response = await fetch(`${API_URL}/api/perfil/confirmar-cambio-email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ otp })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ msg: 'Error al confirmar código' }));
+        throw new Error(errorData.msg || 'Error al confirmar código');
+      }
+
+      const data = await response.json();
+
+      if (!data.ok) {
+        throw new Error(data.msg);
+      }
+
+      // Actualizar email en localStorage y estado
+      localStorage.setItem('correo', emailToUpdate);
+      setOriginalEmail(emailToUpdate);
+      setTempEmail(emailToUpdate);
+      setIsEmailEditable(false);
+      setIsOtpModalOpen(false);
+      setEmailToUpdate("");
+      setOtpError("");
+      alert("Correo actualizado exitosamente");
+
+    } catch (error: any) {
+      console.error("Error:", error);
+      setOtpError(error.message || "Error al verificar código");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Reenviar código
+  const handleResendCode = async () => {
+    setIsLoading(true);
+    try {
+      const token = getToken();
+      const emailNuevo = emailToUpdate || tempEmail;
+
+      const response = await fetch(`${API_URL}/api/perfil/solicitar-cambio-email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ emailNuevo })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ msg: 'Error al reenviar código' }));
+        throw new Error(errorData.msg || 'Error al reenviar código');
+      }
+
+      const data = await response.json();
+
+      if (!data.ok) {
+        throw new Error(data.msg);
+      }
+
+      setOtpError("");
+      alert("Se ha enviado un nuevo código a tu correo");
+
+    } catch (error: any) {
+      console.error("Error:", error);
+      setOtpError(error.message || "Error al reenviar código");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Manejar click en guardar cambios
+  const handleSaveAll = () => {
+    // Si el email está en modo edición y cambió
+    if (isEmailEditable && hasEmailChanged) {
+      solicitarCambioEmail(tempEmail);
+    } else if (isEmailEditable && !hasEmailChanged) {
+      // Si no cambió el email, solo salir del modo edición
+      setIsEmailEditable(false);
+    }
+
+    // Guardar otros campos (nombre, dirección, etc.)
+    if (campoEditando) {
+      setCampoEditando(null);
+      // Aquí puedes agregar la lógica para guardar los demás campos
+      if (campoEditando !== "email") {
+        alert(`${campoEditando} guardado correctamente`);
+      }
+    }
+  };
+
+  // Manejar cancelar
+  const handleCancelAll = () => {
+    setCampoEditando(null);
+    setNombre(localStorage.getItem('nombre') || "Condesa");
+    setPais("");
+    setGenero("");
+    setDireccion("");
+    // Restaurar email original y salir del modo edición
+    setTempEmail(originalEmail);
+    setIsEmailEditable(false);
+  };
+
+  // Activar edición de email - abre el modal de seguridad primero
+  const handleEditEmailClick = () => {
+    setIsSecurityModalOpen(true);
+  };
+
+  // Teléfonos
   const [telefonos, setTelefonos] = useState<Telefono[]>([
     { id: Date.now(), numero: '', pais: 'Bolivia', codigo: '+591' }
   ]);
@@ -60,31 +289,11 @@ export default function ProfileCard() {
     ));
   };
 
-  const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const canSave = tempEmail !== originalEmail && isValidEmail(tempEmail);
-
-  const handleSaveClick = () => {
-    if (!canSave) return;
-    setIsOtpModalOpen(true);
-  };
-
-  const handlePasswordSubmit = () => {
-    setIsEmailEditable(true);
-    setIsSecurityModalOpen(false);
-  };
-
-  const handleOtpSubmit = () => {
-    setOriginalEmail(tempEmail);
-    setIsEmailEditable(false);
-    setIsOtpModalOpen(false);
-  };
-
   return (
     <div className="bg-[#fdf6e6] border border-[#e5dfd7] shadow-sm p-8 rounded-xl flex flex-col md:flex-row gap-10 items-center">
 
       {/* PERFIL */}
       <div className="flex flex-col items-center justify-center w-full md:w-1/3">
-        {/* AVATAR */}
         <div className="w-28 h-28 rounded-full bg-white border border-gray-300 relative flex items-center justify-center shadow-sm mb-10">
           <span className="text-gray-500 text-xs uppercase">Imagen</span>
           <button
@@ -99,7 +308,7 @@ export default function ProfileCard() {
             <Plus size={16} />
           </button>
         </div>
-        <p className="mt-4 font-semibold text-lg">Perfil1</p>
+        <p className="mt-4 font-semibold text-lg">{nombre}</p>
         <p className="text-sm text-gray-500">{originalEmail}</p>
       </div>
 
@@ -131,26 +340,43 @@ export default function ProfileCard() {
             </div>
           </div>
 
-          {/* EMAIL */}
+          {/* EMAIL - FLUJO: Lápiz -> Contraseña -> Editar -> Guardar -> OTP */}
           <div className="flex flex-col md:flex-row md:items-start gap-2 md:gap-4">
             <label className="w-full md:w-40 font-medium text-stone-700 pt-2">E-mail:</label>
             <div className="flex-1 flex flex-col">
-              <input
-                type="email"
-                className={`w-full px-3 py-2 rounded text-sm text-stone-700 
-                  ${!isEmailEditable ? "bg-gray-200 cursor-pointer hover:bg-gray-300" : "bg-white border border-amber-500"}`}
-                readOnly={!isEmailEditable}
-                onClick={!isEmailEditable ? () => setIsSecurityModalOpen(true) : undefined}
-                value={tempEmail}
-                onChange={(e) => setTempEmail(e.target.value)}
-              />
+              <div className="flex w-full items-center gap-2">
+                <input
+                  type="email"
+                  className={`w-full px-3 py-2 rounded text-sm text-stone-700 
+                    ${isEmailEditable
+                      ? "bg-white border border-amber-500"
+                      : "bg-gray-200"}
+                  `}
+                  readOnly={!isEmailEditable}
+                  value={tempEmail}
+                  onChange={(e) => setTempEmail(e.target.value)}
+                  placeholder="correo@ejemplo.com"
+                />
+                <button
+                  onClick={handleEditEmailClick}
+                  className="text-black hover:text-amber-600"
+                  disabled={isEmailEditable}
+                >
+                  <Pencil size={16} />
+                </button>
+              </div>
               {isEmailEditable && tempEmail.length > 0 && !isValidEmail(tempEmail) && (
                 <span className="text-red-500 text-xs mt-1">Formato de correo inválido</span>
               )}
+              {isEmailEditable && hasEmailChanged && (
+                <span className="text-green-500 text-xs mt-1">Listo para guardar cambios</span>
+              )}
+              {isEmailEditable && (
+                <span className="text-amber-600 text-xs mt-1">
+                  Edita el correo y luego haz clic en "Guardar Cambios"
+                </span>
+              )}
             </div>
-            <button onClick={() => setIsSecurityModalOpen(true)}>
-              <Pencil size={16} />
-            </button>
           </div>
 
           {/* TELÉFONOS */}
@@ -301,28 +527,49 @@ export default function ProfileCard() {
           {/* BOTONES */}
           <div className="mt-6 flex justify-end gap-4">
             <button
-              onClick={() => {
-                setCampoEditando(null);
-                setNombre("Condesa");
-                setPais("");
-                setGenero("");
-                setDireccion("");
-                setTempEmail(originalEmail);
-              }}
+              onClick={handleCancelAll}
               className="text-stone-600 hover:text-black text-sm"
+              disabled={isLoading}
             >
               Cancelar
             </button>
-            <button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg text-sm font-medium shadow-sm">
-              Guardar Cambios
+            <button
+              onClick={handleSaveAll}
+              disabled={isLoading}
+              className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg text-sm font-medium shadow-sm disabled:bg-orange-300 disabled:cursor-not-allowed"
+            >
+              {isLoading ? "Procesando..." : "Guardar Cambios"}
             </button>
           </div>
         </div>
       </div>
 
-      <SecurityModal isOpen={isSecurityModalOpen} onClose={() => setIsSecurityModalOpen(false)} onSubmit={handlePasswordSubmit} />
-      <OtpModal isOpen={isOtpModalOpen} onClose={() => setIsOtpModalOpen(false)} onSubmit={handleOtpSubmit} onResendCode={() => {}} />
-
+      {/* MODALES */}
+      <SecurityModal
+        isOpen={isSecurityModalOpen}
+        onClose={() => {
+          setIsSecurityModalOpen(false);
+          setIsLoading(false);
+        }}
+        onSubmit={handlePasswordSubmit}
+        isLoading={isLoading}
+      />
+      <OtpModal
+        isOpen={isOtpModalOpen}
+        onClose={() => {
+          setIsOtpModalOpen(false);
+          setOtpError("");
+          setEmailToUpdate("");
+          setIsLoading(false);
+          // Si cierra el OTP sin confirmar, deshabilitar edición y restaurar email
+          setIsEmailEditable(false);
+          setTempEmail(originalEmail);
+        }}
+        onSubmit={handleOtpSubmit}
+        onResendCode={handleResendCode}
+        externalError={otpError}
+        isLoading={isLoading}
+      />
     </div>
   );
 }
