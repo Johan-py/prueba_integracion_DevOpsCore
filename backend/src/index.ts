@@ -5,6 +5,7 @@ import { env } from "./config/env.js";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { propertiesController } from "./modules/properties/properties.controller.js";
 import {
+  createNotificationController,
   deleteNotificationController,
   getNotificationsController,
   getUnreadCountController,
@@ -29,6 +30,7 @@ import {
   StratGoogleLoginController,
 } from "./modules/auth/google/google.controller.js";
 import multimediaRoutes from './modules/multimedia/multimedia.routes.js'
+import { verifyNotificationEmailTransport } from './modules/email/notification-email.service.js'
 
 const app = express()
 
@@ -81,6 +83,7 @@ app.get('/health', (_req, res) => {
 app.get('/api/properties/search', propertiesController.search)
 app.get('/api/inmuebles', propertiesController.getAll)
 
+app.post('/notificaciones', requireAuth, createNotificationController)
 app.get('/notificaciones', requireAuth, getNotificationsController)
 app.get('/notificaciones/unread-count', requireAuth, getUnreadCountController)
 app.patch('/notificaciones/:id/read', requireAuth, markNotificationAsReadController)
@@ -102,7 +105,14 @@ app.get('/api/publicaciones/gratis', (_req, res) => {
 
 const PORT = Number(process.env.PORT) || 5000
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server running on http://localhost:${PORT}`)
   console.log(`Health check: http://localhost:${PORT}/health`)
+
+  try {
+    await verifyNotificationEmailTransport()
+    console.log('✅ Servicio de email para notificaciones listo')
+  } catch (error) {
+    console.error('❌ Error en configuración de email para notificaciones:', error)
+  }
 })

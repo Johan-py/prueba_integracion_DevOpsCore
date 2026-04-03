@@ -35,6 +35,12 @@ type SoftDeleteNotificationParams = {
   usuarioId: number
 }
 
+type CreateNotificationParams = {
+  usuarioId: number
+  titulo: string
+  mensaje: string
+}
+
 const buildWhereClause = ({
   usuarioId,
   filter
@@ -106,6 +112,24 @@ export const findNotificationByIdRepository = async ({
       id,
       usuarioId,
       eliminada: false
+    }
+  })
+}
+
+export const createNotificationRepository = async ({
+  usuarioId,
+  titulo,
+  mensaje
+}: CreateNotificationParams) => {
+  return prisma.notificacion.create({
+    data: {
+      usuarioId,
+      titulo,
+      mensaje,
+      leida: false,
+      eliminada: false,
+      fechaCreacion: new Date(),
+      fechaLectura: null
     }
   })
 }

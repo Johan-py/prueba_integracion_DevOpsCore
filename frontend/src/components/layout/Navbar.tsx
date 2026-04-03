@@ -269,10 +269,14 @@ export default function Navbar() {
                     role="dialog"
                     aria-label="Panel de notificaciones"
                     aria-modal="true"
-                    className="absolute right-0 top-12 z-50 w-80 overflow-hidden rounded-xl border border-stone-200 bg-white shadow-lg"
+                    className="
+                      fixed left-0 right-0 top-[57px] z-50
+                      mx-2 overflow-hidden rounded-xl border border-stone-200 bg-white shadow-lg
+                      sm:absolute sm:left-auto sm:right-0 sm:top-12 sm:mx-0 sm:w-80
+                    "
                   >
                     <div className="flex items-center justify-between border-b border-stone-100 px-4 py-3">
-                      <h3 id="notifications-title" className="text-sm font-semibold text-stone-900">
+                      <h3 className="text-sm font-semibold text-stone-900">
                         Notificaciones
                       </h3>
 
@@ -344,7 +348,7 @@ export default function Navbar() {
                           role="list"
                           aria-label="Lista de notificaciones"
                           aria-live="polite"
-                          className="max-h-80 overflow-y-auto"
+                          className="max-h-[60vh] overflow-y-auto sm:max-h-80"
                           onScroll={(e) => {
                             const target = e.currentTarget
                             const reachedBottom =
@@ -391,11 +395,11 @@ export default function Navbar() {
                                 >
                                   <div className="flex items-start justify-between gap-3">
                                     <div className="min-w-0 flex-1">
-                                      <p className="text-sm font-semibold text-stone-900">
+                                      <p className="truncate text-sm font-semibold text-stone-900">
                                         {notification.title?.trim() || '(Sin título)'}
                                       </p>
 
-                                      <p className="mt-1 text-sm text-stone-600">
+                                      <p className="mt-1 line-clamp-2 text-sm text-stone-600">
                                         {notification.description?.trim() ||
                                           '(Sin descripción disponible)'}
                                       </p>
@@ -440,10 +444,10 @@ export default function Navbar() {
                             </>
                           )}
                         </div>
-
                         <div className="border-t border-stone-100 px-4 py-3 text-center">
                           <Link
                             href="/notificaciones"
+                            onClick={toggleNotifications}
                             className="text-sm font-medium text-amber-600 transition hover:text-amber-700"
                           >
                             Ver todas las notificaciones
