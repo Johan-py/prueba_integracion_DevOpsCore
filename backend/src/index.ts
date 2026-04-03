@@ -1,7 +1,9 @@
-import express from 'express'
-import cors from 'cors'
-import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { propertiesController } from './modules/properties/properties.controller.js'
+import "dotenv/config";
+import express from "express";
+import cors from "cors";
+import { env } from "./config/env.js";
+import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { propertiesController } from "./modules/properties/properties.controller.js";
 import {
   deleteNotificationController,
   getNotificationsController,
@@ -16,11 +18,16 @@ import { FiltersHomepageController } from './modules/filtershomepage/filtershome
 import {
   registerController,
   loginController,
-  logoutController
-} from './modules/auth/auth.controller.js'
-import { requireAuth } from './middleware/auth.middleware.js'
-import meHandler from '../api/auth/me.js'
-import correoverificacionRoutes from './modules/perfil/correoverificacion.routes.js'
+  logoutController,
+  verifyRegisterCodeController,
+} from "./modules/auth/auth.controller.js";
+import { requireAuth } from "./middleware/auth.middleware.js";
+import meHandler from "../api/auth/me.js";
+import correoverificacionRoutes from "./modules/perfil/correoverificacion.routes.js";
+import {
+  googleCallbackController,
+  StratGoogleLoginController,
+} from "./modules/auth/google/google.controller.js";
 import multimediaRoutes from './modules/multimedia/multimedia.routes.js'
 
 const app = express()
@@ -38,18 +45,19 @@ app.use(express.json())
 
 app.use('/api/perfil', correoverificacionRoutes)
 app.use('/api/publicaciones', multimediaRoutes)
-
+app.post("/api/users", (req, res) => {
+  const user = req.body;
+  res.json({ message: "User created", user });
+});
+app.post("/api/auth/register", registerController);
+app.post("/api/auth/login", loginController);
+app.post("/api/auth/logout", logoutController);
+app.post("/api/auth/verify-register", verifyRegisterCodeController);
+app.get("/api/auth/google/login", StratGoogleLoginController);
+app.get("/api/auth/google/callback", googleCallbackController);
 const bannersController = new BannersController()
 const filtersController = new FiltersHomepageController()
 
-app.post('/api/users', (req, res) => {
-  const user = req.body
-  res.json({ message: 'User created', user })
-})
-
-app.post('/api/auth/register', registerController)
-app.post('/api/auth/login', loginController)
-app.post('/api/auth/logout', logoutController)
 
 app.get('/api/auth/me', async (req, res) => {
   await meHandler(req as any, res as any)
