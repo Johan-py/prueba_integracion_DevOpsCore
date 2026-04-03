@@ -12,24 +12,36 @@ export default function GoogleCallbackPage() {
   const [message, setMessage] = useState('Procesando datos de tu cuenta de Google...')
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search)
-    const hasError = searchParams.get('error')
+    const searchParams = new URLSearchParams(window.location.search);
+const error = searchParams.get("error");
+const isCancelled = error === "access_denied";
+let timeoutId: number | undefined;
 
-    let timeoutId: number | undefined
+if (isCancelled) {
+  setMessage("Cancelaste la autenticación con Google. Redirigiendo al login...");
+  timeoutId = window.setTimeout(() => {
+    router.replace("/sign-in");
+  }, 1500);
 
-    if (hasError) {
-      setMessage('No se pudo obtener la información de Google.')
-
-      timeoutId = window.setTimeout(() => {
-        router.replace('/sign-up')
-      }, 1500)
-
-      return () => {
-        if (timeoutId) {
-          window.clearTimeout(timeoutId)
-        }
-      }
+  return () => {
+    if (timeoutId) {
+      window.clearTimeout(timeoutId);
     }
+  };
+}
+
+if (error) {
+  setMessage("No se pudo iniciar sesión con Google. Redirigiendo al login...");
+  timeoutId = window.setTimeout(() => {
+    router.replace("/sign-in");
+  }, 1500);
+
+  return () => {
+    if (timeoutId) {
+      window.clearTimeout(timeoutId);
+    }
+  };
+}
 
     const prefill = buildGoogleSignupPrefillFromSearchParams(searchParams)
 
