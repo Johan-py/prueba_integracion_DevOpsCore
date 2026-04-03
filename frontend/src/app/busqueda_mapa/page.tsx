@@ -99,9 +99,8 @@ export default function BusquedaMapaPage() {
         >
           <div
             className={`
-            p-4 h-full overflow-y-auto transition-opacity duration-200
+            p-4 h-full w-full overflow-y-auto overflow-x-hidden transition-opacity duration-200
             ${isSidebarOpen ? 'opacity-100 delay-100' : 'opacity-0'}
-            md:w-[30vw] min-w-[250px]
           `}
           >
             {/* Encabezado con el texto y flecha */}
