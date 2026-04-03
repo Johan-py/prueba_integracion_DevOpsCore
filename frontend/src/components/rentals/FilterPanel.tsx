@@ -75,9 +75,7 @@ export default function FilterPanel() {
     setLoading(true);
     setHasError(false);
     try {
-      // 1. Prioriza la variable de entorno de Vercel. 
-      // 2. Si no existe (estás en local), usa el localhost.
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+     const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
       
       const response = await fetch(`${API_BASE_URL}/api/filters`);
       const result = await response.json();
@@ -105,7 +103,6 @@ export default function FilterPanel() {
   const salesLogic = useFilterLogic(salesData, globalSort, sortType);
   const typesLogic = useFilterLogic(typesData, globalSort, sortType);
 
-  // Vista de Carga
   if (loading) {
     return (
       <div className="w-full lg:w-80 bg-white p-8 rounded-3xl lg:rounded-2xl border border-gray-100 shadow-sm lg:shadow-[0_10px_40px_rgba(0,0,0,0.06)] mb-8 lg:sticky lg:top-20 shrink-0 flex items-center justify-center">
@@ -114,7 +111,6 @@ export default function FilterPanel() {
     );
   }
 
-  // Vista de Error Interactiva
   if (hasError) {
     return (
       <div className="w-full lg:w-80 bg-white p-8 rounded-3xl lg:rounded-2xl border border-gray-100 shadow-sm lg:shadow-[0_10px_40px_rgba(0,0,0,0.06)] mb-8 lg:sticky lg:top-20 shrink-0 flex flex-col items-center justify-center text-center gap-4">
@@ -138,7 +134,6 @@ export default function FilterPanel() {
     );
   }
 
-  // Componente de Cabecera Reutilizable para mantener la paridad PC/Móvil
   const FilterHeader = () => (
     <div className="flex items-center justify-between mb-6 border-b border-gray-800 pb-3">
       <div className="flex items-center gap-2 text-gray-900">
@@ -189,7 +184,7 @@ export default function FilterPanel() {
           </button>
         </div>
 
-        {/* Contenido dinámico con misma lógica de expansión */}
+        {/* Contenido dinámico */}
         <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm mx-2">
           {mobileTab === 'alquiler' && <FilterSection title="En Alquiler" data={rentalsData} logic={rentalsLogic} itemLabel="casas" />}
           {mobileTab === 'venta' && <FilterSection title="En Venta" data={salesData} logic={salesLogic} itemLabel="casas" />}
