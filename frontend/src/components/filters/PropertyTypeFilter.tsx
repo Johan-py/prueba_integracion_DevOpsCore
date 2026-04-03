@@ -1,29 +1,32 @@
-"use client";
-import { useState } from "react";
+'use client'
+import { useState } from 'react'
 
 interface PropertyTypeVisualProps {
-  tiposSeleccionados: string[];
-  onTipoChange: (tipo: string) => void;
+  tiposSeleccionados: string[]
+  onTipoChange: (tipo: string) => void
 }
 
-export default function PropertyTypeVisual({ tiposSeleccionados, onTipoChange }: PropertyTypeVisualProps) {
-  const options = ["CASA", "DEPARTAMENTO", "TERRENO", "HABITACION", "LOCAL"];
+export default function PropertyTypeVisual({
+  tiposSeleccionados,
+  onTipoChange
+}: PropertyTypeVisualProps) {
+  const options = ['CASA', 'DEPARTAMENTO', 'TERRENO', 'HABITACION', 'LOCAL']
   const [open, setOpen] = useState(false)
-  
+
   const getDisplayName = (option: string) => {
     const names: Record<string, string> = {
-      "CASA": "Casa",
-      "DEPARTAMENTO": "Departamento",
-      "TERRENO": "Terreno",
-      "HABITACION": "Habitación",
-      "LOCAL": "Local"
-    };
-    return names[option] || option;
-  };
-  
+      CASA: 'Casa',
+      DEPARTAMENTO: 'Departamento',
+      TERRENO: 'Terreno',
+      HABITACION: 'Habitación',
+      LOCAL: 'Local'
+    }
+    return names[option] || option
+  }
+
   const toggleOption = (option: string) => {
-    onTipoChange(option);
-  };
+    onTipoChange(option)
+  }
 
   return (
     <div className=" relative w-56">
@@ -37,9 +40,11 @@ export default function PropertyTypeVisual({ tiposSeleccionados, onTipoChange }:
         style={{ border: '1px solid #8C8787' }}
       >
         <span className="text-sm text-stone-500">
-          {tiposSeleccionados.length === 0 ? "Todos" : tiposSeleccionados.map(getDisplayName).join(", ")}
+          {tiposSeleccionados.length === 0
+            ? 'Todos'
+            : tiposSeleccionados.map(getDisplayName).join(', ')}
         </span>
-        
+
         <span className="text-stone-500 text-sm flex items-center">
           <svg
             width="18"
@@ -65,23 +70,23 @@ export default function PropertyTypeVisual({ tiposSeleccionados, onTipoChange }:
 
       {open && (
         <div className="absolute mt-1 w-full bg-white border rounded-md shadow-md p-2 flex flex-col gap-3 z-10">
-          {options.map(option => {
-            const isSelected = tiposSeleccionados.includes(option);
+          {options.map((option) => {
+            const isSelected = tiposSeleccionados.includes(option)
             return (
               <div
                 key={option}
                 onClick={() => toggleOption(option)}
                 className={`
                   cursor-pointer px-3 py-1.5 rounded-md text-sm
-                  ${isSelected ? "bg-[#d97706] font-medium text-white" : "text-stone-500 hover:bg-stone-100"}
+                  ${isSelected ? 'bg-[#d97706] font-medium text-white' : 'text-stone-500 hover:bg-stone-100'}
                 `}
               >
                 {getDisplayName(option)}
               </div>
-            );
+            )
           })}
         </div>
       )}
     </div>
-  );
+  )
 }

@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
@@ -7,15 +7,15 @@ import { usePopularidad } from '@/hooks/usePopularidad'
 import { useSearchFilters } from '@/hooks/useSearchFilters'
 
 type Location = {
-  id: string | number;
-  nombre: string;
-  departamento: string;
-};
+  id: string | number
+  nombre: string
+  departamento: string
+}
 
 type LocationSearchProps = {
-  value: string;
-  onChange: (value: string) => void;
-};
+  value: string
+  onChange: (value: string) => void
+}
 
 export function LocationSearch({ value, onChange }: LocationSearchProps) {
   const [suggestions, setSuggestions] = useState<Location[]>([])
@@ -24,25 +24,25 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
   const [history, setHistory] = useState<string[]>([])
   const containerRef = useRef<HTMLDivElement>(null)
 
-  const { updateFilters } = useSearchFilters();
-  const { registrarConsulta } = usePopularidad();
+  const { updateFilters } = useSearchFilters()
+  const { registrarConsulta } = usePopularidad()
 
   // FUNCIÓN MODULAR DE SELECCIÓN
   const handleSelectLocation = (loc: Location) => {
-    const fullName = `${loc.nombre} - ${loc.departamento} - Bolivia`;
-    
+    const fullName = `${loc.nombre} - ${loc.departamento} - Bolivia`
+
     // 1. "Avisamos" al sistema
-    updateFilters({ 
-      locationId: loc.id, 
-      query: fullName 
-    });
+    updateFilters({
+      locationId: loc.id,
+      query: fullName
+    })
 
     // 2. Lógica interna del componente
-    onChange(fullName);
-    saveToHistory(fullName);
-    setIsOpen(false);
-    registrarConsulta(loc.id, fullName);
-  };
+    onChange(fullName)
+    saveToHistory(fullName)
+    setIsOpen(false)
+    registrarConsulta(loc.id, fullName)
+  }
 
   // Cargar historial al montar el componente
   useEffect(() => {
@@ -54,61 +54,58 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
 
   // Guardar en historial cuando se selecciona una ubicación
   const saveToHistory = (item: string) => {
-    const updatedHistory = [item, ...history.filter(i => i !== item)].slice(0, 5)
+    const updatedHistory = [item, ...history.filter((i) => i !== item)].slice(0, 5)
     setHistory(updatedHistory)
     localStorage.setItem('searchHistory', JSON.stringify(updatedHistory))
   }
 
   // --- LÓGICA DE LIMPIEZA (HU 2) --- --BitPro
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawValue = e.target.value;
-    
+    const rawValue = e.target.value
+
     // Filtro: Solo letras (incluye tildes y ñ), números, espacios y guiones.
     // Todo lo demás (emojis, @, #, $, etc.) se elimina al instante.
-    const cleanValue = rawValue.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s\-]/gi, '');
-    
-    onChange(cleanValue);
-  };
+    const cleanValue = rawValue.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s\-]/gi, '')
+
+    onChange(cleanValue)
+  }
 
   const isSelected = value.includes('Bolivia')
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
-      ) {
-        setIsOpen(false);
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setIsOpen(false)
       }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   useEffect(() => {
     const fetchLocations = async () => {
       if (value.trim().length < 2 || isSelected) {
-        setSuggestions([]);
-        return;
+        setSuggestions([])
+        return
       }
-      setIsLoading(true);
+      setIsLoading(true)
       try {
         const res = await fetch(
-          `http://localhost:5000/api/locations/search?q=${encodeURIComponent(value)}`,
-        );
+          `http://localhost:5000/api/locations/search?q=${encodeURIComponent(value)}`
+        )
         if (res.ok) {
-          const data = await res.json();
-          setSuggestions(data);
-          setIsOpen(true);
+          const data = await res.json()
+          setSuggestions(data)
+          setIsOpen(true)
         }
       } catch {
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
-    const timer = setTimeout(fetchLocations, 300);
-    return () => clearTimeout(timer);
-  }, [value, isSelected]);
+    }
+    const timer = setTimeout(fetchLocations, 300)
+    return () => clearTimeout(timer)
+  }, [value, isSelected])
 
   return (
     <div className="w-full relative" ref={containerRef}>
@@ -119,12 +116,12 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
       <div
         className={`h-[46px] rounded-xl border transition-all flex items-center gap-3 px-4 bg-white shadow-sm ${
           isOpen && suggestions.length > 0
-            ? "border-amber-600 ring-2 ring-amber-100"
-            : "border-stone-300"
+            ? 'border-amber-600 ring-2 ring-amber-100'
+            : 'border-stone-300'
         }`}
       >
         <MapPin
-          className={`w-5 h-5 flex-shrink-0 ${value ? "text-amber-600" : "text-stone-400"}`}
+          className={`w-5 h-5 flex-shrink-0 ${value ? 'text-amber-600' : 'text-stone-400'}`}
         />
 
         <div className="relative flex-1 flex items-center h-full">
@@ -155,7 +152,7 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
           <Loader2 className="w-4 h-4 animate-spin text-amber-600" />
         ) : (
           value && (
-            <button onClick={() => onChange("")} type="button">
+            <button onClick={() => onChange('')} type="button">
               <X className="w-4 h-4 text-stone-400 hover:text-red-500" />
             </button>
           )
@@ -165,12 +162,13 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
       {/* PANEL DESPLEGABLE */}
       {isOpen && (
         <div className="absolute z-[100] w-full mt-2 bg-white border border-stone-200 rounded-xl shadow-xl overflow-hidden">
-          
           {/* CASO A: MOSTRAR HISTORIAL (Input vacío) */}
           {value.trim().length === 0 && history.length > 0 && (
             <div>
               <div className="px-4 py-2 bg-stone-50 border-b border-stone-100">
-                <span className="text-[10px] uppercase font-bold text-stone-400 tracking-wider">Búsquedas recientes</span>
+                <span className="text-[10px] uppercase font-bold text-stone-400 tracking-wider">
+                  Búsquedas recientes
+                </span>
               </div>
               {history.map((item, idx) => (
                 <button
@@ -178,9 +176,9 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
                   type="button"
                   // Acción del botón
                   onClick={() => {
-                    onChange(item);
-                    setIsOpen(false);
-                    updateFilters({ query: item }); // Avisamos al sistema global
+                    onChange(item)
+                    setIsOpen(false)
+                    updateFilters({ query: item }) // Avisamos al sistema global
                   }}
                   className="w-full px-4 py-3 flex items-center gap-3 hover:bg-amber-50 transition-colors text-left border-b border-stone-50 last:border-0"
                 >
@@ -210,9 +208,17 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
                     >
                       <div className="flex items-center gap-3">
                         <Search className="w-3.5 h-3.5 text-stone-500" />
-                        <span className="text-sm font-bold text-stone-600">{loc.nombre} - {loc.departamento} - Bolivia</span>
+                        <span className="text-sm font-bold text-stone-600">
+                          {loc.nombre} - {loc.departamento} - Bolivia
+                        </span>
                       </div>
-                      <Image src="https://flagcdn.com/w20/bo.png" alt="BO" width={20} height={14} className="rounded-sm" />
+                      <Image
+                        src="https://flagcdn.com/w20/bo.png"
+                        alt="BO"
+                        width={20}
+                        height={14}
+                        className="rounded-sm"
+                      />
                     </button>
                   ))}
                 </div>
@@ -227,5 +233,5 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
         </div>
       )}
     </div>
-  );
+  )
 }

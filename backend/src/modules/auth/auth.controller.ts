@@ -1,5 +1,11 @@
 import { Request, Response } from 'express'
-import { AuthError, loginService, logoutService, registerUser } from './auth.service.js'
+import {
+  AuthError,
+  loginService,
+  logoutService,
+  registerUser,
+  verifyRegisterCodeService
+} from './auth.service.js'
 
 type RegisterBody = {
   nombre: string
@@ -10,9 +16,32 @@ type RegisterBody = {
   telefono?: string
 }
 
+type VerifyRegisterBody = {
+  verificationToken: string
+  codigo: string
+  password: string
+}
+
+const isDuplicateEmailError = (message: string) => {
+  const normalized = message.toLowerCase()
+
+  return (
+    normalized === 'el correo ya está registrado' ||
+    (normalized.includes('unique constraint failed') && normalized.includes('correo'))
+  )
+}
+
 const getRegisterErrorStatus = (message: string) => {
-  if (message === 'El correo ya está registrado') return 409
+  if (isDuplicateEmailError(message)) return 409
   return 400
+}
+
+const getRegisterErrorMessage = (message: string) => {
+  if (isDuplicateEmailError(message)) {
+    return 'El correo ya está registrado'
+  }
+
+  return message
 }
 
 export const loginController = async (req: Request, res: Response) => {
@@ -57,15 +86,52 @@ export const registerController = async (
       telefono
     })
 
+    return res.status(200).json({
+      message: 'Te enviamos un código de verificación a tu correo.',
+      ...result
+    })
+  } catch (error) {
+    if (error instanceof AuthError) {
+      return res.status(error.statusCode).json({
+        message: error.message
+      })
+    }
+
+    const message = error instanceof Error ? error.message : 'Error interno del servidor'
+
+    return res.status(400).json({ message })
+  }
+}
+
+export const verifyRegisterCodeController = async (
+  req: Request<unknown, unknown, VerifyRegisterBody>,
+  res: Response
+) => {
+  try {
+    const { verificationToken, codigo, password } = req.body
+
+    const result = await verifyRegisterCodeService({
+      verificationToken,
+      codigo,
+      password
+    })
+
     return res.status(201).json({
-      message: 'Usuario registrado correctamente',
+      message: 'Correo verificado y usuario creado correctamente',
+
       user: result.user,
       token: result.token
     })
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Error interno del servidor'
+    if (error instanceof AuthError) {
+      return res.status(error.statusCode).json({
+        message: error.message
+      })
+    }
 
-    return res.status(getRegisterErrorStatus(message)).json({ message })
+    const message = error instanceof Error ? error.message : 'Error al verificar código'
+
+    return res.status(400).json({ message })
   }
 }
 
@@ -76,7 +142,7 @@ export const logoutController = async (req: Request, res: Response) => {
     return res.status(401).json({ message: 'Token no proporcionado' })
   }
 
-  const token = authHeader.split(' ')[1]
+  const token = authHeader.split('Bearer ')[1]
 
   try {
     const result = await logoutService(token)
