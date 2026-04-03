@@ -22,7 +22,6 @@ const popularidadHandler = async (req: any, res: any) => {
     if (!actualizado) {
       return res.status(404).json({ error: 'No se encontró la ubicación para actualizar' })
     }
-
     return res.status(200).json({
       success: true,
       id: actualizado.id,
