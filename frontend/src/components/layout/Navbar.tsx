@@ -63,16 +63,20 @@ export default function Navbar() {
     setIsLoggedIn
   } = useNotifications()
 
-  const clearSession = () => {
-    localStorage.removeItem(USER_STORAGE_KEY)
-    localStorage.removeItem(SESSION_EXPIRES_KEY)
-    localStorage.removeItem('token')
-    setUser(null)
-    setIsPanelOpen(false)
-    setShowLogoutModal(false)
-    window.dispatchEvent(new Event('propbol:session-changed'))
-    window.dispatchEvent(new Event('auth-state-changed'))
+  const clearSession = (emitEvent = true) => {
+  localStorage.removeItem(USER_STORAGE_KEY);
+  localStorage.removeItem(SESSION_EXPIRES_KEY);
+  localStorage.removeItem("token");
+  setUser(null);
+  setIsPanelOpen(false);
+  setShowLogoutModal(false);
+  setIsLoggedIn(false);
+
+  if (emitEvent) {
+    window.dispatchEvent(new Event("propbol:session-changed"));
+    window.dispatchEvent(new Event("auth-state-changed"));
   }
+};
 
   const isSessionExpired = () => {
     const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY)
@@ -81,25 +85,27 @@ export default function Navbar() {
   }
 
   const restoreSession = () => {
-    const savedUser = localStorage.getItem(USER_STORAGE_KEY)
-    const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY)
+  const savedUser = localStorage.getItem(USER_STORAGE_KEY);
+  const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY);
+  const token = localStorage.getItem("token");
 
-    if (!savedUser || !expiresAt) {
-      clearSession()
-      return
-    }
-
-    if (Date.now() > Number(expiresAt)) {
-      clearSession()
-      return
-    }
-
-    try {
-      setUser(JSON.parse(savedUser))
-    } catch {
-      clearSession()
-    }
+  if (!savedUser || !expiresAt || !token) {
+    clearSession(false);
+    return;
   }
+
+  if (Date.now() > Number(expiresAt)) {
+    clearSession(false);
+    return;
+  }
+
+  try {
+    setUser(JSON.parse(savedUser));
+    setIsLoggedIn(true);
+  } catch {
+    clearSession(false);
+  }
+};
 
   useEffect(() => {
     restoreSession()
