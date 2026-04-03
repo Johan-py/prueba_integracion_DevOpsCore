@@ -75,15 +75,26 @@ export default function FilterPanel() {
     setLoading(true);
     setHasError(false);
     try {
-      const response = await fetch("http://localhost:5000/api/filters");
+      // 1. Prioriza la variable de entorno de Vercel. 
+      // 2. Si no existe (estás en local), usa el localhost.
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      
+      const response = await fetch(`${API_BASE_URL}/api/filters`);
       const result = await response.json();
+
       if (result.success) {
         setRentalsData(result.data.rentals);
         setSalesData(result.data.sales);
         setTypesData(result.data.categories);
-      } else { setHasError(true); }
-    } catch (error) { setHasError(true); } 
-    finally { setLoading(false); }
+      } else { 
+        setHasError(true); 
+      }
+    } catch (error) { 
+      console.error("Error fetching filters:", error);
+      setHasError(true); 
+    } finally { 
+      setLoading(false); 
+    }
   };
 
   useEffect(() => {
