@@ -125,6 +125,7 @@ export const findActiveSessionByToken = async (token: string) => {
     where: {
       token,
       estado: true,
+
       fechaExpiracion: {
         gt: new Date()
       }

@@ -103,7 +103,7 @@ export default function UserMenu({
               />
               <MenuLink
                 label="Mis publicaciones"
-                href="/publicaciones"
+                href="mis-publicaciones"
                 icon={FileText}
                 onClick={onClosePanel}
               />

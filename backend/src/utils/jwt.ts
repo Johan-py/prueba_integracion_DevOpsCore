@@ -5,7 +5,6 @@ export type JwtPayload = {
   id: number
   correo: string
 }
-
 export const generateToken = (payload: JwtPayload) => {
   const secret = process.env.JWT_SECRET
 

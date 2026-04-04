@@ -32,6 +32,7 @@ import {
 } from './modules/auth/google/google.controller.js'
 import multimediaRoutes from './modules/multimedia/multimedia.routes.js'
 import { verifyNotificationEmailTransport } from './modules/email/notification-email.service.js'
+import publicacionRoutes from './modules/publicacion/publicacion.routes.js' //lista de publicaciones
 
 const app = express()
 
@@ -46,6 +47,7 @@ app.use(
 
 app.use(express.json())
 
+app.use('/api/publicaciones', publicacionRoutes) // lista de publicaciones
 app.use('/api/perfil', correoverificacionRoutes)
 app.use('/api/perfil/usuario', perfilRoutes)
 app.use('/api/publicaciones', multimediaRoutes)

@@ -38,9 +38,9 @@ export const obtenerPerfil = async (req: AuthRequest, res: Response) => {
 
     // Mapear género a formato legible
     const generoMap: { [key: string]: string } = {
-      'MASCULINO': 'Masculino',
-      'FEMENINO': 'Femenino',
-      'OTRO': 'Otro'
+      MASCULINO: 'Masculino',
+      FEMENINO: 'Femenino',
+      OTRO: 'Otro'
     }
 
     const perfilFormateado = {
@@ -102,7 +102,7 @@ export const editarPais = async (req: AuthRequest, res: Response) => {
     }
 
     // Si pais es undefined o string vacío, guardar null
-    const paisActualizado = (pais && pais.trim() !== '') ? pais : null
+    const paisActualizado = pais && pais.trim() !== '' ? pais : null
 
     const usuarioActualizado = await prisma.usuario.update({
       where: { id: usuarioId },
@@ -135,9 +135,9 @@ export const editarGenero = async (req: AuthRequest, res: Response) => {
 
     // Mapeo de valores del frontend a los valores del enum en MAYÚSCULAS
     const enumMap: { [key: string]: string } = {
-      'Masculino': 'MASCULINO',
-      'Femenino': 'FEMENINO',
-      'Otro': 'OTRO'
+      Masculino: 'MASCULINO',
+      Femenino: 'FEMENINO',
+      Otro: 'OTRO'
     }
 
     let generoActualizado = null
@@ -158,12 +158,14 @@ export const editarGenero = async (req: AuthRequest, res: Response) => {
 
     // Mapear de vuelta para la respuesta
     const generoResponseMap: { [key: string]: string } = {
-      'MASCULINO': 'Masculino',
-      'FEMENINO': 'Femenino',
-      'OTRO': 'Otro'
+      MASCULINO: 'Masculino',
+      FEMENINO: 'Femenino',
+      OTRO: 'Otro'
     }
 
-    const generoRespuesta = usuarioActualizado.genero ? generoResponseMap[usuarioActualizado.genero] : null
+    const generoRespuesta = usuarioActualizado.genero
+      ? generoResponseMap[usuarioActualizado.genero]
+      : null
 
     return res.json({
       ok: true,
@@ -189,7 +191,7 @@ export const editarDireccion = async (req: AuthRequest, res: Response) => {
     }
 
     // Si direccion es undefined o string vacío, guardar null
-    const direccionActualizada = (direccion && direccion.trim() !== '') ? direccion : null
+    const direccionActualizada = direccion && direccion.trim() !== '' ? direccion : null
 
     const usuarioActualizado = await prisma.usuario.update({
       where: { id: usuarioId },
