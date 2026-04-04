@@ -50,7 +50,6 @@ export const ResultadosBusqueda = () => {
   const [inmueblesRaw, setInmueblesRaw] = useState<Inmueble[]>([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState(false)
-
   // @ts-ignore
   const { ordenActual, cambiarOrden, inmueblesOrdenados } = useOrdenamiento({
     inmuebles: inmueblesRaw as any
