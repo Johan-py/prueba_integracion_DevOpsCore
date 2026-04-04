@@ -22,11 +22,11 @@ function AboutUsHeader() {
 
 function AboutUsIntroCard() {
   return (
-    <article className="grid gap-6 rounded-[28px] bg-stone-100 p-4 sm:p-6 lg:grid-cols-[1.05fr_1fr] lg:p-8">
+    <article className="grid gap-6 rounded-[28px] bg-stone-100 p-4 sm:p-6 xl:grid-cols-[1.05fr_1fr] xl:items-stretch xl:p-8">
       <AboutUsImage
         src={aboutImages.familyHome}
         alt="Propiedad residencial destacada de PropBol"
-        className="h-72 w-full rounded-[24px] object-cover shadow-sm sm:h-80 lg:h-full"
+        className="aspect-[16/11] w-full rounded-[24px] shadow-sm sm:aspect-[16/10] xl:h-full xl:min-h-[440px] xl:aspect-auto"
       />
       <div className="space-y-8">
         {introSections.map((section) => (
@@ -47,7 +47,7 @@ function AboutUsPeopleCard() {
         <AboutUsImage
           src={peopleSection.imageSrc}
           alt={peopleSection.imageAlt}
-          className="h-56 w-full rounded-[24px] object-cover shadow-sm"
+          className="aspect-[16/10] w-full rounded-[24px] shadow-sm"
         />
         <p className="text-base leading-7 text-stone-600">{peopleSection.description}</p>
       </div>
@@ -58,7 +58,7 @@ function AboutUsPeopleCard() {
 function AboutUsPresenceCard() {
   return (
     <article className="rounded-[28px] bg-stone-100 p-4 sm:p-6">
-      <div className="grid gap-6 lg:grid-cols-[1fr_0.76fr] lg:items-end">
+      <div className="grid gap-6 xl:grid-cols-[1fr_0.76fr] xl:items-end">
         <div className="space-y-6">
           {presenceSections.map((section) => (
             <AboutUsSectionBlock key={section.title} {...section} />
@@ -67,7 +67,7 @@ function AboutUsPresenceCard() {
         <AboutUsImage
           src={aboutImages.boliviaCity}
           alt="Vista urbana representativa del mercado inmobiliario boliviano"
-          className="h-64 w-full rounded-[24px] object-cover shadow-sm sm:h-72 lg:h-80"
+          className="aspect-[4/3] w-full rounded-[24px] shadow-sm sm:aspect-[16/11] xl:h-80 xl:aspect-auto"
         />
       </div>
     </article>
@@ -76,10 +76,10 @@ function AboutUsPresenceCard() {
 
 export default function AboutUsContent() {
   return (
-    <section className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-1 py-4 font-['Inter'] sm:px-2 lg:gap-8">
+    <section className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 font-['Inter'] sm:px-6 lg:px-8 lg:gap-8">
       <AboutUsHeader />
       <AboutUsIntroCard />
-      <div className="grid gap-6 lg:grid-cols-[0.72fr_1.28fr]">
+      <div className="grid gap-6 xl:grid-cols-[0.72fr_1.28fr]">
         <AboutUsPeopleCard />
         <AboutUsPresenceCard />
       </div>
