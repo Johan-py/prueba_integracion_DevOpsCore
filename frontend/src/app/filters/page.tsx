@@ -8,7 +8,6 @@ interface FiltrosInput {
   query: string;
   updatedAt?: string;
 }
-
 export default function FiltersPage() {
   // Usamos la interfaz aquí para que coincida perfectamente con el componente
   const handleSearch = (filtros: FiltrosInput) => {
