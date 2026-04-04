@@ -1,15 +1,27 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { Plus, Trash2, Pencil } from 'lucide-react'
+import React, { useState, useEffect, useRef } from 'react'
+import { Plus, Trash2, Pencil, Camera, Loader2 } from 'lucide-react'
 import SecurityModal from './SecurityModal'
 import OtpModal from './OtpModal'
+import Image from 'next/image'
 
 interface Telefono {
   id: number
   numero: string
   pais: string
   codigo: string
+}
+
+interface PerfilData {
+  id: number
+  nombre: string
+  correo: string
+  avatar: string | null
+  pais: string | null
+  genero: string | null
+  direccion: string | null
+  telefonos: any[] | null
 }
 
 const PAISES = [
@@ -23,46 +35,282 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
 
 export default function ProfileCard() {
   const [campoEditando, setCampoEditando] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const [nombre, setNombre] = useState('Condesa')
+  // Datos del perfil
+  const [perfilData, setPerfilData] = useState<PerfilData | null>(null)
+  const [nombre, setNombre] = useState('')
   const [pais, setPais] = useState('')
   const [genero, setGenero] = useState('')
   const [direccion, setDireccion] = useState('')
-
-  const soloLetras = (value: string) => {
-    return value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')
-  }
+  const [avatar, setAvatar] = useState<string | null>(null)
 
   // ========== FUNCIONALIDAD DE EMAIL CON OTP ==========
   const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false)
   const [isOtpModalOpen, setIsOtpModalOpen] = useState(false)
   const [isEmailEditable, setIsEmailEditable] = useState(false)
-  const [originalEmail, setOriginalEmail] = useState('perfil1@gmail.com')
-  const [tempEmail, setTempEmail] = useState('perfil1@gmail.com')
+  const [originalEmail, setOriginalEmail] = useState('')
+  const [tempEmail, setTempEmail] = useState('')
   const [otpError, setOtpError] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [emailToUpdate, setEmailToUpdate] = useState('') // Email nuevo a guardar
+  const [emailToUpdate, setEmailToUpdate] = useState('')
 
-  // Cargar datos del usuario desde localStorage
+  // Teléfonos
+  const [telefonos, setTelefonos] = useState<Telefono[]>([
+    { id: Date.now(), numero: '', pais: 'Bolivia', codigo: '+591' }
+  ])
+
+  const soloLetras = (value: string) => {
+    return value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')
+  }
+
+  // Obtener token
+  const getToken = () => localStorage.getItem('token')
+
+  // ========== CARGAR DATOS DEL PERFIL ==========
+  const cargarPerfil = async () => {
+    setIsLoading(true)
+    try {
+      const token = getToken()
+      if (!token) {
+        console.error('No hay token')
+        return
+      }
+
+      const response = await fetch(`${API_URL}/api/perfil/usuario`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      const data = await response.json()
+
+      if (data.ok && data.perfil) {
+        const perfil = data.perfil
+        setPerfilData(perfil)
+        setNombre(perfil.nombre || '')
+        setPais(perfil.pais || '')
+        setGenero(perfil.genero || '')
+        setDireccion(perfil.direccion || '')
+        setAvatar(perfil.avatar || null)
+        setOriginalEmail(perfil.correo || '')
+        setTempEmail(perfil.correo || '')
+
+        // Cargar teléfonos si existen
+        if (perfil.telefonos && Array.isArray(perfil.telefonos) && perfil.telefonos.length > 0) {
+          const telefonosCargados = perfil.telefonos.map((tel: any, index: number) => {
+            const paisEncontrado = PAISES.find(p => tel.codigoPais === p.codigo) || PAISES[0]
+            return {
+              id: Date.now() + index,
+              numero: tel.numero,
+              pais: paisEncontrado.nombre,
+              codigo: paisEncontrado.codigo
+            }
+          })
+          setTelefonos(telefonosCargados)
+        } else {
+          setTelefonos([{ id: Date.now(), numero: '', pais: 'Bolivia', codigo: '+591' }])
+        }
+
+        // Guardar en localStorage
+        localStorage.setItem('nombre', perfil.nombre || '')
+        localStorage.setItem('correo', perfil.correo || '')
+      }
+    } catch (error) {
+      console.error('Error al cargar perfil:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   useEffect(() => {
-    const email = localStorage.getItem('correo')
-    const nombreStorage = localStorage.getItem('nombre')
-    if (email) {
-      setOriginalEmail(email)
-      setTempEmail(email)
-    }
-    if (nombreStorage) {
-      setNombre(nombreStorage)
-    }
+    cargarPerfil()
   }, [])
 
   const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
   const hasEmailChanged = tempEmail !== originalEmail && isValidEmail(tempEmail)
 
-  // Obtener token
-  const getToken = () => localStorage.getItem('token')
+  // ========== FUNCIONES DE EDICIÓN ==========
 
-  // PASO 1: Verificar contraseña al hacer clic en el lápiz
+  // Editar nombre
+  const guardarNombre = async () => {
+    setIsLoading(true)
+    try {
+      const token = getToken()
+      const response = await fetch(`${API_URL}/api/perfil/usuario/nombre`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ nombre })
+      })
+
+      const data = await response.json()
+      if (data.ok) {
+        localStorage.setItem('nombre', nombre)
+        alert('Nombre actualizado exitosamente')
+        setCampoEditando(null)
+      } else {
+        throw new Error(data.msg)
+      }
+    } catch (error: any) {
+      alert(error.message || 'Error al actualizar nombre')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Editar país
+  const guardarPais = async () => {
+    setIsLoading(true)
+    try {
+      const token = getToken()
+      const response = await fetch(`${API_URL}/api/perfil/usuario/pais`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ pais })
+      })
+
+      const data = await response.json()
+      if (data.ok) {
+        alert('País actualizado exitosamente')
+        setCampoEditando(null)
+      } else {
+        throw new Error(data.msg)
+      }
+    } catch (error: any) {
+      alert(error.message || 'Error al actualizar país')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Editar género
+  const guardarGenero = async () => {
+    setIsLoading(true)
+    try {
+      const token = getToken()
+      const response = await fetch(`${API_URL}/api/perfil/usuario/genero`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ genero })
+      })
+
+      const data = await response.json()
+      if (data.ok) {
+        alert('Género actualizado exitosamente')
+        setCampoEditando(null)
+      } else {
+        throw new Error(data.msg)
+      }
+    } catch (error: any) {
+      alert(error.message || 'Error al actualizar género')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Editar dirección
+  const guardarDireccion = async () => {
+    setIsLoading(true)
+    try {
+      const token = getToken()
+      const response = await fetch(`${API_URL}/api/perfil/usuario/direccion`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ direccion })
+      })
+
+      const data = await response.json()
+      if (data.ok) {
+        alert('Dirección actualizada exitosamente')
+        setCampoEditando(null)
+      } else {
+        throw new Error(data.msg)
+      }
+    } catch (error: any) {
+      alert(error.message || 'Error al actualizar dirección')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // ========== FUNCIONALIDAD DE FOTO ==========
+  const handleFotoClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const subirFoto = async (file: File) => {
+    // Validar tipo de archivo
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+    if (!allowedTypes.includes(file.type)) {
+      alert('Solo se permiten imágenes (JPEG, JPG, PNG, GIF, WEBP)')
+      return
+    }
+
+    // Validar tamaño (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('La imagen no puede superar los 5MB')
+      return
+    }
+
+    setIsUploading(true)
+    try {
+      const token = getToken()
+      const formData = new FormData()
+      formData.append('foto', file)
+
+      const response = await fetch(`${API_URL}/api/perfil/usuario/foto-perfil`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: formData
+      })
+
+      const data = await response.json()
+
+      if (data.ok) {
+        setAvatar(data.fotoPerfil)
+        alert('Foto de perfil actualizada exitosamente')
+        // Recargar perfil para actualizar datos
+        cargarPerfil()
+      } else {
+        throw new Error(data.msg)
+      }
+    } catch (error: any) {
+      console.error('Error al subir foto:', error)
+      alert(error.message || 'Error al subir la foto')
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      subirFoto(file)
+    }
+    // Limpiar el input para poder subir el mismo archivo nuevamente
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
+
+  // ========== FUNCIONALIDAD DE EMAIL CON OTP ==========
   const handlePasswordSubmit = async (passwordActual: string) => {
     setIsLoading(true)
     try {
@@ -72,7 +320,6 @@ export default function ProfileCard() {
         throw new Error('No hay sesión activa. Inicia sesión nuevamente.')
       }
 
-      // Verificar contraseña
       const verifyRes = await fetch(`${API_URL}/api/perfil/verificar-password`, {
         method: 'POST',
         headers: {
@@ -83,9 +330,7 @@ export default function ProfileCard() {
       })
 
       if (!verifyRes.ok) {
-        const errorData = await verifyRes
-          .json()
-          .catch(() => ({ msg: 'Error al verificar contraseña' }))
+        const errorData = await verifyRes.json().catch(() => ({ msg: 'Error al verificar contraseña' }))
         throw new Error(errorData.msg || 'Error al verificar contraseña')
       }
 
@@ -95,10 +340,9 @@ export default function ProfileCard() {
         throw new Error(verifyData.msg)
       }
 
-      // Contraseña correcta: habilitar edición de email
       setIsSecurityModalOpen(false)
       setIsEmailEditable(true)
-      setTempEmail(originalEmail) // Reset al valor original por si acaso
+      setTempEmail(originalEmail)
     } catch (error: any) {
       console.error('Error:', error)
       alert(error.message || 'Contraseña incorrecta')
@@ -107,7 +351,6 @@ export default function ProfileCard() {
     }
   }
 
-  // PASO 2: Solicitar cambio de email (envía OTP) - se llama al guardar
   const solicitarCambioEmail = async (nuevoEmail: string) => {
     setIsLoading(true)
     try {
@@ -123,9 +366,7 @@ export default function ProfileCard() {
       })
 
       if (!solicitarRes.ok) {
-        const errorData = await solicitarRes
-          .json()
-          .catch(() => ({ msg: 'Error al solicitar cambio' }))
+        const errorData = await solicitarRes.json().catch(() => ({ msg: 'Error al solicitar cambio' }))
         throw new Error(errorData.msg || 'Error al solicitar cambio de email')
       }
 
@@ -135,10 +376,7 @@ export default function ProfileCard() {
         throw new Error(solicitarData.msg)
       }
 
-      // Guardar email que se va a actualizar
       setEmailToUpdate(nuevoEmail)
-
-      // Abrir modal OTP
       setIsOtpModalOpen(true)
       setOtpError('')
     } catch (error: any) {
@@ -149,7 +387,6 @@ export default function ProfileCard() {
     }
   }
 
-  // PASO 3: Confirmar OTP y actualizar email
   const handleOtpSubmit = async (otp: string) => {
     setIsLoading(true)
     try {
@@ -175,7 +412,6 @@ export default function ProfileCard() {
         throw new Error(data.msg)
       }
 
-      // Actualizar email en localStorage y estado
       localStorage.setItem('correo', emailToUpdate)
       setOriginalEmail(emailToUpdate)
       setTempEmail(emailToUpdate)
@@ -184,6 +420,7 @@ export default function ProfileCard() {
       setEmailToUpdate('')
       setOtpError('')
       alert('Correo actualizado exitosamente')
+      cargarPerfil()
     } catch (error: any) {
       console.error('Error:', error)
       setOtpError(error.message || 'Error al verificar código')
@@ -192,7 +429,6 @@ export default function ProfileCard() {
     }
   }
 
-  // Reenviar código
   const handleResendCode = async () => {
     setIsLoading(true)
     try {
@@ -229,54 +465,7 @@ export default function ProfileCard() {
     }
   }
 
-  // Manejar click en guardar cambios
-  const handleSaveAll = () => {
-    // Si el email está en modo edición y cambió
-    if (isEmailEditable && hasEmailChanged) {
-      solicitarCambioEmail(tempEmail)
-    } else if (isEmailEditable && !hasEmailChanged) {
-      // Si no cambió el email, solo salir del modo edición
-      setIsEmailEditable(false)
-    }
-    // Guardar TELÉFONOS si se está editando un teléfono
-    if (campoEditando && campoEditando.startsWith('telefono-')) {
-      guardarTelefonos()
-      setCampoEditando(null)
-      return
-    }
-
-    // Guardar otros campos (nombre, dirección, etc.)
-    if (campoEditando) {
-      setCampoEditando(null)
-      // Aquí puedes agregar la lógica para guardar los demás campos
-      if (campoEditando !== 'email') {
-        alert(`${campoEditando} guardado correctamente`)
-      }
-    }
-  }
-
-  // Manejar cancelar
-  const handleCancelAll = () => {
-    setCampoEditando(null)
-    setNombre(localStorage.getItem('nombre') || 'Condesa')
-    setPais('')
-    setGenero('')
-    setDireccion('')
-    // Restaurar email original y salir del modo edición
-    setTempEmail(originalEmail)
-    setIsEmailEditable(false)
-  }
-
-  // Activar edición de email - abre el modal de seguridad primero
-  const handleEditEmailClick = () => {
-    setIsSecurityModalOpen(true)
-  }
-
-  // Teléfonos
-  const [telefonos, setTelefonos] = useState<Telefono[]>([
-    { id: Date.now(), numero: '', pais: 'Bolivia', codigo: '+591' }
-  ])
-
+  // ========== TELÉFONOS ==========
   const agregarTelefono = () => {
     if (telefonos.length < 3) {
       setTelefonos([...telefonos, { id: Date.now(), numero: '', pais: 'Bolivia', codigo: '+591' }])
@@ -294,19 +483,19 @@ export default function ProfileCard() {
       telefonos.map((t) => (t.id === id ? { ...t, numero: valor.replace(/\D/g, '') } : t))
     )
   }
+
   const guardarTelefonos = async () => {
     setIsLoading(true)
     try {
-      const token = localStorage.getItem('token')
+      const token = getToken()
 
-      // Preparamos el cuerpo EXACTAMENTE como lo pide el controlador
       const body = {
         telefonos: telefonos
-          .filter((t) => t.numero.trim() !== '') // Evita enviar vacíos
+          .filter((t) => t.numero.trim() !== '')
           .map((t, index) => ({
-            codigoPais: t.codigo, // Tu backend pide 'codigoPais'
-            numero: t.numero, // Tu backend pide 'numero'
-            principal: index === 0 // Define el primero como principal
+            codigoPais: t.codigo,
+            numero: t.numero,
+            principal: index === 0
           }))
       }
 
@@ -326,31 +515,101 @@ export default function ProfileCard() {
       }
 
       alert('¡Teléfonos actualizados exitosamente!')
-      setCampoEditando(null) // Cerramos el modo edición
+      setCampoEditando(null)
+      cargarPerfil()
     } catch (error: any) {
-      console.error('Error en HU4:', error)
+      console.error('Error:', error)
       alert(error.message)
     } finally {
       setIsLoading(false)
     }
   }
+
+  // Manejar guardado general
+  const handleSaveAll = () => {
+    if (isEmailEditable && hasEmailChanged) {
+      solicitarCambioEmail(tempEmail)
+    } else if (isEmailEditable && !hasEmailChanged) {
+      setIsEmailEditable(false)
+    }
+
+    if (campoEditando && campoEditando.startsWith('telefono-')) {
+      guardarTelefonos()
+      setCampoEditando(null)
+      return
+    }
+
+    if (campoEditando === 'nombre') {
+      guardarNombre()
+    } else if (campoEditando === 'pais') {
+      guardarPais()
+    } else if (campoEditando === 'genero') {
+      guardarGenero()
+    } else if (campoEditando === 'direccion') {
+      guardarDireccion()
+    } else if (campoEditando) {
+      setCampoEditando(null)
+    }
+  }
+
+  const handleCancelAll = () => {
+    setCampoEditando(null)
+    if (perfilData) {
+      setNombre(perfilData.nombre || '')
+      setPais(perfilData.pais || '')
+      setGenero(perfilData.genero || '')
+      setDireccion(perfilData.direccion || '')
+    }
+    setTempEmail(originalEmail)
+    setIsEmailEditable(false)
+  }
+
+  const handleEditEmailClick = () => {
+    setIsSecurityModalOpen(true)
+  }
+
+  if (isLoading && !perfilData) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-orange-500" />
+      </div>
+    )
+  }
+
   return (
     <div className="bg-[#fdf6e6] border border-[#e5dfd7] shadow-sm p-8 rounded-xl flex flex-col md:flex-row gap-10 items-center">
       {/* PERFIL */}
       <div className="flex flex-col items-center justify-center w-full md:w-1/3">
-        <div className="w-28 h-28 rounded-full bg-white border border-gray-300 relative flex items-center justify-center shadow-sm mb-10">
-          <span className="text-gray-500 text-xs uppercase">Imagen</span>
+        <div className="relative">
+          <div className="w-28 h-28 rounded-full bg-white border border-gray-300 flex items-center justify-center shadow-sm overflow-hidden">
+            {avatar ? (
+              <img
+                src={avatar}
+                alt="Foto de perfil"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span className="text-gray-500 text-xs uppercase">Imagen</span>
+            )}
+          </div>
           <button
-            className="
-              absolute
-              right-0 top-1/2 -translate-y-1/2
-              md:right-1/2 md:translate-x-1/2 md:top-full md:mt-6
-              w-8 h-8 bg-white border border-gray-300 rounded-full
-              flex items-center justify-center shadow-sm hover:bg-gray-100
-            "
+            onClick={handleFotoClick}
+            disabled={isUploading}
+            className="absolute right-0 top-1/2 -translate-y-1/2 md:right-1/2 md:translate-x-1/2 md:top-full md:mt-4 w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center shadow-sm hover:bg-gray-100 disabled:opacity-50"
           >
-            <Plus size={16} />
+            {isUploading ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <Camera size={14} />
+            )}
           </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+            onChange={handleFileChange}
+            className="hidden"
+          />
         </div>
         <p className="mt-4 font-semibold text-lg">{nombre}</p>
         <p className="text-sm text-gray-500">{originalEmail}</p>
@@ -371,10 +630,9 @@ export default function ProfileCard() {
                 value={nombre}
                 onChange={(e) => setNombre(soloLetras(e.target.value))}
                 className={`flex-1 px-3 py-2 rounded text-sm
-                  ${
-                    campoEditando === 'nombre'
-                      ? 'bg-white border border-amber-500'
-                      : 'bg-gray-200 cursor-not-allowed'
+                  ${campoEditando === 'nombre'
+                    ? 'bg-white border border-amber-500'
+                    : 'bg-gray-200 cursor-not-allowed'
                   }
                 `}
               />
@@ -386,7 +644,7 @@ export default function ProfileCard() {
             </div>
           </div>
 
-          {/* EMAIL - FLUJO: Lápiz -> Contraseña -> Editar -> Guardar -> OTP */}
+          {/* EMAIL */}
           <div className="flex flex-col md:flex-row md:items-start gap-2 md:gap-4">
             <label className="w-full md:w-40 font-medium text-stone-700 pt-2">E-mail:</label>
             <div className="flex-1 flex flex-col">
@@ -415,11 +673,6 @@ export default function ProfileCard() {
               {isEmailEditable && hasEmailChanged && (
                 <span className="text-green-500 text-xs mt-1">Listo para guardar cambios</span>
               )}
-              {isEmailEditable && (
-                <span className="text-amber-600 text-xs mt-1">
-                  Edita el correo y luego haz clic en "Guardar Cambios"
-                </span>
-              )}
             </div>
           </div>
 
@@ -427,17 +680,13 @@ export default function ProfileCard() {
           {telefonos.map((tel, index) => {
             const keyCampo = `telefono-${tel.id}`
             return (
-              <div
-                key={tel.id}
-                className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4"
-              >
+              <div key={tel.id} className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
                 <label className="w-full md:w-40 font-medium text-stone-700">
                   {index === 0 ? 'Teléfono:' : `Teléfono ${index + 1}:`}
                 </label>
                 <div className="flex w-full items-center gap-2">
                   <select
                     disabled={campoEditando !== keyCampo}
-                    // Añade estas dos líneas:
                     value={`${tel.pais} ${tel.codigo}`}
                     onChange={(e) => {
                       const seleccion = PAISES.find(
@@ -453,34 +702,27 @@ export default function ProfileCard() {
                         )
                       }
                     }}
-                    className={`px-2 py-2 rounded text-sm
-    ${
-      campoEditando === keyCampo
-        ? 'bg-white border border-amber-500'
-        : 'bg-gray-200 cursor-not-allowed'
-    }
-  `}
+                    className={`px-2 py-2 rounded text-sm ${campoEditando === keyCampo
+                        ? 'bg-white border border-amber-500'
+                        : 'bg-gray-200 cursor-not-allowed'
+                      }`}
                   >
                     {PAISES.map((p) => (
-                      // Asegúrate de que el value coincida con la búsqueda del find
                       <option key={p.nombre} value={`${p.nombre} ${p.codigo}`}>
                         {p.flag} {p.codigo}
                       </option>
                     ))}
-                  </select>{' '}
+                  </select>
                   <input
                     type="text"
                     placeholder="Ej. 70000000"
                     value={tel.numero}
                     disabled={campoEditando !== keyCampo}
                     onChange={(e) => actualizarTelefono(tel.id, e.target.value)}
-                    className={`flex-1 px-3 py-2 rounded text-sm
-                      ${
-                        campoEditando === keyCampo
-                          ? 'bg-white border border-amber-500'
-                          : 'bg-gray-200 cursor-not-allowed'
-                      }
-                    `}
+                    className={`flex-1 px-3 py-2 rounded text-sm ${campoEditando === keyCampo
+                        ? 'bg-white border border-amber-500'
+                        : 'bg-gray-200 cursor-not-allowed'
+                      }`}
                   />
                   <button
                     onClick={() => setCampoEditando(campoEditando === keyCampo ? null : keyCampo)}
@@ -512,10 +754,9 @@ export default function ProfileCard() {
                 value={pais}
                 onChange={(e) => setPais(e.target.value)}
                 className={`flex-1 px-3 py-2 rounded text-sm
-                  ${
-                    campoEditando === 'pais'
-                      ? 'bg-white border border-amber-500'
-                      : 'bg-gray-200 cursor-not-allowed'
+                  ${campoEditando === 'pais'
+                    ? 'bg-white border border-amber-500'
+                    : 'bg-gray-200 cursor-not-allowed'
                   }
                 `}
               >
@@ -543,10 +784,9 @@ export default function ProfileCard() {
                 value={genero}
                 onChange={(e) => setGenero(e.target.value)}
                 className={`flex-1 px-3 py-2 rounded text-sm
-                  ${
-                    campoEditando === 'genero'
-                      ? 'bg-white border border-amber-500'
-                      : 'bg-gray-200 cursor-not-allowed'
+                  ${campoEditando === 'genero'
+                    ? 'bg-white border border-amber-500'
+                    : 'bg-gray-200 cursor-not-allowed'
                   }
                 `}
               >
@@ -573,10 +813,9 @@ export default function ProfileCard() {
                 value={direccion}
                 onChange={(e) => setDireccion(e.target.value)}
                 className={`flex-1 px-3 py-2 rounded text-sm
-                  ${
-                    campoEditando === 'direccion'
-                      ? 'bg-white border border-amber-500'
-                      : 'bg-gray-200 cursor-not-allowed'
+                  ${campoEditando === 'direccion'
+                    ? 'bg-white border border-amber-500'
+                    : 'bg-gray-200 cursor-not-allowed'
                   }
                 `}
               />
@@ -625,7 +864,6 @@ export default function ProfileCard() {
           setOtpError('')
           setEmailToUpdate('')
           setIsLoading(false)
-          // Si cierra el OTP sin confirmar, deshabilitar edición y restaurar email
           setIsEmailEditable(false)
           setTempEmail(originalEmail)
         }}
