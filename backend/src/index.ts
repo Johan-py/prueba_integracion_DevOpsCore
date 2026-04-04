@@ -1,7 +1,6 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import { env } from "./config/env.js";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { propertiesController } from "./modules/properties/properties.controller.js";
 import {

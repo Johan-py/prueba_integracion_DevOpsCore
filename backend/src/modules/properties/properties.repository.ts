@@ -73,7 +73,7 @@ export const propertiesRepository = {
     //
     // Para precio y superficie: el frontend los maneja con criterioActivo,
     // así que el backend solo necesita proveer el default y popularidad.
-    let orderBy: any[] = [];
+    const orderBy: any[] = [];
 
     if (filtros.precio === 'menor-a-mayor') {
       orderBy.push({ precio: 'asc' });

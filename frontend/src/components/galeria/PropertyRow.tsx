@@ -1,4 +1,5 @@
 import ContactButton from "./ContactButton"; // <-- Importas tu componente
+import Image from 'next/image'
 
 export default function PropertyRow({
   title,
@@ -18,7 +19,7 @@ export default function PropertyRow({
       
       {/* FOTO */}
       <div className="w-[40px] h-[40px] rounded-md overflow-hidden bg-gray-200">
-        <img src={image} alt={title} className="w-full h-full object-cover" />
+        <Image src={image} alt={title} className="w-full h-full object-cover" width={40} height={40} />
       </div>
 
       {/* PRECIO */}

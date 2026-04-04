@@ -50,9 +50,8 @@ export const ResultadosBusqueda = () => {
   const [inmueblesRaw, setInmueblesRaw] = useState<Inmueble[]>([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState(false)
-  // @ts-ignore
   const { ordenActual, cambiarOrden, inmueblesOrdenados } = useOrdenamiento({
-    inmuebles: inmueblesRaw as any
+    inmuebles: inmueblesRaw as unknown as any[]
   })
   useEffect(() => {
     // Función reutilizable para hacer el fetch con filtros
@@ -67,8 +66,6 @@ export const ResultadosBusqueda = () => {
       const queryStr = params.toString() ? `?${params}` : ''
       const url = `${API_BASE}/api/inmuebles${queryStr}`
 
-      console.log('Fetch con filtros:', url)
-
       fetch(url)
         .then((res) => {
           if (!res.ok) throw new Error('Error de red')
@@ -82,8 +79,8 @@ export const ResultadosBusqueda = () => {
             setError(true)
           }
         })
-        .catch((err) => {
-          console.error("Error en el fetch:", err)
+        .catch((_err) => {
+          console.error("Error en el fetch de inmuebles")
           setError(true)
         })
         .finally(() => setCargando(false))
@@ -117,9 +114,12 @@ export const ResultadosBusqueda = () => {
       />
       {inmueblesOrdenados.length > 0 ? (
         <div className="grid grid-cols-1 gap-4">
-          {inmueblesOrdenados.map((inmueble: any) => (
+          {inmueblesOrdenados.map((item: unknown) => {
+          const inmueble = item as Inmueble; 
+          return (
             <TarjetaInmueble key={inmueble.id} inmueble={inmueble} />
-          ))}
+          );
+        })}
         </div>
       ) : (
         <div className="text-center py-12">

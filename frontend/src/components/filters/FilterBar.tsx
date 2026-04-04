@@ -7,7 +7,6 @@ import { LocationSearch } from '../layout/LocationSearch' // Componente de Zona
 import { ComboBox } from '../ui/ComboBox' // Componente estético
 import TransactionModeFilter from './TransactionModeFilter'
 import { usePathname, useRouter } from 'next/navigation'
-import { cite, div } from 'framer-motion/m'
 
 interface FilterBarProps {
   // Ajustamos los nombres para que coincidan con 'nuevosFiltros'
@@ -45,8 +44,6 @@ export default function FilterBar({ onSearch, variant = 'home' }: FilterBarProps
   }, [])
 
   const handleSearch = () => {
-    // MENSAJE DE CONTROL 1: Verifica que la función inicia
-    console.log("%c🔍 Iniciando búsqueda en BitPro...", "color: #d97706; font-weight: bold;");
 
     if (modosSeleccionados.length === 0) {
       alert('Por favor, selecciona al menos un modo (Venta, Alquiler o Anticrético)') 
@@ -79,9 +76,6 @@ export default function FilterBar({ onSearch, variant = 'home' }: FilterBarProps
 
     const queryString = params.toString();
     const targetUrl = `/busqueda_mapa${queryString ? `?${queryString}` : ''}`;
-
-    // MENSAJE DE CONTROL 2: Verifica la URL final antes de navegar
-    console.log("%c🚀 Navegando a resultados:", "color: #10b981; font-weight: bold;", targetUrl);
 
     // Ejecutar navegación 
     router.push(targetUrl);
