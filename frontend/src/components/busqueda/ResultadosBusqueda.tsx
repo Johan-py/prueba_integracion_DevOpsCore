@@ -52,7 +52,7 @@ export const ResultadosBusqueda = () => {
   const [error, setError] = useState(false)
 
   const { ordenActual, cambiarOrden, inmueblesOrdenados } = useOrdenamiento({
-    inmuebles: inmueblesRaw
+    inmuebles: inmueblesRaw as any
   })
 
   useEffect(() => {
@@ -63,7 +63,10 @@ export const ResultadosBusqueda = () => {
 
       const filtros = leerFiltrosGuardados()
       const params = construirParams(filtros)
-      const url = `http://localhost:5000/api/inmuebles${params.toString() ? `?${params}` : ''}`
+
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const queryStr = params.toString() ? `?${params}` : ''
+      const url = `${API_BASE}/api/inmuebles${queryStr}`
 
       console.log('Fetch con filtros:', url)
 
@@ -73,10 +76,17 @@ export const ResultadosBusqueda = () => {
           return res.json()
         })
         .then((data) => {
-          if (data.ok) setInmueblesRaw(data.data)
-          else setError(true)
+          // Ajustamos según la respuesta de tu API (data.ok o data directo)
+          if (data && (data.ok || Array.isArray(data))) {
+            setInmueblesRaw(data.ok ? data.data : data)
+          } else {
+            setError(true)
+          }
         })
-        .catch(() => setError(true))
+        .catch((err) => {
+          console.error("Error en el fetch:", err)
+          setError(true)
+        })
         .finally(() => setCargando(false))
     }
 
@@ -109,7 +119,7 @@ export const ResultadosBusqueda = () => {
 
       {inmueblesOrdenados.length > 0 ? (
         <div className="grid grid-cols-1 gap-4">
-          {inmueblesOrdenados.map((inmueble) => (
+          {inmueblesOrdenados.map((inmueble: any) => (
             <TarjetaInmueble key={inmueble.id} inmueble={inmueble} />
           ))}
         </div>
