@@ -52,7 +52,7 @@ export const ResultadosBusqueda = () => {
   const [error, setError] = useState(false)
 
   const { ordenActual, cambiarOrden, inmueblesOrdenados } = useOrdenamiento({
-    inmuebles: inmueblesRaw as any
+    inmuebles: inmueblesRaw as any[]
   })
 
   useEffect(() => {
