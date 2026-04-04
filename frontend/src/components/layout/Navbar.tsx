@@ -1,17 +1,9 @@
 'use client'
 
-import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import {
-  Bell,
-  CheckCheck,
-  Loader2,
-  Menu,
-  Trash2,
-  WifiOff,
-  X,
-} from "lucide-react";
+import { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { Bell, CheckCheck, Loader2, Menu, Trash2, WifiOff, X } from 'lucide-react'
 
 import Logo from '../navbar/Logo'
 import NavLinks from '../navbar/NavLinks'
@@ -35,11 +27,11 @@ export default function Navbar() {
   const router = useRouter()
   const panelRef = useRef<HTMLDivElement | null>(null)
 
-  const [user, setUser] = useState<User | null>(null);
-  const [isPanelOpen, setIsPanelOpen] = useState(false);
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null)
+  const [isPanelOpen, setIsPanelOpen] = useState(false)
+  const [showLogoutModal, setShowLogoutModal] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const {
     open,
@@ -64,19 +56,19 @@ export default function Navbar() {
   } = useNotifications()
 
   const clearSession = (emitEvent = true) => {
-  localStorage.removeItem(USER_STORAGE_KEY);
-  localStorage.removeItem(SESSION_EXPIRES_KEY);
-  localStorage.removeItem("token");
-  setUser(null);
-  setIsPanelOpen(false);
-  setShowLogoutModal(false);
-  setIsLoggedIn(false);
+    localStorage.removeItem(USER_STORAGE_KEY)
+    localStorage.removeItem(SESSION_EXPIRES_KEY)
+    localStorage.removeItem('token')
+    setUser(null)
+    setIsPanelOpen(false)
+    setShowLogoutModal(false)
+    setIsLoggedIn(false)
 
-  if (emitEvent) {
-    window.dispatchEvent(new Event("propbol:session-changed"));
-    window.dispatchEvent(new Event("auth-state-changed"));
+    if (emitEvent) {
+      window.dispatchEvent(new Event('propbol:session-changed'))
+      window.dispatchEvent(new Event('auth-state-changed'))
+    }
   }
-};
 
   const isSessionExpired = () => {
     const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY)
@@ -85,27 +77,27 @@ export default function Navbar() {
   }
 
   const restoreSession = () => {
-  const savedUser = localStorage.getItem(USER_STORAGE_KEY);
-  const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY);
-  const token = localStorage.getItem("token");
+    const savedUser = localStorage.getItem(USER_STORAGE_KEY)
+    const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY)
+    const token = localStorage.getItem('token')
 
-  if (!savedUser || !expiresAt || !token) {
-    clearSession(false);
-    return;
-  }
+    if (!savedUser || !expiresAt || !token) {
+      clearSession(false)
+      return
+    }
 
-  if (Date.now() > Number(expiresAt)) {
-    clearSession(false);
-    return;
-  }
+    if (Date.now() > Number(expiresAt)) {
+      clearSession(false)
+      return
+    }
 
-  try {
-    setUser(JSON.parse(savedUser));
-    setIsLoggedIn(true);
-  } catch {
-    clearSession(false);
+    try {
+      setUser(JSON.parse(savedUser))
+      setIsLoggedIn(true)
+    } catch {
+      clearSession(false)
+    }
   }
-};
 
   useEffect(() => {
     restoreSession()
@@ -175,8 +167,8 @@ export default function Navbar() {
   }
 
   const toggleMobileMenu = () => {
-    setIsMobileMenuOpen((prev) => !prev);
-  };
+    setIsMobileMenuOpen((prev) => !prev)
+  }
 
   const handleLoginRedirect = () => {
     router.push('/sign-in')
@@ -276,9 +268,7 @@ export default function Navbar() {
                     "
                   >
                     <div className="flex items-center justify-between border-b border-stone-100 px-4 py-3">
-                      <h3 className="text-sm font-semibold text-stone-900">
-                        Notificaciones
-                      </h3>
+                      <h3 className="text-sm font-semibold text-stone-900">Notificaciones</h3>
 
                       {isLoggedIn ? (
                         <button

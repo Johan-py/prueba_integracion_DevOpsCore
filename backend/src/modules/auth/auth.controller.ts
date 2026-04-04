@@ -118,7 +118,6 @@ export const verifyRegisterCodeController = async (
 
     return res.status(201).json({
       message: 'Correo verificado y usuario creado correctamente',
-
       user: result.user,
       token: result.token
     })

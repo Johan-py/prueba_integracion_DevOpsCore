@@ -4,7 +4,6 @@ import jwt from 'jsonwebtoken'
 import { env } from '../../config/env.js'
 import { enviarCodigoRegistro } from '../../lib/email.service.js'
 import { generateToken, type JwtPayload } from '../../utils/jwt.js'
-
 import {
   createSession,
   createUser,
@@ -551,7 +550,6 @@ export const loginWithGoogleCodeService = async (code: string) => {
       nombre: user.nombre,
       apellido: user.apellido
     },
-
     token
   }
 }
