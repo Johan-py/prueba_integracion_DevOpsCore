@@ -1,6 +1,6 @@
-import Link from "next/link";
-import type { User } from "../layout/Navbar";
-import { User as UserIcon, Eye, FileText, Map, ArrowLeftRight } from "lucide-react";
+import Link from 'next/link'
+import type { User } from '../layout/Navbar'
+import { User as UserIcon, Eye, FileText, Map, ArrowLeftRight } from 'lucide-react'
 type UserMenuProps = {
   user: User | null
   isPanelOpen: boolean
@@ -10,15 +10,26 @@ type UserMenuProps = {
   onOpenLogoutModal: () => void
 }
 
-const MenuLink = ({ label, href, onClick, icon: Icon }: { label: string; href: string; onClick: () => void; icon: any }) => (
+const MenuLink = ({
+  label,
+  href,
+  onClick,
+  icon: Icon
+}: {
+  label: string
+  href: string
+  onClick: () => void
+  icon: any
+}) => (
   <Link
     href={href}
     onClick={onClick}
-    className="flex items-center gap-3 py-2 px-2 text-gray-500 text-sm hover:bg-black/5 hover:text-[#E68B25] transition-colors rounded">
+    className="flex items-center gap-3 py-2 px-2 text-gray-500 text-sm hover:bg-black/5 hover:text-[#E68B25] transition-colors rounded"
+  >
     <Icon size={18} strokeWidth={1.5} />
     {label}
   </Link>
-);
+)
 
 export default function UserMenu({
   user,
@@ -83,12 +94,27 @@ export default function UserMenu({
             </Link>
 
             <div className="flex flex-col mb-4">
-             <MenuLink label="Mi cuenta" href="/cuenta" icon={UserIcon} onClick={onClosePanel} />
-             <MenuLink label="Mis propiedades vistas" href="/vistas" icon={Eye} onClick={onClosePanel} />
-             <MenuLink label="Mis publicaciones" href="/publicaciones" icon={FileText} onClick={onClosePanel} />
-             <MenuLink label="Mis zonas" href="/zonas" icon={Map} onClick={onClosePanel} />
-             <MenuLink label="Mis comparaciones" href="/comparaciones" icon={ArrowLeftRight} onClick={onClosePanel} />
-             </div>
+              <MenuLink label="Mi cuenta" href="/cuenta" icon={UserIcon} onClick={onClosePanel} />
+              <MenuLink
+                label="Mis propiedades vistas"
+                href="/vistas"
+                icon={Eye}
+                onClick={onClosePanel}
+              />
+              <MenuLink
+                label="Mis publicaciones"
+                href="mis-publicaciones"
+                icon={FileText}
+                onClick={onClosePanel}
+              />
+              <MenuLink label="Mis zonas" href="/zonas" icon={Map} onClick={onClosePanel} />
+              <MenuLink
+                label="Mis comparaciones"
+                href="/comparaciones"
+                icon={ArrowLeftRight}
+                onClick={onClosePanel}
+              />
+            </div>
 
             <button
               onClick={onOpenLogoutModal}
@@ -100,8 +126,18 @@ export default function UserMenu({
         ) : (
           <div className="text-center py-2 flex flex-col items-center">
             <div className="w-12 h-12 bg-[#E68B25]/10 rounded-full flex items-center justify-center mb-3">
-              <svg className="w-6 h-6 text-[#E68B25]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                className="w-6 h-6 text-[#E68B25]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
             </div>
 
@@ -117,5 +153,5 @@ export default function UserMenu({
         )}
       </div>
     </>
-  );
+  )
 }

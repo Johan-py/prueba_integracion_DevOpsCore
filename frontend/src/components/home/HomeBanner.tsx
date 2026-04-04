@@ -1,5 +1,4 @@
 import Image from 'next/image'
-import FilterBar from '../filters/FilterBar'
 
 interface BannerProps {
   url: string
@@ -30,11 +29,7 @@ export const HomeBanner = ({ url, title, subtitle }: BannerProps) => {
         )}
         {/* INTEGRACIÓN: La Barra de Filtros centrada */}
         {/* Usamos un div envoltorio para asegurar el ancho máximo de 921px  */}
-        <div className="hidden md:flex w-full max-w-[921px] justify-center">
-          <FilterBar />
-        </div>
       </div>
-
       {/* En móvil, mostramos la barra de filtros debajo del banner */}
       {/* Versión móvil: La barra sale debajo en pantallas pequeñas para no tapar la foto */}
       <div className="md:hidden relative z-20 -mt-10 px-4 w-full">
