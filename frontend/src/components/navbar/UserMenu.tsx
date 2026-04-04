@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import type { User } from '../layout/Navbar'
-
+import { User as UserIcon, Eye, FileText, Map, ArrowLeftRight } from 'lucide-react'
 type UserMenuProps = {
   user: User | null
   isPanelOpen: boolean
@@ -9,6 +9,27 @@ type UserMenuProps = {
   onLogin: () => void
   onOpenLogoutModal: () => void
 }
+
+const MenuLink = ({
+  label,
+  href,
+  onClick,
+  icon: Icon
+}: {
+  label: string
+  href: string
+  onClick: () => void
+  icon: any
+}) => (
+  <Link
+    href={href}
+    onClick={onClick}
+    className="flex items-center gap-3 py-2 px-2 text-gray-500 text-sm hover:bg-black/5 hover:text-[#E68B25] transition-colors rounded"
+  >
+    <Icon size={18} strokeWidth={1.5} />
+    {label}
+  </Link>
+)
 
 export default function UserMenu({
   user,
@@ -54,24 +75,46 @@ export default function UserMenu({
 
         {user ? (
           <>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center text-white font-bold">
-                {user.name.charAt(0)}
+            <div className="flex items-center gap-3 mb-4 px-1">
+              <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                {user.name.charAt(0).toUpperCase()}
               </div>
-
-              <div>
-                <p className="font-bold text-gray-800 text-sm">{user.name}</p>
+              <div className="flex flex-col">
+                <p className="font-bold text-gray-800 text-sm leading-tight">{user.name}</p>
                 <p className="text-xs text-gray-500">{user.email}</p>
               </div>
             </div>
 
             <Link
-              href="/perfil"
-              className="flex justify-between w-full text-black font-bold mb-4 hover:bg-black/5 p-2 rounded transition text-sm"
+              href="/profile"
+              className="flex justify-between items-center w-full text-black font-bold py-3 border-t border-b border-gray-200 hover:bg-black/5 px-2 mb-2 transition text-sm"
               onClick={onClosePanel}
             >
-              Mi perfil <span>&gt;</span>
+              Mi perfil <span className="text-lg">›</span>
             </Link>
+
+            <div className="flex flex-col mb-4">
+              <MenuLink label="Mi cuenta" href="/cuenta" icon={UserIcon} onClick={onClosePanel} />
+              <MenuLink
+                label="Mis propiedades vistas"
+                href="/vistas"
+                icon={Eye}
+                onClick={onClosePanel}
+              />
+              <MenuLink
+                label="Mis publicaciones"
+                href="mis-publicaciones"
+                icon={FileText}
+                onClick={onClosePanel}
+              />
+              <MenuLink label="Mis zonas" href="/zonas" icon={Map} onClick={onClosePanel} />
+              <MenuLink
+                label="Mis comparaciones"
+                href="/comparaciones"
+                icon={ArrowLeftRight}
+                onClick={onClosePanel}
+              />
+            </div>
 
             <button
               onClick={onOpenLogoutModal}

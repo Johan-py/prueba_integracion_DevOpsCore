@@ -1,10 +1,17 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
-import { Eye, EyeOff, Mail, User, Phone, Lock, AlertCircle, Chrome } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Eye, EyeOff, Mail, User, Phone, Lock, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { validateEmail, validatePassword } from '@/lib/validators/auth'
+import GoogleRegisterButton from '@/components/layout/auth/google/GoogleRegisterButton'
+import {
+  consumeGoogleSignupPrefill,
+  extractGooglePrefillValidationFromCredential,
+  getMissingGoogleSignupFields,
+  type GoogleSignupMissingField
+} from '@/lib/auth/google'
 
 type FormData = {
   email: string
@@ -26,7 +33,10 @@ type FormErrors = {
 
 interface RegisterResponse {
   message: string
-  token?: string
+  verificationToken?: string
+  email?: string
+  requiresEmailVerification?: boolean
+  expiresInMinutes?: number
 }
 
 const MAX_NAME_LENGTH = 30
@@ -39,6 +49,38 @@ const initialFormData: FormData = {
   phone: '',
   password: '',
   confirmPassword: ''
+}
+
+function buildGoogleMissingFieldsMessage(missingFields: GoogleSignupMissingField[]) {
+  if (missingFields.length === 0) {
+    return ''
+  }
+
+  const labels: Record<GoogleSignupMissingField, string> = {
+    email: 'el correo electrónico',
+    firstName: 'el nombre',
+    lastName: 'el apellido'
+  }
+
+  if (missingFields.length === 1) {
+    return `Google no devolvió ${labels[missingFields[0]]} de la cuenta.`
+  }
+
+  if (missingFields.length === 2) {
+    return `Google no devolvió ${labels[missingFields[0]]} ni ${labels[missingFields[1]]} de la cuenta.`
+  }
+
+  return 'Google no devolvió el correo electrónico, el nombre ni el apellido de la cuenta.'
+}
+
+function buildGoogleFieldErrors(
+  missingFields: GoogleSignupMissingField[]
+): Pick<FormErrors, 'email' | 'firstName' | 'lastName'> {
+  return {
+    email: missingFields.includes('email') ? 'Google no devolvió el correo electrónico' : undefined,
+    firstName: missingFields.includes('firstName') ? 'Google no devolvió el nombre' : undefined,
+    lastName: missingFields.includes('lastName') ? 'Google no devolvió el apellido' : undefined
+  }
 }
 
 function getInputClasses(hasError?: boolean, hasRightIcon?: boolean) {
@@ -93,6 +135,37 @@ export default function SignUpForm() {
       router.replace('/')
     }
   }, [router])
+
+  useEffect(() => {
+    const googlePrefill = consumeGoogleSignupPrefill()
+
+    if (!googlePrefill) {
+      return
+    }
+
+    const missingFields = getMissingGoogleSignupFields(googlePrefill)
+
+    setFormData((prev) => ({
+      ...prev,
+      email: googlePrefill.email?.trim() || prev.email,
+      firstName: googlePrefill.firstName?.trim() || prev.firstName,
+      lastName: googlePrefill.lastName?.trim() || prev.lastName
+    }))
+
+    setErrors((prev) => ({
+      ...prev,
+      ...buildGoogleFieldErrors(missingFields)
+    }))
+
+    setTouched((prev) => ({
+      ...prev,
+      email: missingFields.includes('email'),
+      firstName: missingFields.includes('firstName'),
+      lastName: missingFields.includes('lastName')
+    }))
+
+    setServerError(buildGoogleMissingFieldsMessage(missingFields))
+  }, [])
 
   const validateFirstName = (value: string) => {
     const trimmed = value.trim()
@@ -342,16 +415,19 @@ export default function SignUpForm() {
         throw new Error(data?.message || 'No se pudo completar el registro')
       }
 
-      if (data?.token) {
-        localStorage.setItem('token', data.token)
+      if (!data?.verificationToken || !data?.email) {
+        throw new Error('No se recibió la verificación del registro')
       }
 
+      sessionStorage.setItem('pendingRegisterToken', data.verificationToken)
+      sessionStorage.setItem('pendingRegisterPassword', formData.password.trim())
+      sessionStorage.setItem('pendingRegisterEmail', data.email)
       sessionStorage.setItem(
         'register_success_message',
-        data?.message || 'Usuario registrado correctamente'
+        data.message || 'Te enviamos un código de verificación a tu correo.'
       )
 
-      router.replace('/')
+      router.replace('/verify-email')
     } catch (error) {
       const message =
         error instanceof TypeError
@@ -366,6 +442,39 @@ export default function SignUpForm() {
       setIsSubmitting(false)
     }
   }
+
+  const handleGoogleCredential = useCallback((credential: string) => {
+    setServerError('')
+
+    const { prefill: googlePrefill, missingFields } =
+      extractGooglePrefillValidationFromCredential(credential)
+
+    if (!googlePrefill) {
+      setServerError('No se pudieron obtener los datos de la cuenta de Google.')
+      return
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      email: googlePrefill.email || prev.email,
+      firstName: googlePrefill.firstName || prev.firstName,
+      lastName: googlePrefill.lastName || prev.lastName
+    }))
+
+    setErrors((prev) => ({
+      ...prev,
+      ...buildGoogleFieldErrors(missingFields)
+    }))
+
+    setTouched((prev) => ({
+      ...prev,
+      email: missingFields.includes('email'),
+      firstName: missingFields.includes('firstName'),
+      lastName: missingFields.includes('lastName')
+    }))
+
+    setServerError(buildGoogleMissingFieldsMessage(missingFields))
+  }, [])
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#f5f5f4] px-4 py-8">
@@ -564,13 +673,11 @@ export default function SignUpForm() {
               </button>
             </div>
 
-            <button
-              type="button"
-              className="flex w-full items-center justify-center gap-2 rounded-md border border-[#d6d3d1] bg-white px-4 py-2.5 text-[12px] font-medium text-[#292524] transition hover:bg-[#fafaf9]"
-            >
-              <Chrome size={14} />
-              Regístrate con Google
-            </button>
+            <GoogleRegisterButton
+              onCredentialReceived={handleGoogleCredential}
+              onError={setServerError}
+              disabled={isSubmitting}
+            />
 
             <button
               type="button"
