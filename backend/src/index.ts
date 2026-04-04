@@ -1,9 +1,9 @@
-import "dotenv/config";
-import express from "express";
-import cors from "cors";
-import { env } from "./config/env.js";
-import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { propertiesController } from "./modules/properties/properties.controller.js";
+import 'dotenv/config'
+import express from 'express'
+import cors from 'cors'
+import { env } from './config/env.js'
+import type { VercelRequest, VercelResponse } from '@vercel/node'
+import { propertiesController } from './modules/properties/properties.controller.js'
 import {
   createNotificationController,
   deleteNotificationController,
@@ -20,16 +20,16 @@ import {
   registerController,
   loginController,
   logoutController,
-  verifyRegisterCodeController,
-} from "./modules/auth/auth.controller.js";
-import { requireAuth } from "./middleware/auth.middleware.js";
-import meHandler from "../api/auth/me.js";
-import correoverificacionRoutes from "./modules/perfil/correoverificacion.routes.js";
-import perfilRoutes from "./modules/perfil/perfil.routes.js";
+  verifyRegisterCodeController
+} from './modules/auth/auth.controller.js'
+import { requireAuth } from './middleware/auth.middleware.js'
+import meHandler from '../api/auth/me.js'
+import correoverificacionRoutes from './modules/perfil/correoverificacion.routes.js'
+import perfilRoutes from './modules/perfil/perfil.routes.js'
 import {
   googleCallbackController,
-  StratGoogleLoginController,
-} from "./modules/auth/google/google.controller.js";
+  StratGoogleLoginController
+} from './modules/auth/google/google.controller.js'
 import multimediaRoutes from './modules/multimedia/multimedia.routes.js'
 import { verifyNotificationEmailTransport } from './modules/email/notification-email.service.js'
 
@@ -38,7 +38,7 @@ const app = express()
 app.use(
   cors({
     origin: ['http://localhost:3000', 'http://localhost:3001'],
-    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
   })
@@ -47,21 +47,20 @@ app.use(
 app.use(express.json())
 
 app.use('/api/perfil', correoverificacionRoutes)
-app.use("/api/perfil/usuario", perfilRoutes)
+app.use('/api/perfil/usuario', perfilRoutes)
 app.use('/api/publicaciones', multimediaRoutes)
-app.post("/api/users", (req, res) => {
-  const user = req.body;
-  res.json({ message: "User created", user });
-});
-app.post("/api/auth/register", registerController);
-app.post("/api/auth/login", loginController);
-app.post("/api/auth/logout", logoutController);
-app.post("/api/auth/verify-register", verifyRegisterCodeController);
-app.get("/api/auth/google/login", StratGoogleLoginController);
-app.get("/api/auth/google/callback", googleCallbackController);
+app.post('/api/users', (req, res) => {
+  const user = req.body
+  res.json({ message: 'User created', user })
+})
+app.post('/api/auth/register', registerController)
+app.post('/api/auth/login', loginController)
+app.post('/api/auth/logout', logoutController)
+app.post('/api/auth/verify-register', verifyRegisterCodeController)
+app.get('/api/auth/google/login', StratGoogleLoginController)
+app.get('/api/auth/google/callback', googleCallbackController)
 const bannersController = new BannersController()
 const filtersController = new FiltersHomepageController()
-
 
 app.get('/api/auth/me', async (req, res) => {
   await meHandler(req as any, res as any)

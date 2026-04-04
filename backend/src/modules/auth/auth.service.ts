@@ -1,17 +1,17 @@
-import crypto from "node:crypto";
-import jwt from "jsonwebtoken";
+import crypto from 'node:crypto'
+import jwt from 'jsonwebtoken'
 
-import { env } from "../../config/env.js";
-import { enviarCodigoRegistro } from "../../lib/email.service.js";
-import { generateToken, type JwtPayload } from "../../utils/jwt.js";
+import { env } from '../../config/env.js'
+import { enviarCodigoRegistro } from '../../lib/email.service.js'
+import { generateToken, type JwtPayload } from '../../utils/jwt.js'
 import {
   createSession,
   createUser,
   desactiveSessionByToken,
   findActiveSessionByToken,
   findUser,
-  findUserByCorreo,
-} from "./auth.repository.js";
+  findUserByCorreo
+} from './auth.repository.js'
 
 type LoginDTO = {
   correo: string
@@ -28,20 +28,20 @@ type RegisterDTO = {
 }
 
 type VerifyRegisterCodeDTO = {
-  verificationToken: string;
-  codigo: string;
-  password: string;
-};
+  verificationToken: string
+  codigo: string
+  password: string
+}
 
 type PendingRegisterPayload = {
-  purpose: "pending-register";
-  nombre: string;
-  apellido: string;
-  correo: string;
-  telefono?: string;
-  nonce: string;
-  codeSignature: string;
-};
+  purpose: 'pending-register'
+  nombre: string
+  apellido: string
+  correo: string
+  telefono?: string
+  nonce: string
+  codeSignature: string
+}
 
 type LoginAttemptState = {
   failedAttempts: number
@@ -65,24 +65,23 @@ const MAX_APELLIDO = 30
 const MAX_LOGIN_ATTEMPTS = 5
 const LOGIN_BLOCK_TIME_MS = 15 * 60 * 1000
 
-const REGISTER_CODE_TTL_MINUTES = 5;
-const REGISTER_CODE_TTL_SECONDS = REGISTER_CODE_TTL_MINUTES * 60;
+const REGISTER_CODE_TTL_MINUTES = 5
+const REGISTER_CODE_TTL_SECONDS = REGISTER_CODE_TTL_MINUTES * 60
 
-const loginAttempts = new Map<string, LoginAttemptState>();
+const loginAttempts = new Map<string, LoginAttemptState>()
 
-const DUPLICATE_EMAIL_MESSAGE = "El correo ya está registrado";
+const DUPLICATE_EMAIL_MESSAGE = 'El correo ya está registrado'
 
 const isDuplicateEmailError = (error: unknown) => {
-  if (!(error instanceof Error)) return false;
+  if (!(error instanceof Error)) return false
 
-  const normalized = error.message.toLowerCase();
+  const normalized = error.message.toLowerCase()
 
   return (
     normalized === DUPLICATE_EMAIL_MESSAGE.toLowerCase() ||
-    (normalized.includes("unique constraint failed") &&
-      normalized.includes("correo"))
-  );
-};
+    (normalized.includes('unique constraint failed') && normalized.includes('correo'))
+  )
+}
 
 const getAttemptState = (correo: string): LoginAttemptState => {
   const existingState = loginAttempts.get(correo)
@@ -157,27 +156,27 @@ const clearFailedAttempts = (correo: string) => {
 }
 
 const normalizeRegisterPayload = (payload: RegisterDTO) => {
-  const nombre = payload.nombre?.trim();
-  const apellido = payload.apellido?.trim();
-  const correo = payload.correo?.trim().toLowerCase();
-  const password = payload.password?.trim();
-  const confirmPassword = payload.confirmPassword?.trim();
-  const telefono = payload.telefono?.trim() || undefined;
+  const nombre = payload.nombre?.trim()
+  const apellido = payload.apellido?.trim()
+  const correo = payload.correo?.trim().toLowerCase()
+  const password = payload.password?.trim()
+  const confirmPassword = payload.confirmPassword?.trim()
+  const telefono = payload.telefono?.trim() || undefined
 
   if (!nombre || !apellido || !correo || !password || !confirmPassword) {
-    throw new Error("Todos los campos obligatorios deben ser completados");
+    throw new Error('Todos los campos obligatorios deben ser completados')
   }
 
   if (nombre.length > MAX_NOMBRE) {
-    throw new Error(`El nombre no puede superar ${MAX_NOMBRE} caracteres`);
+    throw new Error(`El nombre no puede superar ${MAX_NOMBRE} caracteres`)
   }
 
   if (apellido.length > MAX_APELLIDO) {
-    throw new Error(`El apellido no puede superar ${MAX_APELLIDO} caracteres`);
+    throw new Error(`El apellido no puede superar ${MAX_APELLIDO} caracteres`)
   }
 
   if (password !== confirmPassword) {
-    throw new Error("Las contraseñas no coinciden");
+    throw new Error('Las contraseñas no coinciden')
   }
 
   return {
@@ -185,65 +184,59 @@ const normalizeRegisterPayload = (payload: RegisterDTO) => {
     apellido,
     correo,
     password,
-    telefono,
-  };
-};
+    telefono
+  }
+}
 
 const generateRegisterCode = () => {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-};
+  return Math.floor(100000 + Math.random() * 900000).toString()
+}
 
 const signRegisterCode = ({
   codigo,
   correo,
-  nonce,
+  nonce
 }: {
-  codigo: string;
-  correo: string;
-  nonce: string;
+  codigo: string
+  correo: string
+  nonce: string
 }) => {
   return crypto
-    .createHmac("sha256", env.JWT_SECRET)
+    .createHmac('sha256', env.JWT_SECRET)
     .update(`${codigo}:${correo}:${nonce}:pending-register`)
-    .digest("hex");
-};
+    .digest('hex')
+}
 
-const isMatchingCodeSignature = (
-  expectedSignature: string,
-  currentSignature: string,
-) => {
-  const expectedBuffer = Buffer.from(expectedSignature, "utf8");
-  const currentBuffer = Buffer.from(currentSignature, "utf8");
+const isMatchingCodeSignature = (expectedSignature: string, currentSignature: string) => {
+  const expectedBuffer = Buffer.from(expectedSignature, 'utf8')
+  const currentBuffer = Buffer.from(currentSignature, 'utf8')
 
   if (expectedBuffer.length !== currentBuffer.length) {
-    return false;
+    return false
   }
 
-  return crypto.timingSafeEqual(expectedBuffer, currentBuffer);
-};
+  return crypto.timingSafeEqual(expectedBuffer, currentBuffer)
+}
 
 const generatePendingRegisterToken = (payload: PendingRegisterPayload) => {
   return jwt.sign(payload, env.JWT_SECRET, {
-    expiresIn: REGISTER_CODE_TTL_SECONDS,
-  });
-};
+    expiresIn: REGISTER_CODE_TTL_SECONDS
+  })
+}
 
 const verifyPendingRegisterToken = (token: string) => {
   try {
-    const decoded = jwt.verify(token, env.JWT_SECRET) as jwt.JwtPayload &
-      PendingRegisterPayload;
+    const decoded = jwt.verify(token, env.JWT_SECRET) as jwt.JwtPayload & PendingRegisterPayload
 
-    if (decoded.purpose !== "pending-register") {
-      throw new Error("Token de verificación inválido");
+    if (decoded.purpose !== 'pending-register') {
+      throw new Error('Token de verificación inválido')
     }
 
-    return decoded;
+    return decoded
   } catch {
-    throw new Error(
-      "El código expiró o ya no es válido. Vuelve a registrarte.",
-    );
+    throw new Error('El código expiró o ya no es válido. Vuelve a registrarte.')
   }
-};
+}
 
 export const loginService = async (payload: LoginDTO) => {
   const correo = payload.correo?.trim().toLowerCase()
@@ -320,19 +313,19 @@ export const loginService = async (payload: LoginDTO) => {
 }
 
 export const registerUser = async (payload: RegisterDTO) => {
-  const normalized = normalizeRegisterPayload(payload);
+  const normalized = normalizeRegisterPayload(payload)
 
-  const existingUser = await findUserByCorreo(normalized.correo);
+  const existingUser = await findUserByCorreo(normalized.correo)
 
   if (existingUser) {
-    throw new Error("El correo ya está registrado");
+    throw new Error('El correo ya está registrado')
   }
 
-  const codigo = generateRegisterCode();
-  const nonce = crypto.randomUUID();
+  const codigo = generateRegisterCode()
+  const nonce = crypto.randomUUID()
 
   const verificationToken = generatePendingRegisterToken({
-    purpose: "pending-register",
+    purpose: 'pending-register',
     nombre: normalized.nombre,
     apellido: normalized.apellido,
     correo: normalized.correo,
@@ -341,59 +334,55 @@ export const registerUser = async (payload: RegisterDTO) => {
     codeSignature: signRegisterCode({
       codigo,
       correo: normalized.correo,
-      nonce,
-    }),
-  });
+      nonce
+    })
+  })
 
   const emailResult = await enviarCodigoRegistro({
     emailDestino: normalized.correo,
     codigo,
-    nombreUsuario: normalized.nombre,
-  });
+    nombreUsuario: normalized.nombre
+  })
 
   if (!emailResult.success) {
-    throw new Error(
-      "No se pudo enviar el código de verificación. Intenta nuevamente.",
-    );
+    throw new Error('No se pudo enviar el código de verificación. Intenta nuevamente.')
   }
 
   return {
     email: normalized.correo,
     verificationToken,
     requiresEmailVerification: true,
-    expiresInMinutes: REGISTER_CODE_TTL_MINUTES,
-  };
-};
+    expiresInMinutes: REGISTER_CODE_TTL_MINUTES
+  }
+}
 
-export const verifyRegisterCodeService = async (
-  payload: VerifyRegisterCodeDTO,
-) => {
-  const verificationToken = payload.verificationToken?.trim();
-  const codigo = payload.codigo?.trim();
-  const password = payload.password?.trim();
+export const verifyRegisterCodeService = async (payload: VerifyRegisterCodeDTO) => {
+  const verificationToken = payload.verificationToken?.trim()
+  const codigo = payload.codigo?.trim()
+  const password = payload.password?.trim()
 
   if (!verificationToken || !codigo || !password) {
-    throw new Error("Token, código y contraseña son obligatorios");
+    throw new Error('Token, código y contraseña son obligatorios')
   }
 
-  const decoded = verifyPendingRegisterToken(verificationToken);
+  const decoded = verifyPendingRegisterToken(verificationToken)
 
   const expectedSignature = signRegisterCode({
     codigo,
     correo: decoded.correo,
-    nonce: decoded.nonce,
-  });
+    nonce: decoded.nonce
+  })
 
   if (!isMatchingCodeSignature(expectedSignature, decoded.codeSignature)) {
-    throw new Error("El código ingresado no es válido");
+    throw new Error('El código ingresado no es válido')
   }
 
-  const existingUser = await findUserByCorreo(decoded.correo);
+  const existingUser = await findUserByCorreo(decoded.correo)
 
   if (existingUser) {
-    throw new AuthError(DUPLICATE_EMAIL_MESSAGE, 409);
+    throw new AuthError(DUPLICATE_EMAIL_MESSAGE, 409)
   }
-  let newUser;
+  let newUser
 
   try {
     newUser = await createUser({
@@ -401,14 +390,14 @@ export const verifyRegisterCodeService = async (
       apellido: decoded.apellido,
       correo: decoded.correo,
       password,
-      telefono: decoded.telefono,
-    });
+      telefono: decoded.telefono
+    })
   } catch (error) {
     if (isDuplicateEmailError(error)) {
-      throw new AuthError(DUPLICATE_EMAIL_MESSAGE, 409);
+      throw new AuthError(DUPLICATE_EMAIL_MESSAGE, 409)
     }
 
-    throw error;
+    throw error
   }
 
   const jwtPayload: JwtPayload = {
@@ -465,108 +454,102 @@ export const logoutService = async (token: string) => {
   await desactiveSessionByToken(token)
 
   return {
-    message: "Logout exitoso",
-  };
-};
+    message: 'Logout exitoso'
+  }
+}
 
 type GoogleTokenResponse = {
-  access_token?: string;
-  expires_in?: number;
-  id_token?: string;
-  scope?: string;
-  token_type?: string;
-  error?: string;
-  error_description?: string;
-};
+  access_token?: string
+  expires_in?: number
+  id_token?: string
+  scope?: string
+  token_type?: string
+  error?: string
+  error_description?: string
+}
 
 type GoogleUserInfoResponse = {
-  id?: string;
-  email?: string;
-  verified_email?: boolean;
-  name?: string;
-  given_name?: string;
-  family_name?: string;
-  picture?: string;
-};
+  id?: string
+  email?: string
+  verified_email?: boolean
+  name?: string
+  given_name?: string
+  family_name?: string
+  picture?: string
+}
 
 export const loginWithGoogleCodeService = async (code: string) => {
-  const normalizedCode = code?.trim();
+  const normalizedCode = code?.trim()
 
   if (!normalizedCode) {
-    throw new Error("Google no devolvió un código válido");
+    throw new Error('Google no devolvió un código válido')
   }
 
-  const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
+  const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
+      'Content-Type': 'application/x-www-form-urlencoded'
     },
     body: new URLSearchParams({
       code: normalizedCode,
       client_id: env.GOOGLE_CLIENT_ID,
       client_secret: env.GOOGLE_CLIENT_SECRET,
       redirect_uri: env.GOOGLE_CALLBACK_URL,
-      grant_type: "authorization_code",
-    }).toString(),
-  });
+      grant_type: 'authorization_code'
+    }).toString()
+  })
 
-  const tokenData = (await tokenResponse.json()) as GoogleTokenResponse;
+  const tokenData = (await tokenResponse.json()) as GoogleTokenResponse
 
   if (!tokenResponse.ok || !tokenData.access_token) {
-    throw new Error("No se pudo validar la autenticación con Google");
+    throw new Error('No se pudo validar la autenticación con Google')
   }
 
-  const userInfoResponse = await fetch(
-    "https://www.googleapis.com/oauth2/v2/userinfo",
-    {
-      headers: {
-        Authorization: `Bearer ${tokenData.access_token}`,
-      },
-    },
-  );
+  const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+    headers: {
+      Authorization: `Bearer ${tokenData.access_token}`
+    }
+  })
 
-  const googleUser = (await userInfoResponse.json()) as GoogleUserInfoResponse;
+  const googleUser = (await userInfoResponse.json()) as GoogleUserInfoResponse
 
   if (!userInfoResponse.ok) {
-    throw new Error("No se pudo obtener la información de la cuenta de Google");
+    throw new Error('No se pudo obtener la información de la cuenta de Google')
   }
 
-  const correo = googleUser.email?.trim().toLowerCase();
+  const correo = googleUser.email?.trim().toLowerCase()
 
   if (!correo || googleUser.verified_email === false) {
-    throw new Error("Google no devolvió un correo válido");
+    throw new Error('Google no devolvió un correo válido')
   }
 
-  const user = await findUserByCorreo(correo);
+  const user = await findUserByCorreo(correo)
 
   if (!user) {
-    throw new AuthError(
-      "Esta cuenta de Google no está registrada. Regístrate primero.",
-      404,
-    );
+    throw new AuthError('Esta cuenta de Google no está registrada. Regístrate primero.', 404)
   }
 
   const jwtPayload: JwtPayload = {
     id: user.id,
-    correo: user.correo,
-  };
+    correo: user.correo
+  }
 
-  const token = generateToken(jwtPayload);
-  const fechaExpiracion = new Date(Date.now() + 60 * 60 * 1000);
+  const token = generateToken(jwtPayload)
+  const fechaExpiracion = new Date(Date.now() + 60 * 60 * 1000)
 
   await createSession({
     token,
     usuarioId: user.id,
-    fechaExpiracion,
-  });
+    fechaExpiracion
+  })
 
   return {
     user: {
       id: user.id,
       correo: user.correo,
       nombre: user.nombre,
-      apellido: user.apellido,
+      apellido: user.apellido
     },
-    token,
-  };
-};
+    token
+  }
+}

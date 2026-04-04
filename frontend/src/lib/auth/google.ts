@@ -5,9 +5,9 @@ export type GoogleSignupPrefill = {
   fullName?: string
 }
 
-export type GoogleSignupMissingField = "email" | "firstName" | "lastName";
+export type GoogleSignupMissingField = 'email' | 'firstName' | 'lastName'
 
-const GOOGLE_SIGNUP_PREFILL_KEY = "propbol_google_signup_prefill";
+const GOOGLE_SIGNUP_PREFILL_KEY = 'propbol_google_signup_prefill'
 
 type GoogleCredentialPayload = {
   email?: string
@@ -155,46 +155,44 @@ export function buildGoogleSignupPrefillFromSearchParams(
 }
 
 export function getMissingGoogleSignupFields(
-  data: Partial<GoogleSignupPrefill> | null | undefined,
+  data: Partial<GoogleSignupPrefill> | null | undefined
 ): GoogleSignupMissingField[] {
   if (!data) {
-    return [];
+    return []
   }
 
-  const missingFields: GoogleSignupMissingField[] = [];
+  const missingFields: GoogleSignupMissingField[] = []
 
   if (!data.email?.trim()) {
-    missingFields.push("email");
+    missingFields.push('email')
   }
 
   if (!data.firstName?.trim()) {
-    missingFields.push("firstName");
+    missingFields.push('firstName')
   }
 
   if (!data.lastName?.trim()) {
-    missingFields.push("lastName");
+    missingFields.push('lastName')
   }
 
-  return missingFields;
+  return missingFields
 }
 
-export function extractGooglePrefillValidationFromCredential(
-  credential: string,
-): {
-  prefill: GoogleSignupPrefill | null;
-  missingFields: GoogleSignupMissingField[];
+export function extractGooglePrefillValidationFromCredential(credential: string): {
+  prefill: GoogleSignupPrefill | null
+  missingFields: GoogleSignupMissingField[]
 } {
-  const prefill = extractGooglePrefillFromCredential(credential);
+  const prefill = extractGooglePrefillFromCredential(credential)
 
   if (!prefill) {
     return {
       prefill: null,
-      missingFields: [],
-    };
+      missingFields: []
+    }
   }
 
   return {
     prefill,
-    missingFields: getMissingGoogleSignupFields(prefill),
-  };
+    missingFields: getMissingGoogleSignupFields(prefill)
+  }
 }

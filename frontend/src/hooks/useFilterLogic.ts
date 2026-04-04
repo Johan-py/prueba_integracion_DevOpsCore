@@ -23,14 +23,10 @@ export const useFilterLogic = <T extends FilterItem>(
       if (sortBy === 'name') {
         const nameA = a?.name ?? ''
         const nameB = b?.name ?? ''
-        return globalSortOrder === 'asc' 
-          ? nameA.localeCompare(nameB) 
-          : nameB.localeCompare(nameA)
+        return globalSortOrder === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA)
       } else {
         // Ordenar por Cantidad (count)
-        return globalSortOrder === 'asc' 
-          ? a.count - b.count 
-          : b.count - a.count
+        return globalSortOrder === 'asc' ? a.count - b.count : b.count - a.count
       }
     })
 

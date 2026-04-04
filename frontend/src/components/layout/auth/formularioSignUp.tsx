@@ -1,50 +1,42 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  Eye,
-  EyeOff,
-  Mail,
-  User,
-  Phone,
-  Lock,
-  AlertCircle,
-} from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { validateEmail, validatePassword } from "@/lib/validators/auth";
-import GoogleRegisterButton from "@/components/layout/auth/google/GoogleRegisterButton";
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Eye, EyeOff, Mail, User, Phone, Lock, AlertCircle } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { validateEmail, validatePassword } from '@/lib/validators/auth'
+import GoogleRegisterButton from '@/components/layout/auth/google/GoogleRegisterButton'
 import {
   consumeGoogleSignupPrefill,
   extractGooglePrefillValidationFromCredential,
   getMissingGoogleSignupFields,
-  type GoogleSignupMissingField,
-} from "@/lib/auth/google";
+  type GoogleSignupMissingField
+} from '@/lib/auth/google'
 
 type FormData = {
-  email: string;
-  firstName: string;
-  lastName: string;
-  phone: string;
-  password: string;
-  confirmPassword: string;
-};
+  email: string
+  firstName: string
+  lastName: string
+  phone: string
+  password: string
+  confirmPassword: string
+}
 
 type FormErrors = {
-  email?: string;
-  firstName?: string;
-  lastName?: string;
-  phone?: string;
-  password?: string;
-  confirmPassword?: string;
-};
+  email?: string
+  firstName?: string
+  lastName?: string
+  phone?: string
+  password?: string
+  confirmPassword?: string
+}
 
 interface RegisterResponse {
-  message: string;
-  verificationToken?: string;
-  email?: string;
-  requiresEmailVerification?: boolean;
-  expiresInMinutes?: number;
+  message: string
+  verificationToken?: string
+  email?: string
+  requiresEmailVerification?: boolean
+  expiresInMinutes?: number
 }
 
 const MAX_NAME_LENGTH = 30
@@ -59,44 +51,36 @@ const initialFormData: FormData = {
   confirmPassword: ''
 }
 
-function buildGoogleMissingFieldsMessage(
-  missingFields: GoogleSignupMissingField[],
-) {
+function buildGoogleMissingFieldsMessage(missingFields: GoogleSignupMissingField[]) {
   if (missingFields.length === 0) {
-    return "";
+    return ''
   }
 
   const labels: Record<GoogleSignupMissingField, string> = {
-    email: "el correo electrónico",
-    firstName: "el nombre",
-    lastName: "el apellido",
-  };
+    email: 'el correo electrónico',
+    firstName: 'el nombre',
+    lastName: 'el apellido'
+  }
 
   if (missingFields.length === 1) {
-    return `Google no devolvió ${labels[missingFields[0]]} de la cuenta.`;
+    return `Google no devolvió ${labels[missingFields[0]]} de la cuenta.`
   }
 
   if (missingFields.length === 2) {
-    return `Google no devolvió ${labels[missingFields[0]]} ni ${labels[missingFields[1]]} de la cuenta.`;
+    return `Google no devolvió ${labels[missingFields[0]]} ni ${labels[missingFields[1]]} de la cuenta.`
   }
 
-  return "Google no devolvió el correo electrónico, el nombre ni el apellido de la cuenta.";
+  return 'Google no devolvió el correo electrónico, el nombre ni el apellido de la cuenta.'
 }
 
 function buildGoogleFieldErrors(
-  missingFields: GoogleSignupMissingField[],
-): Pick<FormErrors, "email" | "firstName" | "lastName"> {
+  missingFields: GoogleSignupMissingField[]
+): Pick<FormErrors, 'email' | 'firstName' | 'lastName'> {
   return {
-    email: missingFields.includes("email")
-      ? "Google no devolvió el correo electrónico"
-      : undefined,
-    firstName: missingFields.includes("firstName")
-      ? "Google no devolvió el nombre"
-      : undefined,
-    lastName: missingFields.includes("lastName")
-      ? "Google no devolvió el apellido"
-      : undefined,
-  };
+    email: missingFields.includes('email') ? 'Google no devolvió el correo electrónico' : undefined,
+    firstName: missingFields.includes('firstName') ? 'Google no devolvió el nombre' : undefined,
+    lastName: missingFields.includes('lastName') ? 'Google no devolvió el apellido' : undefined
+  }
 }
 
 function getInputClasses(hasError?: boolean, hasRightIcon?: boolean) {
@@ -159,7 +143,7 @@ export default function SignUpForm() {
       return
     }
 
-    const missingFields = getMissingGoogleSignupFields(googlePrefill);
+    const missingFields = getMissingGoogleSignupFields(googlePrefill)
 
     setFormData((prev) => ({
       ...prev,
@@ -170,18 +154,18 @@ export default function SignUpForm() {
 
     setErrors((prev) => ({
       ...prev,
-      ...buildGoogleFieldErrors(missingFields),
-    }));
+      ...buildGoogleFieldErrors(missingFields)
+    }))
 
     setTouched((prev) => ({
       ...prev,
-      email: missingFields.includes("email"),
-      firstName: missingFields.includes("firstName"),
-      lastName: missingFields.includes("lastName"),
-    }));
+      email: missingFields.includes('email'),
+      firstName: missingFields.includes('firstName'),
+      lastName: missingFields.includes('lastName')
+    }))
 
-    setServerError(buildGoogleMissingFieldsMessage(missingFields));
-  }, []);
+    setServerError(buildGoogleMissingFieldsMessage(missingFields))
+  }, [])
 
   const validateFirstName = (value: string) => {
     const trimmed = value.trim()
@@ -432,21 +416,18 @@ export default function SignUpForm() {
       }
 
       if (!data?.verificationToken || !data?.email) {
-        throw new Error("No se recibió la verificación del registro");
+        throw new Error('No se recibió la verificación del registro')
       }
 
-      sessionStorage.setItem("pendingRegisterToken", data.verificationToken);
+      sessionStorage.setItem('pendingRegisterToken', data.verificationToken)
+      sessionStorage.setItem('pendingRegisterPassword', formData.password.trim())
+      sessionStorage.setItem('pendingRegisterEmail', data.email)
       sessionStorage.setItem(
-        "pendingRegisterPassword",
-        formData.password.trim(),
-      );
-      sessionStorage.setItem("pendingRegisterEmail", data.email);
-      sessionStorage.setItem(
-        "register_success_message",
-        data.message || "Te enviamos un código de verificación a tu correo.",
-      );
+        'register_success_message',
+        data.message || 'Te enviamos un código de verificación a tu correo.'
+      )
 
-      router.replace("/verify-email");
+      router.replace('/verify-email')
     } catch (error) {
       const message =
         error instanceof TypeError
@@ -466,7 +447,7 @@ export default function SignUpForm() {
     setServerError('')
 
     const { prefill: googlePrefill, missingFields } =
-      extractGooglePrefillValidationFromCredential(credential);
+      extractGooglePrefillValidationFromCredential(credential)
 
     if (!googlePrefill) {
       setServerError('No se pudieron obtener los datos de la cuenta de Google.')
@@ -482,18 +463,18 @@ export default function SignUpForm() {
 
     setErrors((prev) => ({
       ...prev,
-      ...buildGoogleFieldErrors(missingFields),
-    }));
+      ...buildGoogleFieldErrors(missingFields)
+    }))
 
     setTouched((prev) => ({
       ...prev,
-      email: missingFields.includes("email"),
-      firstName: missingFields.includes("firstName"),
-      lastName: missingFields.includes("lastName"),
-    }));
+      email: missingFields.includes('email'),
+      firstName: missingFields.includes('firstName'),
+      lastName: missingFields.includes('lastName')
+    }))
 
-    setServerError(buildGoogleMissingFieldsMessage(missingFields));
-  }, []);
+    setServerError(buildGoogleMissingFieldsMessage(missingFields))
+  }, [])
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#f5f5f4] px-4 py-8">
