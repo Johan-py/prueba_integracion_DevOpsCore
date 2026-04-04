@@ -16,7 +16,6 @@ function BusquedaContent() {
     </div>
   )
 }
-
 export default function BusquedaPage() {
   return (
     // El Suspense debe ser lo único que devuelva el export default

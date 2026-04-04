@@ -49,7 +49,6 @@ function BusquedaMapaContent() {
           console.log("🔍 Buscando con filtros:", nuevosFiltros);
         }} 
       />
-
       <main className="flex flex-1 overflow-hidden relative">
         <aside
           className={`bg-white border-r border-stone-200 flex flex-col z-10 transition-all duration-300 ${
