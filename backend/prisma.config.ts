@@ -11,9 +11,15 @@ export default defineConfig({
     seed: "bun ./prisma/seed.ts",
   },
   datasource: {
+<<<<<<< HEAD
     url: process.env.DATABASE_URL
   }
 })
   
     
 
+=======
+    url: process.env.DATABASE_URL,
+  },
+});
+>>>>>>> b68a39aab8d9cda89a4ae3b8e3d1069c14f8933f

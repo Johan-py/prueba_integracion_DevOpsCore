@@ -12,9 +12,10 @@ export const TarjetaInmueble = ({ inmueble }: TarjetaInmuebleProps) => {
     maximumFractionDigits: 0
   })
 
-  const ubicacionTexto = typeof inmueble.ubicacion === 'object' && inmueble.ubicacion !== null
-    ? `${inmueble.ubicacion.zona ?? ''}, ${inmueble.ubicacion.ciudad ?? ''}`
-    : ''
+  const ubicacionTexto =
+    typeof inmueble.ubicacion === 'object' && inmueble.ubicacion !== null
+      ? `${inmueble.ubicacion.zona ?? ''}, ${inmueble.ubicacion.ciudad ?? ''}`
+      : ''
 
   return (
     <div className="group flex flex-col w-full bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300">
@@ -37,7 +38,7 @@ export const TarjetaInmueble = ({ inmueble }: TarjetaInmuebleProps) => {
           <h3 className="font-semibold text-lg text-gray-900 leading-tight line-clamp-1">
             {inmueble.titulo}
           </h3>
-          <span className="text-lg font-bold text-gray-900 whitespace-nowrap ml-2">
+          <span className="text-xs font-bold text-gray-900 whitespace-nowrap ml-2">
             {formatoMoneda.format(Number(inmueble.precio))}
           </span>
         </div>

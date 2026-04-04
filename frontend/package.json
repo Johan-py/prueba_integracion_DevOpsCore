@@ -13,6 +13,7 @@
     "@prisma/adapter-pg": "^7.6.0",
     "@prisma/client": "^7.6.0",
     "clsx": "^2.1.0",
+    "express-validator": "^7.3.2",
     "framer-motion": "^11.0.3",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.330.0",

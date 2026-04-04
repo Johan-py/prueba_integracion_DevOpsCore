@@ -1,15 +1,12 @@
 'use client'
 
-
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { ChevronDown, Check } from 'lucide-react'
-
 
 export interface DropdownOption<T extends string = string> {
   label: string
   value: T
 }
-
 
 interface DropdownOrdenProps<T extends string = string> {
   options: DropdownOption<T>[]
@@ -19,7 +16,6 @@ interface DropdownOrdenProps<T extends string = string> {
   placeholder?: string
   className?: string
 }
-
 
 /**
  * Componente Dropdown reutilizable para ordenamiento.
@@ -43,10 +39,8 @@ export const DropdownOrden = <T extends string = string>({
   const [internalValue, setInternalValue] = useState<T | undefined>(defaultValue)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
-
   // Usar valor controlado o interno
   const currentValue = value !== undefined ? value : internalValue
-
 
   // Cerrar al hacer clic fuera
   useEffect(() => {
@@ -58,7 +52,6 @@ export const DropdownOrden = <T extends string = string>({
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
-
 
   // Cerrar con tecla Escape
   useEffect(() => {
@@ -73,17 +66,17 @@ export const DropdownOrden = <T extends string = string>({
     }
   }, [isOpen])
 
-
-  const handleSelect = useCallback((optionValue: T) => {
-    setInternalValue(optionValue)
-    onChange(optionValue)
-    setIsOpen(false)
-  }, [onChange])
-
+  const handleSelect = useCallback(
+    (optionValue: T) => {
+      setInternalValue(optionValue)
+      onChange(optionValue)
+      setIsOpen(false)
+    },
+    [onChange]
+  )
 
   const selectedOption = options.find((opt) => opt.value === currentValue)
   const hasSelection = selectedOption !== undefined
-
 
   return (
     <div className={`relative inline-block w-full text-left ${className}`} ref={dropdownRef}>
@@ -103,9 +96,7 @@ export const DropdownOrden = <T extends string = string>({
           ${hasSelection ? 'text-gray-900' : 'text-gray-500'}
         `}
       >
-        <span className="truncate">
-          {hasSelection ? selectedOption.label : placeholder}
-        </span>
+        <span className="truncate">{hasSelection ? selectedOption.label : placeholder}</span>
         <ChevronDown
           className={`h-4 w-4 flex-shrink-0 transition-transform duration-200
             ${isOpen ? 'rotate-180' : ''}
@@ -114,7 +105,6 @@ export const DropdownOrden = <T extends string = string>({
           aria-hidden="true"
         />
       </button>
-
 
       {/* Dropdown Menu */}
       {isOpen && (
@@ -140,18 +130,16 @@ export const DropdownOrden = <T extends string = string>({
                     flex w-full items-center justify-between
                     px-4 py-2.5 text-sm text-left
                     transition-colors duration-150
-                    ${isSelected
-                      ? 'bg-orange-500 text-white font-semibold'
-                      : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'
+                    ${
+                      isSelected
+                        ? 'bg-orange-500 text-white font-semibold'
+                        : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'
                     }
                   `}
                 >
                   <span>{option.label}</span>
                   {isSelected && (
-                    <Check
-                      className="h-4 w-4 text-white ml-2 flex-shrink-0"
-                      strokeWidth={2.5}
-                    />
+                    <Check className="h-4 w-4 text-white ml-2 flex-shrink-0" strokeWidth={2.5} />
                   )}
                 </button>
               )

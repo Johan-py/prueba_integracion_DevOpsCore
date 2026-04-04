@@ -1,34 +1,56 @@
-// 1. Importamos $Enums (con el signo $) desde el cliente generado
-import { $Enums } from "@prisma/client";
-import prisma from "../../config/prisma.js";
+import { $Enums, Prisma } from '@prisma/client'
+import { prisma } from '../../db'
 
 export class FiltersHomepageRepository {
-  // 2. Usamos $Enums.TipoAccion para el tipado
   async getCountsByCity(tipoAccion: $Enums.TipoAccion) {
-    return await prisma.ubicacionInmueble.groupBy({
-      by: ["ciudad"],
+    const groups = await prisma.ubicacion_maestra.groupBy({
+      by: ['departamento'],
       where: {
-        inmueble: {
-          tipoAccion: tipoAccion,
-          // 3. Usamos $Enums.EstadoInmueble para el valor
-          estado: $Enums.EstadoInmueble.ACTIVO,
-        },
-      },
-      _count: {
-        id: true,
-      },
-    });
+        ubicacion_inmueble: {
+          some: {
+            inmueble: {
+              tipoAccion: tipoAccion,
+              estado: $Enums.EstadoInmueble.ACTIVO
+            }
+          }
+        }
+      }
+    })
+
+    const counts = await Promise.all(
+      groups.map(async (g) => {
+        const total = await prisma.ubicacionInmueble.count({
+          where: {
+            ubicacion_maestra: {
+              departamento: g.departamento
+            },
+            inmueble: {
+              tipoAccion: tipoAccion,
+              estado: $Enums.EstadoInmueble.ACTIVO
+            }
+          }
+        })
+
+        return {
+          departamento: g.departamento,
+          count: total
+        }
+      })
+    )
+
+    return counts.sort((a, b) => b.count - a.count)
   }
 
   async getCountsByCategoria() {
     return await prisma.inmueble.groupBy({
-      by: ["categoria"],
+      by: ['categoria'],
       where: {
         estado: $Enums.EstadoInmueble.ACTIVO,
+        categoria: { not: null }
       },
       _count: {
-        id: true,
-      },
-    });
+        id: true
+      }
+    })
   }
 }

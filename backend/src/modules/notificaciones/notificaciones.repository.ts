@@ -1,163 +1,187 @@
-import { prisma } from "../../lib/prisma.js";
+import { prisma } from '../../db'
 
-type SupportedNotificationFilter = "todas" | "leida" | "no leida";
+type SupportedNotificationFilter = 'todas' | 'leida' | 'no leida'
 
 type FindNotificationsParams = {
-  usuarioId: number;
-  filter: SupportedNotificationFilter;
-  limit: number;
-  offset: number;
-};
+  usuarioId: number
+  filter: SupportedNotificationFilter
+  limit: number
+  offset: number
+}
 
 type CountNotificationsParams = {
-  usuarioId: number;
-  filter: SupportedNotificationFilter;
-};
+  usuarioId: number
+  filter: SupportedNotificationFilter
+}
 
 type FindNotificationByIdParams = {
-  id: number;
-  usuarioId: number;
-};
+  id: number
+  usuarioId: number
+}
 
 type MarkNotificationAsReadParams = {
-  id: number;
-  usuarioId: number;
-  fechaLectura: Date;
-};
+  id: number
+  usuarioId: number
+  fechaLectura: Date
+}
 
 type MarkAllNotificationsAsReadParams = {
-  usuarioId: number;
-  fechaLectura: Date;
-};
+  usuarioId: number
+  fechaLectura: Date
+}
 
 type SoftDeleteNotificationParams = {
-  id: number;
-  usuarioId: number;
-};
+  id: number
+  usuarioId: number
+}
+
+type CreateNotificationParams = {
+  usuarioId: number
+  titulo: string
+  mensaje: string
+}
 
 const buildWhereClause = ({
   usuarioId,
-  filter,
+  filter
 }: {
-  usuarioId: number;
-  filter: SupportedNotificationFilter;
+  usuarioId: number
+  filter: SupportedNotificationFilter
 }) => {
   const where: {
-    usuarioId: number;
-    eliminada: boolean;
-    leida?: boolean;
+    usuarioId: number
+    eliminada: boolean
+    leida?: boolean
   } = {
     usuarioId,
-    eliminada: false,
-  };
-
-  if (filter === "leida") {
-    where.leida = true;
+    eliminada: false
   }
 
-  if (filter === "no leida") {
-    where.leida = false;
+  if (filter === 'leida') {
+    where.leida = true
   }
 
-  return where;
-};
+  if (filter === 'no leida') {
+    where.leida = false
+  }
+
+  return where
+}
 
 export const findNotificationsByUserRepository = async ({
   usuarioId,
   filter,
   limit,
-  offset,
+  offset
 }: FindNotificationsParams) => {
   return prisma.notificacion.findMany({
     where: buildWhereClause({ usuarioId, filter }),
     orderBy: {
-      fechaCreacion: "desc",
+      fechaCreacion: 'desc'
     },
     take: limit,
-    skip: offset,
-  });
-};
+    skip: offset
+  })
+}
 
 export const countNotificationsByUserRepository = async ({
   usuarioId,
-  filter,
+  filter
 }: CountNotificationsParams) => {
   return prisma.notificacion.count({
-    where: buildWhereClause({ usuarioId, filter }),
-  });
-};
+    where: buildWhereClause({ usuarioId, filter })
+  })
+}
 
 export const countUnreadNotificationsRepository = async (usuarioId: number) => {
   return prisma.notificacion.count({
     where: {
       usuarioId,
       eliminada: false,
-      leida: false,
-    },
-  });
-};
+      leida: false
+    }
+  })
+}
 
 export const findNotificationByIdRepository = async ({
   id,
-  usuarioId,
+  usuarioId
 }: FindNotificationByIdParams) => {
   return prisma.notificacion.findFirst({
     where: {
       id,
       usuarioId,
+      eliminada: false
+    }
+  })
+}
+
+export const createNotificationRepository = async ({
+  usuarioId,
+  titulo,
+  mensaje
+}: CreateNotificationParams) => {
+  return prisma.notificacion.create({
+    data: {
+      usuarioId,
+      titulo,
+      mensaje,
+      leida: false,
       eliminada: false,
-    },
-  });
-};
+      fechaCreacion: new Date(),
+      fechaLectura: null
+    }
+  })
+}
 
 export const markNotificationAsReadRepository = async ({
   id,
   usuarioId,
-  fechaLectura,
+  fechaLectura
 }: MarkNotificationAsReadParams) => {
   return prisma.notificacion.updateMany({
     where: {
       id,
       usuarioId,
       eliminada: false,
-      leida: false,
+      leida: false
     },
     data: {
       leida: true,
-      fechaLectura,
-    },
-  });
-};
+      fechaLectura
+    }
+  })
+}
 
 export const markAllNotificationsAsReadRepository = async ({
   usuarioId,
-  fechaLectura,
+  fechaLectura
 }: MarkAllNotificationsAsReadParams) => {
   return prisma.notificacion.updateMany({
     where: {
       usuarioId,
       eliminada: false,
-      leida: false,
+      leida: false
     },
     data: {
       leida: true,
-      fechaLectura,
-    },
-  });
-};
+      fechaLectura
+    }
+  })
+}
 
 export const softDeleteNotificationRepository = async ({
   id,
-  usuarioId,
+  usuarioId
 }: SoftDeleteNotificationParams) => {
   return prisma.notificacion.updateMany({
     where: {
       id,
       usuarioId,
-      eliminada: false,
+      eliminada: false
     },
     data: {
-      eliminada: true,
-    },
-  });
-};
+      eliminada: true
+    }
+  })
+}
