@@ -9,6 +9,7 @@ import {
   editarTelefonos
 } from './perfil.controller.js'
 import { validarJWT } from '../../middleware/validarJWT.js'
+import { upload } from '../../middleware/upload.js'
 
 const router = Router()
 
@@ -51,7 +52,7 @@ PUT http://localhost:5000/api/perfil/usuario/foto-perfil
   "fotoPerfil": "https://example.com/nueva-foto.jpg"
 }
 */
-router.put('/foto-perfil', validarJWT, editarFotoPerfil)
+router.put('/foto-perfil', validarJWT, upload.single('foto'), editarFotoPerfil)
 /*
 PUT http://localhost:5000/api/perfil/usuario/telefonos
 {

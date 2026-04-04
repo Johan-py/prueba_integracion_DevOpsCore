@@ -197,19 +197,27 @@ export const editarDireccion = async (req: AuthRequest, res: Response) => {
 export const editarFotoPerfil = async (req: AuthRequest, res: Response) => {
   try {
     const usuarioId = req.usuario?.id
-    const { fotoPerfil } = req.body
 
     if (!usuarioId) {
       return res.status(401).json({ ok: false, msg: 'No hay token válido' })
     }
 
-    if (!fotoPerfil) {
-      return res.status(400).json({ ok: false, msg: 'La URL de la foto es requerida' })
+    // Verificar si se subió un archivo
+    if (!req.file) {
+      return res.status(400).json({
+        ok: false,
+        msg: 'No se ha subido ninguna imagen'
+      })
     }
 
+    // Construir la URL para acceder a la imagen
+    const baseUrl = `${req.protocol}://${req.get('host')}`
+    const fotoUrl = `${baseUrl}/uploads/avatars/${req.file.filename}`
+
+    // Actualizar el usuario con la URL de la foto
     const usuarioActualizado = await prisma.usuario.update({
       where: { id: usuarioId },
-      data: { avatar: fotoPerfil }
+      data: { avatar: fotoUrl }
     })
 
     return res.json({
@@ -218,10 +226,10 @@ export const editarFotoPerfil = async (req: AuthRequest, res: Response) => {
       fotoPerfil: usuarioActualizado.avatar
     })
   } catch (error) {
-    console.error('Error en editarFotoPerfil:', error)
+    console.error('Error en subirFotoPerfil:', error)
     return res.status(500).json({
       ok: false,
-      msg: 'Error al editar la foto de perfil'
+      msg: 'Error al subir la foto de perfil'
     })
   }
 }
