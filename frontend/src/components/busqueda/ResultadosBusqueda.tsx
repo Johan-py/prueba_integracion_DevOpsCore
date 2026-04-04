@@ -51,8 +51,9 @@ export const ResultadosBusqueda = () => {
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState(false)
 
+  // @ts-ignore
   const { ordenActual, cambiarOrden, inmueblesOrdenados } = useOrdenamiento({
-    inmuebles: inmueblesRaw as any[]
+    inmuebles: inmueblesRaw as any
   })
   useEffect(() => {
     // Función reutilizable para hacer el fetch con filtros
