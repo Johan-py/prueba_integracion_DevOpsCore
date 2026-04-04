@@ -1,75 +1,75 @@
 'use client'
 
-import React, { useState, useEffect } from "react";
-import { Plus, Trash2, Pencil } from 'lucide-react';
-import SecurityModal from "./SecurityModal";
-import OtpModal from "./OtpModal";
+import React, { useState, useEffect } from 'react'
+import { Plus, Trash2, Pencil } from 'lucide-react'
+import SecurityModal from './SecurityModal'
+import OtpModal from './OtpModal'
 
 interface Telefono {
-  id: number;
-  numero: string;
-  pais: string;
-  codigo: string;
+  id: number
+  numero: string
+  pais: string
+  codigo: string
 }
 
 const PAISES = [
   { nombre: 'Bolivia', codigo: '+591', flag: '🇧🇴' },
   { nombre: 'Argentina', codigo: '+54', flag: '🇦🇷' },
   { nombre: 'Chile', codigo: '+56', flag: '🇨🇱' },
-  { nombre: 'Perú', codigo: '+51', flag: '🇵🇪' },
-];
+  { nombre: 'Perú', codigo: '+51', flag: '🇵🇪' }
+]
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
 
 export default function ProfileCard() {
-  const [campoEditando, setCampoEditando] = useState<string | null>(null);
+  const [campoEditando, setCampoEditando] = useState<string | null>(null)
 
-  const [nombre, setNombre] = useState("Condesa");
-  const [pais, setPais] = useState("");
-  const [genero, setGenero] = useState("");
-  const [direccion, setDireccion] = useState("");
+  const [nombre, setNombre] = useState('Condesa')
+  const [pais, setPais] = useState('')
+  const [genero, setGenero] = useState('')
+  const [direccion, setDireccion] = useState('')
 
   const soloLetras = (value: string) => {
-    return value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
-  };
+    return value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')
+  }
 
   // ========== FUNCIONALIDAD DE EMAIL CON OTP ==========
-  const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false);
-  const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
-  const [isEmailEditable, setIsEmailEditable] = useState(false);
-  const [originalEmail, setOriginalEmail] = useState("perfil1@gmail.com");
-  const [tempEmail, setTempEmail] = useState("perfil1@gmail.com");
-  const [otpError, setOtpError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [emailToUpdate, setEmailToUpdate] = useState(""); // Email nuevo a guardar
+  const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false)
+  const [isOtpModalOpen, setIsOtpModalOpen] = useState(false)
+  const [isEmailEditable, setIsEmailEditable] = useState(false)
+  const [originalEmail, setOriginalEmail] = useState('perfil1@gmail.com')
+  const [tempEmail, setTempEmail] = useState('perfil1@gmail.com')
+  const [otpError, setOtpError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [emailToUpdate, setEmailToUpdate] = useState('') // Email nuevo a guardar
 
   // Cargar datos del usuario desde localStorage
   useEffect(() => {
-    const email = localStorage.getItem('correo');
-    const nombreStorage = localStorage.getItem('nombre');
+    const email = localStorage.getItem('correo')
+    const nombreStorage = localStorage.getItem('nombre')
     if (email) {
-      setOriginalEmail(email);
-      setTempEmail(email);
+      setOriginalEmail(email)
+      setTempEmail(email)
     }
     if (nombreStorage) {
-      setNombre(nombreStorage);
+      setNombre(nombreStorage)
     }
-  }, []);
+  }, [])
 
-  const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const hasEmailChanged = tempEmail !== originalEmail && isValidEmail(tempEmail);
+  const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  const hasEmailChanged = tempEmail !== originalEmail && isValidEmail(tempEmail)
 
   // Obtener token
-  const getToken = () => localStorage.getItem('token');
+  const getToken = () => localStorage.getItem('token')
 
   // PASO 1: Verificar contraseña al hacer clic en el lápiz
   const handlePasswordSubmit = async (passwordActual: string) => {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
-      const token = getToken();
+      const token = getToken()
 
       if (!token) {
-        throw new Error("No hay sesión activa. Inicia sesión nuevamente.");
+        throw new Error('No hay sesión activa. Inicia sesión nuevamente.')
       }
 
       // Verificar contraseña
@@ -77,221 +77,265 @@ export default function ProfileCard() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({ passwordActual })
-      });
+      })
 
       if (!verifyRes.ok) {
-        const errorData = await verifyRes.json().catch(() => ({ msg: 'Error al verificar contraseña' }));
-        throw new Error(errorData.msg || 'Error al verificar contraseña');
+        const errorData = await verifyRes
+          .json()
+          .catch(() => ({ msg: 'Error al verificar contraseña' }))
+        throw new Error(errorData.msg || 'Error al verificar contraseña')
       }
 
-      const verifyData = await verifyRes.json();
+      const verifyData = await verifyRes.json()
 
       if (!verifyData.ok) {
-        throw new Error(verifyData.msg);
+        throw new Error(verifyData.msg)
       }
 
       // Contraseña correcta: habilitar edición de email
-      setIsSecurityModalOpen(false);
-      setIsEmailEditable(true);
-      setTempEmail(originalEmail); // Reset al valor original por si acaso
-
+      setIsSecurityModalOpen(false)
+      setIsEmailEditable(true)
+      setTempEmail(originalEmail) // Reset al valor original por si acaso
     } catch (error: any) {
-      console.error("Error:", error);
-      alert(error.message || "Contraseña incorrecta");
+      console.error('Error:', error)
+      alert(error.message || 'Contraseña incorrecta')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   // PASO 2: Solicitar cambio de email (envía OTP) - se llama al guardar
   const solicitarCambioEmail = async (nuevoEmail: string) => {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
-      const token = getToken();
+      const token = getToken()
 
       const solicitarRes = await fetch(`${API_URL}/api/perfil/solicitar-cambio-email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({ emailNuevo: nuevoEmail })
-      });
+      })
 
       if (!solicitarRes.ok) {
-        const errorData = await solicitarRes.json().catch(() => ({ msg: 'Error al solicitar cambio' }));
-        throw new Error(errorData.msg || 'Error al solicitar cambio de email');
+        const errorData = await solicitarRes
+          .json()
+          .catch(() => ({ msg: 'Error al solicitar cambio' }))
+        throw new Error(errorData.msg || 'Error al solicitar cambio de email')
       }
 
-      const solicitarData = await solicitarRes.json();
+      const solicitarData = await solicitarRes.json()
 
       if (!solicitarData.ok) {
-        throw new Error(solicitarData.msg);
+        throw new Error(solicitarData.msg)
       }
 
       // Guardar email que se va a actualizar
-      setEmailToUpdate(nuevoEmail);
+      setEmailToUpdate(nuevoEmail)
 
       // Abrir modal OTP
-      setIsOtpModalOpen(true);
-      setOtpError("");
-
+      setIsOtpModalOpen(true)
+      setOtpError('')
     } catch (error: any) {
-      console.error("Error:", error);
-      alert(error.message || "Error al solicitar cambio de email");
+      console.error('Error:', error)
+      alert(error.message || 'Error al solicitar cambio de email')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   // PASO 3: Confirmar OTP y actualizar email
   const handleOtpSubmit = async (otp: string) => {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
-      const token = getToken();
+      const token = getToken()
 
       const response = await fetch(`${API_URL}/api/perfil/confirmar-cambio-email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({ otp })
-      });
+      })
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ msg: 'Error al confirmar código' }));
-        throw new Error(errorData.msg || 'Error al confirmar código');
+        const errorData = await response.json().catch(() => ({ msg: 'Error al confirmar código' }))
+        throw new Error(errorData.msg || 'Error al confirmar código')
       }
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (!data.ok) {
-        throw new Error(data.msg);
+        throw new Error(data.msg)
       }
 
       // Actualizar email en localStorage y estado
-      localStorage.setItem('correo', emailToUpdate);
-      setOriginalEmail(emailToUpdate);
-      setTempEmail(emailToUpdate);
-      setIsEmailEditable(false);
-      setIsOtpModalOpen(false);
-      setEmailToUpdate("");
-      setOtpError("");
-      alert("Correo actualizado exitosamente");
-
+      localStorage.setItem('correo', emailToUpdate)
+      setOriginalEmail(emailToUpdate)
+      setTempEmail(emailToUpdate)
+      setIsEmailEditable(false)
+      setIsOtpModalOpen(false)
+      setEmailToUpdate('')
+      setOtpError('')
+      alert('Correo actualizado exitosamente')
     } catch (error: any) {
-      console.error("Error:", error);
-      setOtpError(error.message || "Error al verificar código");
+      console.error('Error:', error)
+      setOtpError(error.message || 'Error al verificar código')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   // Reenviar código
   const handleResendCode = async () => {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
-      const token = getToken();
-      const emailNuevo = emailToUpdate || tempEmail;
+      const token = getToken()
+      const emailNuevo = emailToUpdate || tempEmail
 
       const response = await fetch(`${API_URL}/api/perfil/solicitar-cambio-email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({ emailNuevo })
-      });
+      })
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ msg: 'Error al reenviar código' }));
-        throw new Error(errorData.msg || 'Error al reenviar código');
+        const errorData = await response.json().catch(() => ({ msg: 'Error al reenviar código' }))
+        throw new Error(errorData.msg || 'Error al reenviar código')
       }
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (!data.ok) {
-        throw new Error(data.msg);
+        throw new Error(data.msg)
       }
 
-      setOtpError("");
-      alert("Se ha enviado un nuevo código a tu correo");
-
+      setOtpError('')
+      alert('Se ha enviado un nuevo código a tu correo')
     } catch (error: any) {
-      console.error("Error:", error);
-      setOtpError(error.message || "Error al reenviar código");
+      console.error('Error:', error)
+      setOtpError(error.message || 'Error al reenviar código')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   // Manejar click en guardar cambios
   const handleSaveAll = () => {
     // Si el email está en modo edición y cambió
     if (isEmailEditable && hasEmailChanged) {
-      solicitarCambioEmail(tempEmail);
+      solicitarCambioEmail(tempEmail)
     } else if (isEmailEditable && !hasEmailChanged) {
       // Si no cambió el email, solo salir del modo edición
-      setIsEmailEditable(false);
+      setIsEmailEditable(false)
+    }
+    // Guardar TELÉFONOS si se está editando un teléfono
+    if (campoEditando && campoEditando.startsWith('telefono-')) {
+      guardarTelefonos()
+      setCampoEditando(null)
+      return
     }
 
     // Guardar otros campos (nombre, dirección, etc.)
     if (campoEditando) {
-      setCampoEditando(null);
+      setCampoEditando(null)
       // Aquí puedes agregar la lógica para guardar los demás campos
-      if (campoEditando !== "email") {
-        alert(`${campoEditando} guardado correctamente`);
+      if (campoEditando !== 'email') {
+        alert(`${campoEditando} guardado correctamente`)
       }
     }
-  };
+  }
 
   // Manejar cancelar
   const handleCancelAll = () => {
-    setCampoEditando(null);
-    setNombre(localStorage.getItem('nombre') || "Condesa");
-    setPais("");
-    setGenero("");
-    setDireccion("");
+    setCampoEditando(null)
+    setNombre(localStorage.getItem('nombre') || 'Condesa')
+    setPais('')
+    setGenero('')
+    setDireccion('')
     // Restaurar email original y salir del modo edición
-    setTempEmail(originalEmail);
-    setIsEmailEditable(false);
-  };
+    setTempEmail(originalEmail)
+    setIsEmailEditable(false)
+  }
 
   // Activar edición de email - abre el modal de seguridad primero
   const handleEditEmailClick = () => {
-    setIsSecurityModalOpen(true);
-  };
+    setIsSecurityModalOpen(true)
+  }
 
   // Teléfonos
   const [telefonos, setTelefonos] = useState<Telefono[]>([
     { id: Date.now(), numero: '', pais: 'Bolivia', codigo: '+591' }
-  ]);
+  ])
 
   const agregarTelefono = () => {
     if (telefonos.length < 3) {
-      setTelefonos([...telefonos, { id: Date.now(), numero: '', pais: 'Bolivia', codigo: '+591' }]);
+      setTelefonos([...telefonos, { id: Date.now(), numero: '', pais: 'Bolivia', codigo: '+591' }])
     }
-  };
+  }
 
   const eliminarTelefono = (id: number) => {
     if (telefonos.length > 1) {
-      setTelefonos(telefonos.filter((t) => t.id !== id));
+      setTelefonos(telefonos.filter((t) => t.id !== id))
     }
-  };
+  }
 
   const actualizarTelefono = (id: number, valor: string) => {
-    setTelefonos(telefonos.map((t) =>
-      t.id === id ? { ...t, numero: valor.replace(/\D/g, '') } : t
-    ));
-  };
+    setTelefonos(
+      telefonos.map((t) => (t.id === id ? { ...t, numero: valor.replace(/\D/g, '') } : t))
+    )
+  }
+  const guardarTelefonos = async () => {
+    setIsLoading(true)
+    try {
+      const token = localStorage.getItem('token')
 
+      // Preparamos el cuerpo EXACTAMENTE como lo pide el controlador
+      const body = {
+        telefonos: telefonos
+          .filter((t) => t.numero.trim() !== '') // Evita enviar vacíos
+          .map((t, index) => ({
+            codigoPais: t.codigo, // Tu backend pide 'codigoPais'
+            numero: t.numero, // Tu backend pide 'numero'
+            principal: index === 0 // Define el primero como principal
+          }))
+      }
+
+      const res = await fetch(`${API_URL}/api/perfil/usuario/telefonos`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(body)
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.msg || 'Error al actualizar teléfonos')
+      }
+
+      alert('¡Teléfonos actualizados exitosamente!')
+      setCampoEditando(null) // Cerramos el modo edición
+    } catch (error: any) {
+      console.error('Error en HU4:', error)
+      alert(error.message)
+    } finally {
+      setIsLoading(false)
+    }
+  }
   return (
     <div className="bg-[#fdf6e6] border border-[#e5dfd7] shadow-sm p-8 rounded-xl flex flex-col md:flex-row gap-10 items-center">
-
       {/* PERFIL */}
       <div className="flex flex-col items-center justify-center w-full md:w-1/3">
         <div className="w-28 h-28 rounded-full bg-white border border-gray-300 relative flex items-center justify-center shadow-sm mb-10">
@@ -319,22 +363,24 @@ export default function ProfileCard() {
         <div className="flex flex-col gap-4">
           {/* NOMBRE */}
           <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-            <label className="w-full md:w-40 font-medium text-stone-700">
-              Nombre Completo:
-            </label>
+            <label className="w-full md:w-40 font-medium text-stone-700">Nombre Completo:</label>
             <div className="flex w-full items-center gap-2">
               <input
                 type="text"
-                disabled={campoEditando !== "nombre"}
+                disabled={campoEditando !== 'nombre'}
                 value={nombre}
                 onChange={(e) => setNombre(soloLetras(e.target.value))}
                 className={`flex-1 px-3 py-2 rounded text-sm
-                  ${campoEditando === "nombre"
-                    ? "bg-white border border-amber-500"
-                    : "bg-gray-200 cursor-not-allowed"}
+                  ${
+                    campoEditando === 'nombre'
+                      ? 'bg-white border border-amber-500'
+                      : 'bg-gray-200 cursor-not-allowed'
+                  }
                 `}
               />
-              <button onClick={() => setCampoEditando(campoEditando === "nombre" ? null : "nombre")}>
+              <button
+                onClick={() => setCampoEditando(campoEditando === 'nombre' ? null : 'nombre')}
+              >
                 <Pencil size={16} />
               </button>
             </div>
@@ -348,9 +394,7 @@ export default function ProfileCard() {
                 <input
                   type="email"
                   className={`w-full px-3 py-2 rounded text-sm text-stone-700 
-                    ${isEmailEditable
-                      ? "bg-white border border-amber-500"
-                      : "bg-gray-200"}
+                    ${isEmailEditable ? 'bg-white border border-amber-500' : 'bg-gray-200'}
                   `}
                   readOnly={!isEmailEditable}
                   value={tempEmail}
@@ -381,27 +425,49 @@ export default function ProfileCard() {
 
           {/* TELÉFONOS */}
           {telefonos.map((tel, index) => {
-            const keyCampo = `telefono-${tel.id}`;
+            const keyCampo = `telefono-${tel.id}`
             return (
-              <div key={tel.id} className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+              <div
+                key={tel.id}
+                className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4"
+              >
                 <label className="w-full md:w-40 font-medium text-stone-700">
-                  {index === 0 ? "Teléfono:" : `Teléfono ${index + 1}:`}
+                  {index === 0 ? 'Teléfono:' : `Teléfono ${index + 1}:`}
                 </label>
                 <div className="flex w-full items-center gap-2">
                   <select
                     disabled={campoEditando !== keyCampo}
+                    // Añade estas dos líneas:
+                    value={`${tel.pais} ${tel.codigo}`}
+                    onChange={(e) => {
+                      const seleccion = PAISES.find(
+                        (p) => `${p.nombre} ${p.codigo}` === e.target.value
+                      )
+                      if (seleccion) {
+                        setTelefonos(
+                          telefonos.map((t) =>
+                            t.id === tel.id
+                              ? { ...t, pais: seleccion.nombre, codigo: seleccion.codigo }
+                              : t
+                          )
+                        )
+                      }
+                    }}
                     className={`px-2 py-2 rounded text-sm
-                      ${campoEditando === keyCampo
-                        ? "bg-white border border-amber-500"
-                        : "bg-gray-200 cursor-not-allowed"}
-                    `}
+    ${
+      campoEditando === keyCampo
+        ? 'bg-white border border-amber-500'
+        : 'bg-gray-200 cursor-not-allowed'
+    }
+  `}
                   >
                     {PAISES.map((p) => (
-                      <option key={p.nombre}>
+                      // Asegúrate de que el value coincida con la búsqueda del find
+                      <option key={p.nombre} value={`${p.nombre} ${p.codigo}`}>
                         {p.flag} {p.codigo}
                       </option>
                     ))}
-                  </select>
+                  </select>{' '}
                   <input
                     type="text"
                     placeholder="Ej. 70000000"
@@ -409,17 +475,15 @@ export default function ProfileCard() {
                     disabled={campoEditando !== keyCampo}
                     onChange={(e) => actualizarTelefono(tel.id, e.target.value)}
                     className={`flex-1 px-3 py-2 rounded text-sm
-                      ${campoEditando === keyCampo
-                        ? "bg-white border border-amber-500"
-                        : "bg-gray-200 cursor-not-allowed"}
+                      ${
+                        campoEditando === keyCampo
+                          ? 'bg-white border border-amber-500'
+                          : 'bg-gray-200 cursor-not-allowed'
+                      }
                     `}
                   />
                   <button
-                    onClick={() =>
-                      setCampoEditando(
-                        campoEditando === keyCampo ? null : keyCampo
-                      )
-                    }
+                    onClick={() => setCampoEditando(campoEditando === keyCampo ? null : keyCampo)}
                     className="text-black"
                   >
                     <Pencil size={16} />
@@ -436,23 +500,23 @@ export default function ProfileCard() {
                   )}
                 </div>
               </div>
-            );
+            )
           })}
 
           {/* PAÍS */}
           <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-            <label className="w-full md:w-40 font-medium text-stone-700">
-              País:
-            </label>
+            <label className="w-full md:w-40 font-medium text-stone-700">País:</label>
             <div className="flex w-full items-center gap-2">
               <select
-                disabled={campoEditando !== "pais"}
+                disabled={campoEditando !== 'pais'}
                 value={pais}
                 onChange={(e) => setPais(e.target.value)}
                 className={`flex-1 px-3 py-2 rounded text-sm
-                  ${campoEditando === "pais"
-                    ? "bg-white border border-amber-500"
-                    : "bg-gray-200 cursor-not-allowed"}
+                  ${
+                    campoEditando === 'pais'
+                      ? 'bg-white border border-amber-500'
+                      : 'bg-gray-200 cursor-not-allowed'
+                  }
                 `}
               >
                 <option value="">Seleccione un país</option>
@@ -462,9 +526,7 @@ export default function ProfileCard() {
                 <option value="Perú">Perú</option>
               </select>
               <button
-                onClick={() =>
-                  setCampoEditando(campoEditando === "pais" ? null : "pais")
-                }
+                onClick={() => setCampoEditando(campoEditando === 'pais' ? null : 'pais')}
                 className="text-black"
               >
                 <Pencil size={16} />
@@ -474,18 +536,18 @@ export default function ProfileCard() {
 
           {/* GÉNERO */}
           <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-            <label className="w-full md:w-40 font-medium text-stone-700">
-              Género:
-            </label>
+            <label className="w-full md:w-40 font-medium text-stone-700">Género:</label>
             <div className="flex w-full items-center gap-2">
               <select
-                disabled={campoEditando !== "genero"}
+                disabled={campoEditando !== 'genero'}
                 value={genero}
                 onChange={(e) => setGenero(e.target.value)}
                 className={`flex-1 px-3 py-2 rounded text-sm
-                  ${campoEditando === "genero"
-                    ? "bg-white border border-amber-500"
-                    : "bg-gray-200 cursor-not-allowed"}
+                  ${
+                    campoEditando === 'genero'
+                      ? 'bg-white border border-amber-500'
+                      : 'bg-gray-200 cursor-not-allowed'
+                  }
                 `}
               >
                 <option value="">Seleccione género</option>
@@ -494,9 +556,7 @@ export default function ProfileCard() {
                 <option value="Otro">Otro</option>
               </select>
               <button
-                onClick={() =>
-                  setCampoEditando(campoEditando === "genero" ? null : "genero")
-                }
+                onClick={() => setCampoEditando(campoEditando === 'genero' ? null : 'genero')}
                 className="text-black"
               >
                 <Pencil size={16} />
@@ -509,16 +569,20 @@ export default function ProfileCard() {
             <label className="w-full md:w-40 font-medium text-stone-700">Dirección:</label>
             <div className="flex w-full items-center gap-2">
               <input
-                disabled={campoEditando !== "direccion"}
+                disabled={campoEditando !== 'direccion'}
                 value={direccion}
                 onChange={(e) => setDireccion(e.target.value)}
                 className={`flex-1 px-3 py-2 rounded text-sm
-                  ${campoEditando === "direccion"
-                    ? "bg-white border border-amber-500"
-                    : "bg-gray-200 cursor-not-allowed"}
+                  ${
+                    campoEditando === 'direccion'
+                      ? 'bg-white border border-amber-500'
+                      : 'bg-gray-200 cursor-not-allowed'
+                  }
                 `}
               />
-              <button onClick={() => setCampoEditando(campoEditando === "direccion" ? null : "direccion")}>
+              <button
+                onClick={() => setCampoEditando(campoEditando === 'direccion' ? null : 'direccion')}
+              >
                 <Pencil size={16} />
               </button>
             </div>
@@ -538,7 +602,7 @@ export default function ProfileCard() {
               disabled={isLoading}
               className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg text-sm font-medium shadow-sm disabled:bg-orange-300 disabled:cursor-not-allowed"
             >
-              {isLoading ? "Procesando..." : "Guardar Cambios"}
+              {isLoading ? 'Procesando...' : 'Guardar Cambios'}
             </button>
           </div>
         </div>
@@ -548,8 +612,8 @@ export default function ProfileCard() {
       <SecurityModal
         isOpen={isSecurityModalOpen}
         onClose={() => {
-          setIsSecurityModalOpen(false);
-          setIsLoading(false);
+          setIsSecurityModalOpen(false)
+          setIsLoading(false)
         }}
         onSubmit={handlePasswordSubmit}
         isLoading={isLoading}
@@ -557,13 +621,13 @@ export default function ProfileCard() {
       <OtpModal
         isOpen={isOtpModalOpen}
         onClose={() => {
-          setIsOtpModalOpen(false);
-          setOtpError("");
-          setEmailToUpdate("");
-          setIsLoading(false);
+          setIsOtpModalOpen(false)
+          setOtpError('')
+          setEmailToUpdate('')
+          setIsLoading(false)
           // Si cierra el OTP sin confirmar, deshabilitar edición y restaurar email
-          setIsEmailEditable(false);
-          setTempEmail(originalEmail);
+          setIsEmailEditable(false)
+          setTempEmail(originalEmail)
         }}
         onSubmit={handleOtpSubmit}
         onResendCode={handleResendCode}
@@ -571,5 +635,5 @@ export default function ProfileCard() {
         isLoading={isLoading}
       />
     </div>
-  );
+  )
 }

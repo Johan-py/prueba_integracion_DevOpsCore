@@ -82,9 +82,7 @@ export default function NotificationsPage() {
 
       <div className="mb-5 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-bold text-stone-900 sm:text-2xl">
-            Todas las notificaciones
-          </h1>
+          <h1 className="text-xl font-bold text-stone-900 sm:text-2xl">Todas las notificaciones</h1>
           <p className="mt-0.5 text-sm text-stone-500">
             Aquí puedes revisar, marcar como leídas y eliminar tus notificaciones.
           </p>
@@ -121,9 +119,7 @@ export default function NotificationsPage() {
         className="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm"
       >
         {isLoading ? (
-          <p className="px-4 py-6 text-center text-sm text-stone-500">
-            Cargando notificaciones...
-          </p>
+          <p className="px-4 py-6 text-center text-sm text-stone-500">Cargando notificaciones...</p>
         ) : error && isOnline ? (
           <div className="px-4 py-6 text-center">
             <p className="text-sm text-red-500">{error}</p>

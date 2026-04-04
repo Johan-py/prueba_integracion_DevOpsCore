@@ -1,8 +1,7 @@
-import { $Enums, Prisma } from '@prisma/client';
-import { prisma } from '../../db';
+import { $Enums, Prisma } from '@prisma/client'
+import { prisma } from '../../db'
 
 export class FiltersHomepageRepository {
-  
   async getCountsByCity(tipoAccion: $Enums.TipoAccion) {
     const groups = await prisma.ubicacion_maestra.groupBy({
       by: ['departamento'],
@@ -11,12 +10,12 @@ export class FiltersHomepageRepository {
           some: {
             inmueble: {
               tipoAccion: tipoAccion,
-              estado: $Enums.EstadoInmueble.ACTIVO,
+              estado: $Enums.EstadoInmueble.ACTIVO
             }
           }
         }
       }
-    });
+    })
 
     const counts = await Promise.all(
       groups.map(async (g) => {
@@ -27,19 +26,19 @@ export class FiltersHomepageRepository {
             },
             inmueble: {
               tipoAccion: tipoAccion,
-              estado: $Enums.EstadoInmueble.ACTIVO,
+              estado: $Enums.EstadoInmueble.ACTIVO
             }
           }
-        });
+        })
 
         return {
           departamento: g.departamento,
           count: total
-        };
+        }
       })
-    );
+    )
 
-    return counts.sort((a, b) => b.count - a.count);
+    return counts.sort((a, b) => b.count - a.count)
   }
 
   async getCountsByCategoria() {
@@ -52,6 +51,6 @@ export class FiltersHomepageRepository {
       _count: {
         id: true
       }
-    });
+    })
   }
 }
