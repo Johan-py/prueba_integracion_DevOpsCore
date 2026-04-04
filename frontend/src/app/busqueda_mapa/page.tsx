@@ -14,7 +14,6 @@ import PropertyCard from '@/components/layout/PropertyCard'
 import PropertyRow from '@/components/galeria/PropertyRow'
 import EmptyState from '@/components/galeria/EmptyState'
 import { MenuOrdenamiento } from '@/components/busqueda/ordenamiento/MenuOrdenamiento'
-
 // 🟢 Mantenemos la carga dinámica del mapa
 const MapView = nextDynamic(() => import('./MapView'), { 
   ssr: false,
