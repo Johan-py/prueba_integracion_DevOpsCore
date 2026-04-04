@@ -54,7 +54,6 @@ export const ResultadosBusqueda = () => {
   const { ordenActual, cambiarOrden, inmueblesOrdenados } = useOrdenamiento({
     inmuebles: inmueblesRaw as any[]
   })
-
   useEffect(() => {
     // Función reutilizable para hacer el fetch con filtros
     function fetchInmuebles() {
