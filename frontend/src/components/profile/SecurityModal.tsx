@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+// SecurityModal.tsx (añadir prop isLoading)
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
 'use client'
 
 import React, { useState } from 'react'
@@ -7,9 +11,21 @@ interface SecurityModalProps {
   isOpen: boolean
   onClose: () => void
   onSubmit: (password: string) => void
+<<<<<<< HEAD
 }
 
 export default function SecurityModal({ isOpen, onClose, onSubmit }: SecurityModalProps) {
+=======
+  isLoading?: boolean
+}
+
+export default function SecurityModal({
+  isOpen,
+  onClose,
+  onSubmit,
+  isLoading = false
+}: SecurityModalProps) {
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
@@ -28,12 +44,16 @@ export default function SecurityModal({ isOpen, onClose, onSubmit }: SecurityMod
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      {/* Fondo blanco, borde superior color Ámbar */}
       <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm mx-4 border-t-4 border-amber-600">
+<<<<<<< HEAD
         {/* Título color Piedra 900 */}
         <h2 className="text-xl font-bold mb-2 text-stone-900">Seguridad Requerida</h2>
 
         {/* Texto Secundario color Piedra 600 */}
+=======
+        <h2 className="text-xl font-bold mb-2 text-stone-900">Seguridad Requerida</h2>
+
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
         <p className="text-sm text-stone-600 mb-4">
           Para editar tu correo electrónico, necesitamos verificar tu identidad.
         </p>
@@ -41,17 +61,20 @@ export default function SecurityModal({ isOpen, onClose, onSubmit }: SecurityMod
         <form onSubmit={handleSubmit}>
           <div className="relative mb-1">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<<<<<<< HEAD
               {/* Candado color Piedra 600 */}
+=======
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
               <Lock className="h-5 w-5 text-stone-600" />
             </div>
 
             <input
               type="password"
-              /* Anillo de enfoque color Ámbar */
               className="w-full border border-stone-300 p-2 pl-10 rounded focus:outline-none focus:ring-2 focus:ring-amber-600"
               placeholder="Ingresa tu contraseña actual"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={isLoading}
             />
           </div>
 
@@ -61,17 +84,17 @@ export default function SecurityModal({ isOpen, onClose, onSubmit }: SecurityMod
             <button
               type="button"
               onClick={onClose}
-              /* Botón cancelar: Fondo Piedra 100, Texto Piedra 900 */
               className="px-4 py-2 text-stone-900 bg-stone-100 rounded hover:bg-stone-200 transition-colors"
+              disabled={isLoading}
             >
               Cancelar
             </button>
             <button
               type="submit"
-              /* Botón Verificar: Fondo Ámbar */
-              className="px-4 py-2 bg-amber-600 text-white rounded hover:bg-amber-700 transition-colors font-medium"
+              className="px-4 py-2 bg-amber-600 text-white rounded hover:bg-amber-700 transition-colors font-medium disabled:bg-amber-400"
+              disabled={isLoading}
             >
-              Verificar
+              {isLoading ? 'Verificando...' : 'Verificar'}
             </button>
           </div>
         </form>

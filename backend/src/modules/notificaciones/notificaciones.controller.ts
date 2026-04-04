@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express'
 import {
+  createNotificationService,
   deleteNotificationService,
   getNotificationsService,
   getUnreadCountService,
@@ -17,6 +18,15 @@ type AuthenticatedRequest = Request & {
 type NotificationParams = {
   id: string
 }
+<<<<<<< HEAD
+=======
+
+type CreateNotificationBody = {
+  usuarioId?: number | string
+  titulo?: string
+  mensaje?: string
+}
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
 
 const getUserIdFromRequest = (req: AuthenticatedRequest) => {
   const userId = Number(req.user?.id)
@@ -102,6 +112,41 @@ export const getUnreadCountController = async (req: Request, res: Response) => {
     })
   }
 }
+<<<<<<< HEAD
+=======
+
+export const createNotificationController = async (
+  req: Request<unknown, unknown, CreateNotificationBody>,
+  res: Response
+) => {
+  try {
+    const authenticatedUserId = getUserIdFromRequest(req as AuthenticatedRequest)
+
+    if (!authenticatedUserId) {
+      return res.status(401).json({
+        message: 'No autorizado'
+      })
+    }
+
+    const bodyUserId =
+      req.body.usuarioId !== undefined ? Number(req.body.usuarioId) : authenticatedUserId
+
+    const result = await createNotificationService({
+      usuarioId: bodyUserId,
+      titulo: req.body.titulo ?? '',
+      mensaje: req.body.mensaje ?? ''
+    })
+
+    return res.status(201).json(result)
+  } catch (error) {
+    const { statusCode, message } = buildErrorResponse(error)
+
+    return res.status(statusCode).json({
+      message
+    })
+  }
+}
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
 
 export const markNotificationAsReadController = async (
   req: Request<NotificationParams>,

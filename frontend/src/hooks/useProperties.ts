@@ -1,12 +1,17 @@
 import { useState, useEffect } from 'react'
 import { PropertyMapPin } from '@/types/property'
+<<<<<<< HEAD
 import { MOCK_PROPERTIES } from '@/data/mockProperties'
+=======
+import { useSearchParams } from 'next/navigation'
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
 
-// Para conectar la BD real, solo hay que:
-// 1. Cambiar USE_MOCK a false
-// 2. Asegurarse de que NEXT_PUBLIC_API_URL esté en .env.local
+// Asegurarse de que NEXT_PUBLIC_API_URL esté en .env.local
 
+<<<<<<< HEAD
 const USE_MOCK = true
+=======
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
 
 interface UsePropertiesResult {
@@ -16,6 +21,10 @@ interface UsePropertiesResult {
 }
 
 export function useProperties(): UsePropertiesResult {
+<<<<<<< HEAD
+=======
+  const searchParams = useSearchParams()
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
   const [properties, setProperties] = useState<PropertyMapPin[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -28,6 +37,7 @@ export function useProperties(): UsePropertiesResult {
       setError(null)
 
       try {
+<<<<<<< HEAD
         if (USE_MOCK) {
           // Simula latencia de red para que el loading state se vea real
           await new Promise((resolve) => setTimeout(resolve, 400))
@@ -40,6 +50,34 @@ export function useProperties(): UsePropertiesResult {
         }
       } catch (err) {
         if (!cancelled) setError(err instanceof Error ? err.message : 'Error desconocido')
+=======
+        //Convertimos los parámetros de la URL en una query string 
+        const queryString = searchParams.toString()
+        
+        //Llamamos al endpoint de inmuebles con los filtros dinámicos 
+        const res = await fetch(`${API_URL}/api/properties/inmuebles?${queryString}`)
+        
+        if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`)
+        
+        const json = await res.json()
+        
+        //Actualizamos el estado con los datos reales de la BD
+        if (!cancelled) {
+          const mappedData: PropertyMapPin[] = (json.data || []).map((item: any) => ({
+            id: item.id.toString(),
+            // Accedemos a la latitud/longitud según UbicacionInmueble del schema
+            lat: parseFloat(item.ubicacion?.latitud || 0),
+            lng: parseFloat(item.ubicacion?.longitud || 0), 
+            price: parseFloat(item.precio),
+            currency: 'USD', // O el campo que definas en el schema
+            type: (item.categoria?.toLowerCase() || 'casa') as any,
+            title: item.titulo
+          }))
+          setProperties(mappedData)
+        }
+      } catch (err) {
+        if (!cancelled) setError(err instanceof Error ? err.message : 'Error al conectar con PropBol')
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
       } finally {
         if (!cancelled) setIsLoading(false)
       }
@@ -49,7 +87,11 @@ export function useProperties(): UsePropertiesResult {
     return () => {
       cancelled = true
     }
+<<<<<<< HEAD
   }, [])
+=======
+  }, [searchParams])
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
 
   return { properties, isLoading, error }
 }

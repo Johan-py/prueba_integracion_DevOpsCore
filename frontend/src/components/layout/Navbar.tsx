@@ -3,7 +3,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+<<<<<<< HEAD
 import { Bell, CheckCheck, Loader2, Trash2, WifiOff } from 'lucide-react'
+=======
+import { Bell, CheckCheck, Loader2, Menu, Trash2, WifiOff, X } from 'lucide-react'
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
 
 import Logo from '../navbar/Logo'
 import NavLinks from '../navbar/NavLinks'
@@ -31,6 +35,10 @@ export default function Navbar() {
   const [isPanelOpen, setIsPanelOpen] = useState(false)
   const [showLogoutModal, setShowLogoutModal] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+<<<<<<< HEAD
+=======
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
 
   const {
     open,
@@ -54,15 +62,28 @@ export default function Navbar() {
     setIsLoggedIn
   } = useNotifications()
 
+<<<<<<< HEAD
   const clearSession = () => {
+=======
+  const clearSession = (emitEvent = true) => {
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
     localStorage.removeItem(USER_STORAGE_KEY)
     localStorage.removeItem(SESSION_EXPIRES_KEY)
     localStorage.removeItem('token')
     setUser(null)
     setIsPanelOpen(false)
     setShowLogoutModal(false)
+<<<<<<< HEAD
     window.dispatchEvent(new Event('propbol:session-changed'))
     window.dispatchEvent(new Event('auth-state-changed'))
+=======
+    setIsLoggedIn(false)
+
+    if (emitEvent) {
+      window.dispatchEvent(new Event('propbol:session-changed'))
+      window.dispatchEvent(new Event('auth-state-changed'))
+    }
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
   }
 
   const isSessionExpired = () => {
@@ -74,21 +95,38 @@ export default function Navbar() {
   const restoreSession = () => {
     const savedUser = localStorage.getItem(USER_STORAGE_KEY)
     const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY)
+<<<<<<< HEAD
 
     if (!savedUser || !expiresAt) {
       clearSession()
+=======
+    const token = localStorage.getItem('token')
+
+    if (!savedUser || !expiresAt || !token) {
+      clearSession(false)
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
       return
     }
 
     if (Date.now() > Number(expiresAt)) {
+<<<<<<< HEAD
       clearSession()
+=======
+      clearSession(false)
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
       return
     }
 
     try {
       setUser(JSON.parse(savedUser))
+<<<<<<< HEAD
     } catch {
       clearSession()
+=======
+      setIsLoggedIn(true)
+    } catch {
+      clearSession(false)
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
     }
   }
 
@@ -158,6 +196,13 @@ export default function Navbar() {
 
     setIsPanelOpen((prev) => !prev)
   }
+<<<<<<< HEAD
+=======
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen((prev) => !prev)
+  }
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
 
   const handleLoginRedirect = () => {
     router.push('/sign-in')
@@ -250,12 +295,20 @@ export default function Navbar() {
                     role="dialog"
                     aria-label="Panel de notificaciones"
                     aria-modal="true"
-                    className="absolute right-0 top-12 z-50 w-80 overflow-hidden rounded-xl border border-stone-200 bg-white shadow-lg"
+                    className="
+                      fixed left-0 right-0 top-[57px] z-50
+                      mx-2 overflow-hidden rounded-xl border border-stone-200 bg-white shadow-lg
+                      sm:absolute sm:left-auto sm:right-0 sm:top-12 sm:mx-0 sm:w-80
+                    "
                   >
                     <div className="flex items-center justify-between border-b border-stone-100 px-4 py-3">
+<<<<<<< HEAD
                       <h3 id="notifications-title" className="text-sm font-semibold text-stone-900">
                         Notificaciones
                       </h3>
+=======
+                      <h3 className="text-sm font-semibold text-stone-900">Notificaciones</h3>
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
 
                       {isLoggedIn ? (
                         <button
@@ -325,7 +378,7 @@ export default function Navbar() {
                           role="list"
                           aria-label="Lista de notificaciones"
                           aria-live="polite"
-                          className="max-h-80 overflow-y-auto"
+                          className="max-h-[60vh] overflow-y-auto sm:max-h-80"
                           onScroll={(e) => {
                             const target = e.currentTarget
                             const reachedBottom =
@@ -372,11 +425,15 @@ export default function Navbar() {
                                 >
                                   <div className="flex items-start justify-between gap-3">
                                     <div className="min-w-0 flex-1">
+<<<<<<< HEAD
                                       <p className="text-sm font-semibold text-stone-900">
+=======
+                                      <p className="truncate text-sm font-semibold text-stone-900">
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
                                         {notification.title?.trim() || '(Sin título)'}
                                       </p>
 
-                                      <p className="mt-1 text-sm text-stone-600">
+                                      <p className="mt-1 line-clamp-2 text-sm text-stone-600">
                                         {notification.description?.trim() ||
                                           '(Sin descripción disponible)'}
                                       </p>
@@ -421,10 +478,10 @@ export default function Navbar() {
                             </>
                           )}
                         </div>
-
                         <div className="border-t border-stone-100 px-4 py-3 text-center">
                           <Link
                             href="/notificaciones"
+                            onClick={toggleNotifications}
                             className="text-sm font-medium text-amber-600 transition hover:text-amber-700"
                           >
                             Ver todas las notificaciones
@@ -446,6 +503,17 @@ export default function Navbar() {
                   onOpenLogoutModal={handleOpenLogoutModal}
                 />
               </div>
+
+              {/* Botón de Hamburguesa para móvil */}
+              <button
+                type="button"
+                onClick={toggleMobileMenu}
+                className="rounded-full p-2 transition duration-200 hover:bg-black/5 hover:shadow-sm md:hidden"
+                aria-label="Abrir menú de navegación"
+                aria-expanded={isMobileMenuOpen}
+              >
+                <Menu className="h-6 w-6 text-stone-600" />
+              </button>
             </div>
           </div>
         </div>
@@ -457,6 +525,57 @@ export default function Navbar() {
         onCancel={handleCancelLogout}
         onConfirm={handleConfirmLogout}
       />
+
+      {/* Panel de Menú Móvil */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/40 md:hidden"
+          onClick={toggleMobileMenu}
+          aria-modal="true"
+          role="dialog"
+        >
+          <div
+            className="fixed right-0 top-0 h-full w-4/5 max-w-xs bg-[#F9F6EE] p-6 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <Logo />
+              <button
+                type="button"
+                onClick={toggleMobileMenu}
+                className="rounded-full p-2 transition duration-200 hover:bg-black/5"
+                aria-label="Cerrar menú"
+              >
+                <X className="h-6 w-6 text-stone-600" />
+              </button>
+            </div>
+
+            <nav className="mt-10 flex flex-col gap-4">
+              <Link
+                href="/"
+                onClick={toggleMobileMenu}
+                className="rounded-md px-3 py-2 text-lg font-medium text-gray-700 hover:bg-[#E68B25]/10 hover:text-[#E68B25]"
+              >
+                Inicio
+              </Link>
+              <Link
+                href="#contacto"
+                onClick={toggleMobileMenu}
+                className="rounded-md px-3 py-2 text-lg font-medium text-gray-700 hover:bg-[#E68B25]/10 hover:text-[#E68B25]"
+              >
+                Contáctanos
+              </Link>
+              <Link
+                href="#nosotros"
+                onClick={toggleMobileMenu}
+                className="rounded-md px-3 py-2 text-lg font-medium text-gray-700 hover:bg-[#E68B25]/10 hover:text-[#E68B25]"
+              >
+                Sobre Nosotros
+              </Link>
+            </nav>
+          </div>
+        </div>
+      )}
     </>
   )
 }

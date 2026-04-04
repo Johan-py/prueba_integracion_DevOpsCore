@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 export default function ConsumoPage() {
@@ -10,7 +11,7 @@ export default function ConsumoPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch('http://localhost:3000/api/consumo/1')
+        const res = await fetch('http://localhost:5000/api/consumo/1')
 
         if (!res.ok) {
           throw new Error('Error en la API')
@@ -77,9 +78,11 @@ export default function ConsumoPage() {
       {/* esto es para la parte de arriba  */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Panel de consumo</h1>
-        <button className="bg-gradient-to-r from-black to-orange-400 text-white px-4 py-2 rounded-lg hover:bg-orange-900 transition">
-          Ver planes de ampliación
-        </button>
+        <Link href="/cobros-suscripciones">
+          <button className="bg-gradient-to-r from-black to-orange-400 text-white px-4 py-2 rounded-lg hover:bg-orange-900 transition">
+            Ver planes de ampliación
+          </button>
+        </Link>
       </div>
 
       {/* Esto es para el mensaje que dice cuando le queda por usar */}
@@ -128,9 +131,11 @@ export default function ConsumoPage() {
       {data.usadas >= data.limite && (
         <div className="bg-red-100 text-red-700 p-4 rounded-lg flex justify-between items-center">
           <span>Sin cupo restante</span>
-          <button className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition">
-            Ampliar plan
-          </button>
+          <Link href="/cobros-suscripciones">
+            <button className="bg-gradient-to-r from-black to-orange-400 text-white px-4 py-2 rounded-lg hover:bg-orange-900 transition">
+              Ampliar plan
+            </button>
+          </Link>
         </div>
       )}
     </div>

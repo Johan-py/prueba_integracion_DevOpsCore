@@ -1,7 +1,10 @@
 import { HomeBanner } from '@/components/home/HomeBanner'
 import ExploreSection from '@/components/layout/ExploreSection'
 import FilterPanel from '@/components/rentals/FilterPanel'
+<<<<<<< HEAD
 import RegisterSuccessToast from '@/components/layout/RegisterSuccessToast'
+=======
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
 interface BannerData {
   id: number
   urlImagen: string

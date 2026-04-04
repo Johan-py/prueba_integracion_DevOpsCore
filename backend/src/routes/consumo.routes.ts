@@ -1,9 +1,10 @@
 import { Router } from 'express'
 import { getConsumo } from '../controllers/consumo.controller.js'
-import { authMiddleware } from '../middleware/authMiddleware.js'
+// import { verifyToken } from '../middleware/auth.middleware.js'
 
 const router = Router()
 
-router.get('/consumo/:userId', authMiddleware, getConsumo)
+// 🔥 SIN TOKEN (para probar)
+router.get('/consumo/:userId', getConsumo)
 
 export default router

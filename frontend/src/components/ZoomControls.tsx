@@ -56,7 +56,10 @@ export default function ZoomControls() {
     backgroundColor: active === type ? '#F97316' : '#ffffff',
     color: disabled ? '#d1d5db' : active === type ? '#ffffff' : '#374151'
   })
+<<<<<<< HEAD
 
+=======
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
   return (
     <div
       style={{

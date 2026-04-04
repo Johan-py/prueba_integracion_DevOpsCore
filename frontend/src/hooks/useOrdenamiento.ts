@@ -1,58 +1,96 @@
-import { useState, useMemo, useCallback } from 'react'
-import { Inmueble, EstadoOrdenamiento, ORDENAMIENTO_DEFAULT } from '../types/inmueble'
-import { ordenarInmuebles } from '../utils/ordenarInmuebles'
+import { useState, useCallback, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { PropertyMapPin } from '../types/property'
+import { EstadoOrdenamiento, ORDENAMIENTO_DEFAULT } from '../types/inmueble'
+
+const STORAGE_KEY = 'propbol:ordenamiento'
+
+function cargarOrdenGuardado(): EstadoOrdenamiento {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return ORDENAMIENTO_DEFAULT
+    return JSON.parse(raw) as EstadoOrdenamiento
+  } catch {
+    return ORDENAMIENTO_DEFAULT
+  }
+}
+
+function guardarOrden(orden: EstadoOrdenamiento): void {
+  try {
+    if (orden.criterioActivo === null) {
+      localStorage.removeItem(STORAGE_KEY)
+    } else {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(orden))
+    }
+  } catch {
+    // localStorage puede estar bloqueado (modo privado estricto, Safari, etc.)
+    // Fallamos silenciosamente — la app sigue funcionando sin persistencia.
+  }
+}
+
+// ── Hook ──────────────────────────────────────────────────────────────────────
 
 interface UseOrdenamientoProps {
-  /** Array de inmuebles a ordenar (puede estar pre-filtrado) */
-  inmuebles: Inmueble[]
-  /** Estado de ordenamiento inicial (opcional) */
+  inmuebles: PropertyMapPin[]
   ordenInicial?: EstadoOrdenamiento
 }
 
 interface UseOrdenamientoResult {
-  /** Estado actual del ordenamiento */
   ordenActual: EstadoOrdenamiento
-  /** Función para actualizar el ordenamiento */
   cambiarOrden: (nuevoOrden: EstadoOrdenamiento) => void
-  /** Inmuebles ordenados según los criterios actuales */
-  inmueblesOrdenados: Inmueble[]
+  inmueblesOrdenados: PropertyMapPin[]
 }
 
 /**
- * Hook para manejar el ordenamiento simultáneo de inmuebles.
+ * Hook para manejar el ordenamiento de inmuebles con persistencia.
  *
- * Características:
- * - Soporta ordenamiento por múltiples criterios simultáneos
- * - Estado por defecto: Más recientes, Precio menor a mayor, Superficie menor a mayor
- * - Se re-aplica automáticamente cuando cambian los inmuebles filtrados
- * - Ordena en cliente sin llamadas a API
- *
- * @example
- * const { ordenActual, cambiarOrden, inmueblesOrdenados } = useOrdenamiento({
- *   inmuebles: inmueblesFiltrados
- * })
+ * Comportamiento:
+ * - Primera visita o sin criterio guardado → ordena por fecha más recientes (default)
+ * - Si el usuario eligió un criterio antes → lo recupera al refrescar
+ * - Si el usuario limpia el ordenamiento → borra la preferencia guardada
+ * - Falla silenciosamente si localStorage no está disponible
  */
 export const useOrdenamiento = ({
   inmuebles,
-  ordenInicial = ORDENAMIENTO_DEFAULT
+  ordenInicial
 }: UseOrdenamientoProps): UseOrdenamientoResult => {
-  // Estado del ordenamiento actual
-  const [ordenActual, setOrdenActual] = useState<EstadoOrdenamiento>(ordenInicial)
+  const router = useRouter()
+  const searchParams = useSearchParams()
 
-  // Callback memoizado para cambiar el orden
-  const cambiarOrden = useCallback((nuevoOrden: EstadoOrdenamiento) => {
-    setOrdenActual(nuevoOrden)
-  }, [])
+  const [ordenActual, setOrdenActual] = useState<EstadoOrdenamiento>(() => {
+    return ordenInicial ?? cargarOrdenGuardado()
+  })
 
-  // Ordenar inmuebles reactivamente
-  // Se re-ejecuta cuando cambian los inmuebles O el estado de ordenamiento
-  const inmueblesOrdenados = useMemo(() => {
-    return ordenarInmuebles(inmuebles, ordenActual)
-  }, [inmuebles, ordenActual])
+  useEffect(() => {
+    guardarOrden(ordenActual)
+  }, [ordenActual])
+
+  const cambiarOrden = useCallback(
+    (nuevoOrden: EstadoOrdenamiento) => {
+      setOrdenActual(nuevoOrden)
+      // Sincronización con la URL para que el Backend ordene
+      const params = new URLSearchParams(searchParams.toString())
+
+      params.delete('precio')
+      params.delete('superficie')
+      params.delete('fecha')
+
+      if (nuevoOrden.criterioActivo === 'precio') {
+        params.set('precio', nuevoOrden.precio)
+      } else if (nuevoOrden.criterioActivo === 'superficie') {
+        params.set('superficie', nuevoOrden.superficie)
+      } else if (nuevoOrden.criterioActivo === 'fecha') {
+        params.set('fecha', nuevoOrden.fecha)
+      }
+
+      router.push(`?${params.toString()}`, { scroll: false })
+    },
+    [router, searchParams]
+  )
 
   return {
     ordenActual,
     cambiarOrden,
-    inmueblesOrdenados
+    inmueblesOrdenados: inmuebles // Prisma ya los devuelve ordenados
   }
 }

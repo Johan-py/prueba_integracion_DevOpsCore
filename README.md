@@ -2,12 +2,22 @@
 
 ## 📌 Descripción General
 
+<<<<<<< HEAD
+
 - Frontend y Backend en **Next.js + TSX** (App Router)
 - API REST simple (`/api/calculator`)
 - Tests con **Bun**
 - Docker para contenedores
+  <<<<<<< HEAD
+- # Scripts de desarrollo y CI/CD listos para pipelines
+  **PropBol** es una plataforma web enfocada en la **compra, venta y gestión de inmuebles** en Bolivia.
+  > > > > > > > # 84448d89714560d514d37a9cf4fa1f046e2ebab1
 - Scripts de desarrollo y CI/CD listos para pipelines
   **PropBol** es una plataforma web enfocada en la **compra, venta y gestión de inmuebles** en Bolivia.
+  <<<<<<< HEAD
+  =======
+  > > > > > > > b68a39aab8d9cda89a4ae3b8e3d1069c14f8933f
+  > > > > > > > 12892ab53161466e83fa52424359eeccc35604a5
 
 Permite a usuarios:
 
@@ -29,6 +39,8 @@ El proyecto sigue un enfoque **monorepo** con separación clara por capas:
 - **Infraestructura** → Docker + CI/CD (GitHub Actions)
 
 ---
+
+<<<<<<< HEAD
 
 ## ⚡ Requisitos
 
@@ -87,9 +99,21 @@ GET /api/calculator?a=10&b=2&op=divide
 
 ## 🐳 Docker
 
+<<<<<<< HEAD
+
+# Levantar contenedor de desarrollo:
+
+=======
 Levantar contenedor de desarrollo:
+<<<<<<< HEAD
+=======
+
+> > > > > > > b68a39aab8d9cda89a4ae3b8e3d1069c14f8933f
+> > > > > > > 12892ab53161466e83fa52424359eeccc35604a5
 
 ## 📂 Estructura del Proyecto
+
+> > > > > > > 84448d89714560d514d37a9cf4fa1f046e2ebab1
 
 ```bash
 .
@@ -100,24 +124,45 @@ Levantar contenedor de desarrollo:
 └── .github/      # pipelines CI/CD
 ```
 
+<<<<<<< HEAD
+
 - Acceder a `http://localhost:3000/`
 - API: `http://localhost:3000/api/calculator`
 
 =======
 
-- Acceder a `http://localhost:3000/`
-- API: `http://localhost:3000/api/calculator`
+> > > > > > > 84448d89714560d514d37a9cf4fa1f046e2ebab1
 
 ---
 
 ## ⚙️ Requisitos
 
+# <<<<<<< HEAD
+
+<<<<<<< HEAD
+<<<<<<< HEAD
+
+=======
+
+> > > > > > > b68a39aab8d9cda89a4ae3b8e3d1069c14f8933f
+> > > > > > > 12892ab53161466e83fa52424359eeccc35604a5
+
 - Usa `bun test` para todos los tests; no es necesario configurar Jest manualmente
 - Toda la lógica de API está en `app/api/calculator/route.ts`
 - Layout obligatorio en `app/layout.tsx` para evitar errores de Next.js con App Router
 
+<<<<<<< HEAD
+
+> # Este repositorio sirve como **base para construir escenarios de estrés realistas para el equipo de DevOps**.
+>
+> =======
 > Este repositorio sirve como **base para construir escenarios de estrés realistas para el equipo de DevOps**.
-> Asegúrate de tener instalado:
+
+# <<<<<<< HEAD
+
+> > > > > > > b68a39aab8d9cda89a4ae3b8e3d1069c14f8933f
+> > > > > > > 12892ab53161466e83fa52424359eeccc35604a5
+> > > > > > > Asegúrate de tener instalado:
 
 - Bun >= 1.x
 - Node.js >= 18
@@ -269,3 +314,5 @@ Para contribuir:
 ## 📄 Licencia
 
 Pendiente de definición.
+
+> > > > > > > 84448d89714560d514d37a9cf4fa1f046e2ebab1

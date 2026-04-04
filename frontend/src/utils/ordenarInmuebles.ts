@@ -1,27 +1,45 @@
 import { Inmueble, EstadoOrdenamiento } from '../types/inmueble'
 
+/**
+ * Ordena inmuebles según el criterioActivo del estado:
+ *
+ *  null        → default: fecha más recientes (primera carga / limpiar ordenamiento)
+ *  'fecha'     → solo por el valor de orden.fecha
+ *  'precio'    → solo por orden.precio (asc o desc)
+ *  'superficie'→ solo por orden.superficie (asc o desc)
+ */
 export function ordenarInmuebles(inmuebles: Inmueble[], orden: EstadoOrdenamiento): Inmueble[] {
   return [...inmuebles].sort((a, b) => {
-    if (orden.fecha === 'mas-recientes') {
-      const diff = new Date(b.fechaPublicacion).getTime() - new Date(a.fechaPublicacion).getTime()
-      if (diff !== 0) return diff
-    } else if (orden.fecha === 'mas-antiguos') {
-      const diff = new Date(a.fechaPublicacion).getTime() - new Date(b.fechaPublicacion).getTime()
-      if (diff !== 0) return diff
-    } else {
-      const popA = a.popularidad ?? 0
-      const popB = b.popularidad ?? 0
-      if (popA !== popB) return popB - popA
+    // ── DEFAULT o criterio FECHA ───────────────────────────────────────────
+    // null  → siempre cae aquí y aplica 'mas-recientes'
+    // fecha → aplica lo que el usuario eligió
+    if (orden.criterioActivo === null || orden.criterioActivo === 'fecha') {
+      const tsA = new Date(a.fechaPublicacion).getTime()
+      const tsB = new Date(b.fechaPublicacion).getTime()
+
+      if (orden.fecha === 'mas-recientes') return tsB - tsA
+      if (orden.fecha === 'mas-antiguos') return tsA - tsB
+      if (orden.fecha === 'mas-populares') {
+        return (b.popularidad ?? 0) - (a.popularidad ?? 0)
+      }
     }
 
-    const factorPrecio = orden.precio === 'menor-a-mayor' ? 1 : -1
-    const precioA = Number(a.precio)
-    const precioB = Number(b.precio)
-    if (precioA !== precioB) return (precioA - precioB) * factorPrecio
+    // ── Criterio PRECIO ────────────────────────────────────────────────────
+    if (orden.criterioActivo === 'precio') {
+      const precioA = Number(a.precio) || 0
+      const precioB = Number(b.precio) || 0
+      const factor = orden.precio === 'menor-a-mayor' ? 1 : -1
+      return (precioA - precioB) * factor
+    }
 
-    const factorSup = orden.superficie === 'menor-a-mayor' ? 1 : -1
-    const supA = Number(a.superficieM2 ?? 0)
-    const supB = Number(b.superficieM2 ?? 0)
-    return (supA - supB) * factorSup
+    // ── Criterio SUPERFICIE ────────────────────────────────────────────────
+    if (orden.criterioActivo === 'superficie') {
+      const supA = Number(a.superficieM2) || 0
+      const supB = Number(b.superficieM2) || 0
+      const factor = orden.superficie === 'menor-a-mayor' ? 1 : -1
+      return (supA - supB) * factor
+    }
+
+    return 0
   })
 }

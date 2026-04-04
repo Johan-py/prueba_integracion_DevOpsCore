@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+// OtpModal.tsx (añadir prop isLoading)
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
 'use client'
 
 import React, { useState, useEffect } from 'react'
@@ -8,8 +12,13 @@ interface OtpModalProps {
   onClose: () => void
   onSubmit: (otpCode: string) => void
   onResendCode: () => void
+<<<<<<< HEAD
   // Permite inyectar errores desde el componente padre (ej. "Código incorrecto")
   externalError?: string
+=======
+  externalError?: string
+  isLoading?: boolean
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
 }
 
 export default function OtpModal({
@@ -17,23 +26,33 @@ export default function OtpModal({
   onClose,
   onSubmit,
   onResendCode,
+<<<<<<< HEAD
   externalError
 }: OtpModalProps) {
   const [otp, setOtp] = useState('')
   const [localError, setLocalError] = useState('')
   const [timeLeft, setTimeLeft] = useState(300) // 300 segundos = 5 minutos
+=======
+  externalError,
+  isLoading = false
+}: OtpModalProps) {
+  const [otp, setOtp] = useState('')
+  const [localError, setLocalError] = useState('')
+  const [timeLeft, setTimeLeft] = useState(300)
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
 
-  // Efecto para manejar el temporizador de 5 minutos
   useEffect(() => {
     if (!isOpen) {
+<<<<<<< HEAD
       // Reiniciamos todo si el modal se cierra
+=======
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
       setOtp('')
       setLocalError('')
       setTimeLeft(300)
       return
     }
 
-    // Cuenta regresiva
     const timer = setInterval(() => {
       setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0))
     }, 1000)
@@ -43,7 +62,6 @@ export default function OtpModal({
 
   if (!isOpen) return null
 
-  // Formatear segundos a MM:SS
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60)
       .toString()
@@ -69,18 +87,26 @@ export default function OtpModal({
   }
 
   const handleResend = () => {
+<<<<<<< HEAD
     setTimeLeft(300) // Reiniciamos los 5 minutos
+=======
+    setTimeLeft(300)
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
     setLocalError('')
     setOtp('')
     onResendCode()
   }
 
-  // Función para cerrar si hacen clic en el fondo gris (Cumpliendo tu Criterio de Aceptación)
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
       onClose()
     }
   }
+<<<<<<< HEAD
+=======
+
+  const displayError = localError || externalError
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
 
   return (
     <div
@@ -101,7 +127,6 @@ export default function OtpModal({
         </p>
 
         <form onSubmit={handleSubmit} className="w-full flex flex-col items-center">
-          {/* Contenedor del Input al estilo de tu wireframe */}
           <div className="relative mb-2 w-48">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Lock className="h-6 w-6 text-stone-900" />
@@ -109,23 +134,29 @@ export default function OtpModal({
 
             <input
               type="text"
-              maxLength={4} // Limitamos a 4 dígitos según tus AC
-              className="w-full border-2 border-stone-900 p-3 pl-12 rounded focus:outline-none focus:border-amber-600 text-center text-2xl tracking-[0.5em] font-bold text-stone-900"
+              maxLength={4}
+              className="w-full border-2 border-stone-900 p-3 pl-12 rounded focus:outline-none focus:border-amber-600 text-center text-2xl tracking-[0.5em] font-bold text-stone-900 disabled:bg-gray-100"
               placeholder="****"
               value={otp}
-              onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))} // Solo permite números
+              onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))}
+              disabled={isLoading}
             />
           </div>
 
+<<<<<<< HEAD
           {/* Manejo de errores (locales o inyectados desde el backend) */}
           {(localError || externalError) && (
             <p className="text-red-500 text-xs mb-3 text-center">{localError || externalError}</p>
           )}
+=======
+          {displayError && <p className="text-red-500 text-xs mb-3 text-center">{displayError}</p>}
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
 
           <button
             type="button"
             onClick={handleResend}
-            className="text-sm text-amber-600 hover:text-amber-700 underline mb-5"
+            className="text-sm text-amber-600 hover:text-amber-700 underline mb-5 disabled:text-gray-400"
+            disabled={isLoading}
           >
             Reenviar código
           </button>
@@ -134,20 +165,25 @@ export default function OtpModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2 text-stone-900 bg-stone-100 rounded hover:bg-stone-200 transition-colors"
+              className="px-6 py-2 text-stone-900 bg-stone-100 rounded hover:bg-stone-200 transition-colors disabled:opacity-50"
+              disabled={isLoading}
             >
               Cancelar
             </button>
             <button
               type="submit"
-              disabled={timeLeft === 0}
+              disabled={timeLeft === 0 || isLoading}
               className={`px-6 py-2 text-white rounded font-medium transition-colors ${
+<<<<<<< HEAD
                 timeLeft === 0
+=======
+                timeLeft === 0 || isLoading
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
                   ? 'bg-stone-400 cursor-not-allowed'
                   : 'bg-amber-600 hover:bg-amber-700'
               }`}
             >
-              Aceptar
+              {isLoading ? 'Verificando...' : 'Aceptar'}
             </button>
           </div>
         </form>

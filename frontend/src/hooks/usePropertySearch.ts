@@ -28,7 +28,7 @@ export function usePropertySearch() {
 
     try {
       setLoading(true)
-      // 4. Petición al backend local [cite: 409-410]
+      // 4. Petición al backend local
       const res = await fetch(`http://localhost:5000/api/properties/search?${params.toString()}`)
 
       const json = await res.json()

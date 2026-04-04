@@ -1,6 +1,7 @@
 import { prisma } from '../db/prisma.js'
 
 export const obtenerConsumo = async (userId: number) => {
+
   const usuario = await prisma.usuario.findUnique({
     where: {
       id: userId
@@ -27,14 +28,22 @@ export const obtenerConsumo = async (userId: number) => {
     throw new Error('No tiene suscripción activa')
   }
 
-  const plan = suscripcion.plan_suscripcion
-
-  if (!plan) {
-    throw new Error('La suscripción no tiene un plan asignado')
+  if (!suscripcion.plan_suscripcion) {
+    throw new Error('La suscripción no tiene plan asignado')
   }
 
+  const plan = suscripcion.plan_suscripcion
+
+  // 🔥 CONTAR PUBLICACIONES REALES (ya puedes hacerlo con tu BD)
+  const publicacionesUsadas = await prisma.publicacion.count({
+    where: {
+      usuarioId: userId,
+      estado: 'ACTIVA' // opcional pero recomendado
+    }
+  })
+
   return {
-    usadas: 0,
+    usadas: publicacionesUsadas,
     limite: plan.nro_publicaciones_plan,
     plan: plan.nombre_plan
   }

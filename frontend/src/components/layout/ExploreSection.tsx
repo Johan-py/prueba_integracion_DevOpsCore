@@ -4,6 +4,10 @@ import { useState } from 'react'
 import { ComboBox } from '../ui/ComboBox'
 import { Home, Search, Building, Bed, Trees, Flower2 } from 'lucide-react'
 import { LocationSearch } from './LocationSearch'
+<<<<<<< HEAD
+=======
+import { useRouter } from 'next/navigation'
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
 
 const searchOptions = [
   { id: 'venta', name: 'Venta' },
@@ -12,8 +16,15 @@ const searchOptions = [
 ]
 
 export default function ExploreSection() {
+<<<<<<< HEAD
   const [selectedOption, setSelectedOption] = useState<string[]>([])
   const [location, setLocation] = useState('')
+=======
+  const router = useRouter();
+  const [selectedOption, setSelectedOption] = useState<string[]>([])
+  const [location, setLocation] = useState('')
+  const [propertyType, setPropertyType] = useState('Cualquier tipo')
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
   const [errorMessage, setErrorMessage] = useState('')
 
   const propertyTypes = [
@@ -34,6 +45,39 @@ export default function ExploreSection() {
     }
 
     setErrorMessage('')
+<<<<<<< HEAD
+=======
+
+    // 1. Construir los parámetros de búsqueda 
+    const params = new URLSearchParams();
+    
+    // Modos (VENTA, ALQUILER, etc.)
+    selectedOption.forEach(modo => params.append('modoInmueble', modo.toUpperCase()));
+
+    // Tipo de Inmueble (Mapeo manual para el Backend) 
+    if (propertyType !== 'Cualquier tipo') {
+      const tipoMap: Record<string, string> = {
+        'Casas': 'CASA',
+        'Departamentos': 'DEPARTAMENTO',
+        'Cuartos': 'CASA', 
+        'Terrenos': 'TERRENO',
+        'Espacios Cementerio': 'TERRENO'
+      };
+      const tipoFinal = tipoMap[propertyType] || propertyType.toUpperCase();
+      params.set('tipoInmueble', tipoFinal);
+    }
+
+    // Ubicación / Texto
+    if (location.trim() !== '') {
+      params.set('query', location.trim());
+    }
+
+    // 2. NAVEGAR A LA PÁGINA DEL MAPA 
+    const finalUrl = `/busqueda_mapa?${params.toString()}`;
+    console.log("🚀 Navegando desde Home a:", finalUrl);
+    router.push(finalUrl);
+
+>>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
   }
 
   return (
@@ -81,6 +125,7 @@ export default function ExploreSection() {
                 placeholder="Cualquier tipo"
                 options={propertyTypes}
                 icon={Home}
+                onChange={(val) => setPropertyType(val)}
               />
             </div>
             <div className="w-full">

@@ -11,26 +11,19 @@ import type {
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000'
 const ITEMS_PER_LOAD = 20
 const NOTIFICATIONS_UPDATED_EVENT = 'notifications-updated'
+
 const AUTH_STATE_CHANGED_EVENT = 'auth-state-changed'
+const SKELETON_DELAY_MS = 300
 
 const getStoredToken = () => {
-  if (typeof window === 'undefined') {
-    return null
-  }
-
+  if (typeof window === 'undefined') return null
   return window.localStorage.getItem('token')
 }
 
 const getAuthHeaders = (): HeadersInit => {
   const token = getStoredToken()
-
-  if (!token) {
-    return {}
-  }
-
-  return {
-    Authorization: `Bearer ${token}`
-  }
+  if (!token) return {}
+  return { Authorization: `Bearer ${token}` }
 }
 
 const buildNotificationsUrl = (filter: NotificationFilter, limit: number, offset: number) => {
@@ -38,11 +31,9 @@ const buildNotificationsUrl = (filter: NotificationFilter, limit: number, offset
     limit: String(limit),
     offset: String(offset)
   })
-
   if (filter !== 'todas') {
     params.set('filter', filter)
   }
-
   return `${API_URL}/notificaciones?${params.toString()}`
 }
 
@@ -69,7 +60,6 @@ const requestJson = async <T>(url: string, init?: RequestInit): Promise<T> => {
       const error = new Error(data?.message ?? 'No se pudo completar la solicitud') as Error & {
         status?: number
       }
-
       error.status = response.status
       throw error
     }
@@ -80,11 +70,9 @@ const requestJson = async <T>(url: string, init?: RequestInit): Promise<T> => {
       const timeoutError = new Error('No se pudieron cargar las notificaciones.') as Error & {
         status?: number
       }
-
       timeoutError.status = 408
       throw timeoutError
     }
-
     throw error
   } finally {
     window.clearTimeout(timeout)
@@ -97,8 +85,10 @@ export function useNotifications() {
   const [notifications, setNotifications] = useState<NotificationItem[]>([])
   const [total, setTotal] = useState(0)
   const [unreadCount, setUnreadCount] = useState(0)
+
   const [isLoggedIn, setIsLoggedIn] = useState(Boolean(getStoredToken()))
   const [isLoading, setIsLoading] = useState(false)
+  const [showSkeleton, setShowSkeleton] = useState(false)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isOnline, setIsOnline] = useState(
@@ -115,15 +105,13 @@ export function useNotifications() {
     setError(null)
     setOpen(false)
     setIsLoading(false)
+    setShowSkeleton(false)
     setIsLoadingMore(false)
     setIsLoggedIn(false)
   }, [])
 
   const emitNotificationsUpdated = useCallback(() => {
-    if (typeof window === 'undefined') {
-      return
-    }
-
+    if (typeof window === 'undefined') return
     window.dispatchEvent(
       new CustomEvent(NOTIFICATIONS_UPDATED_EVENT, {
         detail: { source: instanceId.current }
@@ -140,8 +128,16 @@ export function useNotifications() {
         return
       }
 
+      if (!window.navigator.onLine) {
+        return
+      }
+
       setIsLoading(true)
       setError(null)
+
+      const skeletonTimer = window.setTimeout(() => {
+        setShowSkeleton(true)
+      }, SKELETON_DELAY_MS)
 
       try {
         const [notificationsResponse, unreadCountResponse] = await Promise.all([
@@ -154,6 +150,10 @@ export function useNotifications() {
         setUnreadCount(unreadCountResponse.unreadCount)
         setIsLoggedIn(true)
       } catch (err) {
+        if (!window.navigator.onLine) {
+          return
+        }
+
         const error = err as Error & { status?: number }
         const technicalMessage = error.message.toLowerCase()
 
@@ -172,7 +172,9 @@ export function useNotifications() {
           setError('No se pudieron cargar las notificaciones.')
         }
       } finally {
+        window.clearTimeout(skeletonTimer)
         setIsLoading(false)
+        setShowSkeleton(false)
       }
     },
     [clearNotificationsState]
@@ -186,9 +188,7 @@ export function useNotifications() {
       return
     }
 
-    if (isLoading || isLoadingMore || notifications.length >= total) {
-      return
-    }
+    if (isLoading || isLoadingMore || notifications.length >= total) return
 
     setIsLoadingMore(true)
 
@@ -196,17 +196,15 @@ export function useNotifications() {
       const response = await requestJson<NotificationsResponse>(
         buildNotificationsUrl(filter, ITEMS_PER_LOAD, notifications.length)
       )
-
       setNotifications((prev) => [...prev, ...response.items])
       setTotal(response.total)
     } catch (err) {
       const error = err as Error & { status?: number }
-
       if (error.status === 401) {
         clearNotificationsState()
         return
       }
-
+      if (!window.navigator.onLine) return
       setError('No se pudieron cargar las notificaciones.')
     } finally {
       setIsLoadingMore(false)
@@ -219,10 +217,7 @@ export function useNotifications() {
 
   const markAsRead = useCallback(
     async (id: number) => {
-      await requestJson(`${API_URL}/notificaciones/${id}/read`, {
-        method: 'PATCH'
-      })
-
+      await requestJson(`${API_URL}/notificaciones/${id}/read`, { method: 'PATCH' })
       await refreshNotifications(filter)
       emitNotificationsUpdated()
     },
@@ -230,20 +225,14 @@ export function useNotifications() {
   )
 
   const markAllAsRead = useCallback(async () => {
-    await requestJson(`${API_URL}/notificaciones/read-all`, {
-      method: 'PATCH'
-    })
-
+    await requestJson(`${API_URL}/notificaciones/read-all`, { method: 'PATCH' })
     await refreshNotifications(filter)
     emitNotificationsUpdated()
   }, [emitNotificationsUpdated, filter, refreshNotifications])
 
   const deleteNotification = useCallback(
     async (id: number) => {
-      await requestJson(`${API_URL}/notificaciones/${id}`, {
-        method: 'DELETE'
-      })
-
+      await requestJson(`${API_URL}/notificaciones/${id}`, { method: 'DELETE' })
       await refreshNotifications(filter)
       emitNotificationsUpdated()
     },
@@ -260,6 +249,7 @@ export function useNotifications() {
 
     const handleOffline = () => {
       setIsOnline(false)
+      setError(null)
     }
 
     window.addEventListener('online', handleOnline)
@@ -278,16 +268,11 @@ export function useNotifications() {
   useEffect(() => {
     const handleNotificationsUpdated = (event: Event) => {
       const customEvent = event as CustomEvent<{ source?: string }>
-
-      if (customEvent.detail?.source === instanceId.current) {
-        return
-      }
-
+      if (customEvent.detail?.source === instanceId.current) return
       void refreshNotifications(filter)
     }
 
     window.addEventListener(NOTIFICATIONS_UPDATED_EVENT, handleNotificationsUpdated)
-
     return () => {
       window.removeEventListener(NOTIFICATIONS_UPDATED_EVENT, handleNotificationsUpdated)
     }
@@ -299,7 +284,6 @@ export function useNotifications() {
         clearNotificationsState()
         return
       }
-
       void refreshNotifications(filter)
     }
 
@@ -330,7 +314,6 @@ export function useNotifications() {
     }
 
     document.addEventListener('mousedown', handleClickOutside)
-
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
@@ -341,9 +324,12 @@ export function useNotifications() {
 
   useEffect(() => {
     if (!isLoggedIn || !isOnline) return
+
     const interval = setInterval(() => {
+      if (!window.navigator.onLine) return
       void refreshNotifications(filter)
-    }, 30000)
+    }, 15000)
+
     return () => clearInterval(interval)
   }, [isLoggedIn, isOnline, filter, refreshNotifications])
 
@@ -355,6 +341,7 @@ export function useNotifications() {
     visibleNotifications,
     unreadCount,
     isLoading,
+    showSkeleton,
     isLoadingMore,
     error,
     isOnline,
