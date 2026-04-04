@@ -1,5 +1,5 @@
-import { Prisma, RolNombre } from '@prisma/client'
-import { prisma } from '../../lib/prisma.js'
+import { RolNombre } from '@prisma/client'
+import { prisma } from '../../db'
 
 interface CreateUserInput {
   nombre: string
@@ -9,14 +9,45 @@ interface CreateUserInput {
   telefono?: string
 }
 
-export const createUser = async (data: CreateUserInput) => {
-  const rol = await prisma.rol.findUnique({
-    where: { nombre: RolNombre.VISITANTE }
-  })
-
-  if (!rol) {
-    throw new Error('Rol de usuario no encontrado')
+type PrismaLikeKnownError = {
+  code?: string
+  meta?: {
+    target?: unknown
   }
+  message?: string
+}
+
+const ensureVisitorRole = async () => {
+  return await prisma.rol.upsert({
+    where: { nombre: RolNombre.VISITANTE },
+    update: {},
+    create: { nombre: RolNombre.VISITANTE }
+  })
+}
+
+const isUniqueConstraintError = (error: unknown): error is PrismaLikeKnownError => {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    (error as PrismaLikeKnownError).code === 'P2002'
+  )
+}
+
+const getUniqueConstraintMessage = (error: PrismaLikeKnownError) => {
+  const rawTarget = error.meta?.target
+  const targets = Array.isArray(rawTarget) ? rawTarget.map(String) : []
+  const searchableText = `${targets.join(' ')} ${error.message ?? ''}`.toLowerCase()
+
+  if (searchableText.includes('correo')) {
+    return 'El correo ya está registrado'
+  }
+
+  return 'Ya existe un registro con esos datos'
+}
+
+export const createUser = async (data: CreateUserInput) => {
+  const rol = await ensureVisitorRole()
 
   try {
     return await prisma.usuario.create({
@@ -41,8 +72,8 @@ export const createUser = async (data: CreateUserInput) => {
       }
     })
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-      throw new Error('El correo ya está registrado')
+    if (isUniqueConstraintError(error)) {
+      throw new Error(getUniqueConstraintMessage(error))
     }
 
     throw error
@@ -94,7 +125,10 @@ export const findActiveSessionByToken = async (token: string) => {
     where: {
       token,
       estado: true,
-      fechaExpiracion: { gt: new Date() }
+
+      fechaExpiracion: {
+        gt: new Date()
+      }
     },
     include: {
       usuario: {

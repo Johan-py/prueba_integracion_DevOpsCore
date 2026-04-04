@@ -1,44 +1,62 @@
-import { prisma } from '../../prismaClient.js'
+import {
+  buscarPublicacionesPorUsuarioRepository,
+  buscarPublicacionPorIdRepository,
+  eliminarLogicamentePublicacionRepository
+} from './publicacion.repository.js'
 
-const createProperty = async (data: any, userId: number) => {
-  const result = await prisma.$transaction(async (tx) => {
-    const inmueble = await tx.inmueble.create({
-      data: {
-        titulo: data.titulo,
-        tipoAccion: data.tipoAccion,
-        categoria: data.categoria,
-        precio: data.precio,
-        superficieM2: data.superficieM2,
-        nroCuartos: data.nroCuartos,
-        nroBanos: data.nroBanos,
-        descripcion: data.descripcion,
-        propietarioId: userId
-      }
-    })
+export const listarMisPublicacionesService = async (usuarioId: number) => {
+  if (Number.isNaN(usuarioId) || usuarioId <= 0) {
+    throw new Error('USUARIO_INVALIDO')
+  }
 
-    const publicacion = await tx.publicacion.create({
-      data: {
-        titulo: data.titulo,
-        descripcion: data.descripcion,
-        usuarioId: userId,
-        inmuebleId: inmueble.id
-      }
-    })
+  const publicaciones = await buscarPublicacionesPorUsuarioRepository(usuarioId)
 
-    await tx.$executeRaw`
-      INSERT INTO ubicacion_inmueble ("inmuebleId", "direccion", "latitud", "longitud")
-      VALUES (
-        ${inmueble.id},
-        ${data.direccion},
-        ${data.latitud ?? 0},
-        ${data.longitud ?? 0}
-      )
-    `
+  type PublicacionesPorUsuario = Awaited<ReturnType<typeof buscarPublicacionesPorUsuarioRepository>>
 
-    return { inmueble, publicacion }
-  })
-
-  return result
+  return publicaciones.map((publicacion: PublicacionesPorUsuario[number]) => ({
+    id: publicacion.id,
+    titulo: publicacion.titulo,
+    precio: Number(publicacion.inmueble.precio),
+    ubicacion: publicacion.inmueble.ubicacion?.direccion || 'Ubicación no disponible',
+    nroBanos: publicacion.inmueble.nroBanos,
+    nroCuartos: publicacion.inmueble.nroCuartos,
+    superficieM2: publicacion.inmueble.superficieM2
+      ? Number(publicacion.inmueble.superficieM2)
+      : null,
+    imagenUrl: publicacion.multimedia?.[0]?.url ?? null
+  }))
 }
 
-export default { createProperty }
+export const eliminarPublicacionService = async (
+  publicacionId: number,
+  usuarioSolicitanteId: number
+) => {
+  if (Number.isNaN(publicacionId) || publicacionId <= 0) {
+    throw new Error('ID_INVALIDO')
+  }
+
+  if (Number.isNaN(usuarioSolicitanteId) || usuarioSolicitanteId <= 0) {
+    throw new Error('USUARIO_INVALIDO')
+  }
+
+  const publicacion = await buscarPublicacionPorIdRepository(publicacionId)
+
+  if (!publicacion) {
+    throw new Error('PUBLICACION_NO_EXISTE')
+  }
+
+  if (publicacion.usuarioId !== usuarioSolicitanteId) {
+    throw new Error('NO_AUTORIZADO')
+  }
+
+  if (publicacion.estado === 'ELIMINADA') {
+    throw new Error('PUBLICACION_YA_ELIMINADA')
+  }
+
+  await eliminarLogicamentePublicacionRepository(publicacion.id, publicacion.inmuebleId)
+
+  return {
+    id: publicacion.id,
+    estado: 'ELIMINADA'
+  }
+}

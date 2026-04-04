@@ -3,12 +3,14 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { Bell, CheckCheck, Loader2, Menu, Trash2, WifiOff, X } from 'lucide-react'
 
 import Logo from '../navbar/Logo'
 import NavLinks from '../navbar/NavLinks'
 import UserMenu from '../navbar/UserMenu'
 import LogoutModal from '../navbar/LogoutModal'
 import { useNotifications } from '@/hooks/useNotifications'
+import type { NotificationFilter } from '@/types/notification'
 
 export type User = {
   name: string
@@ -17,7 +19,9 @@ export type User = {
 
 const USER_STORAGE_KEY = 'propbol_user'
 const SESSION_EXPIRES_KEY = 'propbol_session_expires'
-const SESSION_DURATION_MS = 60 * 60 * 1000 // 1 hora
+const SESSION_DURATION_MS = 60 * 60 * 1000
+
+const filters: NotificationFilter[] = ['todas', 'leida', 'no leida']
 
 export default function Navbar() {
   const router = useRouter()
@@ -27,31 +31,43 @@ export default function Navbar() {
   const [isPanelOpen, setIsPanelOpen] = useState(false)
   const [showLogoutModal, setShowLogoutModal] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const {
     open,
     filter,
-    notifications,
-    filteredNotifications,
     visibleNotifications,
+    unreadCount,
+    isLoading,
+    isLoadingMore,
+    error,
+    isOnline,
     notificationRef,
     toggleNotifications,
     setFilter,
     markAsRead,
-    archiveNotification,
+    markAllAsRead,
+    deleteNotification,
     loadMoreNotifications,
+    hasMore,
+    refreshNotifications,
     isLoggedIn,
     setIsLoggedIn
   } = useNotifications()
 
-  const unreadCount = notifications.filter((n) => n.status === 'no leida').length
-
-  const clearSession = () => {
+  const clearSession = (emitEvent = true) => {
     localStorage.removeItem(USER_STORAGE_KEY)
     localStorage.removeItem(SESSION_EXPIRES_KEY)
+    localStorage.removeItem('token')
     setUser(null)
     setIsPanelOpen(false)
     setShowLogoutModal(false)
+    setIsLoggedIn(false)
+
+    if (emitEvent) {
+      window.dispatchEvent(new Event('propbol:session-changed'))
+      window.dispatchEvent(new Event('auth-state-changed'))
+    }
   }
 
   const isSessionExpired = () => {
@@ -63,22 +79,38 @@ export default function Navbar() {
   const restoreSession = () => {
     const savedUser = localStorage.getItem(USER_STORAGE_KEY)
     const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY)
+    const token = localStorage.getItem('token')
 
-    if (!savedUser || !expiresAt) {
-      clearSession()
+    if (!savedUser || !expiresAt || !token) {
+      clearSession(false)
       return
     }
 
     if (Date.now() > Number(expiresAt)) {
-      clearSession()
+      clearSession(false)
       return
     }
 
-    setUser(JSON.parse(savedUser))
+    try {
+      setUser(JSON.parse(savedUser))
+      setIsLoggedIn(true)
+    } catch {
+      clearSession(false)
+    }
   }
 
   useEffect(() => {
     restoreSession()
+
+    const handleSessionChange = () => restoreSession()
+
+    window.addEventListener('propbol:login', handleSessionChange)
+    window.addEventListener('propbol:session-changed', handleSessionChange)
+
+    return () => {
+      window.removeEventListener('propbol:login', handleSessionChange)
+      window.removeEventListener('propbol:session-changed', handleSessionChange)
+    }
   }, [])
 
   useEffect(() => {
@@ -108,6 +140,22 @@ export default function Navbar() {
     return () => clearInterval(interval)
   }, [user, router])
 
+  useEffect(() => {
+    if (!open) return
+
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        toggleNotifications()
+      }
+    }
+
+    document.addEventListener('keydown', handleEsc)
+
+    return () => {
+      document.removeEventListener('keydown', handleEsc)
+    }
+  }, [open, toggleNotifications])
+
   const togglePanel = () => {
     if (user && isSessionExpired()) {
       clearSession()
@@ -115,7 +163,15 @@ export default function Navbar() {
       return
     }
 
-    setIsPanelOpen(!isPanelOpen)
+    setIsPanelOpen((prev) => !prev)
+  }
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen((prev) => !prev)
+  }
+
+  const handleLoginRedirect = () => {
+    router.push('/sign-in')
   }
 
   const handleLoginMock = () => {
@@ -129,6 +185,8 @@ export default function Navbar() {
     setUser(mockUser)
     localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(mockUser))
     localStorage.setItem(SESSION_EXPIRES_KEY, String(expiresAt))
+    setIsLoggedIn(true)
+    window.dispatchEvent(new Event('auth-state-changed'))
   }
 
   const handleOpenLogoutModal = () => {
@@ -140,21 +198,35 @@ export default function Navbar() {
     setShowLogoutModal(false)
   }
 
-  const handleConfirmLogout = () => {
+  const handleConfirmLogout = async () => {
     if (isLoggingOut) return
 
     setIsLoggingOut(true)
 
-    setTimeout(() => {
-      clearSession()
-      setIsLoggingOut(false)
-      router.push('/')
-    }, 400)
+    const token = localStorage.getItem('token')
+
+    if (token) {
+      try {
+        await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000'}/api/auth/logout`,
+          {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        )
+      } catch {
+        // si falla la red igual limpiamos la sesión local
+      }
+    }
+
+    clearSession()
+    setIsLoggingOut(false)
+    router.push('/')
   }
 
   return (
     <>
-      <nav className="sticky top-0 z-40 w-full border-b border-gray-200 bg-[#F9F6EE] shadow-sm">
+      <nav className="sticky top-0 z-40 w-full border-b border-stone-200 bg-[#F9F6EE] shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-10">
@@ -167,47 +239,67 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={toggleNotifications}
-                  className="relative rounded-full p-2 transition hover:bg-gray-100"
                   aria-label="Abrir notificaciones"
+                  aria-haspopup="true"
+                  aria-expanded={open}
+                  className="relative rounded-full p-2 transition duration-200 hover:bg-black/5 hover:shadow-sm"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6 text-gray-600"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                    />
-                  </svg>
+                  <Bell className="h-6 w-6 text-stone-600" />
 
-                  {unreadCount > 0 && (
-                    <span className="absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1 text-xs font-semibold text-white">
-                      {unreadCount}
+                  {unreadCount > 0 ? (
+                    <span
+                      aria-label={`${unreadCount} notificaciones no leídas`}
+                      className="absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-amber-600 px-1 text-xs font-semibold text-white"
+                    >
+                      {unreadCount > 99 ? '99+' : unreadCount}
                     </span>
-                  )}
+                  ) : null}
                 </button>
 
-                {open && (
-                  <div className="absolute right-0 top-12 z-50 w-80 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
-                    <div className="border-b border-gray-100 px-4 py-3">
-                      <h3 className="text-sm font-semibold text-gray-800">Notificaciones</h3>
+                {open ? (
+                  <div
+                    role="dialog"
+                    aria-label="Panel de notificaciones"
+                    aria-modal="true"
+                    className="
+                      fixed left-0 right-0 top-[57px] z-50
+                      mx-2 overflow-hidden rounded-xl border border-stone-200 bg-white shadow-lg
+                      sm:absolute sm:left-auto sm:right-0 sm:top-12 sm:mx-0 sm:w-80
+                    "
+                  >
+                    <div className="flex items-center justify-between border-b border-stone-100 px-4 py-3">
+                      <h3 className="text-sm font-semibold text-stone-900">Notificaciones</h3>
+
+                      {isLoggedIn ? (
+                        <button
+                          type="button"
+                          onClick={() => void markAllAsRead()}
+                          disabled={!isOnline}
+                          className="inline-flex items-center gap-1 text-xs text-amber-600 transition hover:text-amber-700 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          <CheckCheck className="h-4 w-4" />
+                          Marcar todas
+                        </button>
+                      ) : null}
                     </div>
+
+                    {!isOnline ? (
+                      <div className="flex items-center gap-2 border-b border-stone-100 bg-stone-50 px-4 py-2 text-xs text-stone-500">
+                        <WifiOff className="h-3 w-3 shrink-0" />
+                        <span>Sin conexión. Se actualizará al reconectarte.</span>
+                      </div>
+                    ) : null}
 
                     {!isLoggedIn ? (
                       <div className="px-4 py-6 text-center">
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-stone-500">
                           Inicia sesión para recibir notificaciones
                         </p>
                         <div className="mt-3 flex justify-center">
                           <button
                             type="button"
-                            onClick={() => setIsLoggedIn(true)}
-                            className="rounded-full bg-blue-600 px-4 py-1.5 text-xs font-medium text-white transition hover:bg-blue-700"
+                            onClick={handleLoginRedirect}
+                            className="rounded-full bg-amber-600 px-4 py-1.5 text-xs font-medium text-white transition hover:bg-amber-700"
                           >
                             Iniciar sesión
                           </button>
@@ -215,67 +307,69 @@ export default function Navbar() {
                       </div>
                     ) : (
                       <>
-                        <div className="flex flex-wrap gap-2 border-b border-gray-100 px-4 py-3">
-                          <button
-                            type="button"
-                            onClick={() => setFilter('todas')}
-                            className={`rounded-full px-3 py-1 text-xs font-medium transition ${
-                              filter === 'todas'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
-                          >
-                            Todas
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setFilter('leida')}
-                            className={`rounded-full px-3 py-1 text-xs font-medium transition ${
-                              filter === 'leida'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
-                          >
-                            Leídas
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setFilter('no leida')}
-                            className={`rounded-full px-3 py-1 text-xs font-medium transition ${
-                              filter === 'no leida'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
-                          >
-                            No leídas
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setFilter('archivada')}
-                            className={`rounded-full px-3 py-1 text-xs font-medium transition ${
-                              filter === 'archivada'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
-                          >
-                            Archivadas
-                          </button>
+                        <div
+                          role="tablist"
+                          aria-label="Filtros de notificaciones"
+                          className="flex flex-wrap gap-2 border-b border-stone-100 px-4 py-3"
+                        >
+                          {filters.map((item) => (
+                            <button
+                              key={item}
+                              type="button"
+                              role="tab"
+                              aria-selected={filter === item}
+                              onClick={() => setFilter(item)}
+                              className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+                                filter === item
+                                  ? 'bg-amber-600 text-white'
+                                  : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+                              }`}
+                            >
+                              {item === 'todas'
+                                ? 'Todas'
+                                : item === 'leida'
+                                  ? 'Leídas'
+                                  : 'No leídas'}
+                            </button>
+                          ))}
                         </div>
 
                         <div
-                          className="max-h-80 overflow-y-auto"
+                          role="list"
+                          aria-label="Lista de notificaciones"
+                          aria-live="polite"
+                          className="max-h-[60vh] overflow-y-auto sm:max-h-80"
                           onScroll={(e) => {
                             const target = e.currentTarget
                             const reachedBottom =
                               target.scrollTop + target.clientHeight >= target.scrollHeight - 10
 
-                            if (reachedBottom) {
-                              loadMoreNotifications()
+                            if (reachedBottom && hasMore && !isLoadingMore) {
+                              void loadMoreNotifications()
                             }
                           }}
                         >
-                          {filteredNotifications.length === 0 ? (
-                            <p className="px-4 py-6 text-center text-sm text-gray-500">
+                          {isLoading ? (
+                            <div className="flex items-center justify-center gap-2 px-4 py-8 text-sm text-stone-500">
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                              Cargando notificaciones...
+                            </div>
+                          ) : error && isOnline ? (
+                            <div className="px-4 py-6 text-center">
+                              <p className="text-sm text-red-500">{error}</p>
+                              <button
+                                type="button"
+                                onClick={() => void refreshNotifications(filter)}
+                                className="mt-3 rounded border border-stone-300 px-3 py-1 text-sm text-stone-700 transition hover:bg-stone-50"
+                              >
+                                Reintentar
+                              </button>
+                            </div>
+                          ) : visibleNotifications.length === 0 ? (
+                            <p
+                              role="status"
+                              className="px-4 py-6 text-center text-sm text-stone-500"
+                            >
                               No hay notificaciones
                             </p>
                           ) : (
@@ -283,67 +377,76 @@ export default function Navbar() {
                               {visibleNotifications.map((notification) => (
                                 <div
                                   key={notification.id}
-                                  onClick={() => {
-                                    if (notification.status !== 'archivada') {
-                                      markAsRead(notification.id)
-                                    }
-                                  }}
-                                  className={`cursor-pointer border-b border-gray-100 px-4 py-3 transition hover:bg-gray-50 ${
-                                    notification.status === 'no leida' ? 'bg-blue-50' : 'bg-white'
+                                  role="listitem"
+                                  aria-label={`Notificación: ${notification.title}`}
+                                  className={`border-b border-stone-100 px-4 py-3 transition hover:bg-stone-50 ${
+                                    notification.status === 'no leida' ? 'bg-amber-50' : 'bg-white'
                                   }`}
                                 >
-                                  <div className="flex items-center justify-between gap-3">
-                                    <p className="text-sm font-semibold text-gray-800">
-                                      {notification.title?.trim() || '(Sin título)'}
-                                    </p>
-                                    <span className="text-[10px] uppercase text-gray-400">
-                                      {notification.status}
-                                    </span>
-                                  </div>
+                                  <div className="flex items-start justify-between gap-3">
+                                    <div className="min-w-0 flex-1">
+                                      <p className="truncate text-sm font-semibold text-stone-900">
+                                        {notification.title?.trim() || '(Sin título)'}
+                                      </p>
 
-                                  <p className="mt-1 text-sm text-gray-600">
-                                    {notification.description?.trim() ||
-                                      '(Sin descripción disponible)'}
-                                  </p>
+                                      <p className="mt-1 line-clamp-2 text-sm text-stone-600">
+                                        {notification.description?.trim() ||
+                                          '(Sin descripción disponible)'}
+                                      </p>
 
-                                  {notification.status !== 'archivada' && (
-                                    <div className="mt-2 flex justify-end">
+                                      <span className="mt-2 inline-block text-[10px] uppercase text-stone-400">
+                                        {notification.status}
+                                      </span>
+                                    </div>
+
+                                    <div className="flex shrink-0 items-center gap-2">
+                                      {notification.status === 'no leida' ? (
+                                        <button
+                                          type="button"
+                                          onClick={() => void markAsRead(notification.id)}
+                                          disabled={!isOnline}
+                                          aria-label={`Marcar como leída: ${notification.title}`}
+                                          className="text-xs text-amber-600 transition hover:text-amber-700 disabled:cursor-not-allowed disabled:opacity-40"
+                                        >
+                                          Leer
+                                        </button>
+                                      ) : null}
+
                                       <button
                                         type="button"
-                                        onClick={(e) => {
-                                          e.stopPropagation()
-                                          archiveNotification(notification.id)
-                                        }}
-                                        className="text-xs text-gray-400 transition hover:text-gray-600"
+                                        onClick={() => void deleteNotification(notification.id)}
+                                        disabled={!isOnline}
+                                        aria-label={`Eliminar notificación: ${notification.title}`}
+                                        className="text-xs text-red-500 transition hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-40"
                                       >
-                                        Archivar
+                                        <Trash2 className="h-4 w-4" />
                                       </button>
                                     </div>
-                                  )}
+                                  </div>
                                 </div>
                               ))}
 
-                              {visibleNotifications.length < filteredNotifications.length && (
-                                <p className="px-4 py-3 text-center text-xs text-gray-400">
+                              {isLoadingMore ? (
+                                <p className="px-4 py-3 text-center text-xs text-stone-400">
                                   Cargando más notificaciones...
                                 </p>
-                              )}
+                              ) : null}
                             </>
                           )}
                         </div>
-
-                        <div className="border-t border-gray-100 px-4 py-3 text-center">
+                        <div className="border-t border-stone-100 px-4 py-3 text-center">
                           <Link
                             href="/notificaciones"
-                            className="text-sm font-medium text-blue-600 transition hover:text-blue-700"
+                            onClick={toggleNotifications}
+                            className="text-sm font-medium text-amber-600 transition hover:text-amber-700"
                           >
-                            Ver todo
+                            Ver todas las notificaciones
                           </Link>
                         </div>
                       </>
                     )}
                   </div>
-                )}
+                ) : null}
               </div>
 
               <div className="relative" ref={panelRef}>
@@ -352,10 +455,21 @@ export default function Navbar() {
                   isPanelOpen={isPanelOpen}
                   onTogglePanel={togglePanel}
                   onClosePanel={() => setIsPanelOpen(false)}
-                  onLogin={handleLoginMock}
+                  onLogin={handleLoginRedirect}
                   onOpenLogoutModal={handleOpenLogoutModal}
                 />
               </div>
+
+              {/* Botón de Hamburguesa para móvil */}
+              <button
+                type="button"
+                onClick={toggleMobileMenu}
+                className="rounded-full p-2 transition duration-200 hover:bg-black/5 hover:shadow-sm md:hidden"
+                aria-label="Abrir menú de navegación"
+                aria-expanded={isMobileMenuOpen}
+              >
+                <Menu className="h-6 w-6 text-stone-600" />
+              </button>
             </div>
           </div>
         </div>
@@ -367,6 +481,57 @@ export default function Navbar() {
         onCancel={handleCancelLogout}
         onConfirm={handleConfirmLogout}
       />
+
+      {/* Panel de Menú Móvil */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/40 md:hidden"
+          onClick={toggleMobileMenu}
+          aria-modal="true"
+          role="dialog"
+        >
+          <div
+            className="fixed right-0 top-0 h-full w-4/5 max-w-xs bg-[#F9F6EE] p-6 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <Logo />
+              <button
+                type="button"
+                onClick={toggleMobileMenu}
+                className="rounded-full p-2 transition duration-200 hover:bg-black/5"
+                aria-label="Cerrar menú"
+              >
+                <X className="h-6 w-6 text-stone-600" />
+              </button>
+            </div>
+
+            <nav className="mt-10 flex flex-col gap-4">
+              <Link
+                href="/"
+                onClick={toggleMobileMenu}
+                className="rounded-md px-3 py-2 text-lg font-medium text-gray-700 hover:bg-[#E68B25]/10 hover:text-[#E68B25]"
+              >
+                Inicio
+              </Link>
+              <Link
+                href="#contacto"
+                onClick={toggleMobileMenu}
+                className="rounded-md px-3 py-2 text-lg font-medium text-gray-700 hover:bg-[#E68B25]/10 hover:text-[#E68B25]"
+              >
+                Contáctanos
+              </Link>
+              <Link
+                href="#nosotros"
+                onClick={toggleMobileMenu}
+                className="rounded-md px-3 py-2 text-lg font-medium text-gray-700 hover:bg-[#E68B25]/10 hover:text-[#E68B25]"
+              >
+                Sobre Nosotros
+              </Link>
+            </nav>
+          </div>
+        </div>
+      )}
     </>
   )
 }

@@ -1,11 +1,13 @@
 import { Router } from 'express'
-import { createProperty, cancelProperty } from '../publicacion/publicacion.controller.js'
-import { propertyValidationRules } from '../publicacion/publicacion.validator.js'
-//import { verifyToken } from '../middleware/auth.middleware.js'
+import { validarJWT } from '../../middleware/validarJWT.js'
+import {
+  eliminarPublicacionController,
+  listarMisPublicacionesController
+} from './publicacion.controller.js'
 
 const router = Router()
 
-router.post('/properties', propertyValidationRules, createProperty)
-router.post('/properties/cancel', cancelProperty)
+router.get('/mias', validarJWT, listarMisPublicacionesController)
+router.delete('/:id', validarJWT, eliminarPublicacionController)
 
 export default router

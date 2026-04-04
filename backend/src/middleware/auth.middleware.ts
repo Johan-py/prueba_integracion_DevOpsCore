@@ -5,14 +5,14 @@ import { findActiveSessionByToken } from '../modules/auth/auth.repository.js'
 export const verifyAuth = async (req: VercelRequest, res: VercelResponse) => {
   const authHeader = req.headers.authorization
 
-  if (!authHeader || authHeader.startsWith('Bearer ')) {
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     res.status(401).json({
       message: 'Token no proporcionado'
     })
     return null
   }
 
-  const token = authHeader.split('')[1]
+  const token = authHeader.split(' ')[1]
 
   if (!token) {
     res.status(401).json({
