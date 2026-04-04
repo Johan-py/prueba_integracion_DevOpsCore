@@ -19,6 +19,7 @@ yarn-debug.log*
 yarn-error.log*
 bun.lockb
 *.log
+uploads/
 
 # IDEs
 .vscode/
