@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { uploadPerfilAvatar } from "../../middleware/upload.middleware.js";
 import {
   obtenerPerfil,
   editarNombre,
@@ -50,8 +51,7 @@ PUT http://localhost:5000/api/perfil/usuario/foto-perfil
 {
   "fotoPerfil": "https://example.com/nueva-foto.jpg"
 }
-*/
-router.put("/foto-perfil", validarJWT, editarFotoPerfil);
+*/router.put("/foto-perfil", validarJWT, uploadPerfilAvatar.single("fotoPerfil"), editarFotoPerfil);
 /*
 PUT http://localhost:5000/api/perfil/usuario/telefonos
 {

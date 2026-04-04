@@ -197,15 +197,20 @@ export const editarDireccion = async (req: AuthRequest, res: Response) => {
 export const editarFotoPerfil = async (req: AuthRequest, res: Response) => {
   try {
     const usuarioId = req.usuario?.id;
-    const { fotoPerfil } = req.body;
 
     if (!usuarioId) {
       return res.status(401).json({ ok: false, msg: "No hay token válido" });
     }
 
-    if (!fotoPerfil) {
-      return res.status(400).json({ ok: false, msg: "La URL de la foto es requerida" });
+    if (!(req as any).file) {
+      return res.status(400).json({
+        ok: false,
+        msg: "Debe enviar una imagen"
+      });
     }
+
+    const archivo = (req as any).file
+    const fotoPerfil = `/uploads/perfiles/${archivo.filename}`
 
     const usuarioActualizado = await prisma.usuario.update({
       where: { id: usuarioId },

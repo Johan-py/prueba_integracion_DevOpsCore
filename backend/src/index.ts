@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import path from "path";
 import cors from "cors";
 import { env } from "./config/env.js";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
@@ -38,13 +39,14 @@ const app = express()
 app.use(
   cors({
     origin: ['http://localhost:3000', 'http://localhost:3001'],
-    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS', 'PUT'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
   })
 )
 
 app.use(express.json())
+app.use("/uploads", express.static(path.resolve("uploads")))
 
 app.use('/api/perfil', correoverificacionRoutes)
 app.use("/api/perfil/usuario", perfilRoutes)
