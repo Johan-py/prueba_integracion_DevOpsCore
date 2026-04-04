@@ -12,7 +12,8 @@ export interface FiltrosBusqueda {
   categoria?: string | string[];
   tipoInmueble?: string | string[]; 
   modoInmueble?: string | string[]; 
-  query?: string;                   
+  query?: string;
+  locationId?: number;                   
   fecha?: 'mas-recientes' | 'mas-populares' | 'mas-antiguos';
   precio?: 'menor-a-mayor' | 'mayor-a-menor';
   superficie?: 'menor-a-mayor' | 'mayor-a-menor';
@@ -20,9 +21,8 @@ export interface FiltrosBusqueda {
 
 export const propertiesRepository = {
   async getAll(filtros: FiltrosBusqueda = {}) {
-    console.log("📦 Body de filtros recibido:", JSON.stringify(filtros, null, 2));
     // ── WHERE ──────────────────────────────────────────────────────────────
-    const where: any = { estado: 'ACTIVO' }
+    const where: any = {estado: 'ACTIVO'}
 
     const rawTipo = filtros.tipoInmueble || filtros.categoria;
     if (rawTipo) {
@@ -40,29 +40,17 @@ export const propertiesRepository = {
     }
   }
 
-  if (filtros.query && filtros.query.trim() !== '') {
-  const q = filtros.query.trim();
-
-  where.OR = [
-    { titulo: { contains: q, mode: 'insensitive' } },
-    { descripcion: { contains: q, mode: 'insensitive' } },
-    {
-      // Filtramos por la zona directamente
-      ubicacion: {
-        zona: { contains: q, mode: 'insensitive' }
-      }
-    },
-    {
-      // Filtramos por el nombre de la ubicación maestra
-      ubicacion: {
-        ubicacion_maestra: {
-          nombre: { contains: q, mode: 'insensitive' }
-        }
-      }
-    }
-  ];
-}
-  console.log("🛠️ Objeto WHERE generado para Prisma:", JSON.stringify(where, null, 2));
+  if (filtros.locationId) {
+    where.ubicacion = {
+      ubicacionMaestraId: Number(filtros.locationId)
+    };
+  } else if (filtros.query && filtros.query.trim() !== '') {
+    const q = filtros.query.trim();
+    where.OR = [
+      { titulo: { contains: q, mode: 'insensitive' } },
+      { descripcion: { contains: q, mode: 'insensitive' } }
+    ];
+  }
 
   
     // ── ORDER BY ───────────────────────────────────────────────────────────

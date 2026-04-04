@@ -73,15 +73,13 @@ export const ResultadosBusqueda = () => {
         })
         .then((data) => {
           // Ajustamos según la respuesta de tu API (data.ok o data directo)
-          if (data && (data.ok || Array.isArray(data))) {
-            setInmueblesRaw(data.ok ? data.data : data)
+         if (data && data.ok === true && Array.isArray(data.data)) {
+            console.log("✅ Datos recibidos con éxito:", data.data.length);
+            setInmueblesRaw(data.data); // Guardamos solo el arreglo de inmuebles
           } else {
-            setError(true)
+            console.error("❌ Formato de datos inesperado:", data);
+            setError(true);
           }
-        })
-        .catch((_err) => {
-          console.error("Error en el fetch de inmuebles")
-          setError(true)
         })
         .finally(() => setCargando(false))
     }
