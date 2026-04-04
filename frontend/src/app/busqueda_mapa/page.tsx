@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, Suspense } from 'react'
-import dynamic from 'next/dynamic'
+import nextDynamic from 'next/dynamic'
 import { ChevronLeft, ChevronRight, List as ListIcon, LayoutGrid } from 'lucide-react'
 
 // === HOOKS ===
@@ -16,7 +16,7 @@ import EmptyState from '@/components/galeria/EmptyState'
 import { MenuOrdenamiento } from '@/components/busqueda/ordenamiento/MenuOrdenamiento'
 
 // 🟢 Mantenemos la carga dinámica del mapa
-const MapView = dynamic(() => import('./MapView'), { 
+const MapView = nextDynamic(() => import('./MapView'), { 
   ssr: false,
   loading: () => <div className="h-full w-full bg-stone-100 animate-pulse flex items-center justify-center text-stone-400">Cargando mapa de Bolivia...</div>
 })
@@ -173,8 +173,7 @@ function BusquedaMapaContent() {
   )
 }
 
-// 🟢 EXPORT PRINCIPAL: Ahora forzamos que no se intente pre-renderizar estáticamente
-export const dynamicPage = 'force-dynamic' // 🚀 Truco extra para Vercel
+export const dynamic = 'force-dynamic' 
 
 export default function BusquedaMapaPage() {
   return (
