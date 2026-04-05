@@ -9,6 +9,8 @@
 - # Scripts de desarrollo y CI/CD listos para pipelines
   **PropBol** es una plataforma web enfocada en la **compra, venta y gestión de inmuebles** en Bolivia.
 - Scripts de desarrollo y CI/CD listos para pipelines
+  **PropBol** es una plataforma web enfocada en la **compra, venta y gestión de inmuebles** en Bolivia.
+
 Permite a usuarios:
 
 - Publicar propiedades (casas, departamentos, terrenos)
@@ -90,6 +92,8 @@ GET /api/calculator?a=10&b=2&op=divide
 
 
 # Levantar contenedor de desarrollo:
+Levantar contenedor de desarrollo:
+
 
 ## 📂 Estructura del Proyecto
 
@@ -119,7 +123,10 @@ GET /api/calculator?a=10&b=2&op=divide
 > Este repositorio sirve como **base para construir escenarios de estrés realistas para el equipo de DevOps**.
 
 
-
+> # Este repositorio sirve como **base para construir escenarios de estrés realistas para el equipo de DevOps**.
+>
+> Este repositorio sirve como **base para construir escenarios de estrés realistas para el equipo de DevOps**.
+>
 > > > > > > > Asegúrate de tener instalado:
 
 - Bun >= 1.x
