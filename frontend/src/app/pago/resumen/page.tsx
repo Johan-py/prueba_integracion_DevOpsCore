@@ -142,7 +142,7 @@ export default function PaginaResumenCompra() {
 
         {/* Columna derecha: Resumen de compra */}
         <div>
-      <ResumenTransaccion transaccion={transaccion} />
+          <ResumenTransaccion transaccion={transaccion} />
         </div>
       </div>
 
