@@ -87,6 +87,7 @@ export default function ProfileCard() {
       })
 
       const data = await response.json()
+      console.log('Respuesta cargar perfil:', data)
 
       if (data.ok && data.perfil) {
         const perfil = data.perfil
@@ -95,14 +96,14 @@ export default function ProfileCard() {
         setPais(perfil.pais || '')
         setGenero(perfil.genero || '')
         setDireccion(perfil.direccion || '')
-        setAvatar(perfil.avatar || null)
+        setAvatar(perfil.avatar || perfil.fotoPerfil || null)
         setOriginalEmail(perfil.correo || '')
         setTempEmail(perfil.correo || '')
 
         // Cargar teléfonos si existen
         if (perfil.telefonos && Array.isArray(perfil.telefonos) && perfil.telefonos.length > 0) {
           const telefonosCargados = perfil.telefonos.map((tel: any, index: number) => {
-            const paisEncontrado = PAISES.find(p => tel.codigoPais === p.codigo) || PAISES[0]
+            const paisEncontrado = PAISES.find((p) => tel.codigoPais === p.codigo) || PAISES[0]
             return {
               id: Date.now() + index,
               numero: tel.numero,
@@ -282,9 +283,10 @@ export default function ProfileCard() {
       })
 
       const data = await response.json()
+      console.log('Respuesta upload foto:', data)
 
       if (data.ok) {
-        setAvatar(data.fotoPerfil)
+        setAvatar(data.fotoPerfil || data.avatar || null)
         alert('Foto de perfil actualizada exitosamente')
         // Recargar perfil para actualizar datos
         cargarPerfil()
@@ -330,7 +332,9 @@ export default function ProfileCard() {
       })
 
       if (!verifyRes.ok) {
-        const errorData = await verifyRes.json().catch(() => ({ msg: 'Error al verificar contraseña' }))
+        const errorData = await verifyRes
+          .json()
+          .catch(() => ({ msg: 'Error al verificar contraseña' }))
         throw new Error(errorData.msg || 'Error al verificar contraseña')
       }
 
@@ -366,7 +370,9 @@ export default function ProfileCard() {
       })
 
       if (!solicitarRes.ok) {
-        const errorData = await solicitarRes.json().catch(() => ({ msg: 'Error al solicitar cambio' }))
+        const errorData = await solicitarRes
+          .json()
+          .catch(() => ({ msg: 'Error al solicitar cambio' }))
         throw new Error(errorData.msg || 'Error al solicitar cambio de email')
       }
 
@@ -584,7 +590,7 @@ export default function ProfileCard() {
           <div className="w-28 h-28 rounded-full bg-white border border-gray-300 flex items-center justify-center shadow-sm overflow-hidden">
             {avatar ? (
               <img
-                src={avatar}
+                src={avatar.startsWith('http') ? avatar : `${API_URL}${avatar}`}
                 alt="Foto de perfil"
                 className="w-full h-full object-cover"
               />
@@ -597,11 +603,7 @@ export default function ProfileCard() {
             disabled={isUploading}
             className="absolute right-0 top-1/2 -translate-y-1/2 md:right-1/2 md:translate-x-1/2 md:top-full md:mt-4 w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center shadow-sm hover:bg-gray-100 disabled:opacity-50"
           >
-            {isUploading ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : (
-              <Camera size={14} />
-            )}
+            {isUploading ? <Loader2 size={16} className="animate-spin" /> : <Camera size={14} />}
           </button>
           <input
             ref={fileInputRef}
@@ -630,9 +632,10 @@ export default function ProfileCard() {
                 value={nombre}
                 onChange={(e) => setNombre(soloLetras(e.target.value))}
                 className={`flex-1 px-3 py-2 rounded text-sm
-                  ${campoEditando === 'nombre'
-                    ? 'bg-white border border-amber-500'
-                    : 'bg-gray-200 cursor-not-allowed'
+                  ${
+                    campoEditando === 'nombre'
+                      ? 'bg-white border border-amber-500'
+                      : 'bg-gray-200 cursor-not-allowed'
                   }
                 `}
               />
@@ -680,7 +683,10 @@ export default function ProfileCard() {
           {telefonos.map((tel, index) => {
             const keyCampo = `telefono-${tel.id}`
             return (
-              <div key={tel.id} className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+              <div
+                key={tel.id}
+                className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4"
+              >
                 <label className="w-full md:w-40 font-medium text-stone-700">
                   {index === 0 ? 'Teléfono:' : `Teléfono ${index + 1}:`}
                 </label>
@@ -702,10 +708,11 @@ export default function ProfileCard() {
                         )
                       }
                     }}
-                    className={`px-2 py-2 rounded text-sm ${campoEditando === keyCampo
+                    className={`px-2 py-2 rounded text-sm ${
+                      campoEditando === keyCampo
                         ? 'bg-white border border-amber-500'
                         : 'bg-gray-200 cursor-not-allowed'
-                      }`}
+                    }`}
                   >
                     {PAISES.map((p) => (
                       <option key={p.nombre} value={`${p.nombre} ${p.codigo}`}>
@@ -719,10 +726,11 @@ export default function ProfileCard() {
                     value={tel.numero}
                     disabled={campoEditando !== keyCampo}
                     onChange={(e) => actualizarTelefono(tel.id, e.target.value)}
-                    className={`flex-1 px-3 py-2 rounded text-sm ${campoEditando === keyCampo
+                    className={`flex-1 px-3 py-2 rounded text-sm ${
+                      campoEditando === keyCampo
                         ? 'bg-white border border-amber-500'
                         : 'bg-gray-200 cursor-not-allowed'
-                      }`}
+                    }`}
                   />
                   <button
                     onClick={() => setCampoEditando(campoEditando === keyCampo ? null : keyCampo)}
@@ -754,9 +762,10 @@ export default function ProfileCard() {
                 value={pais}
                 onChange={(e) => setPais(e.target.value)}
                 className={`flex-1 px-3 py-2 rounded text-sm
-                  ${campoEditando === 'pais'
-                    ? 'bg-white border border-amber-500'
-                    : 'bg-gray-200 cursor-not-allowed'
+                  ${
+                    campoEditando === 'pais'
+                      ? 'bg-white border border-amber-500'
+                      : 'bg-gray-200 cursor-not-allowed'
                   }
                 `}
               >
@@ -784,9 +793,10 @@ export default function ProfileCard() {
                 value={genero}
                 onChange={(e) => setGenero(e.target.value)}
                 className={`flex-1 px-3 py-2 rounded text-sm
-                  ${campoEditando === 'genero'
-                    ? 'bg-white border border-amber-500'
-                    : 'bg-gray-200 cursor-not-allowed'
+                  ${
+                    campoEditando === 'genero'
+                      ? 'bg-white border border-amber-500'
+                      : 'bg-gray-200 cursor-not-allowed'
                   }
                 `}
               >
@@ -813,9 +823,10 @@ export default function ProfileCard() {
                 value={direccion}
                 onChange={(e) => setDireccion(e.target.value)}
                 className={`flex-1 px-3 py-2 rounded text-sm
-                  ${campoEditando === 'direccion'
-                    ? 'bg-white border border-amber-500'
-                    : 'bg-gray-200 cursor-not-allowed'
+                  ${
+                    campoEditando === 'direccion'
+                      ? 'bg-white border border-amber-500'
+                      : 'bg-gray-200 cursor-not-allowed'
                   }
                 `}
               />

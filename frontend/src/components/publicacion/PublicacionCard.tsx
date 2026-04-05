@@ -23,13 +23,11 @@ export default function PublicacionCard({ publicacion, onDeleted }: Props) {
     cerrarConfirmacion,
     cerrarExito,
     cerrarError,
-    confirmarEliminacion,
+    confirmarEliminacion
   } = useDeletePublicacion(publicacion.id, () => onDeleted(publicacion.id))
 
   const precioFormateado = `$${publicacion.precio.toLocaleString()}`
-  const areaFormateada = publicacion.superficieM2
-    ? `${publicacion.superficieM2}m²`
-    : '-'
+  const areaFormateada = publicacion.superficieM2 ? `${publicacion.superficieM2}m²` : '-'
 
   return (
     <>
@@ -63,16 +61,12 @@ export default function PublicacionCard({ publicacion, onDeleted }: Props) {
           <div className="mb-4 grid min-h-[48px] grid-cols-3 overflow-hidden rounded-xl border border-[#ddd4c8] bg-[#f7f2ec]">
             <div className="flex items-center justify-center gap-2 border-r border-[#ddd4c8] px-2">
               <Bath className="h-4 w-4 shrink-0 text-[#e6a04b]" />
-              <span className="text-[14px] text-[#444]">
-                {publicacion.nroBanos ?? '-'}
-              </span>
+              <span className="text-[14px] text-[#444]">{publicacion.nroBanos ?? '-'}</span>
             </div>
 
             <div className="flex items-center justify-center gap-2 border-r border-[#ddd4c8] px-2">
               <BedDouble className="h-4 w-4 shrink-0 text-[#e6a04b]" />
-              <span className="text-[14px] text-[#444]">
-                {publicacion.nroCuartos ?? '-'}
-              </span>
+              <span className="text-[14px] text-[#444]">{publicacion.nroCuartos ?? '-'}</span>
             </div>
 
             <div className="flex items-center justify-center gap-2 px-2">
@@ -103,10 +97,7 @@ export default function PublicacionCard({ publicacion, onDeleted }: Props) {
         loading={loading}
       />
 
-      <DeleteSuccessModal
-        abierto={modalExitoAbierto}
-        onAceptar={cerrarExito}
-      />
+      <DeleteSuccessModal abierto={modalExitoAbierto} onAceptar={cerrarExito} />
 
       <DeleteErrorModal
         abierto={modalErrorAbierto}
