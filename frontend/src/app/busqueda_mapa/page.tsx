@@ -159,15 +159,15 @@ function BusquedaMapaContent() {
                       </div>
                     ))}
                   </div>
-            )}
-          </div>
+                )}
+              </div>
             </div>
           )}
         </aside>
 
         <section className="flex-1 relative bg-stone-200">
           {!isSidebarOpen && (
-          <button
+            <button
               onClick={() => setIsSidebarOpen(true)}
               className="absolute left-0 top-4 z-[1000] bg-white text-black shadow-md rounded-r-md flex flex-col items-center py-4 px-2 gap-4 hover:bg-stone-50 transition-colors"
             >
@@ -176,7 +176,7 @@ function BusquedaMapaContent() {
                 Inmuebles
               </span>
               <ListIcon size={16} className="text-stone-500" />
-          </button>
+            </button>
           )}
 
           <div className="absolute inset-0">
