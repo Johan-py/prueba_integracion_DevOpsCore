@@ -40,6 +40,6 @@
     "@typescript-eslint/parser": "^8.57.2",
     "eslint": "^10.1.0",
     "prisma": "^7.6.0",
-    "typescript": "^6.0.2"
+    "typescript": "^5.3.3"
   }
 }
