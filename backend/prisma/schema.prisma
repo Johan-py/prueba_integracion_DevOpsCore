@@ -375,8 +375,6 @@ model ubicacion_maestra {
   @@index([nombre])
 }
 
-<<<<<<< HEAD
-=======
 model bitacora_pagos {
   id               Int               @id @default(autoincrement())
   id_usuario       Int?
@@ -444,7 +442,6 @@ model transacciones {
   @@index([id_usuario], map: "idx_transacciones_usuario_id")
 }
 
->>>>>>> b68a39aab8d9cda89a4ae3b8e3d1069c14f8933f
 model verificacion_pago {
   id                     Int            @id @default(autoincrement())
   id_transaccion         Int?
