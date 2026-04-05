@@ -13,7 +13,7 @@ import { usePathname, useRouter } from 'next/navigation'
 
 interface FilterBarProps {
   // Ajustamos los nombres para que coincidan con 'nuevosFiltros'
-  onSearch?: (filtros: { 
+  onSearch?: (filtros: {
     tipoInmueble: string[]
     modoInmueble: string[]
     query: string
@@ -60,7 +60,7 @@ export default function FilterBar({ onSearch, variant = 'home' }: FilterBarProps
       return
     }
 
-    // Mapeo para el backend 
+    // Mapeo para el backend
     const tipoMap: Record<string, string> = {
       Casa: 'CASA',
       Departamento: 'DEPARTAMENTO',
@@ -89,7 +89,7 @@ export default function FilterBar({ onSearch, variant = 'home' }: FilterBarProps
     const queryString = params.toString()
     const targetUrl = `/busqueda_mapa${queryString ? `?${queryString}` : ''}`
 
-    // Ejecutar navegación 
+    // Ejecutar navegación
     router.push(targetUrl)
 
     if (onSearch) onSearch(nuevosFiltros)
@@ -135,7 +135,7 @@ export default function FilterBar({ onSearch, variant = 'home' }: FilterBarProps
       <div className={variant === 'map' ? 'shrink-0 scale-90 origin-left' : ''}>
         <TransactionModeFilter
           modoSeleccionado={modosSeleccionados}
-          onModoChange={setModosSeleccionados} 
+          onModoChange={setModosSeleccionados}
         />
       </div>
 
@@ -146,20 +146,20 @@ export default function FilterBar({ onSearch, variant = 'home' }: FilterBarProps
           <ComboBox
             label={variant === 'map' ? '' : 'Tipo'}
             placeholder="Cualquier tipo"
-            icon={Home} 
-            options={['Casa', 'Departamento', 'Terreno', 'Espacios Cementerio']} 
-            onChange={(val) => setTipoInmueble(val)} 
+            icon={Home}
+            options={['Casa', 'Departamento', 'Terreno', 'Espacios Cementerio']}
+            onChange={(val) => setTipoInmueble(val)}
           />
         </div>
 
         <div className="flex-1">
-          <LocationSearch 
-            value={ubicacionTexto} 
+          <LocationSearch
+            value={ubicacionTexto}
             onChange={(val: any) => {
-               // Captura tanto strings como objetos de autocompletado
+              // Captura tanto strings como objetos de autocompletado
               const text = typeof val === 'string' ? val : val?.nombre || val?.target?.value || ''
               setUbicacionTexto(text)
-            }} 
+            }}
           />
         </div>
 
