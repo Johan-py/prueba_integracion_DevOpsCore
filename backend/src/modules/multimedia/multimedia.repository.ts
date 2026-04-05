@@ -1,6 +1,10 @@
 import type { TipoMultimedia } from '@prisma/client'
 import { prisma } from '../../db.js'
-import type { MultimediaRecord, MultimediaType, PublicacionRecord } from './multimedia.types.js'
+import type {
+  MultimediaRecord,
+  MultimediaType,
+  PublicacionRecord
+} from './multimedia.types.js'
 
 const mapPublicationRecord = (publication: {
   id: number
@@ -98,4 +102,34 @@ export const createMultimediaRepository = async (
   })
 
   return mapMultimediaRecord(created)
+}
+
+export const createManyMultimediaRepository = async (
+  items: Array<Omit<MultimediaRecord, 'id'>>
+): Promise<MultimediaRecord[]> => {
+  if (items.length === 0) {
+    return []
+  }
+
+  const createdItems = await prisma.$transaction(
+    items.map((item) =>
+      prisma.multimedia.create({
+        data: {
+          publicacionId: item.publicacionId,
+          tipo: item.tipo as TipoMultimedia,
+          url: item.url,
+          pesoMb: item.pesoMb ?? null
+        },
+        select: {
+          id: true,
+          publicacionId: true,
+          tipo: true,
+          url: true,
+          pesoMb: true
+        }
+      })
+    )
+  )
+
+  return createdItems.map(mapMultimediaRecord)
 }
