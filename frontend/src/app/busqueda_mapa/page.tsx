@@ -121,13 +121,10 @@ function BusquedaMapaContent() {
                     {properties.map((property: any) => (
                       <div
                         key={property.id}
-                        onMouseEnter={() => setHoveredId(property.id)}
+                        // ESTA LÍNEA ES LA QUE DISPARA SU VUELO EN EL MAPA
+                        onMouseEnter={() => setHoveredId(property.id)} 
                         onClick={() => setSelectedPropertyId(property.id)}
-                        className={`cursor-pointer transition-all duration-200 rounded-xl ${viewMode === 'list' ? 'py-1 px-2' : ''} ${
-                          selectedPropertyId === property.id
-                            ? 'ring-2 ring-[#ea580c] shadow-md bg-orange-50/50'
-                            : 'hover:border-stone-300 hover:shadow-sm'
-                        }`}
+                        className={`cursor-pointer transition-all duration-200 rounded-xl ...`}
                       >
                         {viewMode === 'grid' ? (
                           <PropertyCard
