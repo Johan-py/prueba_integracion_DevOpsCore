@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-//formulario
+
 export default function MiRegistroPage() {
   const [datos, setDatos] = useState({
     titulo: 'Tropico 6 Federa',
@@ -31,7 +31,6 @@ export default function MiRegistroPage() {
     const nuevosDatos = { ...datos, [name]: value }
     setDatos(nuevosDatos)
 
-    // Validación en tiempo real para el título
     if (name === 'titulo') {
       const tituloLimpio = value.trim()
 
@@ -39,7 +38,10 @@ export default function MiRegistroPage() {
         setMensajeError('DEBE LLENAR TODOS LOS CAMPOS OBLIGATORIOS')
         setEstado('error')
       } else if (tituloLimpio.length < 20) {
-        setMensajeError('TÍTULO MUY CORTO, DEBE SER MAYOR O IGUAL A 20 CARACTERES')
+        setMensajeError('TÍTULO MUY CORTO, DEBE TENER MÍNIMO 20 CARACTERES')
+        setEstado('error')
+      } else if (tituloLimpio.length >= 80) {
+        setMensajeError('HAZ LLEGADO AL MAXIMO DE 80 CARACTERES')
         setEstado('error')
       } else {
         setMensajeError('')
@@ -61,7 +63,13 @@ export default function MiRegistroPage() {
     }
 
     if (tituloLimpio.length < 20) {
-      setMensajeError('TÍTULO MUY CORTO, DEBE SER MAYOR O IGUAL A 20 CARACTERES')
+      setMensajeError('TÍTULO MUY CORTO, DEBE TENER MÍNIMO 20 CARACTERES')
+      setEstado('error')
+      return
+    }
+
+    if (tituloLimpio.length >= 80) {
+      setMensajeError('HAZ LLEGADO AL MAXIMO DE 80 CARACTERES')
       setEstado('error')
       return
     }
@@ -111,7 +119,6 @@ export default function MiRegistroPage() {
           'ERROR AL GUARDAR LA PROPIEDAD'
 
         console.error('❌ Error backend:', erroresBackend)
-
         setMensajeError(erroresBackend)
         setEstado('error')
         return
@@ -126,6 +133,9 @@ export default function MiRegistroPage() {
       setEstado('error')
     }
   }
+
+  const errorTitulo =
+    mensajeError.includes('TÍTULO MUY CORTO') || mensajeError.includes('TÍTULO MUY LARGO')
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
@@ -161,19 +171,19 @@ export default function MiRegistroPage() {
                       name="titulo"
                       value={datos.titulo}
                       onChange={manejarCambio}
+                      maxLength={80}
                       className={`w-full p-3 rounded-xl border bg-white/70 ${
-                        mensajeError &&
-                        mensajeError.includes('TÍTULO MUY CORTO')
-                          ? 'border-red-500'
-                          : 'border-gray-200'
+                        errorTitulo ? 'border-red-500' : 'border-gray-200'
                       }`}
                     />
 
-                    {mensajeError && mensajeError.includes('TÍTULO MUY CORTO') && (
-                      <p className="text-red-500 text-sm mt-2">
-                        {mensajeError}
-                      </p>
+                    {errorTitulo && (
+                      <p className="text-red-500 text-sm mt-2">{mensajeError}</p>
                     )}
+
+                    <p className="text-xs text-gray-500 mt-1">
+                      {datos.titulo.length}/80 caracteres
+                    </p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
@@ -325,13 +335,11 @@ export default function MiRegistroPage() {
                   </button>
                 </div>
 
-                {estado === 'error' &&
-                  mensajeError &&
-                  !mensajeError.includes('TÍTULO MUY CORTO') && (
-                    <div className="bg-white border-2 border-red-400 rounded-2xl p-4 shadow-md max-w-md ml-auto whitespace-pre-line">
-                      {mensajeError}
-                    </div>
-                  )}
+                {estado === 'error' && mensajeError && !errorTitulo && (
+                  <div className="bg-white border-2 border-red-400 rounded-2xl p-4 shadow-md max-w-md ml-auto whitespace-pre-line">
+                    {mensajeError}
+                  </div>
+                )}
 
                 {estado === 'exito' && (
                   <div className="bg-white border-2 border-green-400 rounded-2xl p-4 shadow-md max-w-md ml-auto">
