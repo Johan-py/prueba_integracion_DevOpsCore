@@ -295,6 +295,20 @@ model public_Telefono {
   @@map("Telefono")
 }
 
+model ubicacion_maestra {
+  id                 Int                 @id @default(autoincrement())
+  departamento       String
+  provincia          String?
+  municipio          String?
+  nombre             String
+  latitud            Decimal             @db.Decimal(10, 7)
+  longitud           Decimal             @db.Decimal(10, 7)
+  popularidad        Int                 @default(0)
+  ubicacion_inmueble UbicacionInmueble[]
+
+  @@index([nombre])
+}
+
 model bitacora_pagos {
   id               Int               @id @default(autoincrement())
   id_usuario       Int?
@@ -318,7 +332,6 @@ model plan_suscripcion {
   precio_plan            Decimal                 @db.Decimal(10, 2)
   duracion_plan_dias     Int
   nro_publicaciones_plan Int
-  imagen_gr_url          String?                 @db.VarChar(255)
   bitacora_pagos         bitacora_pagos[]
   suscripciones_activas  suscripciones_activas[]
   transacciones          transacciones[]
@@ -346,6 +359,8 @@ model transacciones {
   iva_monto              Decimal                 @db.Decimal(10, 2)
   total                  Decimal                 @db.Decimal(10, 2)
   metodo_pago            String?                 @default("QR_BANCARIO") @db.VarChar(30)
+  qr_texto               String?
+  qr_url                 String?
   fecha_intento          DateTime?               @default(now()) @db.Timestamp(6)
   fecha_completado       DateTime?               @db.Timestamp(6)
   estado                 String?                 @default("PENDIENTE") @db.VarChar(20)
@@ -359,20 +374,6 @@ model transacciones {
 
   @@index([estado], map: "idx_transacciones_estado")
   @@index([id_usuario], map: "idx_transacciones_usuario_id")
-}
-
-model ubicacion_maestra {
-  id                 Int                 @id @default(autoincrement())
-  departamento       String
-  provincia          String?
-  municipio          String?
-  nombre             String
-  latitud            Decimal             @db.Decimal(10, 7)
-  longitud           Decimal             @db.Decimal(10, 7)
-  popularidad        Int                 @default(0)
-  ubicacion_inmueble UbicacionInmueble[]
-
-  @@index([nombre])
 }
 
 model verificacion_pago {
