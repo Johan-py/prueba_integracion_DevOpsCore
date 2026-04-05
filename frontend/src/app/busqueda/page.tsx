@@ -28,4 +28,7 @@ export default function BusquedaPage() {
     </Suspense>
   )
 }
+<<<<<<< HEAD
 >>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
+=======
+>>>>>>> 453ab1a520127979d6fa94229b1b3a7e940c3a22
