@@ -1,57 +1,65 @@
-"use client";
+'use client'
 
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import MarkerClusterGroup from "react-leaflet-cluster";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import MarkerClusterGroup from 'react-leaflet-cluster'
+import L from 'leaflet'
+import { useMap } from 'react-leaflet'
+import { useEffect, useState } from 'react'
 
-import ZoomControls from "@/components/ZoomControls";
-import { createGpsIcon } from "@/components/GpsPin";
-import { createClusterIcon, CLUSTER_CONFIG } from "@/lib/clusterIcon";
+import ZoomControls from '@/components/ZoomControls'
+import { createGpsIcon } from '@/components/GpsPin'
+import { createClusterIcon, CLUSTER_CONFIG } from '@/lib/clusterIcon'
 
-import type { PropertyMapPin } from "@/types/property";
-import { useEffect, useState } from "react";
+import type { PropertyMapPin } from '@/types/property'
 
 // Fix íconos default de Leaflet en Next.js
-if (typeof window !== "undefined") {
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+if (typeof window !== 'undefined') {
+  delete (L.Icon.Default.prototype as any)._getIconUrl
 L.Icon.Default.mergeOptions({
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-});}
+    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png'
+  })
+}
 
-const PIN_FILL: Record<PropertyMapPin["type"], string> = {
-  casa: "#3b82f6",
-  departamento: "#8b5cf6",
-  terreno: "#f59e0b",
-  local: "#10b981",
-};
+const PIN_FILL: Record<PropertyMapPin['type'], string> = {
+  casa: '#3b82f6',
+  departamento: '#8b5cf6',
+  terreno: '#f59e0b',
+  local: '#10b981'
+}
 
-const PIN_HALO: Record<PropertyMapPin["type"], string> = {
-  casa: "rgba(59,  130, 246, 0.25)",
-  departamento: "rgba(139, 92,  246, 0.25)",
-  terreno: "rgba(245, 158, 11,  0.25)",
-  local: "rgba(16,  185, 129, 0.25)",
-};
+const PIN_HALO: Record<PropertyMapPin['type'], string> = {
+  casa: 'rgba(59,  130, 246, 0.25)',
+  departamento: 'rgba(139, 92,  246, 0.25)',
+  terreno: 'rgba(245, 158, 11,  0.25)',
+  local: 'rgba(16,  185, 129, 0.25)'
+}
 
 // Color sólido para el texto del precio en el popup
-const PIN_LABEL: Record<PropertyMapPin["type"], string> = {
-  casa: "#2563eb",
-  departamento: "#7c3aed",
-  terreno: "#d97706",
-  local: "#059669",
-};
+const PIN_LABEL: Record<PropertyMapPin['type'], string> = {
+  casa: '#2563eb',
+  departamento: '#7c3aed',
+  terreno: '#d97706',
+  local: '#059669'
+}
 
-function createPinIcon(type: PropertyMapPin["type"]): L.DivIcon {
-  const fill = PIN_FILL[type] ?? "#6b7280";
-  const halo = PIN_HALO[type] ?? "rgba(107,114,128,0.25)";
+const SELECTED_ICONS: Record<PropertyMapPin['type'], string> = {
+  casa: '/house.svg',
+  departamento: '/department.svg',
+  terreno: '/land.svg',
+  local: '/local.svg'
+}
 
-  const outer = 28;
-  const inner = 20;
-  const half = outer / 2;
+function createPinIcon(type: PropertyMapPin['type']): L.DivIcon {
+  const fill = PIN_FILL[type] ?? '#6b7280'
+  const halo = PIN_HALO[type] ?? 'rgba(107,114,128,0.25)'
+
+  const outer = 28
+  const inner = 20
+  const half = outer / 2
 
   return L.divIcon({
-    className: "",
+    className: '',
     html: `
       <div style="
         width: ${outer}px;
@@ -84,14 +92,14 @@ function createPinIcon(type: PropertyMapPin["type"]): L.DivIcon {
     `,
     iconSize: [outer, outer],
     iconAnchor: [half, outer],
-    popupAnchor: [0, -outer],
-  });
+    popupAnchor: [0, -outer]
+  })
 }
 
-function formatPrice(price: number, currency: "USD" | "BOB"): string {
-  return currency === "USD"
-    ? `$${price.toLocaleString("es-BO")} USD`
-    : `Bs ${price.toLocaleString("es-BO")}`;
+function formatPrice(price: number, currency: 'USD' | 'BOB'): string {
+  return currency === 'USD'
+    ? `$${price.toLocaleString('es-BO')} USD`
+    : `Bs ${price.toLocaleString('es-BO')}`
 }
 
 interface MapViewProps {
@@ -101,7 +109,7 @@ interface MapViewProps {
   selectedId?: string | null
   onSelect?: (id: string) => void
   isLoading?: boolean
-  error?: string | null;
+  error?: string | null
 }
 
 export default function MapView({
@@ -111,15 +119,17 @@ export default function MapView({
   selectedId,
   onSelect,
   isLoading = false,
-  error = null,
+  error = null
 }: MapViewProps) {
-  const [isMounted, setIsMounted] = useState(false);
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
-    setIsMounted(true);
-  }, []);
+    setIsMounted(true)
+  }, [])
 
-  if (!isMounted) return <div className="w-full h-full bg-gray-100 animate-pulse" />;
+  if (!isMounted) return <div className="w-full h-full bg-gray-100 animate-pulse" />
+
+  const selectedProperty = properties.find((p) => p.id === selectedId)
 
   return (
     <div className="relative w-full h-full">
@@ -142,7 +152,7 @@ export default function MapView({
         zoomControl={false}
         touchZoom={true}
         dragging={true}
-        style={{ height: "100%", width: "100%" }}
+        style={{ height: '100%', width: '100%' }}
         className="z-0"
       >
         <TileLayer
@@ -151,6 +161,10 @@ export default function MapView({
         />
 
         <ZoomControls />
+
+        {selectedProperty && (
+          <FlyToSelected lat={selectedProperty.lat} lng={selectedProperty.lng} />
+        )}
 
         <Marker position={center} icon={createGpsIcon()}>
           <Popup>Tu ubicación actual</Popup>
@@ -169,49 +183,40 @@ export default function MapView({
           clusterPane="markerPane"
         >
           {properties.map((property) => {
-            const isSelected = property.id === selectedId;
+            const isSelected = property.id === selectedId
 
             return (
               <Marker
                 key={property.id}
                 position={[property.lat, property.lng]}
-                icon={
-                  isSelected
-                    ? createSelectedIcon()
-                    : createPinIcon(property.type)
-                }
+                icon={isSelected ? createSelectedIcon(property.type) : createPinIcon(property.type)}
                 eventHandlers={{
-                  click: () => onSelect?.(property.id),
+                  click: () => onSelect?.(property.id)
                 }}
               >
                 <Popup>
                   <div className="text-sm min-w-[160px]">
-                    <p className="font-semibold text-gray-800 mb-1">
-                      {property.title}
-                    </p>
-                    <p
-                      className="font-bold"
-                      style={{ color: PIN_LABEL[property.type] }}
-                    >
+                    <p className="font-semibold text-gray-800 mb-1">{property.title}</p>
+                    <p className="font-bold" style={{ color: PIN_LABEL[property.type] }}>
                       {formatPrice(property.price, property.currency)}
                     </p>
-                    <p className="text-gray-500 capitalize mt-1">
-                      {property.type}
-                    </p>
+                    <p className="text-gray-500 capitalize mt-1">{property.type}</p>
                   </div>
                 </Popup>
               </Marker>
-            );
+            )
           })}
         </MarkerClusterGroup>
       </MapContainer>
     </div>
-  );
+  )
 }
 
-function createSelectedIcon(): L.DivIcon {
+function createSelectedIcon(type: PropertyMapPin['type']): L.DivIcon {
+  const iconPath = SELECTED_ICONS[type]
+
   return L.divIcon({
-    className: "",
+    className: '',
     html: `
       <div style="
         display: flex;
@@ -220,8 +225,8 @@ function createSelectedIcon(): L.DivIcon {
         transform: scale(1.6);
       ">
         <div style="
-          width: 34px;
-          height: 34px;
+          width: 36px;
+          height: 36px;
           border-radius: 50%;
           background-color: #ef4444;
           display: flex;
@@ -231,18 +236,41 @@ function createSelectedIcon(): L.DivIcon {
           border: 2px solid white;
         ">
           <img 
-            src="/house.svg" 
+            src="${iconPath}" 
             style="
-              width:18px;
-              height:18px;
-              filter: brightness(0) invert(1);
+              width:20px;
+              height:20px;
+              object-fit: contain;
+              display: block;
             " 
           />
         </div>
       </div>
     `,
-    iconSize: [34, 34],
-    iconAnchor: [17, 34],
-    popupAnchor: [0, -34],
-  });
+    iconSize: [36, 36],
+    iconAnchor: [18, 36],
+    popupAnchor: [0, -36]
+  })
+}
+
+function FlyToSelected({ lat, lng }: { lat: number; lng: number }) {
+  const map = useMap()
+
+  useEffect(() => {
+    if (!lat || !lng) return
+
+    const targetZoom = 18 // control zoom
+
+    map.flyTo([lat, lng], targetZoom, {
+      duration: 1.2
+    })
+
+    const timeout = setTimeout(() => {
+      map.setView([lat, lng], targetZoom)
+    }, 1200)
+
+    return () => clearTimeout(timeout)
+  }, [lat, lng, map])
+
+  return null
 }
