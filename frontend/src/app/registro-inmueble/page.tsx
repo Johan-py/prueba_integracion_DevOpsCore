@@ -31,8 +31,8 @@ export default function MiRegistroPage() {
   }
 
   const guardarPropiedad = async () => {
-    setEstado('ninguno')
-    setMensajeError('')
+  setEstado('ninguno')
+  setMensajeError('')
 
   const tituloLimpio = datos.titulo.trim()
 
@@ -48,17 +48,17 @@ export default function MiRegistroPage() {
     return
   }
 
-    const incompleto =
+  const incompleto =
     !datos.tipoInmueble ||
     !datos.precio ||
     !datos.direccion.trim() ||
     !datos.descripcion.trim()
 
-    if (incompleto) {
-      setMensajeError('DEBE LLENAR TODOS LOS CAMPOS OBLIGATORIOS')
-      setEstado('error')
-      return
-    }
+  if (incompleto) {
+    setMensajeError('DEBE LLENAR TODOS LOS CAMPOS OBLIGATORIOS')
+    setEstado('error')
+    return
+  }
 
   const payload = {
     titulo: tituloLimpio,
@@ -72,18 +72,18 @@ export default function MiRegistroPage() {
     direccion: datos.direccion.trim(),
     zona: datos.zona.trim() || 'CENTRO',
     ciudad: datos.ciudad
-    }
+  }
 
   console.log('📤 Payload enviado al backend:', payload)
 
-    try {
+  try {
     const response = await fetch('http://localhost:5000/api/properties', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(payload)
-      })
+    })
 
     const result = await response.json()
 
@@ -93,24 +93,24 @@ export default function MiRegistroPage() {
       const erroresBackend =
         result.errores?.map((e: any) => `• ${e.mensaje}`).join('\n') ||
         result.mensaje ||
-          'ERROR AL GUARDAR LA PROPIEDAD'
+        'ERROR AL GUARDAR LA PROPIEDAD'
 
       console.error('❌ Error backend:', erroresBackend)
 
       setMensajeError(erroresBackend)
-        setEstado('error')
-        return
-      }
+      setEstado('error')
+      return
+    }
 
-      console.log('✅ Propiedad guardada correctamente')
-      setEstado('exito')
-      setMensajeError('')
-    } catch (error) {
+    console.log('✅ Propiedad guardada correctamente')
+    setEstado('exito')
+    setMensajeError('')
+  } catch (error) {
     console.error('🔥 Error fetch:', error)
     setMensajeError('NO SE PUDO CONECTAR CON EL BACKEND')
-      setEstado('error')
-    }
+    setEstado('error')
   }
+}
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
