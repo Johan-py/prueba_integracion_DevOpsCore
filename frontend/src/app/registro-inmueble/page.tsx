@@ -1,8 +1,7 @@
 'use client'
 import { useState } from 'react'
-
-export default function PaginaRegistroInmueble() {
-  const [formulario, setFormulario] = useState({
+export default function MiRegistroPage() {
+  const [datos, setDatos] = useState({
     titulo: 'Tropico 6 Federaciones',
     operacion: 'ANTICRETO',
     tipoInmueble: '',
@@ -28,81 +27,93 @@ export default function PaginaRegistroInmueble() {
       if (value !== '' && Number(value) < 0) return
     }
 
-    setFormulario({ ...formulario, [name]: value })
+    setDatos({ ...datos, [name]: value })
   }
 
   const guardarPropiedad = async () => {
-    setEstado('ninguno')
-    setMensajeError('')
+  setEstado('ninguno')
+  setMensajeError('')
 
-    const incompleto =
-      !formulario.titulo.trim() ||
-      !formulario.tipoInmueble ||
-      !formulario.precio ||
-      !formulario.direccion.trim() ||
-      !formulario.descripcion.trim()
+  const tituloLimpio = datos.titulo.trim()
 
-    if (incompleto) {
-      setMensajeError('DEBE LLENAR TODOS LOS CAMPOS OBLIGATORIOS')
+  if (!tituloLimpio) {
+    setMensajeError('DEBE LLENAR TODOS LOS CAMPOS OBLIGATORIOS')
+    setEstado('error')
+    return
+  }
+
+  if (tituloLimpio.length < 20) {
+    setMensajeError('TÍTULO MUY CORTO, DEBE SER MAYOR O IGUAL A 20 CARACTERES')
+    setEstado('error')
+    return
+  }
+
+  const incompleto =
+    !datos.tipoInmueble ||
+    !datos.precio ||
+    !datos.direccion.trim() ||
+    !datos.descripcion.trim()
+
+  if (incompleto) {
+    setMensajeError('DEBE LLENAR TODOS LOS CAMPOS OBLIGATORIOS')
+    setEstado('error')
+    return
+  }
+
+  const payload = {
+    titulo: tituloLimpio,
+    tipoAccion: datos.operacion,
+    categoria: datos.tipoInmueble,
+    precio: Number(datos.precio),
+    superficieM2: datos.area ? Number(datos.area) : undefined,
+    nroCuartos: datos.habitaciones ? Number(datos.habitaciones) : undefined,
+    nroBanos: datos.banos ? Number(datos.banos) : 1,
+    descripcion: datos.descripcion.trim(),
+    direccion: datos.direccion.trim(),
+    zona: datos.zona.trim() || 'CENTRO',
+    ciudad: datos.ciudad
+  }
+
+  console.log('📤 Payload enviado al backend:', payload)
+
+  try {
+    const response = await fetch('http://localhost:5000/api/properties', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    })
+
+    const result = await response.json()
+
+    console.log('📥 Respuesta backend:', result)
+
+    if (!response.ok) {
+      const erroresBackend =
+        result.errores?.map((e: any) => `• ${e.mensaje}`).join('\n') ||
+        result.mensaje ||
+        'ERROR AL GUARDAR LA PROPIEDAD'
+
+      console.error('❌ Error backend:', erroresBackend)
+
+      setMensajeError(erroresBackend)
       setEstado('error')
       return
     }
 
-    const datosAEnviar = {
-      titulo: formulario.titulo.trim(),
-      tipoAccion: formulario.operacion,
-      categoria: formulario.tipoInmueble,
-      precio: Number(formulario.precio),
-      superficieM2: formulario.area ? Number(formulario.area) : undefined,
-      nroCuartos: formulario.habitaciones ? Number(formulario.habitaciones) : undefined,
-      nroBanos: formulario.banos ? Number(formulario.banos) : 1,
-      descripcion: formulario.descripcion.trim(),
-      direccion: formulario.direccion.trim(),
-      zona: formulario.zona.trim() || 'CENTRO',
-      ciudad: formulario.ciudad
-    }
-
-    console.log('📤 Datos enviados al servidor:', datosAEnviar)
-
-    try {
-      const respuesta = await fetch('http://localhost:5000/api/properties', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(datosAEnviar)
-      })
-
-      const resultado = await respuesta.json()
-
-      console.log('📥 Respuesta del servidor:', resultado)
-
-      if (!respuesta.ok) {
-        const erroresServidor =
-          resultado.errores?.map((e: any) => `• ${e.mensaje}`).join('\n') ||
-          resultado.mensaje ||
-          'ERROR AL GUARDAR LA PROPIEDAD'
-
-        console.error('❌ Error del servidor:', erroresServidor)
-
-        setMensajeError(erroresServidor)
-        setEstado('error')
-        return
-      }
-
-      console.log('✅ Propiedad guardada correctamente')
-      setEstado('exito')
-      setMensajeError('')
-    } catch (error) {
-      console.error('🔥 Error de conexión:', error)
-      setMensajeError('NO SE PUDO CONECTAR CON EL SERVIDOR')
-      setEstado('error')
-    }
+    console.log('✅ Propiedad guardada correctamente')
+    setEstado('exito')
+    setMensajeError('')
+  } catch (error) {
+    console.error('🔥 Error fetch:', error)
+    setMensajeError('NO SE PUDO CONECTAR CON EL BACKEND')
+    setEstado('error')
   }
+}
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
-
       <main className="max-w-6xl mx-auto p-8 md:p-12">
         <h1 className="text-2xl font-bold mb-6 text-gray-950">Registro Inmueble</h1>
 
@@ -123,7 +134,7 @@ export default function PaginaRegistroInmueble() {
             <div className="space-y-10">
               <section>
                 <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] border-b border-gray-200 pb-2 mb-6">
-                  INFORMACIÓN PRINCIPAL
+                  INFORMACION PRINCIPAL
                 </h3>
 
                 <div className="space-y-6">
@@ -133,7 +144,7 @@ export default function PaginaRegistroInmueble() {
                     </label>
                     <input
                       name="titulo"
-                      value={formulario.titulo}
+                      value={datos.titulo}
                       onChange={manejarCambio}
                       className="w-full p-3 rounded-xl border border-gray-200 bg-white/70"
                     />
@@ -146,7 +157,7 @@ export default function PaginaRegistroInmueble() {
                       </label>
                       <select
                         name="operacion"
-                        value={formulario.operacion}
+                        value={datos.operacion}
                         onChange={manejarCambio}
                         className="w-full p-3 rounded-xl border border-gray-200 bg-white"
                       >
@@ -162,7 +173,7 @@ export default function PaginaRegistroInmueble() {
                       </label>
                       <select
                         name="tipoInmueble"
-                        value={formulario.tipoInmueble}
+                        value={datos.tipoInmueble}
                         onChange={manejarCambio}
                         className="w-full p-3 rounded-xl border border-gray-200 bg-white"
                       >
@@ -182,7 +193,7 @@ export default function PaginaRegistroInmueble() {
                     <input
                       name="precio"
                       type="number"
-                      value={formulario.precio}
+                      value={datos.precio}
                       onChange={manejarCambio}
                       className="w-full p-3 rounded-xl border border-gray-200"
                     />
@@ -201,7 +212,7 @@ export default function PaginaRegistroInmueble() {
                     <input
                       name="area"
                       type="number"
-                      value={formulario.area}
+                      value={datos.area}
                       onChange={manejarCambio}
                       className="w-full p-3 rounded-xl border border-gray-200"
                     />
@@ -212,7 +223,7 @@ export default function PaginaRegistroInmueble() {
                     <input
                       name="habitaciones"
                       type="number"
-                      value={formulario.habitaciones}
+                      value={datos.habitaciones}
                       onChange={manejarCambio}
                       className="w-full p-3 rounded-xl border border-gray-200"
                     />
@@ -225,7 +236,7 @@ export default function PaginaRegistroInmueble() {
                     <input
                       name="banos"
                       type="number"
-                      value={formulario.banos}
+                      value={datos.banos}
                       onChange={manejarCambio}
                       className="w-full p-3 rounded-xl border border-gray-200"
                     />
@@ -235,7 +246,7 @@ export default function PaginaRegistroInmueble() {
                     <label className="block text-[15px] font-bold mb-2">Dirección *</label>
                     <input
                       name="direccion"
-                      value={formulario.direccion}
+                      value={datos.direccion}
                       onChange={manejarCambio}
                       className="w-full p-3 rounded-xl border border-gray-200"
                     />
@@ -246,7 +257,7 @@ export default function PaginaRegistroInmueble() {
                   <label className="block text-[15px] font-bold mb-2">Zona</label>
                   <input
                     name="zona"
-                    value={formulario.zona}
+                    value={datos.zona}
                     onChange={manejarCambio}
                     className="w-full p-3 rounded-xl border border-gray-200"
                   />
@@ -257,11 +268,11 @@ export default function PaginaRegistroInmueble() {
             <div className="flex flex-col h-full">
               <div className="flex-grow">
                 <label className="block text-[15px] font-bold text-gray-900 mb-2">
-                  DESCRIPCIÓN DETALLADA *
+                  DESCRIPCION DETALLADA *
                 </label>
                 <textarea
                   name="descripcion"
-                  value={formulario.descripcion}
+                  value={datos.descripcion}
                   onChange={manejarCambio}
                   className="w-full p-4 rounded-2xl border border-gray-300 h-72 bg-white"
                   placeholder="Casa de dos plantas, amplia y moderna ubicada en una zona tranquila..."
