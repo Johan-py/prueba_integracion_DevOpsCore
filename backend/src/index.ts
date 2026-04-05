@@ -11,12 +11,12 @@ import {
   getNotificationsController,
   getUnreadCountController,
   markAllNotificationsAsReadController,
-  markNotificationAsReadController,
-} from "./modules/notificaciones/notificaciones.controller.js";
-import { BannersController } from "./modules/banners/banners.controller.js";
-import locationSearchHandler from "../api/locations/search.js";
-import { FiltersHomepageController } from "./modules/filtershomepage/filtershomepage.controller.js";
-import type { VercelRequest, VercelResponse } from "@vercel/node";
+  markNotificationAsReadController
+} from './modules/notificaciones/notificaciones.controller.js'
+import { BannersController } from './modules/banners/banners.controller.js'
+import locationSearchHandler from '../api/locations/search.js'
+import popularidadHandler from '../api/locations/popularidad.js'
+import { FiltersHomepageController } from './modules/filtershomepage/filtershomepage.controller.js'
 import {
   registerController,
   loginController,
@@ -36,14 +36,7 @@ import router from './modules/registro-publicacion/publicacion.routes.js' //sig-
 import { verifyNotificationEmailTransport } from './modules/email/notification-email.service.js'
 import publicacionRoutes from './modules/publicacion/publicacion.routes.js' //lista de publicaciones
 
-const app = express();
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
-    credentials: true,
-  }),
-);
+const app = express()
 
 app.use(
   cors({
@@ -54,7 +47,7 @@ app.use(
   })
 )
 
-app.use(express.json());
+app.use(express.json())
 
 app.use('/api/publicaciones', publicacionRoutes) // lista de publicaciones
 app.use('/api/perfil', correoverificacionRoutes)
@@ -79,28 +72,12 @@ app.get('/api/auth/me', async (req, res) => {
   await meHandler(req as any, res as any)
 })
 
-app.get("/api/filters", filtersController.getFilters);
-app.get("/api/banners", (req, res) => bannersController.getBanners(req, res));
-app.get("/api/locations/search", async (req, res) => {
-  await locationSearchHandler(
-    req as unknown as VercelRequest,
-    res as unknown as VercelResponse,
-  );
-});
+app.get('/api/filters', filtersController.getFilters)
+app.get('/api/banners', (req, res) => bannersController.getBanners(req, res))
 
-app.get("/notificaciones", fakeAuth, getNotificationsController);
-app.get("/notificaciones/unread-count", fakeAuth, getUnreadCountController);
-app.patch(
-  "/notificaciones/:id/read",
-  fakeAuth,
-  markNotificationAsReadController,
-);
-app.patch(
-  "/notificaciones/read-all",
-  fakeAuth,
-  markAllNotificationsAsReadController,
-);
-app.delete("/notificaciones/:id", fakeAuth, deleteNotificationController);
+app.get('/api/locations/search', async (req, res) => {
+  await locationSearchHandler(req as unknown as VercelRequest, res as unknown as VercelResponse)
+})
 
 app.post('/api/locations/popularidad', async (req, res) => {
   await popularidadHandler(req as any, res as any)
