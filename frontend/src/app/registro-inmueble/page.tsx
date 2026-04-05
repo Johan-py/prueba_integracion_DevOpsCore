@@ -1,8 +1,9 @@
 'use client'
 import { useState } from 'react'
+
 export default function MiRegistroPage() {
   const [datos, setDatos] = useState({
-    titulo: 'Tropico 6 Federaciones',
+    titulo: 'Tropico 6 Federa',
     operacion: 'ANTICRETO',
     tipoInmueble: '',
     precio: '',
@@ -27,7 +28,24 @@ export default function MiRegistroPage() {
       if (value !== '' && Number(value) < 0) return
     }
 
-    setDatos({ ...datos, [name]: value })
+    const nuevosDatos = { ...datos, [name]: value }
+    setDatos(nuevosDatos)
+
+    // Validación en tiempo real para el título
+    if (name === 'titulo') {
+      const tituloLimpio = value.trim()
+
+      if (!tituloLimpio) {
+        setMensajeError('DEBE LLENAR TODOS LOS CAMPOS OBLIGATORIOS')
+        setEstado('error')
+      } else if (tituloLimpio.length < 20) {
+        setMensajeError('TÍTULO MUY CORTO, DEBE SER MAYOR O IGUAL A 20 CARACTERES')
+        setEstado('error')
+      } else {
+        setMensajeError('')
+        setEstado('ninguno')
+      }
+    }
   }
 
   const guardarPropiedad = async () => {
@@ -143,8 +161,19 @@ export default function MiRegistroPage() {
                       name="titulo"
                       value={datos.titulo}
                       onChange={manejarCambio}
-                      className="w-full p-3 rounded-xl border border-gray-200 bg-white/70"
+                      className={`w-full p-3 rounded-xl border bg-white/70 ${
+                        mensajeError &&
+                        mensajeError.includes('TÍTULO MUY CORTO')
+                          ? 'border-red-500'
+                          : 'border-gray-200'
+                      }`}
                     />
+
+                    {mensajeError && mensajeError.includes('TÍTULO MUY CORTO') && (
+                      <p className="text-red-500 text-sm mt-2">
+                        {mensajeError}
+                      </p>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
@@ -279,7 +308,10 @@ export default function MiRegistroPage() {
               <div className="mt-12 space-y-6">
                 <div className="flex justify-center md:justify-end gap-6">
                   <button
-                    onClick={() => setEstado('ninguno')}
+                    onClick={() => {
+                      setEstado('ninguno')
+                      setMensajeError('')
+                    }}
                     className="px-12 py-3 rounded-full border border-gray-400 bg-[#D9D9D9]"
                   >
                     Cancelar
@@ -293,11 +325,13 @@ export default function MiRegistroPage() {
                   </button>
                 </div>
 
-                {estado === 'error' && (
-                  <div className="bg-white border-2 border-red-400 rounded-2xl p-4 shadow-md max-w-md ml-auto whitespace-pre-line">
-                    {mensajeError}
-                  </div>
-                )}
+                {estado === 'error' &&
+                  mensajeError &&
+                  !mensajeError.includes('TÍTULO MUY CORTO') && (
+                    <div className="bg-white border-2 border-red-400 rounded-2xl p-4 shadow-md max-w-md ml-auto whitespace-pre-line">
+                      {mensajeError}
+                    </div>
+                  )}
 
                 {estado === 'exito' && (
                   <div className="bg-white border-2 border-green-400 rounded-2xl p-4 shadow-md max-w-md ml-auto">
