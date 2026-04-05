@@ -23,14 +23,14 @@ export default function FiltersPage() {
   // Usamos la interfaz aquí para que coincida perfectamente con el componente
   const handleSearch = (filtros: FiltrosInput) => {
     const params = new URLSearchParams()
-    
+
     // Mapeo de los nuevos nombres a los parámetros de tu API
     filtros.tipoInmueble?.forEach((t) => params.append('categoria', t))
     filtros.modoInmueble?.forEach((m) => params.append('tipoAccion', m))
     if (filtros.query) params.append('query', filtros.query)
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
-    
+
     // Usamos una función interna para el async y que no choque con el tipo 'void'
     const fetchData = async () => {
       try {
@@ -41,7 +41,7 @@ export default function FiltersPage() {
         console.error('Error:', error)
       }
     }
-    
+
     fetchData()
 >>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
   }
