@@ -19,6 +19,9 @@ const popularidadHandler = async (req: any, res: any) => {
     // Convertimos a Number porque Prisma espera un entero para el ID
     const actualizado = await locationsService.incrementPopularity(Number(id))
 
+    if (!actualizado) {
+      return res.status(404).json({ error: 'No se encontró la ubicación para actualizar' })
+    }
     return res.status(200).json({
       success: true,
       id: actualizado.id,
