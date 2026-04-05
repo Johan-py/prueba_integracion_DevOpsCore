@@ -1,7 +1,6 @@
 import { prisma } from '../db/prisma.js'
 
 export const obtenerConsumo = async (userId: number) => {
-
   const usuario = await prisma.usuario.findUnique({
     where: {
       id: userId
