@@ -28,7 +28,7 @@ export const crearPublicacion = async (req: Request, res: Response) => {
     })
 
     res.status(201).json(nueva)
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error al crear publicación' })
   }
 }
@@ -38,7 +38,7 @@ export const listarPublicaciones = async (req: Request, res: Response) => {
   try {
     const publicaciones = await prisma.publicacion.findMany()
     res.json(publicaciones)
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error al listar publicaciones' })
   }
 }
@@ -55,7 +55,7 @@ export const validarPublicacionesFree = async (req: Request, res: Response) => {
     const restantes = Math.max(limiteGratis - publicaciones, 0)
 
     res.json({ restantes })
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error al validar publicaciones gratuitas' })
   }
 }
