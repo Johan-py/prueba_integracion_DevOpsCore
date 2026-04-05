@@ -50,4 +50,8 @@ export default function ConfirmDeleteModal({
       </div>
     </div>
   )
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 453ab1a520127979d6fa94229b1b3a7e940c3a22
