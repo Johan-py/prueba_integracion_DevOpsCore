@@ -87,6 +87,7 @@ export default function ProfileCard() {
       })
 
       const data = await response.json()
+      console.log('Respuesta cargar perfil:', data)
 
       if (data.ok && data.perfil) {
         const perfil = data.perfil
@@ -95,7 +96,7 @@ export default function ProfileCard() {
         setPais(perfil.pais || '')
         setGenero(perfil.genero || '')
         setDireccion(perfil.direccion || '')
-        setAvatar(perfil.avatar || null)
+        setAvatar(perfil.avatar || perfil.fotoPerfil || null)
         setOriginalEmail(perfil.correo || '')
         setTempEmail(perfil.correo || '')
 
@@ -282,9 +283,10 @@ export default function ProfileCard() {
       })
 
       const data = await response.json()
+      console.log('Respuesta upload foto:', data)
 
       if (data.ok) {
-        setAvatar(data.fotoPerfil)
+        setAvatar(data.fotoPerfil || data.avatar || null)
         alert('Foto de perfil actualizada exitosamente')
         // Recargar perfil para actualizar datos
         cargarPerfil()
@@ -584,7 +586,7 @@ export default function ProfileCard() {
           <div className="w-28 h-28 rounded-full bg-white border border-gray-300 flex items-center justify-center shadow-sm overflow-hidden">
             {avatar ? (
               <img
-                src={avatar}
+                src={avatar.startsWith('http') ? avatar : `${API_URL}${avatar}`}
                 alt="Foto de perfil"
                 className="w-full h-full object-cover"
               />

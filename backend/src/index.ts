@@ -1,3 +1,4 @@
+import path from 'path'
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
@@ -49,6 +50,7 @@ app.use(express.json())
 app.use('/api/perfil', correoverificacionRoutes)
 app.use('/api/perfil/usuario', perfilRoutes)
 app.use('/api/publicaciones', multimediaRoutes)
+app.use('/uploads', express.static(path.resolve('uploads')))
 app.post('/api/users', (req, res) => {
   const user = req.body
   res.json({ message: 'User created', user })
