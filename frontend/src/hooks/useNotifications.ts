@@ -11,6 +11,7 @@ import type {
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000'
 const ITEMS_PER_LOAD = 20
 const NOTIFICATIONS_UPDATED_EVENT = 'notifications-updated'
+
 const AUTH_STATE_CHANGED_EVENT = 'auth-state-changed'
 const SKELETON_DELAY_MS = 300
 
@@ -84,6 +85,7 @@ export function useNotifications() {
   const [notifications, setNotifications] = useState<NotificationItem[]>([])
   const [total, setTotal] = useState(0)
   const [unreadCount, setUnreadCount] = useState(0)
+
   const [isLoggedIn, setIsLoggedIn] = useState(Boolean(getStoredToken()))
   const [isLoading, setIsLoading] = useState(false)
   const [showSkeleton, setShowSkeleton] = useState(false)

@@ -1,5 +1,6 @@
 import { Inmueble } from '../../types/inmueble'
 import { BedDouble, Bath, Maximize, MapPin, Star } from 'lucide-react'
+import Image from 'next/image'
 
 interface TarjetaInmuebleProps {
   inmueble: Inmueble
@@ -20,10 +21,12 @@ export const TarjetaInmueble = ({ inmueble }: TarjetaInmuebleProps) => {
   return (
     <div className="group flex flex-col w-full bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300">
       <div className="relative aspect-[4/3] w-full bg-gray-200 overflow-hidden">
-        <img
+        <Image
           src={`https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=600&h=400&ixlib=rb-4.0.3`}
           alt={inmueble.titulo}
           className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500 ease-in-out"
+          width={600}
+          height={400}
         />
         {(inmueble.popularidad ?? 0) > 80 && (
           <div className="absolute top-3 left-3 bg-white/90 backdrop-blur px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm">

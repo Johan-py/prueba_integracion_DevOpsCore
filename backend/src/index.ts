@@ -32,7 +32,9 @@ import {
   StratGoogleLoginController
 } from './modules/auth/google/google.controller.js'
 import multimediaRoutes from './modules/multimedia/multimedia.routes.js'
+import router from './modules/registro-publicacion/publicacion.routes.js' //sig-dev
 import { verifyNotificationEmailTransport } from './modules/email/notification-email.service.js'
+import publicacionRoutes from './modules/publicacion/publicacion.routes.js' //lista de publicaciones
 
 const app = express()
 
@@ -47,10 +49,12 @@ app.use(
 
 app.use(express.json())
 
+app.use('/api/publicaciones', publicacionRoutes) // lista de publicaciones
 app.use('/api/perfil', correoverificacionRoutes)
 app.use('/api/perfil/usuario', perfilRoutes)
 app.use('/api/publicaciones', multimediaRoutes)
 app.use('/uploads', express.static(path.resolve('uploads')))
+app.use('/api', router)
 app.post('/api/users', (req, res) => {
   const user = req.body
   res.json({ message: 'User created', user })

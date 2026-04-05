@@ -137,9 +137,10 @@ model UbicacionInmueble {
   latitud            Decimal            @db.Decimal(10, 7)
   longitud           Decimal            @db.Decimal(10, 7)
   direccion          String?
-  
   inmuebleId         Int                @unique
   ubicacionMaestraId Int?
+  ciudad             String?
+  zona               String?
   marcadores         MarcadorMapa[]
   inmueble           Inmueble           @relation(fields: [inmuebleId], references: [id], onDelete: Cascade)
   ubicacion_maestra  ubicacion_maestra? @relation(fields: [ubicacionMaestraId], references: [id])
@@ -310,16 +311,16 @@ model ubicacion_maestra {
 }
 
 model bitacora_pagos {
-  id               Int               @id @default(autoincrement())
-  id_usuario       Int?
-  id_suscripcion   Int?
-  id_transaccion   Int?
+  id               Int               @id @default(autoincrement()) @db.SmallInt
+  id_usuario       Int?              @db.SmallInt
+  id_suscripcion   Int?              @db.SmallInt
+  id_transaccion   Int?              @db.SmallInt
   evento           String            @db.VarChar(100)
   mensaje          String?
   fecha_evento     DateTime?         @default(now()) @db.Timestamp(6)
-  plan_suscripcion plan_suscripcion? @relation(fields: [id_suscripcion], references: [id], onUpdate: NoAction)
-  transacciones    transacciones?    @relation(fields: [id_transaccion], references: [id], onUpdate: NoAction)
-  usuario          Usuario?          @relation(fields: [id_usuario], references: [id], onUpdate: NoAction)
+  plan_suscripcion plan_suscripcion? @relation(fields: [id_suscripcion], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  transacciones    transacciones?    @relation(fields: [id_transaccion], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuario          Usuario?          @relation(fields: [id_usuario], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([fecha_evento], map: "idx_bitacora_fecha_evento")
   @@index([id_transaccion], map: "idx_bitacora_transaccion_id")
@@ -327,11 +328,12 @@ model bitacora_pagos {
 
 model plan_suscripcion {
   id                     Int                     @id @default(autoincrement())
-  nombre_plan            String                  @db.VarChar(50)
+  nombre_plan            String?                 @db.VarChar(50)
   descripcion_plan       String?
-  precio_plan            Decimal                 @db.Decimal(10, 2)
-  duracion_plan_dias     Int
-  nro_publicaciones_plan Int
+  precio_plan            Decimal?                @db.Decimal(10, 2)
+  duracion_plan_dias     Int?
+  nro_publicaciones_plan Int?
+  imagen_gr_url          String?                 @db.VarChar(255)
   bitacora_pagos         bitacora_pagos[]
   suscripciones_activas  suscripciones_activas[]
   transacciones          transacciones[]
@@ -359,8 +361,6 @@ model transacciones {
   iva_monto              Decimal                 @db.Decimal(10, 2)
   total                  Decimal                 @db.Decimal(10, 2)
   metodo_pago            String?                 @default("QR_BANCARIO") @db.VarChar(30)
-  qr_texto               String?
-  qr_url                 String?
   fecha_intento          DateTime?               @default(now()) @db.Timestamp(6)
   fecha_completado       DateTime?               @db.Timestamp(6)
   estado                 String?                 @default("PENDIENTE") @db.VarChar(20)

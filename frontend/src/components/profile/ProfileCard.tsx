@@ -560,7 +560,10 @@ export default function ProfileCard() {
           {telefonos.map((tel, index) => {
             const keyCampo = `telefono-${tel.id}`
             return (
-              <div key={tel.id} className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+              <div
+                key={tel.id}
+                className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4"
+              >
                 <label className="w-full md:w-40 font-medium text-stone-700">
                   {index === 0 ? 'Teléfono:' : `Teléfono ${index + 1}:`}
                 </label>
@@ -578,10 +581,11 @@ export default function ProfileCard() {
                         )
                       }
                     }}
-                    className={`px-2 py-2 rounded text-sm ${campoEditando === keyCampo
+                    className={`px-2 py-2 rounded text-sm ${
+                      campoEditando === keyCampo
                         ? 'bg-white border border-amber-500'
                         : 'bg-gray-200 cursor-not-allowed'
-                      }`}
+                    }`}
                   >
                     {PAISES.map((p) => (
                       <option key={p.nombre} value={`${p.nombre} ${p.codigo}`}>
@@ -595,10 +599,11 @@ export default function ProfileCard() {
                     value={tel.numero}
                     disabled={campoEditando !== keyCampo}
                     onChange={(e) => actualizarTelefono(tel.id, e.target.value)}
-                    className={`flex-1 px-3 py-2 rounded text-sm ${campoEditando === keyCampo
+                    className={`flex-1 px-3 py-2 rounded text-sm ${
+                      campoEditando === keyCampo
                         ? 'bg-white border border-amber-500'
                         : 'bg-gray-200 cursor-not-allowed'
-                      }`}
+                    }`}
                   />
                   <button
                     onClick={() => setCampoEditando(campoEditando === keyCampo ? null : keyCampo)}
