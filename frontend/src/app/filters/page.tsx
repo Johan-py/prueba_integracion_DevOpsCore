@@ -3,10 +3,10 @@ import FilterBar from '@/components/filters/FilterBar'
 
 // Definimos exactamente lo que el FilterBar envía para que TS no llore
 interface FiltrosInput {
-  tipoInmueble: string[];
-  modoInmueble: string[];
-  query: string;
-  updatedAt?: string;
+  tipoInmueble: string[]
+  modoInmueble: string[]
+  query: string
+  updatedAt?: string
 }
 export default function FiltersPage() {
 <<<<<<< HEAD
@@ -53,7 +53,11 @@ export default function FiltersPage() {
     </div>
   )
 <<<<<<< HEAD
+<<<<<<< HEAD
 }
 =======
 }
 >>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
+=======
+}
+>>>>>>> 453ab1a520127979d6fa94229b1b3a7e940c3a22
