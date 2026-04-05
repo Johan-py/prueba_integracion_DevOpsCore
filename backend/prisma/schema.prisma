@@ -324,6 +324,18 @@ model bitacora_pagos {
   @@index([id_transaccion], map: "idx_bitacora_transaccion_id")
 }
 
+model plan_suscripcion {
+  id                     Int                     @id @default(autoincrement())
+  nombre_plan            String                  @db.VarChar(50)
+  descripcion_plan       String?
+  precio_plan            Decimal                 @db.Decimal(10, 2)
+  duracion_plan_dias     Int
+  nro_publicaciones_plan Int
+  bitacora_pagos         bitacora_pagos[]
+  suscripciones_activas  suscripciones_activas[]
+  transacciones          transacciones[]
+}
+
 model suscripciones_activas {
   id               Int               @id @default(autoincrement())
   id_usuario       Int?
