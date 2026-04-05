@@ -19,7 +19,7 @@ import PropertyRow from '@/components/galeria/PropertyRow'
 import EmptyState from '@/components/galeria/EmptyState'
 import { MenuOrdenamiento } from '@/components/busqueda/ordenamiento/MenuOrdenamiento'
 // 🟢 Mantenemos la carga dinámica del mapa
-const MapView = nextDynamic(() => import('./MapView'), { 
+const MapView = nextDynamic(() => import('./MapView'), {
   ssr: false,
   loading: () => (
     <div className="h-full w-full bg-stone-100 animate-pulse flex items-center justify-center text-stone-400">
@@ -36,7 +36,7 @@ function BusquedaMapaContent() {
   // ⚠️ Estos hooks son los que causan el error si no hay Suspense arriba
   const { properties, isLoading } = useProperties()
   const { ordenActual, cambiarOrden } = useOrdenamiento({ inmuebles: properties })
-  
+
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null)
   const [hoveredId, setHoveredId] = useState<string | null>(null)
 
@@ -65,11 +65,11 @@ function BusquedaMapaContent() {
         </div>
 =======
     <div className="flex flex-col h-screen bg-white overflow-hidden">
-      <FilterBar 
-        variant="map" 
+      <FilterBar
+        variant="map"
         onSearch={(nuevosFiltros) => {
           console.log('🔍 Buscando con filtros:', nuevosFiltros)
-        }} 
+        }}
       />
       <main className="flex flex-1 overflow-hidden relative">
         <aside
@@ -101,11 +101,11 @@ function BusquedaMapaContent() {
 >>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
 
                 <div className="border-b border-stone-100 pb-4">
-                   <MenuOrdenamiento 
-                     totalResultados={properties.length}
-                     ordenActual={ordenActual}
-                     onOrdenChange={cambiarOrden} 
-                   />
+                  <MenuOrdenamiento
+                    totalResultados={properties.length}
+                    ordenActual={ordenActual}
+                    onOrdenChange={cambiarOrden}
+                  />
                 </div>
               </div>
 
@@ -208,7 +208,7 @@ function BusquedaMapaContent() {
                       >
                         {viewMode === 'grid' ? (
                           <PropertyCard
-                            imagen="" 
+                            imagen=""
                             estado={property.type}
                             precio={
                               property.currency === 'USD'
@@ -274,7 +274,7 @@ function BusquedaMapaContent() {
   )
 }
 
-export const dynamic = 'force-dynamic' 
+export const dynamic = 'force-dynamic'
 
 export default function BusquedaMapaPage() {
   return (
