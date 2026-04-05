@@ -17,10 +17,14 @@ const searchOptions = [
 
 export default function ExploreSection() {
 <<<<<<< HEAD
+<<<<<<< HEAD
   const [selectedOption, setSelectedOption] = useState<string[]>([])
   const [location, setLocation] = useState('')
 =======
   const router = useRouter();
+=======
+  const router = useRouter()
+>>>>>>> 453ab1a520127979d6fa94229b1b3a7e940c3a22
   const [selectedOption, setSelectedOption] = useState<string[]>([])
   const [location, setLocation] = useState('')
   const [propertyType, setPropertyType] = useState('Cualquier tipo')
@@ -49,35 +53,42 @@ export default function ExploreSection() {
 =======
 
     // 1. Construir los parámetros de búsqueda 
-    const params = new URLSearchParams();
+    const params = new URLSearchParams()
     
     // Modos (VENTA, ALQUILER, etc.)
-    selectedOption.forEach(modo => params.append('modoInmueble', modo.toUpperCase()));
+    selectedOption.forEach((modo) => params.append('modoInmueble', modo.toUpperCase()))
 
     // Tipo de Inmueble (Mapeo manual para el Backend) 
     if (propertyType !== 'Cualquier tipo') {
       const tipoMap: Record<string, string> = {
-        'Casas': 'CASA',
-        'Departamentos': 'DEPARTAMENTO',
-        'Cuartos': 'CASA', 
-        'Terrenos': 'TERRENO',
+        Casas: 'CASA',
+        Departamentos: 'DEPARTAMENTO',
+        Cuartos: 'CASA',
+        Terrenos: 'TERRENO',
         'Espacios Cementerio': 'TERRENO'
-      };
-      const tipoFinal = tipoMap[propertyType] || propertyType.toUpperCase();
-      params.set('tipoInmueble', tipoFinal);
+      }
+      const tipoFinal = tipoMap[propertyType] || propertyType.toUpperCase()
+      params.set('tipoInmueble', tipoFinal)
     }
 
     // Ubicación / Texto
     if (location.trim() !== '') {
-      params.set('query', location.trim());
+      params.set('query', location.trim())
     }
 
+<<<<<<< HEAD
     // 2. NAVEGAR A LA PÁGINA DEL MAPA 
     const finalUrl = `/busqueda_mapa?${params.toString()}`;
     console.log("🚀 Navegando desde Home a:", finalUrl);
     router.push(finalUrl);
 
 >>>>>>> 12892ab53161466e83fa52424359eeccc35604a5
+=======
+    // 2. NAVEGAR A LA PÁGINA DEL MAPA
+    const finalUrl = `/busqueda_mapa?${params.toString()}`
+    console.log('🚀 Navegando desde Home a:', finalUrl)
+    router.push(finalUrl)
+>>>>>>> 453ab1a520127979d6fa94229b1b3a7e940c3a22
   }
 
   return (
