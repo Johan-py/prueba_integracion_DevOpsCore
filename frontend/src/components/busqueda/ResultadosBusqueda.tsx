@@ -11,6 +11,7 @@ interface FiltrosGlobales {
   tipoInmueble?: string[] // ej: ["CASA"] o ["CUALQUIER TIPO"]
   modoInmueble?: string[] // ej: ["VENTA"] o ["VENTA", "ALQUILER"]
   query?: string
+  locationId?: number
   updatedAt?: string
 }
 
@@ -29,18 +30,24 @@ function leerFiltrosGuardados(): FiltrosGlobales {
 function construirParams(filtros: FiltrosGlobales): URLSearchParams {
   const params = new URLSearchParams()
 
-  // tipoInmueble: ignorar si es "CUALQUIER TIPO" o vacío
+  // 🚀 Mapeamos con el nombre correcto que espera el backend (tipoInmueble)
   const tipo = filtros.tipoInmueble?.[0]
   if (tipo && tipo !== 'CUALQUIER TIPO' && tipo !== '') {
-    params.set('categoria', tipo)
+    params.set('tipoInmueble', tipo) 
   }
 
-  // modoInmueble: el backend acepta un solo tipoAccion
-  // Si el usuario eligió varios modos, mandamos el primero.
-  // El backend filtra por VENTA | ALQUILER | ANTICRETO
+  // 🚀 Mapeamos con el nombre correcto (modoInmueble)
   const modo = filtros.modoInmueble?.[0]
   if (modo && modo !== '') {
-    params.set('tipoAccion', modo)
+    params.set('modoInmueble', modo)
+  }
+
+  // 🚀 AÑADIMOS LA UBICACIÓN (La razón de los 0 resultados)
+  if (filtros.locationId) {
+    params.set('locationId', filtros.locationId.toString())
+  }
+  if (filtros.query) {
+    params.set('query', filtros.query)
   }
 
   return params
@@ -63,8 +70,8 @@ export const ResultadosBusqueda = () => {
       const params = construirParams(filtros)
 
       const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
-      const queryStr = params.toString() ? `?${params}` : ''
-      const url = `${API_BASE}/api/inmuebles${queryStr}`
+      const queryStr = params.toString() ? `?${params.toString()}` : ''
+      const url = `${API_BASE}/api/properties/inmuebles${queryStr}`
 
       fetch(url)
         .then((res) => {
@@ -73,15 +80,13 @@ export const ResultadosBusqueda = () => {
         })
         .then((data) => {
           // Ajustamos según la respuesta de tu API (data.ok o data directo)
-          if (data && (data.ok || Array.isArray(data))) {
-            setInmueblesRaw(data.ok ? data.data : data)
+         if (data && data.ok === true && Array.isArray(data.data)) {
+            console.log("✅ Datos recibidos con éxito:", data.data.length);
+            setInmueblesRaw(data.data); // Guardamos solo el arreglo de inmuebles
           } else {
-            setError(true)
+            console.error("❌ Formato de datos inesperado:", data);
+            setError(true);
           }
-        })
-        .catch((_err) => {
-          console.error('Error en el fetch de inmuebles')
-          setError(true)
         })
         .finally(() => setCargando(false))
     }

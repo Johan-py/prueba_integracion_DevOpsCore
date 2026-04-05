@@ -5,6 +5,7 @@ import { ComboBox } from '../ui/ComboBox'
 import { Home, Search, Building, Bed, Trees, Flower2 } from 'lucide-react'
 import { LocationSearch } from './LocationSearch'
 import { useRouter } from 'next/navigation'
+import { useSearchFilters } from '@/hooks/useSearchFilters'
 
 const searchOptions = [
   { id: 'venta', name: 'Venta' },
@@ -27,6 +28,8 @@ export default function ExploreSection() {
     { label: 'Espacios Cementerio', icon: Flower2 }
   ]
 
+  const { updateFilters } = useSearchFilters(); // 🚀 1. Inicializamos el hook
+
   const handleSearch = () => {
     const hasOperationFilter = selectedOption.length > 0
     const hasLocationFilter = location.trim().length > 0
@@ -38,34 +41,31 @@ export default function ExploreSection() {
 
     setErrorMessage('')
 
-    // 1. Construir los parámetros de búsqueda
-    const params = new URLSearchParams()
+    const tipoMap: Record<string, string> = {
+      'Casas': 'CASA',
+      'Departamentos': 'DEPARTAMENTO',
+      'Cuartos': 'CASA', 
+      'Terrenos': 'TERRENO',
+      'Espacios Cementerio': 'TERRENO'
+    };
+    const tipoFinal = tipoMap[propertyType] || (propertyType !== 'Cualquier tipo' ? propertyType.toUpperCase() : '');
 
-    // Modos (VENTA, ALQUILER, etc.)
-    selectedOption.forEach((modo) => params.append('modoInmueble', modo.toUpperCase()))
+    // 🚀 2. SINCRONIZAMOS EL STORAGE ANTES DE VIAJAR (Para que ResultadosBusqueda lo lea)
+    updateFilters({
+      tipoInmueble: tipoFinal ? [tipoFinal] : [],
+      modoInmueble: selectedOption.map(m => m.toUpperCase()),
+      query: location.trim()
+    });
 
-    // Tipo de Inmueble (Mapeo manual para el Backend)
-    if (propertyType !== 'Cualquier tipo') {
-      const tipoMap: Record<string, string> = {
-        Casas: 'CASA',
-        Departamentos: 'DEPARTAMENTO',
-        Cuartos: 'CASA',
-        Terrenos: 'TERRENO',
-        'Espacios Cementerio': 'TERRENO'
-      }
-      const tipoFinal = tipoMap[propertyType] || propertyType.toUpperCase()
-      params.set('tipoInmueble', tipoFinal)
-    }
+    // 3. NAVEGACIÓN INTACTA (Para no romper el mapa)
+    const params = new URLSearchParams();
+    selectedOption.forEach(modo => params.append('modoInmueble', modo.toUpperCase()));
+    if (tipoFinal) params.set('tipoInmueble', tipoFinal);
+    if (location.trim() !== '') params.set('query', location.trim());
 
-    // Ubicación / Texto
-    if (location.trim() !== '') {
-      params.set('query', location.trim())
-    }
-
-    // 2. NAVEGAR A LA PÁGINA DEL MAPA
-    const finalUrl = `/busqueda_mapa?${params.toString()}`
-    console.log('🚀 Navegando desde Home a:', finalUrl)
-    router.push(finalUrl)
+    const finalUrl = `/busqueda_mapa?${params.toString()}`;
+    console.log("🚀 Navegando desde Home a:", finalUrl);
+    router.push(finalUrl);
   }
 
   return (

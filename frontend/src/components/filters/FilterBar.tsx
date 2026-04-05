@@ -44,12 +44,8 @@ export default function FilterBar({ onSearch, variant = 'home' }: FilterBarProps
   }, [])
 
   const handleSearch = () => {
-    if (modosSeleccionados.length === 0) {
-      alert('Por favor, selecciona al menos un modo (Venta, Alquiler o Anticrético)')
-      return
-    }
 
-    // Mapeo para el backend
+    // Mapeo para el backend 
     const tipoMap: Record<string, string> = {
       Casa: 'CASA',
       Departamento: 'DEPARTAMENTO',

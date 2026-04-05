@@ -18,8 +18,9 @@ export class LocationsRepository {
   }
   async findByName(query: string) {
     try {
+      const cleanQuery = query.trim();
       // Si la query es muy corta, devolvemos vacío para evitar carga innecesaria
-      if (!query || query.length < 2) return []
+      if (!cleanQuery || query.length < 2) return [];
 
       return await prisma.ubicacion_maestra.findMany({
         where: {
