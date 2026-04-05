@@ -173,7 +173,6 @@ function BusquedaMapaContent() {
 }
 
 export const dynamic = 'force-dynamic' 
-
 export default function BusquedaMapaPage() {
   return (
     <Suspense fallback={<div className="h-screen w-screen flex items-center justify-center bg-white text-gray-500 italic">Cargando buscador de PropBol...</div>}>
