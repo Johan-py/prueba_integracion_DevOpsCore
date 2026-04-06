@@ -14,7 +14,8 @@ import PropertyCard from '@/components/layout/PropertyCard'
 import PropertyRow from '@/components/galeria/PropertyRow'
 import EmptyState from '@/components/galeria/EmptyState'
 import { MenuOrdenamiento } from '@/components/busqueda/ordenamiento/MenuOrdenamiento'
-// 🟢 Mantenemos la carga dinámica del mapa
+
+// Carga dinámica del mapa (sin SSR)
 const MapView = nextDynamic(() => import('./MapView'), {
   ssr: false,
   loading: () => (
@@ -24,18 +25,18 @@ const MapView = nextDynamic(() => import('./MapView'), {
   )
 })
 
-// 🟢 Componente con la lógica interna
+// Componente con la lógica interna (necesita Suspense por useSearchParams en useProperties)
 function BusquedaMapaContent() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
-  // ⚠️ Estos hooks son los que causan el error si no hay Suspense arriba
-  const { properties, isLoading } = useProperties()
+  const { properties, isLoading, error } = useProperties()
   const { ordenActual, cambiarOrden } = useOrdenamiento({ inmuebles: properties })
 
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null)
   const [hoveredId, setHoveredId] = useState<string | null>(null)
 
+  // Hover con debounce de 200 ms → vuela el mapa al marcador
   useEffect(() => {
     if (!hoveredId) return
     const timeout = setTimeout(() => {
@@ -52,7 +53,9 @@ function BusquedaMapaContent() {
           console.log('🔍 Buscando con filtros:', nuevosFiltros)
         }}
       />
+
       <main className="flex flex-1 overflow-hidden relative">
+        {/* Panel lateral colapsable */}
         <aside
           className={`bg-white border-r border-stone-200 flex flex-col z-10 transition-all duration-300 ${
             isSidebarOpen ? 'w-full md:w-[450px]' : 'w-0'
@@ -60,6 +63,7 @@ function BusquedaMapaContent() {
         >
           {isSidebarOpen && (
             <div className="flex flex-col h-full">
+              {/* Cabecera del panel */}
               <div className="p-4 bg-white shrink-0">
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex flex-col">
@@ -89,6 +93,7 @@ function BusquedaMapaContent() {
                 </div>
               </div>
 
+              {/* Toggle vista grid / lista */}
               <div className="px-4 py-2 border-b border-stone-50 flex justify-end bg-white">
                 <div className="flex bg-stone-100 p-1 rounded-md border border-stone-200 shadow-inner scale-90">
                   <button
@@ -106,6 +111,7 @@ function BusquedaMapaContent() {
                 </div>
               </div>
 
+              {/* Lista de propiedades con hover → fly-to en mapa */}
               <div className="flex-1 overflow-y-auto p-4 bg-stone-50 no-scrollbar">
                 {isLoading ? (
                   <div className="flex flex-col justify-center items-center h-full text-stone-400 text-sm gap-2 animate-pulse">
@@ -121,10 +127,15 @@ function BusquedaMapaContent() {
                     {properties.map((property: any) => (
                       <div
                         key={property.id}
-                        // ESTA LÍNEA ES LA QUE DISPARA SU VUELO EN EL MAPA
-                        onMouseEnter={() => setHoveredId(property.id)} 
+                        // Hover con debounce: dispara el vuelo del mapa al marcador
+                        onMouseEnter={() => setHoveredId(property.id)}
+                        onMouseLeave={() => setHoveredId(null)}
                         onClick={() => setSelectedPropertyId(property.id)}
-                        className={`cursor-pointer transition-all duration-200 rounded-xl ...`}
+                        className={`cursor-pointer transition-all duration-200 rounded-xl ${
+                          selectedPropertyId === property.id
+                            ? 'ring-2 ring-orange-400 ring-offset-1'
+                            : ''
+                        }`}
                       >
                         {viewMode === 'grid' ? (
                           <PropertyCard
@@ -162,7 +173,9 @@ function BusquedaMapaContent() {
           )}
         </aside>
 
+        {/* Área del mapa */}
         <section className="flex-1 relative bg-stone-200">
+          {/* Botón para reabrir el panel cuando está colapsado */}
           {!isSidebarOpen && (
             <button
               onClick={() => setIsSidebarOpen(true)}
@@ -181,6 +194,8 @@ function BusquedaMapaContent() {
               properties={properties}
               selectedId={selectedPropertyId}
               onSelect={setSelectedPropertyId}
+              isLoading={isLoading}
+              error={error}
             />
           </div>
         </section>
