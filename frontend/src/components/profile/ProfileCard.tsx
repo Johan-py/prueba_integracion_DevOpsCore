@@ -52,12 +52,12 @@ export default function ProfileCard() {
   const [genero, setGenero] = useState('')
   const [direccion, setDireccion] = useState('')
   const [avatar, setAvatar] = useState<string | null>(null)
-  const [errorNombre, setErrorNombre] = useState("");
+  const [errorNombre, setErrorNombre] = useState('')
 
-  const [originalNombre] = useState("");
-  const [originalPais] = useState("");
-  const [originalGenero] = useState("");
-  const [originalDireccion] = useState("");
+  const [originalNombre] = useState('')
+  const [originalPais] = useState('')
+  const [originalGenero] = useState('')
+  const [originalDireccion] = useState('')
 
   const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false)
   const [isOtpModalOpen, setIsOtpModalOpen] = useState(false)
@@ -111,12 +111,14 @@ export default function ProfileCard() {
         syncNavbar()
 
         if (perfil.telefonos && Array.isArray(perfil.telefonos) && perfil.telefonos.length > 0) {
-          setTelefonos(perfil.telefonos.map((tel: any, i: number) => ({
+          setTelefonos(
+            perfil.telefonos.map((tel: any, i: number) => ({
             id: Date.now() + i,
             numero: tel.numero,
-            pais: PAISES.find(p => tel.codigoPais === p.codigo)?.nombre || 'Bolivia',
+              pais: PAISES.find((p) => tel.codigoPais === p.codigo)?.nombre || 'Bolivia',
             codigo: tel.codigoPais
-          })))
+            }))
+          )
         } else {
           setTelefonos([{ id: Date.now(), numero: '', pais: 'Bolivia', codigo: '+591' }])
         }
@@ -128,7 +130,9 @@ export default function ProfileCard() {
     }
   }
 
-  useEffect(() => { cargarPerfil() }, [])
+  useEffect(() => {
+    cargarPerfil()
+  }, [])
 
   const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
   const hasEmailChanged = tempEmail !== originalEmail && isValidEmail(tempEmail)
@@ -428,14 +432,14 @@ export default function ProfileCard() {
         setTelefonos(
             telefonos.map((t) => {
                 if (t.id === id) {
-                    const configPais = PAISES.find(p => p.nombre === t.pais);
-                    const maxDigitos = configPais?.digitos || 15;
+          const configPais = PAISES.find((p) => p.nombre === t.pais)
+          const maxDigitos = configPais?.digitos || 15
 
-                    const soloNumerosYCortados = valor.replace(/\D/g, '').slice(0, maxDigitos);
+          const soloNumerosYCortados = valor.replace(/\D/g, '').slice(0, maxDigitos)
 
-                    return { ...t, numero: soloNumerosYCortados };
+          return { ...t, numero: soloNumerosYCortados }
                 }
-                return t;
+        return t
             })
         )
     }
@@ -486,7 +490,7 @@ export default function ProfileCard() {
   pais !== originalPais ||
   genero !== originalGenero ||
   direccion !== originalDireccion ||
-  tempEmail !== originalEmail;
+    tempEmail !== originalEmail
 
   if (isLoading && !perfilData) {
     return (
@@ -498,12 +502,9 @@ export default function ProfileCard() {
 
   return (
   <div className="bg-[#fdf6e6] border border-[#e5dfd7] shadow-sm p-8 rounded-xl flex flex-col md:flex-row gap-10 items-center">
-
     {/* PERFIL */}
     <div className="flex flex-col items-center justify-center w-full md:w-1/3">
-
       <div className="relative mb-10"> 
-
         {/* AVATAR */}
         <div className="w-28 h-28 rounded-full bg-white border border-gray-300 flex items-center justify-center shadow-sm overflow-hidden">
           {avatar ? (
@@ -530,11 +531,7 @@ export default function ProfileCard() {
             disabled:opacity-50
           "
         >
-          {isUploading ? (
-            <Loader2 size={16} className="animate-spin" />
-          ) : (
-            <Plus size={16} />  
-          )}
+            {isUploading ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
         </button>
 
         <input
@@ -544,14 +541,14 @@ export default function ProfileCard() {
           hidden
           onChange={(e) => e.target.files?.[0] && subirFoto(e.target.files[0])}
         />
-
       </div>
 
       <p className="mt-4 font-semibold text-lg">{nombre}</p>
       {/* CORREO OCULTO EN LA BARRA LATERAL */}
-      <p className="text-sm text-gray-500">{isEmailEditable ? originalEmail : ofuscarEmail(originalEmail)}</p>
-
-    </div>
+        <p className="text-sm text-gray-500">
+          {isEmailEditable ? originalEmail : ofuscarEmail(originalEmail)}
+        </p>
+      </div>
 
       {/* FORMULARIO */}
       <div className="w-full md:w-2/3">
@@ -560,25 +557,21 @@ export default function ProfileCard() {
         <div className="flex flex-col gap-4">
           {/* NOMBRE */}
           <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-  
-  <label className="w-full md:w-40 font-medium text-stone-700">
-    Nombre Completo:
-  </label>
+            <label className="w-full md:w-40 font-medium text-stone-700">Nombre Completo:</label>
 
   <div className="flex flex-col w-full">
-
     <div className="flex items-center gap-2">
       <input
         type="text"
         disabled={campoEditando !== 'nombre'}
         value={nombre}
         onChange={(e) => {
-          setNombre(soloLetras(e.target.value));
-          if (errorNombre) setErrorNombre(""); 
+                    setNombre(soloLetras(e.target.value))
+                    if (errorNombre) setErrorNombre('')
         }}
         className={`flex-1 px-3 py-2 rounded text-sm ${
           errorNombre
-            ? "border border-red-500 bg-red-50"
+                      ? 'border border-red-500 bg-red-50'
             : campoEditando === 'nombre'
               ? 'bg-white border border-amber-500'
               : 'bg-gray-200 cursor-not-allowed'
@@ -592,11 +585,7 @@ export default function ProfileCard() {
       </button>
     </div>
 
-    {errorNombre && (
-      <span className="text-red-500 text-xs mt-1">
-        {errorNombre}
-      </span>
-    )}
+              {errorNombre && <span className="text-red-500 text-xs mt-1">{errorNombre}</span>}
   </div>
 </div>
 
@@ -607,7 +596,10 @@ export default function ProfileCard() {
               <div className="flex w-full items-center gap-2">
                 <input
                   type="email"
-                  className={`w-full px-3 py-2 rounded text-sm text-stone-700 ${isEmailEditable ? 'bg-white border border-amber-500' : 'bg-gray-200 cursor-not-allowed'
+                className={`w-full px-3 py-2 rounded text-sm text-stone-700 ${
+                  isEmailEditable
+                    ? 'bg-white border border-amber-500'
+                    : 'bg-gray-200 cursor-not-allowed'
                     }`}
                   readOnly={!isEmailEditable}
                   /* CORREO OCULTO EN EL INPUT */
@@ -623,7 +615,6 @@ export default function ProfileCard() {
                   <Pencil size={16} />
                 </button>
               </div>
-            
           </div>
           {isEmailEditable && tempEmail.length > 0 && !isValidEmail(tempEmail) && (
             <div className="md:ml-44">
@@ -652,11 +643,15 @@ export default function ProfileCard() {
                     disabled={campoEditando !== keyCampo}
                     value={`${tel.pais} ${tel.codigo}`}
                     onChange={(e) => {
-                      const seleccion = PAISES.find((p) => `${p.nombre} ${p.codigo}` === e.target.value)
+                      const seleccion = PAISES.find(
+                        (p) => `${p.nombre} ${p.codigo}` === e.target.value
+                      )
                       if (seleccion) {
                         setTelefonos(
                           telefonos.map((t) =>
-                            t.id === tel.id ? { ...t, pais: seleccion.nombre, codigo: seleccion.codigo } : t
+                            t.id === tel.id
+                              ? { ...t, pais: seleccion.nombre, codigo: seleccion.codigo }
+                              : t
                           )
                         )
                       }
@@ -723,7 +718,8 @@ export default function ProfileCard() {
                 disabled={campoEditando !== 'pais'}
                 value={pais}
                 onChange={(e) => setPais(e.target.value)}
-                className={`flex-1 px-3 py-2 rounded text-sm ${campoEditando === 'pais'
+                className={`flex-1 px-3 py-2 rounded text-sm ${
+                  campoEditando === 'pais'
                     ? 'bg-white border border-amber-500'
                     : 'bg-gray-200 cursor-not-allowed'
                   }`}
@@ -748,7 +744,8 @@ export default function ProfileCard() {
                 disabled={campoEditando !== 'genero'}
                 value={genero}
                 onChange={(e) => setGenero(e.target.value)}
-                className={`flex-1 px-3 py-2 rounded text-sm ${campoEditando === 'genero'
+                className={`flex-1 px-3 py-2 rounded text-sm ${
+                  campoEditando === 'genero'
                     ? 'bg-white border border-amber-500'
                     : 'bg-gray-200 cursor-not-allowed'
                   }`}
@@ -758,7 +755,9 @@ export default function ProfileCard() {
                 <option value="Femenino">Femenino</option>
                 <option value="Otro">Otro</option>
               </select>
-              <button onClick={() => setCampoEditando(campoEditando === 'genero' ? null : 'genero')}>
+              <button
+                onClick={() => setCampoEditando(campoEditando === 'genero' ? null : 'genero')}
+              >
                 <Pencil size={16} />
               </button>
             </div>
@@ -772,12 +771,15 @@ export default function ProfileCard() {
                 disabled={campoEditando !== 'direccion'}
                 value={direccion}
                 onChange={(e) => setDireccion(e.target.value)}
-                className={`flex-1 px-3 py-2 rounded text-sm ${campoEditando === 'direccion'
+                className={`flex-1 px-3 py-2 rounded text-sm ${
+                  campoEditando === 'direccion'
                     ? 'bg-white border border-amber-500'
                     : 'bg-gray-200 cursor-not-allowed'
                   }`}
               />
-              <button onClick={() => setCampoEditando(campoEditando === 'direccion' ? null : 'direccion')}>
+              <button
+                onClick={() => setCampoEditando(campoEditando === 'direccion' ? null : 'direccion')}
+              >
                 <Pencil size={16} />
               </button>
             </div>
@@ -785,7 +787,6 @@ export default function ProfileCard() {
 
           {/* BOTONES */}
           <div className="mt-6 flex justify-end gap-4">
-
              <button
                   onClick={handleCancelAll}
                   className="text-stone-600 hover:text-black text-sm"
@@ -797,23 +798,24 @@ export default function ProfileCard() {
               <button
                    onClick={() => {
     if (!nombre.trim()) {
-      setErrorNombre("El nombre es obligatorio");
-      return;
+                  setErrorNombre('El nombre es obligatorio')
+                  return
     }
 
-    setErrorNombre("");
-    handleSaveAll();
+                setErrorNombre('')
+                handleSaveAll()
   }}
   disabled={isLoading || !hayCambios}
   className={`px-6 py-2 rounded-lg text-sm font-medium shadow-sm transition
-    ${!hayCambios
-      ? "bg-orange-300 cursor-not-allowed text-white"
-      : "bg-orange-500 hover:bg-orange-600 text-white"}
+    ${
+      !hayCambios
+        ? 'bg-orange-300 cursor-not-allowed text-white'
+        : 'bg-orange-500 hover:bg-orange-600 text-white'
+    }
   `}
 >
   {isLoading ? 'Guardando...' : 'Guardar Cambios'}
                  </button>
-
             </div>
         </div>
       </div>
