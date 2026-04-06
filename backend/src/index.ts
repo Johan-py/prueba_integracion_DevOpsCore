@@ -36,6 +36,9 @@ import router from './modules/registro-publicacion/publicacion.routes.js' //sig-
 import { verifyNotificationEmailTransport } from './modules/email/notification-email.service.js'
 import publicacionRoutes from './modules/publicacion/publicacion.routes.js' //lista de publicaciones
 
+// 👇 AQUÍ ESTÁ TU NUEVA IMPORTACIÓN DE TRANSACCIONES
+import transaccionesRoutes from './modules/transacciones/transacciones.routes.js'
+
 const app = express()
 
 app.use(
@@ -55,6 +58,10 @@ app.use('/api/perfil/usuario', perfilRoutes)
 app.use('/api/publicaciones', multimediaRoutes)
 app.use('/uploads', express.static(path.resolve('uploads')))
 app.use('/api', router)
+
+// 👇 AQUÍ ESTÁ TU NUEVA RUTA DE TRANSACCIONES
+app.use('/api/transacciones', transaccionesRoutes)
+
 app.post('/api/users', (req, res) => {
   const user = req.body
   res.json({ message: 'User created', user })
