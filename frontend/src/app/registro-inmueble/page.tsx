@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 type CampoError =
   | 'titulo'
@@ -14,6 +15,8 @@ type CampoError =
   | null
 
 export default function MiRegistroPage() {
+  const router = useRouter()
+
   const [datos, setDatos] = useState({
     titulo: '',
     operacion: '',
@@ -741,11 +744,8 @@ export default function MiRegistroPage() {
               <div className="mt-12 space-y-6">
                 <div className="flex justify-center md:justify-end gap-6">
                   <button
-                    onClick={() => {
-                      setEstado('ninguno')
-                      setMensajeError('')
-                      setCampoError(null)
-                    }}
+                    type="button"
+                    onClick={() => router.back()}
                     className="px-12 py-3 rounded-full border border-gray-400 bg-[#D9D9D9]"
                   >
                     Cancelar
