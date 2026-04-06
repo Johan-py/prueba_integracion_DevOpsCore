@@ -10,6 +10,7 @@ export const getPlanLimit = async (req: Request, res: Response) => {
     if (!userId) return res.status(401).json({ message: 'No autorizado' });
 
 
+
 const user = await prisma.usuario.findUnique({
   where: { id: Number(userId) },
   include: {
