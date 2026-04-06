@@ -1,54 +1,50 @@
-import { prisma } from '../db'
+import { prisma } from "../config/prisma.js";
+
+const USE_MOCK = true;
 
 export const obtenerConsumo = async (userId: number) => {
+  // 🟡MODO MOCK (datos simulados)
+  if (USE_MOCK) {
+    return {
+      usadas: 7,
+      limite: 10,
+      plan: "Plan básico (mock)",
+    };
+  }
+
+  // 🟢 MODO BASE DE DATOS (real)
   const usuario = await prisma.usuario.findUnique({
     where: {
-      id: userId
+      id: userId,
     },
     include: {
       suscripciones_activas: {
         include: {
-          plan_suscripcion: true
-        }
-      }
-    }
-  })
+          plan_suscripcion: true,
+        },
+      },
+    },
+  });
 
-  //Si no existe el usuario
   if (!usuario) {
-    return {
-      usadas: 0,
-      limite: 0,
-      plan: 'Sin usuario'
-    }
+    throw new Error("Usuario no encontrado");
   }
 
-  const suscripcion = usuario.suscripciones_activas[0]
+  const suscripcion = usuario.suscripciones_activas[0];
 
-  //  Si no tiene suscripción
   if (!suscripcion) {
-    return {
-      usadas: 0,
-      limite: 0,
-      plan: 'Sin suscripción'
-    }
+    throw new Error("No tiene suscripción activa");
   }
 
-  const plan = suscripcion.plan_suscripcion
+  const plan = suscripcion.plan_suscripcion;
 
-  //  Si no tiene plan
   if (!plan) {
-    return {
-      usadas: 0,
-      limite: 0,
-      plan: 'Sin plan'
-    }
+    throw new Error("La suscripción no tiene plan asignado");
   }
 
-  // Aquí luego puedes calcular las publicaciones reales
   return {
     usadas: 0,
     limite: plan.nro_publicaciones_plan,
-    plan: plan.nombre_plan
-  }
-}
+    plan: plan.nombre_plan,
+  };
+};

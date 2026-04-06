@@ -1,29 +1,29 @@
-import type { TipoMultimedia } from '@prisma/client'
-import { prisma } from '../../db.js'
+import type { TipoMultimedia } from "@prisma/client";
+import { prisma } from "../../db.js";
 import type {
   MultimediaRecord,
   MultimediaType,
-  PublicacionRecord
-} from './multimedia.types.js'
+  PublicacionRecord,
+} from "./multimedia.types.js";
 
 const mapPublicationRecord = (publication: {
-  id: number
-  usuarioId: number
-  titulo: string
+  id: number;
+  usuarioId: number;
+  titulo: string;
 }): PublicacionRecord => {
   return {
     id: publication.id,
     usuarioId: publication.usuarioId,
-    titulo: publication.titulo
-  }
-}
+    titulo: publication.titulo,
+  };
+};
 
 const mapMultimediaRecord = (multimedia: {
-  id: number
-  publicacionId: number
-  tipo: TipoMultimedia
-  url: string
-  pesoMb: unknown
+  id: number;
+  publicacionId: number;
+  tipo: TipoMultimedia;
+  url: string;
+  pesoMb: unknown;
 }): MultimediaRecord => {
   return {
     id: multimedia.id,
@@ -33,82 +33,82 @@ const mapMultimediaRecord = (multimedia: {
     pesoMb:
       multimedia.pesoMb === null || multimedia.pesoMb === undefined
         ? null
-        : Number(multimedia.pesoMb)
-  }
-}
+        : Number(multimedia.pesoMb),
+  };
+};
 
 export const findPublicationByIdRepository = async (
-  publicacionId: number
+  publicacionId: number,
 ): Promise<PublicacionRecord | null> => {
   const publication = await prisma.publicacion.findUnique({
     where: { id: publicacionId },
     select: {
       id: true,
       usuarioId: true,
-      titulo: true
-    }
-  })
+      titulo: true,
+    },
+  });
 
-  return publication ? mapPublicationRecord(publication) : null
-}
+  return publication ? mapPublicationRecord(publication) : null;
+};
 
 export const getMultimediaByPublicationIdRepository = async (
-  publicacionId: number
+  publicacionId: number,
 ): Promise<MultimediaRecord[]> => {
   const multimedia = await prisma.multimedia.findMany({
     where: { publicacionId },
-    orderBy: { id: 'asc' },
+    orderBy: { id: "asc" },
     select: {
       id: true,
       publicacionId: true,
       tipo: true,
       url: true,
-      pesoMb: true
-    }
-  })
+      pesoMb: true,
+    },
+  });
 
-  return multimedia.map(mapMultimediaRecord)
-}
+  return multimedia.map(mapMultimediaRecord);
+};
 
 export const countMultimediaByPublicationIdAndTypeRepository = async (
   publicacionId: number,
-  tipo: MultimediaType
+  tipo: MultimediaType,
 ): Promise<number> => {
   return prisma.multimedia.count({
     where: {
       publicacionId,
-      tipo: tipo as TipoMultimedia
-    }
-  })
-}
+      tipo: tipo as TipoMultimedia,
+    },
+  });
+};
 
 export const createMultimediaRepository = async (
-  data: Omit<MultimediaRecord, 'id'>
+  data: Omit<MultimediaRecord, "id">,
 ): Promise<MultimediaRecord> => {
   const created = await prisma.multimedia.create({
     data: {
       publicacionId: data.publicacionId,
       tipo: data.tipo as TipoMultimedia,
       url: data.url,
-      pesoMb: data.pesoMb ?? null
+      pesoMb: data.pesoMb ?? null,
     },
     select: {
       id: true,
       publicacionId: true,
       tipo: true,
       url: true,
-      pesoMb: true
-    }
-  })
+      pesoMb: true,
+    },
+  });
 
-  return mapMultimediaRecord(created)
-}
+  return mapMultimediaRecord(created);
+};
 
 export const createManyMultimediaRepository = async (
-  items: Array<Omit<MultimediaRecord, 'id'>>
+  items: Array<Omit<MultimediaRecord, "id">>,
 ): Promise<MultimediaRecord[]> => {
   if (items.length === 0) {
-    return []
+    return [];
   }
 
   const createdItems = await prisma.$transaction(
@@ -118,18 +118,18 @@ export const createManyMultimediaRepository = async (
           publicacionId: item.publicacionId,
           tipo: item.tipo as TipoMultimedia,
           url: item.url,
-          pesoMb: item.pesoMb ?? null
+          pesoMb: item.pesoMb ?? null,
         },
         select: {
           id: true,
           publicacionId: true,
           tipo: true,
           url: true,
-          pesoMb: true
-        }
-      })
-    )
-  )
+          pesoMb: true,
+        },
+      }),
+    ),
+  );
 
-  return createdItems.map(mapMultimediaRecord)
-}
+  return createdItems.map(mapMultimediaRecord);
+};

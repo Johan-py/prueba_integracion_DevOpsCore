@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Router } from "express";
 import {
   obtenerPerfil,
   editarNombre,
@@ -6,22 +6,22 @@ import {
   editarGenero,
   editarDireccion,
   editarFotoPerfil,
-  editarTelefonos
-} from './perfil.controller.js'
-import { validarJWT } from '../../middleware/validarJWT.js'
-import { upload } from '../../middleware/upload.js'
+  editarTelefonos,
+} from "./perfil.controller.js";
+import { validarJWT } from "../../middleware/validarJWT.js";
+import { upload } from "../../middleware/upload.js";
 
-const router = Router()
+const router = Router();
 
 // GET - Obtener perfil
-router.get('/', validarJWT, obtenerPerfil)
+router.get("/", validarJWT, obtenerPerfil);
 
 // PUTs - Editar cada campo
-router.put('/nombre', validarJWT, editarNombre)
-router.put('/pais', validarJWT, editarPais)
-router.put('/genero', validarJWT, editarGenero)
-router.put('/direccion', validarJWT, editarDireccion)
-router.put('/foto-perfil', validarJWT, upload.single('foto'), editarFotoPerfil)
-router.put('/telefonos', validarJWT, editarTelefonos)
+router.put("/nombre", validarJWT, editarNombre);
+router.put("/pais", validarJWT, editarPais);
+router.put("/genero", validarJWT, editarGenero);
+router.put("/direccion", validarJWT, editarDireccion);
+router.put("/foto-perfil", validarJWT, upload.single("foto"), editarFotoPerfil);
+router.put("/telefonos", validarJWT, editarTelefonos);
 
-export default router
+export default router;

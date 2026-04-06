@@ -1,66 +1,77 @@
-import { PrismaClient, Categoria, TipoAccion } from '@prisma/client'
-import { PrismaPg } from '@prisma/adapter-pg'
-import 'dotenv/config'
+import { PrismaClient, Categoria, TipoAccion } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import "dotenv/config";
 
-const databaseUrl = process.env.DATABASE_URL
-if (!databaseUrl) throw new Error('DATABASE_URL no está definido en el entorno')
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl)
+  throw new Error("DATABASE_URL no está definido en el entorno");
 
-const adapter = new PrismaPg({ connectionString: databaseUrl })
-const prisma = new PrismaClient({ adapter })
+const adapter = new PrismaPg({ connectionString: databaseUrl });
+const prisma = new PrismaClient({ adapter });
 
 export interface FiltrosBusqueda {
   categoria?: string | string[];
-  tipoInmueble?: string | string[]; 
-  modoInmueble?: string | string[]; 
+  tipoInmueble?: string | string[];
+  modoInmueble?: string | string[];
   query?: string;
-  locationId?: number;                   
-  fecha?: 'mas-recientes' | 'mas-populares' | 'mas-antiguos';
-  precio?: 'menor-a-mayor' | 'mayor-a-menor';
-  superficie?: 'menor-a-mayor' | 'mayor-a-menor';
+  locationId?: number;
+  fecha?: "mas-recientes" | "mas-populares" | "mas-antiguos";
+  precio?: "menor-a-mayor" | "mayor-a-menor";
+  superficie?: "menor-a-mayor" | "mayor-a-menor";
 }
 
 export const propertiesRepository = {
   async getAll(filtros: FiltrosBusqueda = {}) {
     // ── WHERE ──────────────────────────────────────────────────────────────
-    const where: any = {estado: 'ACTIVO'}
+    const where: any = { estado: "ACTIVO" };
 
-    const rawTipo = filtros.tipoInmueble || filtros.categoria
+    const rawTipo = filtros.tipoInmueble || filtros.categoria;
     if (rawTipo) {
-      const valor = Array.isArray(rawTipo) ? rawTipo[0] : rawTipo
-      if (valor && valor !== 'Cualquier tipo') {
-        where.categoria = valor.toUpperCase().trim()
+      const valor = Array.isArray(rawTipo) ? rawTipo[0] : rawTipo;
+      if (valor && valor !== "Cualquier tipo") {
+        where.categoria = valor.toUpperCase().trim();
       }
     }
 
     if (filtros.modoInmueble) {
-    const valor = Array.isArray(filtros.modoInmueble) ? filtros.modoInmueble[0] : filtros.modoInmueble;
-    if (valor) {
-      const modoLimpio = valor.toUpperCase().includes('ANTICR') ? 'ANTICRETO' : valor.toUpperCase();
-      where.tipoAccion = modoLimpio; 
+      const valor = Array.isArray(filtros.modoInmueble)
+        ? filtros.modoInmueble[0]
+        : filtros.modoInmueble;
+      if (valor) {
+        const modoLimpio = valor.toUpperCase().includes("ANTICR")
+          ? "ANTICRETO"
+          : valor.toUpperCase();
+        where.tipoAccion = modoLimpio;
+      }
     }
-  }
 
-  if (filtros.locationId || (filtros.query && filtros.query.trim() !== '')) {
+    if (filtros.locationId || (filtros.query && filtros.query.trim() !== "")) {
       where.OR = [];
-      
+
       // 1. Buscar por ID de zona exacta (Ideal cuando pases a producción)
       if (filtros.locationId) {
         where.OR.push({
-          ubicacion: { ubicacionMaestraId: Number(filtros.locationId) }
+          ubicacion: { ubicacionMaestraId: Number(filtros.locationId) },
         });
       }
 
       // 2. Buscar por texto (Salva la vida con datos de prueba o sin ID enlazado)
-      if (filtros.query && filtros.query.trim() !== '') {
+      if (filtros.query && filtros.query.trim() !== "") {
         // Extraemos la primera parte (Ej: Saca "Cala Cala" de "Cala Cala - Cochabamba - Bolivia")
-        const textoLimpio = filtros.query.split('-')[0].trim();
-        
-        where.OR.push({ titulo: { contains: textoLimpio, mode: 'insensitive' } });
-        where.OR.push({ descripcion: { contains: textoLimpio, mode: 'insensitive' } });
-        
+        const textoLimpio = filtros.query.split("-")[0].trim();
+
+        where.OR.push({
+          titulo: { contains: textoLimpio, mode: "insensitive" },
+        });
+        where.OR.push({
+          descripcion: { contains: textoLimpio, mode: "insensitive" },
+        });
+
         // También buscamos en la dirección textual de la ubicación
-        where.OR.push({ 
-          ubicacion: { direccion: { contains: textoLimpio, mode: 'insensitive' } } 
+        where.OR.push({
+          ubicacion: {
+            direccion: { contains: textoLimpio, mode: "insensitive" },
+          },
         });
       }
     }
@@ -73,24 +84,24 @@ export const propertiesRepository = {
     //
     // Para precio y superficie: el frontend los maneja con criterioActivo,
     // así que el backend solo necesita proveer el default y popularidad.
-    const orderBy: any[] = []
+    const orderBy: any[] = [];
 
-    if (filtros.precio === 'menor-a-mayor') {
-      orderBy.push({ precio: 'asc' })
-      orderBy.push({ id: 'asc' })
-    } else if (filtros.precio === 'mayor-a-menor') {
-      orderBy.push({ precio: 'desc' })
-    } else if (filtros.superficie === 'menor-a-mayor') {
-      orderBy.push({ superficieM2: 'asc' })
-    } else if (filtros.superficie === 'mayor-a-menor') {
-      orderBy.push({ superficieM2: 'desc' })
-    } else if (filtros.fecha === 'mas-recientes') {
-      orderBy.push({ fechaPublicacion: 'desc' })
-    } else if (filtros.fecha === 'mas-antiguos') {
-      orderBy.push({ fechaPublicacion: 'asc' })
+    if (filtros.precio === "menor-a-mayor") {
+      orderBy.push({ precio: "asc" });
+      orderBy.push({ id: "asc" });
+    } else if (filtros.precio === "mayor-a-menor") {
+      orderBy.push({ precio: "desc" });
+    } else if (filtros.superficie === "menor-a-mayor") {
+      orderBy.push({ superficieM2: "asc" });
+    } else if (filtros.superficie === "mayor-a-menor") {
+      orderBy.push({ superficieM2: "desc" });
+    } else if (filtros.fecha === "mas-recientes") {
+      orderBy.push({ fechaPublicacion: "desc" });
+    } else if (filtros.fecha === "mas-antiguos") {
+      orderBy.push({ fechaPublicacion: "asc" });
     }
 
-    orderBy.push({ id: 'asc' }) // Desempate default
+    orderBy.push({ id: "asc" }); // Desempate default
 
     return prisma.inmueble.findMany({
       where,
@@ -98,14 +109,14 @@ export const propertiesRepository = {
       include: {
         ubicacion: {
           include: {
-            ubicacion_maestra: true // Vital para mostrar zonas de Cochabamba
-          }
+            ubicacion_maestra: true, // Vital para mostrar zonas de Cochabamba
+          },
         },
         publicaciones: {
-          where: { estado: 'ACTIVA' },
-          include: { multimedia: true } // Para obtener las fotos reales
-        }
-      }
-    })
-  }
-}
+          where: { estado: "ACTIVA" },
+          include: { multimedia: true }, // Para obtener las fotos reales
+        },
+      },
+    });
+  },
+};

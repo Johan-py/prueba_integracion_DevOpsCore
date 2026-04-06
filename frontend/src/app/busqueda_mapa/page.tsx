@@ -1,56 +1,65 @@
-'use client'
+"use client";
 
-import { useState, useEffect, Suspense } from 'react'
-import nextDynamic from 'next/dynamic'
-import { ChevronLeft, ChevronRight, List as ListIcon, LayoutGrid } from 'lucide-react'
+import { useState, useEffect, Suspense } from "react";
+import nextDynamic from "next/dynamic";
+import {
+  ChevronLeft,
+  ChevronRight,
+  List as ListIcon,
+  LayoutGrid,
+} from "lucide-react";
 
 // === HOOKS ===
-import { useProperties } from '@/hooks/useProperties'
-import { useOrdenamiento } from '@/hooks/useOrdenamiento'
+import { useProperties } from "@/hooks/useProperties";
+import { useOrdenamiento } from "@/hooks/useOrdenamiento";
 
 // === COMPONENTES ===
-import FilterBar from '@/components/filters/FilterBar'
-import PropertyCard from '@/components/layout/PropertyCard'
-import PropertyRow from '@/components/galeria/PropertyRow'
-import EmptyState from '@/components/galeria/EmptyState'
-import { MenuOrdenamiento } from '@/components/busqueda/ordenamiento/MenuOrdenamiento'
+import FilterBar from "@/components/filters/FilterBar";
+import PropertyCard from "@/components/layout/PropertyCard";
+import PropertyRow from "@/components/galeria/PropertyRow";
+import EmptyState from "@/components/galeria/EmptyState";
+import { MenuOrdenamiento } from "@/components/busqueda/ordenamiento/MenuOrdenamiento";
 
 // Carga dinámica del mapa (sin SSR)
-const MapView = nextDynamic(() => import('./MapView'), {
+const MapView = nextDynamic(() => import("./MapView"), {
   ssr: false,
   loading: () => (
     <div className="h-full w-full bg-stone-100 animate-pulse flex items-center justify-center text-stone-400">
       Cargando mapa de Bolivia...
     </div>
-  )
-})
+  ),
+});
 
 // Componente con la lógica interna (necesita Suspense por useSearchParams en useProperties)
 function BusquedaMapaContent() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  const { properties, isLoading, error } = useProperties()
-  const { ordenActual, cambiarOrden } = useOrdenamiento({ inmuebles: properties })
+  const { properties, isLoading, error } = useProperties();
+  const { ordenActual, cambiarOrden } = useOrdenamiento({
+    inmuebles: properties,
+  });
 
-  const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null)
-  const [hoveredId, setHoveredId] = useState<string | null>(null)
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(
+    null,
+  );
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   // Hover con debounce de 200 ms → vuela el mapa al marcador
   useEffect(() => {
-    if (!hoveredId) return
+    if (!hoveredId) return;
     const timeout = setTimeout(() => {
-      setSelectedPropertyId(hoveredId)
-    }, 200)
-    return () => clearTimeout(timeout)
-  }, [hoveredId])
+      setSelectedPropertyId(hoveredId);
+    }, 200);
+    return () => clearTimeout(timeout);
+  }, [hoveredId]);
 
   return (
     <div className="flex flex-col h-screen bg-white overflow-hidden">
       <FilterBar
         variant="map"
         onSearch={(nuevosFiltros) => {
-          console.log('🔍 Buscando con filtros:', nuevosFiltros)
+          console.log("🔍 Buscando con filtros:", nuevosFiltros);
         }}
       />
 
@@ -58,7 +67,7 @@ function BusquedaMapaContent() {
         {/* Panel lateral colapsable */}
         <aside
           className={`bg-white border-r border-stone-200 flex flex-col z-10 transition-all duration-300 ${
-            isSidebarOpen ? 'w-full md:w-[450px]' : 'w-0'
+            isSidebarOpen ? "w-full md:w-[450px]" : "w-0"
           }`}
         >
           {isSidebarOpen && (
@@ -68,11 +77,13 @@ function BusquedaMapaContent() {
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex flex-col">
                     <h2 className="text-2xl font-bold text-slate-900">
-                      <span className="text-orange-500">{properties.length}</span>
+                      <span className="text-orange-500">
+                        {properties.length}
+                      </span>
                       <span className="ml-2 text-gray-600 font-normal text-lg">
                         {properties.length === 1
-                          ? 'propiedad encontrada'
-                          : 'propiedades encontradas'}
+                          ? "propiedad encontrada"
+                          : "propiedades encontradas"}
                       </span>
                     </h2>
                   </div>
@@ -97,14 +108,14 @@ function BusquedaMapaContent() {
               <div className="px-4 py-2 border-b border-stone-50 flex justify-end bg-white">
                 <div className="flex bg-stone-100 p-1 rounded-md border border-stone-200 shadow-inner scale-90">
                   <button
-                    onClick={() => setViewMode('grid')}
-                    className={`p-1 rounded transition-colors ${viewMode === 'grid' ? 'bg-white text-[#ea580c] shadow-sm' : 'text-stone-400'}`}
+                    onClick={() => setViewMode("grid")}
+                    className={`p-1 rounded transition-colors ${viewMode === "grid" ? "bg-white text-[#ea580c] shadow-sm" : "text-stone-400"}`}
                   >
                     <LayoutGrid size={16} />
                   </button>
                   <button
-                    onClick={() => setViewMode('list')}
-                    className={`p-1 rounded transition-colors ${viewMode === 'list' ? 'bg-white text-[#ea580c] shadow-sm' : 'text-stone-400'}`}
+                    onClick={() => setViewMode("list")}
+                    className={`p-1 rounded transition-colors ${viewMode === "list" ? "bg-white text-[#ea580c] shadow-sm" : "text-stone-400"}`}
                   >
                     <ListIcon size={16} />
                   </button>
@@ -122,7 +133,7 @@ function BusquedaMapaContent() {
                   <EmptyState />
                 ) : (
                   <div
-                    className={`gap-4 flex flex-col ${viewMode === 'list' ? 'divide-y divide-gray-100 bg-white border border-gray-100 rounded-xl shadow-sm' : ''}`}
+                    className={`gap-4 flex flex-col ${viewMode === "list" ? "divide-y divide-gray-100 bg-white border border-gray-100 rounded-xl shadow-sm" : ""}`}
                   >
                     {properties.map((property: any) => (
                       <div
@@ -133,18 +144,18 @@ function BusquedaMapaContent() {
                         onClick={() => setSelectedPropertyId(property.id)}
                         className={`cursor-pointer transition-all duration-200 rounded-xl ${
                           selectedPropertyId === property.id
-                            ? 'ring-2 ring-orange-400 ring-offset-1'
-                            : ''
+                            ? "ring-2 ring-orange-400 ring-offset-1"
+                            : ""
                         }`}
                       >
-                        {viewMode === 'grid' ? (
+                        {viewMode === "grid" ? (
                           <PropertyCard
                             imagen=""
                             estado={property.type}
                             precio={
-                              property.currency === 'USD'
-                                ? `$${property.price.toLocaleString('es-BO')} USD`
-                                : `Bs ${property.price.toLocaleString('es-BO')}`
+                              property.currency === "USD"
+                                ? `$${property.price.toLocaleString("es-BO")} USD`
+                                : `Bs ${property.price.toLocaleString("es-BO")}`
                             }
                             descripcion={property.title}
                             camas={3}
@@ -155,9 +166,9 @@ function BusquedaMapaContent() {
                           <PropertyRow
                             title={property.title}
                             price={
-                              property.currency === 'USD'
-                                ? `$${property.price.toLocaleString('es-BO')} USD`
-                                : `Bs ${property.price.toLocaleString('es-BO')}`
+                              property.currency === "USD"
+                                ? `$${property.price.toLocaleString("es-BO")} USD`
+                                : `Bs ${property.price.toLocaleString("es-BO")}`
                             }
                             size="3 Dorm. • 150 m²"
                             contactType="whatsapp"
@@ -201,10 +212,10 @@ function BusquedaMapaContent() {
         </section>
       </main>
     </div>
-  )
+  );
 }
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 export default function BusquedaMapaPage() {
   return (
@@ -217,5 +228,5 @@ export default function BusquedaMapaPage() {
     >
       <BusquedaMapaContent />
     </Suspense>
-  )
+  );
 }

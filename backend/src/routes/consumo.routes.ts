@@ -1,12 +1,12 @@
-import { Router } from 'express'
-import { getConsumo } from '../controllers/consumo.controllers.js'
-import { getPlanLimit } from '../controllers/planController'; 
+import { Router } from "express";
+import { getConsumo } from "../controllers/consumo.controllers.js";
+import { getPlanLimit } from "../controllers/planController";
 // import { verifyToken } from '../middleware/auth.middleware.js'
 
-const router = Router()
+const router = Router();
 
 // 🔥 SIN TOKEN (para probar)
-router.get('/consumo/:userId', getConsumo)
+router.get("/consumo/:userId", getConsumo);
 
-router.get('/limite', getPlanLimit);
-export default router
+router.get("/limite", getPlanLimit);
+export default router;
