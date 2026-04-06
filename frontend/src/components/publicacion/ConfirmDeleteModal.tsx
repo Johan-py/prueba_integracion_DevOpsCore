@@ -33,7 +33,7 @@ export default function ConfirmDeleteModal({
             <button
               onClick={onCancelar}
               disabled={loading}
-              className="h-11 flex-1 rounded-lg border border-[#9a9a9a] bg-white text-[14px] font-medium text-[#2c2c2c] transition hover:bg-gray-50"
+              className="h-11 w-full rounded-lg border border-[#9a9a9a] bg-white text-[14px] font-medium text-[#2c2c2c] transition hover:bg-gray-50"
             >
               Cancelar
             </button>
@@ -41,7 +41,7 @@ export default function ConfirmDeleteModal({
             <button
               onClick={onAceptar}
               disabled={loading}
-              className="h-11 flex-1 rounded-lg bg-[#D97706] text-[14px] font-medium text-white transition hover:bg-[#bf6905]"
+              className="h-11 w-full rounded-lg bg-[#D97706] text-[14px] font-medium text-white transition hover:bg-[#bf6905]"
             >
               {loading ? 'Eliminando...' : 'Aceptar'}
             </button>
