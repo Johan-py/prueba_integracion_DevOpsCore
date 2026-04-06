@@ -193,8 +193,8 @@ export default function Navbar() {
         await fetch(
           `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/auth/logout`,
           {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` }
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}` }
           }
         )
       } catch {}
@@ -295,7 +295,7 @@ export default function Navbar() {
                                 filter === item
                                   ? 'bg-amber-600 text-white'
                                   : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
-                                }`}
+                              }`}
                             >
                               {item === 'todas'
                                 ? 'Todas'
@@ -351,7 +351,7 @@ export default function Navbar() {
                                   role="listitem"
                                   className={`border-b border-stone-100 px-4 py-3 transition hover:bg-stone-50 ${
                                     notification.status === 'no leida' ? 'bg-amber-50' : 'bg-white'
-                                    }`}
+                                  }`}
                                 >
                                   <div className="flex items-start justify-between gap-3">
                                     <div className="min-w-0 flex-1">
