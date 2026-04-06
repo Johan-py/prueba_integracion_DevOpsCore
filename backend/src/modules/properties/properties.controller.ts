@@ -10,7 +10,7 @@ export const propertiesController = {
       const filtros: FiltrosBusqueda = {
         tipoInmueble: tipoInmueble as string | string[],
         modoInmueble: modoInmueble as string | string[],
-        query: query as string, 
+        query: query as string,
         locationId: locationId ? Number(locationId) : undefined,
         fecha: fecha as any,
         precio: precio as any,
@@ -22,7 +22,7 @@ export const propertiesController = {
         precio: precio as 'menor-a-mayor' | 'mayor-a-menor' | undefined,
         superficie: superficie as 'menor-a-mayor' | 'mayor-a-menor' | undefined
       }
-      
+
       const inmuebles = await propertiesService.getAll(filtros)
       res.json({ ok: true, data: inmuebles })
     } catch (error) {
@@ -44,7 +44,7 @@ export const propertiesController = {
       }
 
       const inmuebles = await propertiesService.getAll(filtros)
-      
+
       // Enviamos la data en el formato que espera tu frontend (data: json)
       res.json({ ok: true, data: inmuebles })
     } catch (error) {
