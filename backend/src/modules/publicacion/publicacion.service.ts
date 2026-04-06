@@ -1,9 +1,15 @@
+// backend/src/modules/publicaciones/publicacion.service.ts
 import {
   buscarPublicacionesPorUsuarioRepository,
   buscarPublicacionPorIdRepository,
   eliminarLogicamentePublicacionRepository
 } from './publicacion.repository.js'
 
+/**
+ * HU1 - Listar publicaciones propias
+ * - Solo permite listar publicaciones activas del usuario autenticado
+ * - Devuelve datos relevantes para mostrar en la vista
+ */
 export const listarMisPublicacionesService = async (usuarioId: number) => {
   if (Number.isNaN(usuarioId) || usuarioId <= 0) {
     throw new Error('USUARIO_INVALIDO')
@@ -27,6 +33,11 @@ export const listarMisPublicacionesService = async (usuarioId: number) => {
   }))
 }
 
+/**
+ * HU1 - Eliminar publicación propia
+ * - Solo permite eliminar publicaciones del usuario autenticado
+ * - Elimina de forma lógica (estado = ELIMINADA, inmueble = INACTIVO)
+ */
 export const eliminarPublicacionService = async (
   publicacionId: number,
   usuarioSolicitanteId: number
