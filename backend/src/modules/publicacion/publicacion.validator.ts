@@ -1,5 +1,17 @@
+
 import { body } from 'express-validator'
 
+/**
+ * HU1 - Validaciones para creación de publicación
+ * - Título: obligatorio, entre 20 y 80 caracteres, solo alfanumérico
+ * - Tipo de acción: obligatorio, valores permitidos: VENTA, ALQUILER, ANTICRETO
+ * - Categoría: obligatorio, valores permitidos: CASA, DEPARTAMENTO, TERRENO, OFICINA
+ * - Precio: obligatorio, número positivo
+ * - Superficie: opcional, número positivo
+ * - Número de cuartos: opcional, entero positivo
+ * - Dirección: obligatoria
+ * - Descripción: obligatoria, entre 50 y 300 caracteres, caracteres básicos permitidos
+ */
 export const propertyValidationRules = [
   body('titulo')
     .isLength({ min: 20, max: 80 })
@@ -15,7 +27,9 @@ export const propertyValidationRules = [
     .isIn(['CASA', 'DEPARTAMENTO', 'TERRENO', 'OFICINA'])
     .withMessage('Tipo de inmueble inválido'),
 
-  body('precio').isFloat({ gt: 0 }).withMessage('El precio debe ser un número positivo'),
+  body('precio')
+    .isFloat({ gt: 0 })
+    .withMessage('El precio debe ser un número positivo'),
 
   body('superficieM2')
     .optional()
@@ -27,7 +41,9 @@ export const propertyValidationRules = [
     .isInt({ gt: 0 })
     .withMessage('El número de habitaciones debe ser positivo'),
 
-  body('direccion').notEmpty().withMessage('La dirección es obligatoria'),
+  body('direccion')
+    .notEmpty()
+    .withMessage('La dirección es obligatoria'),
 
   body('descripcion')
     .isLength({ min: 50, max: 300 })
