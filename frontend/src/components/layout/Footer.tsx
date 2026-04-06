@@ -2,19 +2,20 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 
 type FooterAction = {
   href?: string
   isExternal?: boolean
   label: string
+  requiresAuth?: boolean
 }
 
 const exploreActions: FooterAction[] = [
   { label: 'Comprar Propiedad' }, // TODO: users -> '/propiedades/en-venta' | visitors -> '/auth/login'
   { label: 'Alquilar Inmueble' }, // TODO: users -> '/propiedades/alquiler' | visitors -> '/auth/login'
   { label: 'Anticrético' }, // TODO: users -> '/propiedades/anticretico' | visitors -> '/auth/login'
-  { label: 'Publica tu inmueble' } // TODO: users -> '/publicar' | visitors -> '/auth/login'
+  { label: 'Publica tu inmueble', href: '/registro-inmueble', requiresAuth: true }
 ]
 
 const companyActions: FooterAction[] = [
@@ -83,13 +84,46 @@ function FooterBrand() {
 }
 
 function FooterSection({ actions, title }: { actions: FooterAction[]; title: string }) {
+  const router = useRouter()
+
+  const handleProtectedNavigation = (action: FooterAction) => {
+    if (!action.href) {
+      return
+    }
+
+    const token = localStorage.getItem('token')
+
+    if (!token) {
+      localStorage.setItem('redirectAfterLogin', action.href)
+      router.push('/sign-in')
+      return
+    }
+
+    router.push(action.href)
+  }
+
   return (
     <section className="border-t border-amber-600 pt-4">
       <h2 className="text-xl font-bold text-stone-900">{title}</h2>
       <ul className="mt-4 space-y-4">
         {actions.map((action) => (
           <li key={action.label}>
-            {action.href ? (
+            {action.href && action.requiresAuth ? (
+              <button
+                type="button"
+                onClick={() => handleProtectedNavigation(action)}
+                className="text-left text-sm text-stone-600 transition-colors hover:text-amber-600"
+              >
+                {action.label}
+              </button>
+            ) : action.href && !action.isExternal ? (
+              <Link
+                href={action.href}
+                className="text-sm text-stone-600 transition-colors hover:text-amber-600"
+              >
+                {action.label}
+              </Link>
+            ) : action.href ? (
               <a
                 href={action.href}
                 target={action.isExternal ? '_blank' : undefined}
