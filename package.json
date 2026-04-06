@@ -26,6 +26,8 @@
     "eslint": "^10.1.0"
   },
   "dependencies": {
+    "@prisma/config": "^7.5.0",
+    "cors": "^2.8.6",
     "tailwind": "^4.0.0"
   }
 }
