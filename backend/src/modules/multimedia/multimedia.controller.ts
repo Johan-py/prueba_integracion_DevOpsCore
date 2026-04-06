@@ -68,8 +68,7 @@ const getErrorStatus = (message: string): number => {
 }
 
 const handleControllerError = (error: unknown, res: Response) => {
-  const message =
-    error instanceof Error ? error.message : 'Error interno del servidor'
+  const message = error instanceof Error ? error.message : 'Error interno del servidor'
 
   const status = getErrorStatus(message)
 
@@ -82,10 +81,7 @@ const handleControllerError = (error: unknown, res: Response) => {
   })
 }
 
-export const getPublicationMultimediaController = async (
-  req: Request,
-  res: Response
-) => {
+export const getPublicationMultimediaController = async (req: Request, res: Response) => {
   try {
     const publicacionId = parsePublicacionId(req)
     const usuarioId = getAuthenticatedUserId(req as AuthenticatedRequest)
@@ -104,10 +100,7 @@ export const getPublicationMultimediaController = async (
   }
 }
 
-export const registerVideoLinkController = async (
-  req: Request,
-  res: Response
-) => {
+export const registerVideoLinkController = async (req: Request, res: Response) => {
   try {
     const publicacionId = parsePublicacionId(req)
     const usuarioId = getAuthenticatedUserId(req as AuthenticatedRequest)
@@ -128,18 +121,13 @@ export const registerVideoLinkController = async (
   }
 }
 
-export const registerImagesController = async (
-  req: Request,
-  res: Response
-) => {
+export const registerImagesController = async (req: Request, res: Response) => {
   try {
     const publicacionId = parsePublicacionId(req)
     const usuarioId = getAuthenticatedUserId(req as AuthenticatedRequest)
     const { images } = req.body as Partial<RegisterImagesBody>
 
-    const normalizedImages: ImageUploadItemInput[] = Array.isArray(images)
-      ? images
-      : []
+    const normalizedImages: ImageUploadItemInput[] = Array.isArray(images) ? images : []
 
     const result = await registerImagesService({
       publicacionId,
