@@ -13,7 +13,17 @@ type UserMenuProps = {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
 
-const MenuLink = ({ label, href, onClick, icon: Icon }: { label: string; href: string; onClick: () => void; icon: any }) => (
+const MenuLink = ({
+  label,
+  href,
+  onClick,
+  icon: Icon
+}: {
+  label: string
+  href: string
+  onClick: () => void
+  icon: any
+}) => (
   <Link
     href={href}
     onClick={onClick}
@@ -24,7 +34,14 @@ const MenuLink = ({ label, href, onClick, icon: Icon }: { label: string; href: s
   </Link>
 )
 
-export default function UserMenu({ user, isPanelOpen, onTogglePanel, onClosePanel, onLogin, onOpenLogoutModal }: UserMenuProps) {
+export default function UserMenu({
+  user,
+  isPanelOpen,
+  onTogglePanel,
+  onClosePanel,
+  onLogin,
+  onOpenLogoutModal
+}: UserMenuProps) {
   return (
     <>
       <button
@@ -40,15 +57,28 @@ export default function UserMenu({ user, isPanelOpen, onTogglePanel, onClosePane
           />
         ) : (
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+            />
           </svg>
         )}
       </button>
 
-      <div className={`absolute right-0 mt-3 w-72 rounded-xl border border-gray-200 bg-[#F9F6EE] shadow-lg p-5 z-50 transition-all duration-200 ${isPanelOpen ? 'opacity-100 translate-y-0 visible' : 'opacity-0 -translate-y-2 invisible pointer-events-none'}`}>
+      <div
+        className={`absolute right-0 mt-3 w-72 rounded-xl border border-gray-200 bg-[#F9F6EE] shadow-lg p-5 z-50 transition-all duration-200 ${isPanelOpen ? 'opacity-100 translate-y-0 visible' : 'opacity-0 -translate-y-2 invisible pointer-events-none'}`}
+      >
         <div className="flex justify-between items-center mb-4 border-b border-gray-300 pb-2">
           <span className="font-bold text-sm text-gray-900">Bienvenido a PropBol</span>
-          <button onClick={onClosePanel} className="text-gray-500 hover:text-black" aria-label="Cerrar menú">✕</button>
+          <button
+            onClick={onClosePanel}
+            className="text-gray-500 hover:text-black"
+            aria-label="Cerrar menú"
+          >
+            ✕
+          </button>
         </div>
 
         {user ? (
@@ -71,7 +101,11 @@ export default function UserMenu({ user, isPanelOpen, onTogglePanel, onClosePane
               </div>
             </div>
 
-            <Link href="/profile" onClick={onClosePanel} className="flex justify-between items-center w-full text-black font-bold py-3 border-t border-b border-gray-200 hover:bg-black/5 px-2 mb-2 transition text-sm">
+            <Link
+              href="/profile"
+              onClick={onClosePanel}
+              className="flex justify-between items-center w-full text-black font-bold py-3 border-t border-b border-gray-200 hover:bg-black/5 px-2 mb-2 transition text-sm"
+            >
               Mi perfil <span className="text-lg">›</span>
             </Link>
 
@@ -93,14 +127,20 @@ export default function UserMenu({ user, isPanelOpen, onTogglePanel, onClosePane
               <MenuLink label="Mis zonas" href="/zonas" icon={Map} onClick={onClosePanel} />
             </div>
 
-            <button onClick={onOpenLogoutModal} className="w-full bg-[#E68B25] text-white py-2 rounded-lg font-bold hover:bg-[#cf7b1f] transition text-sm shadow-sm">
+            <button
+              onClick={onOpenLogoutModal}
+              className="w-full bg-[#E68B25] text-white py-2 rounded-lg font-bold hover:bg-[#cf7b1f] transition text-sm shadow-sm"
+            >
               Cerrar Sesión
             </button>
           </>
         ) : (
           <div className="text-center py-2 flex flex-col items-center">
             <p className="text-sm text-gray-600 mb-5">Encuentra tu hogar ideal hoy mismo.</p>
-            <button onClick={onLogin} className="w-full bg-[#E68B25] text-white py-2.5 rounded-xl text-sm font-bold shadow-md">
+            <button
+              onClick={onLogin}
+              className="w-full bg-[#E68B25] text-white py-2.5 rounded-xl text-sm font-bold shadow-md"
+            >
               Ingresar / Registrarse
             </button>
           </div>
