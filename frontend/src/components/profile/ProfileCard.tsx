@@ -24,10 +24,10 @@ interface PerfilData {
 }
 
 const PAISES = [
-    { nombre: 'Bolivia', codigo: '+591', flag: '🇧🇴', digitos: 8 },
-    { nombre: 'Argentina', codigo: '+54', flag: '🇦🇷', digitos: 10 },
-    { nombre: 'Chile', codigo: '+56', flag: '🇨🇱', digitos: 9 },
-    { nombre: 'Perú', codigo: '+51', flag: '🇵🇪', digitos: 9 }
+  { nombre: 'Bolivia', codigo: '+591', flag: '🇧🇴', digitos: 8 },
+  { nombre: 'Argentina', codigo: '+54', flag: '🇦🇷', digitos: 10 },
+  { nombre: 'Chile', codigo: '+56', flag: '🇨🇱', digitos: 9 },
+  { nombre: 'Perú', codigo: '+51', flag: '🇵🇪', digitos: 9 }
 ]
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
@@ -113,10 +113,10 @@ export default function ProfileCard() {
         if (perfil.telefonos && Array.isArray(perfil.telefonos) && perfil.telefonos.length > 0) {
           setTelefonos(
             perfil.telefonos.map((tel: any, i: number) => ({
-            id: Date.now() + i,
-            numero: tel.numero,
+              id: Date.now() + i,
+              numero: tel.numero,
               pais: PAISES.find((p) => tel.codigoPais === p.codigo)?.nombre || 'Bolivia',
-            codigo: tel.codigoPais
+              codigo: tel.codigoPais
             }))
           )
         } else {
@@ -428,21 +428,21 @@ export default function ProfileCard() {
     }
   }
 
-    const actualizarTelefono = (id: number, valor: string) => {
-        setTelefonos(
-            telefonos.map((t) => {
-                if (t.id === id) {
+  const actualizarTelefono = (id: number, valor: string) => {
+    setTelefonos(
+      telefonos.map((t) => {
+        if (t.id === id) {
           const configPais = PAISES.find((p) => p.nombre === t.pais)
           const maxDigitos = configPais?.digitos || 15
 
           const soloNumerosYCortados = valor.replace(/\D/g, '').slice(0, maxDigitos)
 
           return { ...t, numero: soloNumerosYCortados }
-                }
+        }
         return t
-            })
-        )
-    }
+      })
+    )
+  }
 
   const handleSaveAll = () => {
     if (isEmailEditable && hasEmailChanged) {
@@ -486,10 +486,10 @@ export default function ProfileCard() {
   }
 
   const hayCambios =
-  nombre !== originalNombre ||
-  pais !== originalPais ||
-  genero !== originalGenero ||
-  direccion !== originalDireccion ||
+    nombre !== originalNombre ||
+    pais !== originalPais ||
+    genero !== originalGenero ||
+    direccion !== originalDireccion ||
     tempEmail !== originalEmail
 
   if (isLoading && !perfilData) {
@@ -501,28 +501,28 @@ export default function ProfileCard() {
   }
 
   return (
-  <div className="bg-[#fdf6e6] border border-[#e5dfd7] shadow-sm p-8 rounded-xl flex flex-col md:flex-row gap-10 items-center">
-    {/* PERFIL */}
-    <div className="flex flex-col items-center justify-center w-full md:w-1/3">
-      <div className="relative mb-10"> 
-        {/* AVATAR */}
-        <div className="w-28 h-28 rounded-full bg-white border border-gray-300 flex items-center justify-center shadow-sm overflow-hidden">
-          {avatar ? (
-            <img
-              src={avatar.startsWith('http') ? avatar : `${API_URL}${avatar}`}
-              alt="Foto de perfil"
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <span className="text-gray-500 text-xs uppercase">Imagen</span>
-          )}
-        </div>
+    <div className="bg-[#fdf6e6] border border-[#e5dfd7] shadow-sm p-8 rounded-xl flex flex-col md:flex-row gap-10 items-center">
+      {/* PERFIL */}
+      <div className="flex flex-col items-center justify-center w-full md:w-1/3">
+        <div className="relative mb-10">
+          {/* AVATAR */}
+          <div className="w-28 h-28 rounded-full bg-white border border-gray-300 flex items-center justify-center shadow-sm overflow-hidden">
+            {avatar ? (
+              <img
+                src={avatar.startsWith('http') ? avatar : `${API_URL}${avatar}`}
+                alt="Foto de perfil"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span className="text-gray-500 text-xs uppercase">Imagen</span>
+            )}
+          </div>
 
-        {/* BOTÓN + */}
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          disabled={isUploading}
-          className="
+          {/* BOTÓN + */}
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isUploading}
+            className="
             absolute
             right-0 top-1/2 -translate-y-1/2   /* 📱 móvil → derecha */
             md:right-1/2 md:translate-x-1/2 md:top-full md:mt-6  /* 💻 pc → abajo con espacio */
@@ -530,21 +530,21 @@ export default function ProfileCard() {
             flex items-center justify-center shadow-sm hover:bg-gray-100
             disabled:opacity-50
           "
-        >
+          >
             {isUploading ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
-        </button>
+          </button>
 
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-          hidden
-          onChange={(e) => e.target.files?.[0] && subirFoto(e.target.files[0])}
-        />
-      </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+            hidden
+            onChange={(e) => e.target.files?.[0] && subirFoto(e.target.files[0])}
+          />
+        </div>
 
-      <p className="mt-4 font-semibold text-lg">{nombre}</p>
-      {/* CORREO OCULTO EN LA BARRA LATERAL */}
+        <p className="mt-4 font-semibold text-lg">{nombre}</p>
+        {/* CORREO OCULTO EN LA BARRA LATERAL */}
         <p className="text-sm text-gray-500">
           {isEmailEditable ? originalEmail : ofuscarEmail(originalEmail)}
         </p>
@@ -559,71 +559,71 @@ export default function ProfileCard() {
           <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
             <label className="w-full md:w-40 font-medium text-stone-700">Nombre Completo:</label>
 
-  <div className="flex flex-col w-full">
-    <div className="flex items-center gap-2">
-      <input
-        type="text"
-        disabled={campoEditando !== 'nombre'}
-        value={nombre}
-        onChange={(e) => {
+            <div className="flex flex-col w-full">
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  disabled={campoEditando !== 'nombre'}
+                  value={nombre}
+                  onChange={(e) => {
                     setNombre(soloLetras(e.target.value))
                     if (errorNombre) setErrorNombre('')
-        }}
-        className={`flex-1 px-3 py-2 rounded text-sm ${
-          errorNombre
+                  }}
+                  className={`flex-1 px-3 py-2 rounded text-sm ${
+                    errorNombre
                       ? 'border border-red-500 bg-red-50'
-            : campoEditando === 'nombre'
-              ? 'bg-white border border-amber-500'
-              : 'bg-gray-200 cursor-not-allowed'
-        }`}
-      />
-
-      <button
-        onClick={() => setCampoEditando(campoEditando === 'nombre' ? null : 'nombre')}
-      >
-        <Pencil size={16} />
-      </button>
-    </div>
-
-              {errorNombre && <span className="text-red-500 text-xs mt-1">{errorNombre}</span>}
-  </div>
-</div>
-
-          {/* EMAIL - ALINEADO Y OCULTO */}
-          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-            <label className="w-full md:w-40 font-medium text-stone-700">E-mail:</label>
-            
-              <div className="flex w-full items-center gap-2">
-                <input
-                  type="email"
-                className={`w-full px-3 py-2 rounded text-sm text-stone-700 ${
-                  isEmailEditable
-                    ? 'bg-white border border-amber-500'
-                    : 'bg-gray-200 cursor-not-allowed'
-                    }`}
-                  readOnly={!isEmailEditable}
-                  /* CORREO OCULTO EN EL INPUT */
-                  value={isEmailEditable ? tempEmail : ofuscarEmail(originalEmail)}
-                  onChange={(e) => setTempEmail(e.target.value)}
-                  placeholder="correo@ejemplo.com"
+                      : campoEditando === 'nombre'
+                        ? 'bg-white border border-amber-500'
+                        : 'bg-gray-200 cursor-not-allowed'
+                  }`}
                 />
+
                 <button
-                  onClick={handleEditEmailClick}
-                  className="text-black hover:text-amber-600"
-                  disabled={isEmailEditable}
+                  onClick={() => setCampoEditando(campoEditando === 'nombre' ? null : 'nombre')}
                 >
                   <Pencil size={16} />
                 </button>
               </div>
+
+              {errorNombre && <span className="text-red-500 text-xs mt-1">{errorNombre}</span>}
+            </div>
+          </div>
+
+          {/* EMAIL - ALINEADO Y OCULTO */}
+          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+            <label className="w-full md:w-40 font-medium text-stone-700">E-mail:</label>
+
+            <div className="flex w-full items-center gap-2">
+              <input
+                type="email"
+                className={`w-full px-3 py-2 rounded text-sm text-stone-700 ${
+                  isEmailEditable
+                    ? 'bg-white border border-amber-500'
+                    : 'bg-gray-200 cursor-not-allowed'
+                }`}
+                readOnly={!isEmailEditable}
+                /* CORREO OCULTO EN EL INPUT */
+                value={isEmailEditable ? tempEmail : ofuscarEmail(originalEmail)}
+                onChange={(e) => setTempEmail(e.target.value)}
+                placeholder="correo@ejemplo.com"
+              />
+              <button
+                onClick={handleEditEmailClick}
+                className="text-black hover:text-amber-600"
+                disabled={isEmailEditable}
+              >
+                <Pencil size={16} />
+              </button>
+            </div>
           </div>
           {isEmailEditable && tempEmail.length > 0 && !isValidEmail(tempEmail) && (
             <div className="md:ml-44">
-                <span className="text-red-500 text-xs mt-1">Formato de correo inválido</span>
+              <span className="text-red-500 text-xs mt-1">Formato de correo inválido</span>
             </div>
           )}
           {isEmailEditable && hasEmailChanged && (
             <div className="md:ml-44">
-                <span className="text-green-500 text-xs mt-1">Listo para guardar cambios</span>
+              <span className="text-green-500 text-xs mt-1">Listo para guardar cambios</span>
             </div>
           )}
 
@@ -686,15 +686,15 @@ export default function ProfileCard() {
                   >
                     <Pencil size={16} />
                   </button>
-                    {index === 0 && (
-                        <button
-                            onClick={agregarTelefono}
-                            disabled={telefonos.length >= 3}
-                            className="disabled:opacity-30 disabled:cursor-not-allowed hover:text-orange-600 transition-colors"
-                        >
-                            <Plus size={18} />
-                        </button>
-                    )}
+                  {index === 0 && (
+                    <button
+                      onClick={agregarTelefono}
+                      disabled={telefonos.length >= 3}
+                      className="disabled:opacity-30 disabled:cursor-not-allowed hover:text-orange-600 transition-colors"
+                    >
+                      <Plus size={18} />
+                    </button>
+                  )}
                   {index > 0 && (
                     <button onClick={() => eliminarTelefono(tel.id)}>
                       <Trash2 size={18} />
@@ -704,11 +704,11 @@ export default function ProfileCard() {
               </div>
             )
           })}
-            {telefonos.length >= 3 && (
-                <p className="text-[10px] text-orange-600 font-medium md:ml-44 mt-1">
-                    * Has alcanzado el límite máximo de 3 números de contacto.
-                </p>
-            )}
+          {telefonos.length >= 3 && (
+            <p className="text-[10px] text-orange-600 font-medium md:ml-44 mt-1">
+              * Has alcanzado el límite máximo de 3 números de contacto.
+            </p>
+          )}
 
           {/* PAÍS */}
           <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
@@ -722,7 +722,7 @@ export default function ProfileCard() {
                   campoEditando === 'pais'
                     ? 'bg-white border border-amber-500'
                     : 'bg-gray-200 cursor-not-allowed'
-                  }`}
+                }`}
               >
                 <option value="">Seleccione un país</option>
                 <option value="Bolivia">Bolivia</option>
@@ -748,7 +748,7 @@ export default function ProfileCard() {
                   campoEditando === 'genero'
                     ? 'bg-white border border-amber-500'
                     : 'bg-gray-200 cursor-not-allowed'
-                  }`}
+                }`}
               >
                 <option value="">Seleccione género</option>
                 <option value="Masculino">Masculino</option>
@@ -775,7 +775,7 @@ export default function ProfileCard() {
                   campoEditando === 'direccion'
                     ? 'bg-white border border-amber-500'
                     : 'bg-gray-200 cursor-not-allowed'
-                  }`}
+                }`}
               />
               <button
                 onClick={() => setCampoEditando(campoEditando === 'direccion' ? null : 'direccion')}
@@ -787,36 +787,36 @@ export default function ProfileCard() {
 
           {/* BOTONES */}
           <div className="mt-6 flex justify-end gap-4">
-             <button
-                  onClick={handleCancelAll}
-                  className="text-stone-600 hover:text-black text-sm"
-                  disabled={isLoading}
-             >
-                 Cancelar
-              </button>
+            <button
+              onClick={handleCancelAll}
+              className="text-stone-600 hover:text-black text-sm"
+              disabled={isLoading}
+            >
+              Cancelar
+            </button>
 
-              <button
-                   onClick={() => {
-    if (!nombre.trim()) {
+            <button
+              onClick={() => {
+                if (!nombre.trim()) {
                   setErrorNombre('El nombre es obligatorio')
                   return
-    }
+                }
 
                 setErrorNombre('')
                 handleSaveAll()
-  }}
-  disabled={isLoading || !hayCambios}
-  className={`px-6 py-2 rounded-lg text-sm font-medium shadow-sm transition
+              }}
+              disabled={isLoading || !hayCambios}
+              className={`px-6 py-2 rounded-lg text-sm font-medium shadow-sm transition
     ${
       !hayCambios
         ? 'bg-orange-300 cursor-not-allowed text-white'
         : 'bg-orange-500 hover:bg-orange-600 text-white'
     }
   `}
->
-  {isLoading ? 'Guardando...' : 'Guardar Cambios'}
-                 </button>
-            </div>
+            >
+              {isLoading ? 'Guardando...' : 'Guardar Cambios'}
+            </button>
+          </div>
         </div>
       </div>
 
