@@ -32,6 +32,14 @@ const PAISES = [
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
 
+// Función para ocultar el correo (Ej: jo***@gmail.com)
+const ofuscarEmail = (email: string) => {
+  if (!email || !email.includes('@')) return email
+  const [usuario, dominio] = email.split('@')
+  if (usuario.length <= 2) return `**@${dominio}`
+  return `${usuario.substring(0, 2)}***@${dominio}`
+}
+
 export default function ProfileCard() {
   const [campoEditando, setCampoEditando] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -494,7 +502,7 @@ export default function ProfileCard() {
     {/* PERFIL */}
     <div className="flex flex-col items-center justify-center w-full md:w-1/3">
 
-      <div className="relative mb-10"> {/* espacio para que no se monte */}
+      <div className="relative mb-10"> 
 
         {/* AVATAR */}
         <div className="w-28 h-28 rounded-full bg-white border border-gray-300 flex items-center justify-center shadow-sm overflow-hidden">
@@ -529,7 +537,6 @@ export default function ProfileCard() {
           )}
         </button>
 
-        {/* INPUT FILE */}
         <input
           ref={fileInputRef}
           type="file"
@@ -540,9 +547,9 @@ export default function ProfileCard() {
 
       </div>
 
-      {/* TEXTO */}
       <p className="mt-4 font-semibold text-lg">{nombre}</p>
-      <p className="text-sm text-gray-500">{originalEmail}</p>
+      {/* CORREO OCULTO EN LA BARRA LATERAL */}
+      <p className="text-sm text-gray-500">{isEmailEditable ? originalEmail : ofuscarEmail(originalEmail)}</p>
 
     </div>
 
@@ -560,7 +567,6 @@ export default function ProfileCard() {
 
   <div className="flex flex-col w-full">
 
-    {/* INPUT + BOTÓN */}
     <div className="flex items-center gap-2">
       <input
         type="text"
@@ -586,7 +592,6 @@ export default function ProfileCard() {
       </button>
     </div>
 
-    {/* MENSAJE DE ERROR */}
     {errorNombre && (
       <span className="text-red-500 text-xs mt-1">
         {errorNombre}
@@ -595,9 +600,9 @@ export default function ProfileCard() {
   </div>
 </div>
 
-          {/* EMAIL */}
-          <div className="flex flex-col md:flex-row md:items-start gap-2 md:gap-4">
-            <label className="w-full md:w-40 font-medium text-stone-700 pt-2">E-mail:</label>
+          {/* EMAIL - ALINEADO Y OCULTO */}
+          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+            <label className="w-full md:w-40 font-medium text-stone-700">E-mail:</label>
             
               <div className="flex w-full items-center gap-2">
                 <input
@@ -605,7 +610,8 @@ export default function ProfileCard() {
                   className={`w-full px-3 py-2 rounded text-sm text-stone-700 ${isEmailEditable ? 'bg-white border border-amber-500' : 'bg-gray-200 cursor-not-allowed'
                     }`}
                   readOnly={!isEmailEditable}
-                  value={tempEmail}
+                  /* CORREO OCULTO EN EL INPUT */
+                  value={isEmailEditable ? tempEmail : ofuscarEmail(originalEmail)}
                   onChange={(e) => setTempEmail(e.target.value)}
                   placeholder="correo@ejemplo.com"
                 />
@@ -617,14 +623,18 @@ export default function ProfileCard() {
                   <Pencil size={16} />
                 </button>
               </div>
-              {isEmailEditable && tempEmail.length > 0 && !isValidEmail(tempEmail) && (
-                <span className="text-red-500 text-xs mt-1">Formato de correo inválido</span>
-              )}
-              {isEmailEditable && hasEmailChanged && (
-                <span className="text-green-500 text-xs mt-1">Listo para guardar cambios</span>
-              )}
             
           </div>
+          {isEmailEditable && tempEmail.length > 0 && !isValidEmail(tempEmail) && (
+            <div className="md:ml-44">
+                <span className="text-red-500 text-xs mt-1">Formato de correo inválido</span>
+            </div>
+          )}
+          {isEmailEditable && hasEmailChanged && (
+            <div className="md:ml-44">
+                <span className="text-green-500 text-xs mt-1">Listo para guardar cambios</span>
+            </div>
+          )}
 
           {/* TELÉFONOS */}
           {telefonos.map((tel, index) => {
@@ -704,6 +714,7 @@ export default function ProfileCard() {
                     * Has alcanzado el límite máximo de 3 números de contacto.
                 </p>
             )}
+
           {/* PAÍS */}
           <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
             <label className="w-full md:w-40 font-medium text-stone-700">País:</label>
