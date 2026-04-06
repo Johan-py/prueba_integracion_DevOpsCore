@@ -85,10 +85,7 @@ const normalizeYoutubeUrl = (videoUrl: string): string => {
   return `https://www.youtube.com/watch?v=${videoId}`
 }
 
-const validatePublicationOwnership = async (
-  publicacionId: number,
-  usuarioId: number
-) => {
+const validatePublicationOwnership = async (publicacionId: number, usuarioId: number) => {
   validatePositiveInteger(publicacionId, 'ID de publicación')
   validatePositiveInteger(usuarioId, 'Usuario')
 
@@ -135,11 +132,7 @@ const validateImagesInput = (images: RegisterImagesInput['images']) => {
       throw new Error('Formato no permitido. Solo PNG, JPG o JPEG')
     }
 
-    if (
-      typeof image.pesoMb !== 'number' ||
-      Number.isNaN(image.pesoMb) ||
-      image.pesoMb <= 0
-    ) {
+    if (typeof image.pesoMb !== 'number' || Number.isNaN(image.pesoMb) || image.pesoMb <= 0) {
       throw new Error(`El tamaño de la imagen ${imageIndex} no es válido`)
     }
 
@@ -147,10 +140,7 @@ const validateImagesInput = (images: RegisterImagesInput['images']) => {
       throw new Error('La imagen supera el tamaño máximo permitido de 5 MB')
     }
 
-    const normalizedUrl = normalizeHttpUrl(
-      image.url,
-      `La URL de la imagen ${imageIndex}`
-    )
+    const normalizedUrl = normalizeHttpUrl(image.url, `La URL de la imagen ${imageIndex}`)
 
     return {
       url: normalizedUrl,
