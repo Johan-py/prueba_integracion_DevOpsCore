@@ -498,6 +498,7 @@ export default function MiRegistroPage() {
       setEstado('exito')
       setMensajeError('')
       setCampoError(null)
+      router.push('/contenido-multimedia')
     } catch (error) {
       console.error('🔥 Error fetch:', error)
       setMensajeError('NO SE PUDO CONECTAR CON EL BACKEND')
