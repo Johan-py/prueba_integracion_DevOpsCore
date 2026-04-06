@@ -36,17 +36,17 @@ export const propertiesRepository = {
       const valor = Array.isArray(filtros.modoInmueble)
         ? filtros.modoInmueble[0]
         : filtros.modoInmueble
-    if (valor) {
+      if (valor) {
         const modoLimpio = valor.toUpperCase().includes('ANTICR')
           ? 'ANTICRETO'
           : valor.toUpperCase()
         where.tipoAccion = modoLimpio
+      }
     }
-  }
 
-  if (filtros.locationId || (filtros.query && filtros.query.trim() !== '')) {
+    if (filtros.locationId || (filtros.query && filtros.query.trim() !== '')) {
       where.OR = []
-      
+
       // 1. Buscar por ID de zona exacta (Ideal cuando pases a producción)
       if (filtros.locationId) {
         where.OR.push({
@@ -58,13 +58,13 @@ export const propertiesRepository = {
       if (filtros.query && filtros.query.trim() !== '') {
         // Extraemos la primera parte (Ej: Saca "Cala Cala" de "Cala Cala - Cochabamba - Bolivia")
         const textoLimpio = filtros.query.split('-')[0].trim()
-        
+
         where.OR.push({ titulo: { contains: textoLimpio, mode: 'insensitive' } })
         where.OR.push({ descripcion: { contains: textoLimpio, mode: 'insensitive' } })
-        
+
         // También buscamos en la dirección textual de la ubicación
-        where.OR.push({ 
-          ubicacion: { direccion: { contains: textoLimpio, mode: 'insensitive' } } 
+        where.OR.push({
+          ubicacion: { direccion: { contains: textoLimpio, mode: 'insensitive' } }
         })
       }
     }
