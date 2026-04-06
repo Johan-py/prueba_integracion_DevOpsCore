@@ -30,6 +30,7 @@
   "dependencies": {
     "@prisma/config": "^7.5.0",
     "cors": "^2.8.6",
+    "qrcode.react": "^4.2.0",
     "tailwind": "^4.0.0"
   }
 }
