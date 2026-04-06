@@ -44,6 +44,12 @@ export default function ProfileCard() {
   const [genero, setGenero] = useState('')
   const [direccion, setDireccion] = useState('')
   const [avatar, setAvatar] = useState<string | null>(null)
+  const [errorNombre, setErrorNombre] = useState("");
+
+  const [originalNombre] = useState("");
+  const [originalPais] = useState("");
+  const [originalGenero] = useState("");
+  const [originalDireccion] = useState("");
 
   const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false)
   const [isOtpModalOpen, setIsOtpModalOpen] = useState(false)
@@ -457,6 +463,13 @@ export default function ProfileCard() {
     setIsSecurityModalOpen(true)
   }
 
+  const hayCambios =
+  nombre !== originalNombre ||
+  pais !== originalPais ||
+  genero !== originalGenero ||
+  direccion !== originalDireccion ||
+  tempEmail !== originalEmail;
+
   if (isLoading && !perfilData) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -466,39 +479,62 @@ export default function ProfileCard() {
   }
 
   return (
-    <div className="bg-[#fdf6e6] border border-[#e5dfd7] shadow-sm p-8 rounded-xl flex flex-col md:flex-row gap-10 items-start">
-      {/* PERFIL */}
-      <div className="flex flex-col items-center justify-center w-full md:w-1/3">
-        <div className="relative">
-          <div className="w-28 h-28 rounded-full bg-white border border-gray-300 flex items-center justify-center shadow-sm overflow-hidden">
-            {avatar ? (
-              <img
-                src={avatar.startsWith('http') ? avatar : `${API_URL}${avatar}`}
-                alt="Foto de perfil"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <span className="text-gray-500 text-xs uppercase">Imagen</span>
-            )}
-          </div>
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isUploading}
-            className="absolute right-0 top-1/2 -translate-y-1/2 md:right-1/2 md:translate-x-1/2 md:top-full md:mt-4 w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center shadow-sm hover:bg-gray-100 disabled:opacity-50"
-          >
-            {isUploading ? <Loader2 size={16} className="animate-spin" /> : <Camera size={14} />}
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-            hidden
-            onChange={(e) => e.target.files?.[0] && subirFoto(e.target.files[0])}
-          />
+  <div className="bg-[#fdf6e6] border border-[#e5dfd7] shadow-sm p-8 rounded-xl flex flex-col md:flex-row gap-10 items-center">
+
+    {/* PERFIL */}
+    <div className="flex flex-col items-center justify-center w-full md:w-1/3">
+
+      <div className="relative mb-10"> {/* espacio para que no se monte */}
+
+        {/* AVATAR */}
+        <div className="w-28 h-28 rounded-full bg-white border border-gray-300 flex items-center justify-center shadow-sm overflow-hidden">
+          {avatar ? (
+            <img
+              src={avatar.startsWith('http') ? avatar : `${API_URL}${avatar}`}
+              alt="Foto de perfil"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <span className="text-gray-500 text-xs uppercase">Imagen</span>
+          )}
         </div>
-        <p className="mt-4 font-semibold text-lg">{nombre}</p>
-        <p className="text-sm text-gray-500">{originalEmail}</p>
+
+        {/* BOTÓN + */}
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isUploading}
+          className="
+            absolute
+            right-0 top-1/2 -translate-y-1/2   /* 📱 móvil → derecha */
+            md:right-1/2 md:translate-x-1/2 md:top-full md:mt-6  /* 💻 pc → abajo con espacio */
+            w-8 h-8 bg-white border border-gray-300 rounded-full
+            flex items-center justify-center shadow-sm hover:bg-gray-100
+            disabled:opacity-50
+          "
+        >
+          {isUploading ? (
+            <Loader2 size={16} className="animate-spin" />
+          ) : (
+            <Plus size={16} />  
+          )}
+        </button>
+
+        {/* INPUT FILE */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+          hidden
+          onChange={(e) => e.target.files?.[0] && subirFoto(e.target.files[0])}
+        />
+
       </div>
+
+      {/* TEXTO */}
+      <p className="mt-4 font-semibold text-lg">{nombre}</p>
+      <p className="text-sm text-gray-500">{originalEmail}</p>
+
+    </div>
 
       {/* FORMULARIO */}
       <div className="w-full md:w-2/3">
@@ -507,28 +543,52 @@ export default function ProfileCard() {
         <div className="flex flex-col gap-4">
           {/* NOMBRE */}
           <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-            <label className="w-full md:w-40 font-medium text-stone-700">Nombre Completo:</label>
-            <div className="flex w-full items-center gap-2">
-              <input
-                type="text"
-                disabled={campoEditando !== 'nombre'}
-                value={nombre}
-                onChange={(e) => setNombre(soloLetras(e.target.value))}
-                className={`flex-1 px-3 py-2 rounded text-sm ${campoEditando === 'nombre'
-                    ? 'bg-white border border-amber-500'
-                    : 'bg-gray-200 cursor-not-allowed'
-                  }`}
-              />
-              <button onClick={() => setCampoEditando(campoEditando === 'nombre' ? null : 'nombre')}>
-                <Pencil size={16} />
-              </button>
-            </div>
-          </div>
+  
+  <label className="w-full md:w-40 font-medium text-stone-700">
+    Nombre Completo:
+  </label>
+
+  <div className="flex flex-col w-full">
+
+    {/* INPUT + BOTÓN */}
+    <div className="flex items-center gap-2">
+      <input
+        type="text"
+        disabled={campoEditando !== 'nombre'}
+        value={nombre}
+        onChange={(e) => {
+          setNombre(soloLetras(e.target.value));
+          if (errorNombre) setErrorNombre(""); 
+        }}
+        className={`flex-1 px-3 py-2 rounded text-sm ${
+          errorNombre
+            ? "border border-red-500 bg-red-50"
+            : campoEditando === 'nombre'
+              ? 'bg-white border border-amber-500'
+              : 'bg-gray-200 cursor-not-allowed'
+        }`}
+      />
+
+      <button
+        onClick={() => setCampoEditando(campoEditando === 'nombre' ? null : 'nombre')}
+      >
+        <Pencil size={16} />
+      </button>
+    </div>
+
+    {/* MENSAJE DE ERROR */}
+    {errorNombre && (
+      <span className="text-red-500 text-xs mt-1">
+        {errorNombre}
+      </span>
+    )}
+  </div>
+</div>
 
           {/* EMAIL */}
           <div className="flex flex-col md:flex-row md:items-start gap-2 md:gap-4">
             <label className="w-full md:w-40 font-medium text-stone-700 pt-2">E-mail:</label>
-            <div className="flex-1 flex flex-col">
+            
               <div className="flex w-full items-center gap-2">
                 <input
                   type="email"
@@ -553,7 +613,7 @@ export default function ProfileCard() {
               {isEmailEditable && hasEmailChanged && (
                 <span className="text-green-500 text-xs mt-1">Listo para guardar cambios</span>
               )}
-            </div>
+            
           </div>
 
           {/* TELÉFONOS */}
@@ -691,21 +751,36 @@ export default function ProfileCard() {
 
           {/* BOTONES */}
           <div className="mt-6 flex justify-end gap-4">
-            <button
-              onClick={handleCancelAll}
-              className="text-stone-600 hover:text-black text-sm"
-              disabled={isLoading}
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={handleSaveAll}
-              disabled={isLoading}
-              className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg text-sm font-medium shadow-sm disabled:bg-orange-300 disabled:cursor-not-allowed"
-            >
-              {isLoading ? 'Guardando...' : 'Guardar Cambios'}
-            </button>
-          </div>
+
+             <button
+                  onClick={handleCancelAll}
+                  className="text-stone-600 hover:text-black text-sm"
+                  disabled={isLoading}
+             >
+                 Cancelar
+              </button>
+
+              <button
+                   onClick={() => {
+    if (!nombre.trim()) {
+      setErrorNombre("El nombre es obligatorio");
+      return;
+    }
+
+    setErrorNombre("");
+    handleSaveAll();
+  }}
+  disabled={isLoading || !hayCambios}
+  className={`px-6 py-2 rounded-lg text-sm font-medium shadow-sm transition
+    ${!hayCambios
+      ? "bg-orange-300 cursor-not-allowed text-white"
+      : "bg-orange-500 hover:bg-orange-600 text-white"}
+  `}
+>
+  {isLoading ? 'Guardando...' : 'Guardar Cambios'}
+                 </button>
+
+            </div>
         </div>
       </div>
 
