@@ -8,6 +8,7 @@ type CampoError =
   | 'zona'
   | 'habitaciones'
   | 'banos'
+  | 'precio'
   | null
 
 export default function MiRegistroPage() {
@@ -35,13 +36,58 @@ export default function MiRegistroPage() {
     setEstado('ninguno')
   }
 
+  const limpiarPrecio = (valor: string) => valor.replace(/\D/g, '')
+
+  const formatearPrecio = (valor: string) => {
+    const soloNumeros = limpiarPrecio(valor)
+    if (!soloNumeros) return ''
+    return Number(soloNumeros).toLocaleString('es-BO')
+  }
+
   const manejarCambio = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target
 
-    if (['precio', 'area', 'habitaciones', 'banos'].includes(name)) {
+    if (['area', 'habitaciones', 'banos'].includes(name)) {
       if (value !== '' && Number(value) < 0) return
+    }
+
+    if (name === 'precio') {
+      const soloNumeros = limpiarPrecio(value)
+
+      if (soloNumeros === '') {
+        setDatos({ ...datos, precio: '' })
+        if (campoError === 'precio') {
+          limpiarError()
+        }
+        return
+      }
+
+      const numeroLimitado = Math.min(Number(soloNumeros), 999999999)
+      const precioFormateado = formatearPrecio(String(numeroLimitado))
+
+      setDatos({ ...datos, precio: precioFormateado })
+
+      if (numeroLimitado < 1) {
+        setMensajeError('PRECIO DEBE SER MÍNIMO 1')
+        setCampoError('precio')
+        setEstado('error')
+        return
+      }
+
+      if (numeroLimitado >= 999999999) {
+        setMensajeError('Has llegado al máximo de 999.999.999')
+        setCampoError('precio')
+        setEstado('error')
+        return
+      }
+
+      if (campoError === 'precio') {
+        limpiarError()
+      }
+
+      return
     }
 
     if (name === 'habitaciones') {
@@ -217,6 +263,7 @@ export default function MiRegistroPage() {
     const descripcionLimpia = datos.descripcion.trim()
     const direccionLimpia = datos.direccion.trim()
     const zonaLimpia = datos.zona.trim()
+    const precioNumero = datos.precio !== '' ? Number(limpiarPrecio(datos.precio)) : null
     const habitacionesNumero = datos.habitaciones !== '' ? Number(datos.habitaciones) : null
     const banosNumero = datos.banos !== '' ? Number(datos.banos) : null
 
@@ -237,6 +284,27 @@ export default function MiRegistroPage() {
     if (tituloLimpio.length >= 80) {
       setMensajeError('Has llegado al máximo de 80 caracteres')
       setCampoError('titulo')
+      setEstado('error')
+      return
+    }
+
+    if (precioNumero === null) {
+      setMensajeError('DEBE LLENAR TODOS LOS CAMPOS OBLIGATORIOS')
+      setCampoError('precio')
+      setEstado('error')
+      return
+    }
+
+    if (precioNumero < 1) {
+      setMensajeError('PRECIO DEBE SER MÍNIMO 1')
+      setCampoError('precio')
+      setEstado('error')
+      return
+    }
+
+    if (precioNumero >= 999999999) {
+      setMensajeError('Has llegado al máximo de 999.999.999')
+      setCampoError('precio')
       setEstado('error')
       return
     }
@@ -337,7 +405,11 @@ export default function MiRegistroPage() {
     }
 
     const incompleto =
-      !datos.tipoInmueble || !datos.precio || !descripcionLimpia || !direccionLimpia || !zonaLimpia
+      !datos.tipoInmueble ||
+      precioNumero === null ||
+      !descripcionLimpia ||
+      !direccionLimpia ||
+      !zonaLimpia
 
     if (incompleto) {
       setMensajeError('DEBE LLENAR TODOS LOS CAMPOS OBLIGATORIOS')
@@ -350,7 +422,7 @@ export default function MiRegistroPage() {
       titulo: tituloLimpio,
       tipoAccion: datos.operacion,
       categoria: datos.tipoInmueble,
-      precio: Number(datos.precio),
+      precio: precioNumero,
       superficieM2: datos.area ? Number(datos.area) : undefined,
       nroCuartos: habitacionesNumero !== null ? habitacionesNumero : undefined,
       nroBanos: banosNumero !== null ? banosNumero : 1,
@@ -406,6 +478,7 @@ export default function MiRegistroPage() {
   const errorZona = campoError === 'zona'
   const errorHabitaciones = campoError === 'habitaciones'
   const errorBanos = campoError === 'banos'
+  const errorPrecio = campoError === 'precio'
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
@@ -498,11 +571,21 @@ export default function MiRegistroPage() {
                     </label>
                     <input
                       name="precio"
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
                       value={datos.precio}
                       onChange={manejarCambio}
-                      className="w-full p-3 rounded-xl border border-gray-200"
+                      placeholder="Ej: 350.000"
+                      className={`w-full p-3 rounded-xl border ${
+                        errorPrecio ? 'border-red-500' : 'border-gray-200'
+                      }`}
                     />
+
+                    {errorPrecio && (
+                      <p className="text-red-500 text-sm mt-2">{mensajeError}</p>
+                    )}
+
+                    <p className="text-xs text-gray-500 mt-1">Máximo: 999.999.999</p>
                   </div>
                 </div>
               </section>
@@ -542,9 +625,7 @@ export default function MiRegistroPage() {
                       <p className="text-red-500 text-sm mt-2">{mensajeError}</p>
                     )}
 
-                    <p className="text-xs text-gray-500 mt-1">
-                      Máximo 50 habitaciones
-                    </p>
+                    <p className="text-xs text-gray-500 mt-1">Máximo 50 habitaciones</p>
                   </div>
                 </div>
 
@@ -567,9 +648,7 @@ export default function MiRegistroPage() {
                       <p className="text-red-500 text-sm mt-2">{mensajeError}</p>
                     )}
 
-                    <p className="text-xs text-gray-500 mt-1">
-                      Máximo 50 baños
-                    </p>
+                    <p className="text-xs text-gray-500 mt-1">Máximo 50 baños</p>
                   </div>
 
                   <div>
