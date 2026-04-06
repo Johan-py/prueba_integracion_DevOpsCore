@@ -9,6 +9,7 @@ type CampoError =
   | 'habitaciones'
   | 'banos'
   | 'precio'
+  | 'area'
   | null
 
 export default function MiRegistroPage() {
@@ -36,10 +37,10 @@ export default function MiRegistroPage() {
     setEstado('ninguno')
   }
 
-  const limpiarPrecio = (valor: string) => valor.replace(/\D/g, '')
+  const limpiarSoloNumeros = (valor: string) => valor.replace(/\D/g, '')
 
-  const formatearPrecio = (valor: string) => {
-    const soloNumeros = limpiarPrecio(valor)
+  const formatearNumero = (valor: string) => {
+    const soloNumeros = limpiarSoloNumeros(valor)
     if (!soloNumeros) return ''
     return Number(soloNumeros).toLocaleString('es-BO')
   }
@@ -49,23 +50,17 @@ export default function MiRegistroPage() {
   ) => {
     const { name, value } = e.target
 
-    if (['area', 'habitaciones', 'banos'].includes(name)) {
-      if (value !== '' && Number(value) < 0) return
-    }
-
     if (name === 'precio') {
-      const soloNumeros = limpiarPrecio(value)
+      const soloNumeros = limpiarSoloNumeros(value)
 
       if (soloNumeros === '') {
         setDatos({ ...datos, precio: '' })
-        if (campoError === 'precio') {
-          limpiarError()
-        }
+        if (campoError === 'precio') limpiarError()
         return
       }
 
       const numeroLimitado = Math.min(Number(soloNumeros), 999999999)
-      const precioFormateado = formatearPrecio(String(numeroLimitado))
+      const precioFormateado = formatearNumero(String(numeroLimitado))
 
       setDatos({ ...datos, precio: precioFormateado })
 
@@ -83,19 +78,41 @@ export default function MiRegistroPage() {
         return
       }
 
-      if (campoError === 'precio') {
-        limpiarError()
+      if (campoError === 'precio') limpiarError()
+      return
+    }
+
+    if (name === 'area') {
+      const soloNumeros = limpiarSoloNumeros(value)
+
+      if (soloNumeros === '') {
+        setDatos({ ...datos, area: '' })
+        if (campoError === 'area') limpiarError()
+        return
       }
 
+      const numeroLimitado = Math.min(Number(soloNumeros), 10000000)
+      const areaFormateada = formatearNumero(String(numeroLimitado))
+
+      setDatos({ ...datos, area: areaFormateada })
+
+      if (numeroLimitado >= 10000000) {
+        setMensajeError('Has llegado al máximo de 10.000.000')
+        setCampoError('area')
+        setEstado('error')
+        return
+      }
+
+      if (campoError === 'area') limpiarError()
       return
     }
 
     if (name === 'habitaciones') {
+      if (value !== '' && Number(value) < 0) return
+
       if (value === '') {
         setDatos({ ...datos, habitaciones: '' })
-        if (campoError === 'habitaciones') {
-          limpiarError()
-        }
+        if (campoError === 'habitaciones') limpiarError()
         return
       }
 
@@ -119,19 +136,16 @@ export default function MiRegistroPage() {
 
       setDatos({ ...datos, habitaciones: value })
 
-      if (campoError === 'habitaciones') {
-        limpiarError()
-      }
-
+      if (campoError === 'habitaciones') limpiarError()
       return
     }
 
     if (name === 'banos') {
+      if (value !== '' && Number(value) < 0) return
+
       if (value === '') {
         setDatos({ ...datos, banos: '' })
-        if (campoError === 'banos') {
-          limpiarError()
-        }
+        if (campoError === 'banos') limpiarError()
         return
       }
 
@@ -155,10 +169,7 @@ export default function MiRegistroPage() {
 
       setDatos({ ...datos, banos: value })
 
-      if (campoError === 'banos') {
-        limpiarError()
-      }
-
+      if (campoError === 'banos') limpiarError()
       return
     }
 
@@ -181,9 +192,7 @@ export default function MiRegistroPage() {
         setCampoError('titulo')
         setEstado('error')
       } else {
-        if (campoError === 'titulo') {
-          limpiarError()
-        }
+        if (campoError === 'titulo') limpiarError()
       }
     }
 
@@ -203,9 +212,7 @@ export default function MiRegistroPage() {
         setCampoError('descripcion')
         setEstado('error')
       } else {
-        if (campoError === 'descripcion') {
-          limpiarError()
-        }
+        if (campoError === 'descripcion') limpiarError()
       }
     }
 
@@ -225,9 +232,7 @@ export default function MiRegistroPage() {
         setCampoError('direccion')
         setEstado('error')
       } else {
-        if (campoError === 'direccion') {
-          limpiarError()
-        }
+        if (campoError === 'direccion') limpiarError()
       }
     }
 
@@ -247,9 +252,7 @@ export default function MiRegistroPage() {
         setCampoError('zona')
         setEstado('error')
       } else {
-        if (campoError === 'zona') {
-          limpiarError()
-        }
+        if (campoError === 'zona') limpiarError()
       }
     }
   }
@@ -263,7 +266,9 @@ export default function MiRegistroPage() {
     const descripcionLimpia = datos.descripcion.trim()
     const direccionLimpia = datos.direccion.trim()
     const zonaLimpia = datos.zona.trim()
-    const precioNumero = datos.precio !== '' ? Number(limpiarPrecio(datos.precio)) : null
+
+    const precioNumero = datos.precio !== '' ? Number(limpiarSoloNumeros(datos.precio)) : null
+    const areaNumero = datos.area !== '' ? Number(limpiarSoloNumeros(datos.area)) : null
     const habitacionesNumero = datos.habitaciones !== '' ? Number(datos.habitaciones) : null
     const banosNumero = datos.banos !== '' ? Number(datos.banos) : null
 
@@ -305,6 +310,13 @@ export default function MiRegistroPage() {
     if (precioNumero >= 999999999) {
       setMensajeError('Has llegado al máximo de 999.999.999')
       setCampoError('precio')
+      setEstado('error')
+      return
+    }
+
+    if (areaNumero !== null && areaNumero >= 10000000) {
+      setMensajeError('Has llegado al máximo de 10.000.000')
+      setCampoError('area')
       setEstado('error')
       return
     }
@@ -423,7 +435,7 @@ export default function MiRegistroPage() {
       tipoAccion: datos.operacion,
       categoria: datos.tipoInmueble,
       precio: precioNumero,
-      superficieM2: datos.area ? Number(datos.area) : undefined,
+      superficieM2: areaNumero !== null ? areaNumero : undefined,
       nroCuartos: habitacionesNumero !== null ? habitacionesNumero : undefined,
       nroBanos: banosNumero !== null ? banosNumero : 1,
       descripcion: descripcionLimpia,
@@ -479,6 +491,7 @@ export default function MiRegistroPage() {
   const errorHabitaciones = campoError === 'habitaciones'
   const errorBanos = campoError === 'banos'
   const errorPrecio = campoError === 'precio'
+  const errorArea = campoError === 'area'
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
@@ -519,14 +532,8 @@ export default function MiRegistroPage() {
                         errorTitulo ? 'border-red-500' : 'border-gray-200'
                       }`}
                     />
-
-                    {errorTitulo && (
-                      <p className="text-red-500 text-sm mt-2">{mensajeError}</p>
-                    )}
-
-                    <p className="text-xs text-gray-500 mt-1">
-                      {datos.titulo.length}/80 caracteres
-                    </p>
+                    {errorTitulo && <p className="text-red-500 text-sm mt-2">{mensajeError}</p>}
+                    <p className="text-xs text-gray-500 mt-1">{datos.titulo.length}/80 caracteres</p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
@@ -580,11 +587,7 @@ export default function MiRegistroPage() {
                         errorPrecio ? 'border-red-500' : 'border-gray-200'
                       }`}
                     />
-
-                    {errorPrecio && (
-                      <p className="text-red-500 text-sm mt-2">{mensajeError}</p>
-                    )}
-
+                    {errorPrecio && <p className="text-red-500 text-sm mt-2">{mensajeError}</p>}
                     <p className="text-xs text-gray-500 mt-1">Máximo: 999.999.999</p>
                   </div>
                 </div>
@@ -600,11 +603,17 @@ export default function MiRegistroPage() {
                     <label className="block text-[15px] font-bold mb-2">Área total (m²)</label>
                     <input
                       name="area"
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
                       value={datos.area}
                       onChange={manejarCambio}
-                      className="w-full p-3 rounded-xl border border-gray-200"
+                      placeholder="Ej: 1.250"
+                      className={`w-full p-3 rounded-xl border ${
+                        errorArea ? 'border-red-500' : 'border-gray-200'
+                      }`}
                     />
+                    {errorArea && <p className="text-red-500 text-sm mt-2">{mensajeError}</p>}
+                    <p className="text-xs text-gray-500 mt-1">Máximo: 10.000.000</p>
                   </div>
 
                   <div>
@@ -620,11 +629,9 @@ export default function MiRegistroPage() {
                         errorHabitaciones ? 'border-red-500' : 'border-gray-200'
                       }`}
                     />
-
                     {errorHabitaciones && (
                       <p className="text-red-500 text-sm mt-2">{mensajeError}</p>
                     )}
-
                     <p className="text-xs text-gray-500 mt-1">Máximo 50 habitaciones</p>
                   </div>
                 </div>
@@ -643,11 +650,7 @@ export default function MiRegistroPage() {
                         errorBanos ? 'border-red-500' : 'border-gray-200'
                       }`}
                     />
-
-                    {errorBanos && (
-                      <p className="text-red-500 text-sm mt-2">{mensajeError}</p>
-                    )}
-
+                    {errorBanos && <p className="text-red-500 text-sm mt-2">{mensajeError}</p>}
                     <p className="text-xs text-gray-500 mt-1">Máximo 50 baños</p>
                   </div>
 
@@ -662,11 +665,7 @@ export default function MiRegistroPage() {
                         errorDireccion ? 'border-red-500' : 'border-gray-200'
                       }`}
                     />
-
-                    {errorDireccion && (
-                      <p className="text-red-500 text-sm mt-2">{mensajeError}</p>
-                    )}
-
+                    {errorDireccion && <p className="text-red-500 text-sm mt-2">{mensajeError}</p>}
                     <p className="text-xs text-gray-500 mt-1">
                       {datos.direccion.length}/80 caracteres
                     </p>
@@ -684,14 +683,8 @@ export default function MiRegistroPage() {
                       errorZona ? 'border-red-500' : 'border-gray-200'
                     }`}
                   />
-
-                  {errorZona && (
-                    <p className="text-red-500 text-sm mt-2">{mensajeError}</p>
-                  )}
-
-                  <p className="text-xs text-gray-500 mt-1">
-                    {datos.zona.length}/80 caracteres
-                  </p>
+                  {errorZona && <p className="text-red-500 text-sm mt-2">{mensajeError}</p>}
+                  <p className="text-xs text-gray-500 mt-1">{datos.zona.length}/80 caracteres</p>
                 </div>
               </section>
             </div>
@@ -711,11 +704,9 @@ export default function MiRegistroPage() {
                   }`}
                   placeholder="Casa de dos plantas, amplia y moderna ubicada en una zona tranquila..."
                 />
-
                 {errorDescripcion && (
                   <p className="text-red-500 text-sm mt-2">{mensajeError}</p>
                 )}
-
                 <p className="text-xs text-gray-500 mt-1">
                   {datos.descripcion.length}/300 caracteres
                 </p>
