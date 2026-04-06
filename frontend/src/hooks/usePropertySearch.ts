@@ -26,22 +26,22 @@ export function usePropertySearch() {
       })
     }
 
-    if (filters.locationId) params.append('locationId', filters.locationId.toString());
-    if (filters.query) params.append('search', filters.query);
+    if (filters.locationId) params.append('locationId', filters.locationId.toString())
+    if (filters.query) params.append('search', filters.query)
 
     try {
-      setLoading(true);
+      setLoading(true)
       // Cambiamos localhost:5000 por tu variable de entorno para que funcione en Railway
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${API_URL}/api/properties/search?${params.toString()}`);
-      const json = await res.json();
-      setData(json.data || json);
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const res = await fetch(`${API_URL}/api/properties/search?${params.toString()}`)
+      const json = await res.json()
+      setData(json.data || json)
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error:', error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, []);
+  }, [])
   return {
     data,
     loading,
