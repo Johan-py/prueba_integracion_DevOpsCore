@@ -1,10 +1,10 @@
-export type PaymentStatus = "pendiente" | "pagado" | "expirado";
+export type PaymentStatus = "pendiente" | "pagado" | "expirado" | "cancelado";
 
 export interface PaymentData {
   id: string;
   monto: number;
-  referencia: string; // número de referencia, se muestra debajo del QR
-  qrContent: string; // contenido para generar el QR
+  referencia: string;
+  qrContent: string;
   estado: PaymentStatus;
-  fechaExpiracion: string; // ISO string
+  fechaExpiracion: string;
 }

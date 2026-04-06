@@ -19,21 +19,22 @@ export function usePaymentStatus(
 
     const checkStatus = async () => {
       try {
-        // Simulación de API; reemplazar con fetch real
-        const mockResponse = await new Promise<{ estado: PaymentStatus }>(
-          (resolve) => {
-            setTimeout(() => {
-              resolve({ estado: "pendiente" });
-            }, 8000);
-          },
+        // Preguntamos al backend el estado de este ID específico
+        const response = await fetch(
+          `http://localhost:5000/api/transacciones/${paymentId}/estado`,
         );
+
+        if (!response.ok) throw new Error("Error al consultar estado");
+
+        const data = await response.json();
 
         if (!isMounted) return;
 
-        setStatus(mockResponse.estado);
+        const estadoReal = data.estado.toLowerCase() as PaymentStatus;
+        setStatus(estadoReal);
         setIsLoading(false);
 
-        if (mockResponse.estado === "pagado" && onComplete) {
+        if (estadoReal === "pagado" && onComplete) {
           onComplete();
         }
       } catch (error) {
@@ -43,8 +44,7 @@ export function usePaymentStatus(
     };
 
     const intervalId = setInterval(checkStatus, pollInterval);
-
-    checkStatus();
+    checkStatus(); // Primera llamada inmediata
 
     return () => {
       isMounted = false;

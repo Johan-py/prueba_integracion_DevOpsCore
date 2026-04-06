@@ -1,7 +1,7 @@
 "use client";
 
-import React from 'react';
-import { AlertTriangle, X } from 'lucide-react';
+import React from "react";
+import { AlertTriangle, X } from "lucide-react";
 
 interface CancelPaymentModalProps {
   isOpen: boolean;
@@ -9,7 +9,11 @@ interface CancelPaymentModalProps {
   onCancel: () => void;
 }
 
-export function CancelPaymentModal({ isOpen, onConfirm, onCancel }: CancelPaymentModalProps) {
+export function CancelPaymentModal({
+  isOpen,
+  onConfirm,
+  onCancel,
+}: CancelPaymentModalProps) {
   if (!isOpen) return null;
 
   return (
@@ -21,7 +25,7 @@ export function CancelPaymentModal({ isOpen, onConfirm, onCancel }: CancelPaymen
       {/* Card — modal-enter definido en globals.css */}
       <div
         className="modal-enter relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-7 flex flex-col items-center text-center"
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Cerrar (X) */}
         <button
@@ -44,8 +48,10 @@ export function CancelPaymentModal({ isOpen, onConfirm, onCancel }: CancelPaymen
 
         {/* Descripción */}
         <p className="text-sm text-stone-500 mb-1 leading-relaxed">
-          Si salís ahora,{' '}
-          <span className="font-medium text-stone-700">se cancelará la transacción</span>{' '}
+          Si salís ahora,{" "}
+          <span className="font-medium text-stone-700">
+            se cancelará la transacción
+          </span>{" "}
           y tendrás que iniciar una nueva compra.
         </p>
         <p className="text-xs text-stone-400 mb-7">

@@ -1,21 +1,22 @@
 "use client";
-
-import { useState, useEffect } from 'react';
-import { useCurrentPayment } from '@/hooks/payment/useCurrentPayment';
-import { usePaymentStatus } from '@/hooks/payment/usePaymentStatus';
-import { useCancelPayment } from '@/hooks/payment/useCancelPayment';
-import { Timer } from '@/components/payment/Timer';
-import { QRDisplay } from '@/components/payment/QRDisplay';
-import { ExpiredView } from '@/components/payment/ExpiredView';
-import { SuccessView } from '@/components/payment/SuccessView';
-import { CancelPaymentModal } from '@/components/payment/CancelPaymentModal';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
+//confirmar cambios estructurados
+import { useState, useEffect } from "react";
+import { useCurrentPayment } from "@/hooks/payment/useCurrentPayment";
+import { usePaymentStatus } from "@/hooks/payment/usePaymentStatus";
+import { useCancelPayment } from "@/hooks/payment/useCancelPayment";
+import { Timer } from "@/components/payment/Timer";
+import { QRDisplay } from "@/components/payment/QRDisplay";
+import { ExpiredView } from "@/components/payment/ExpiredView";
+import { SuccessView } from "@/components/payment/SuccessView";
+import { CancelPaymentModal } from "@/components/payment/CancelPaymentModal";
+import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 
 export default function PagoQRPage() {
   const router = useRouter();
   const { payment, loading, error } = useCurrentPayment();
-  const { isModalOpen, openModal, closeModal, confirmCancel } = useCancelPayment();
+  const { isModalOpen, openModal, closeModal, confirmCancel } =
+    useCancelPayment();
 
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
 
@@ -27,7 +28,7 @@ export default function PagoQRPage() {
 
   useEffect(() => {
     if (!payment?.fechaExpiracion) return;
-    if (payment.estado === 'pagado' || payment.estado === 'expirado') return;
+    if (payment.estado === "pagado" || payment.estado === "expirado") return;
 
     const updateCounter = () => {
       const remaining = getSecondsLeft(payment.fechaExpiracion);
@@ -42,7 +43,7 @@ export default function PagoQRPage() {
 
   const shouldPoll =
     payment?.id &&
-    payment?.estado === 'pendiente' &&
+    payment?.estado === "pendiente" &&
     (timeLeft === null || timeLeft > 0);
 
   const { status } = usePaymentStatus(shouldPoll ? payment.id : null);
@@ -60,10 +61,11 @@ export default function PagoQRPage() {
       <div className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md text-center">
           <p className="text-red-600">
-            No se encontró un pago pendiente. Por favor, inicia una nueva compra.
+            No se encontró un pago pendiente. Por favor, inicia una nueva
+            compra.
           </p>
           <button
-            onClick={() => router.push('/')}
+            onClick={() => router.push("/")}
             className="mt-4 bg-amber-600 text-white px-6 py-2 rounded-lg"
           >
             Volver al inicio
@@ -73,18 +75,18 @@ export default function PagoQRPage() {
     );
   }
 
-  if (payment.estado === 'expirado' || (timeLeft !== null && timeLeft <= 0)) {
+  if (payment.estado === "expirado" || (timeLeft !== null && timeLeft <= 0)) {
     return <ExpiredView />;
   }
 
-  if (status === 'pagado') {
+  if (status === "pagado") {
     return <SuccessView />;
   }
 
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
   if (timeLeft === null) {
@@ -105,7 +107,6 @@ export default function PagoQRPage() {
 
       <div className="min-h-screen bg-white py-8 px-4">
         <div className="max-w-md mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
-
           {/* Botón de retroceso — abre modal de confirmación */}
           <div className="px-6 pt-5">
             <button
@@ -135,7 +136,6 @@ export default function PagoQRPage() {
               size={200}
             />
           </div>
-
         </div>
       </div>
     </>

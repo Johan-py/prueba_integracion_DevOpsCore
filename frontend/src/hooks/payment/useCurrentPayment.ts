@@ -9,21 +9,29 @@ export function useCurrentPayment() {
   useEffect(() => {
     const fetchPayment = async () => {
       try {
-        // Endpoint real: /api/payment/current
-        // Por ahora usamos un mock con setTimeout
-        const mockPayment: PaymentData = {
-          id: "PAY-2024-00847",
-          monto: 10.0,
-          referencia: "PAY-2024-00847",
-          qrContent: "https://tuapp.com/pagar/PAY-2024-00847",
-          estado: "pendiente",
-          fechaExpiracion: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+        const response = await fetch(
+          "http://localhost:5000/api/transacciones/pendiente/1",
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          },
+        );
+
+        if (!response.ok) throw new Error("Error al obtener la transacción");
+
+        const data = await response.json();
+
+        const realPayment: PaymentData = {
+          id: data.id,
+          monto: data.monto,
+          referencia: data.referencia,
+          qrContent: data.qrContent,
+          estado: data.estado,
+          fechaExpiracion: data.fechaExpiracion,
         };
 
-        // Simular latencia de red
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        setPayment(mockPayment);
+        setPayment(realPayment);
       } catch {
         setError("Error al cargar el pago");
       } finally {
