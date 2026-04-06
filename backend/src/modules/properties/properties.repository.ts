@@ -8,38 +8,60 @@ if (!databaseUrl) throw new Error('DATABASE_URL no está definido en el entorno'
 const adapter = new PrismaPg({ connectionString: databaseUrl })
 const prisma = new PrismaClient({ adapter })
 
-type OrdenFecha = 'mas-recientes' | 'mas-populares' | 'mas-antiguos'
-type OrdenDireccion = 'menor-a-mayor' | 'mayor-a-menor'
-
-interface FiltrosBusqueda {
-  categoria?: string | string[]
-  tipoAccion?: string
-  fecha?: OrdenFecha
-  precio?: OrdenDireccion
-  superficie?: OrdenDireccion
+export interface FiltrosBusqueda {
+  categoria?: string | string[];
+  tipoInmueble?: string | string[]; 
+  modoInmueble?: string | string[]; 
+  query?: string;
+  locationId?: number;                   
+  fecha?: 'mas-recientes' | 'mas-populares' | 'mas-antiguos';
+  precio?: 'menor-a-mayor' | 'mayor-a-menor';
+  superficie?: 'menor-a-mayor' | 'mayor-a-menor';
 }
 
 export const propertiesRepository = {
   async getAll(filtros: FiltrosBusqueda = {}) {
     // ── WHERE ──────────────────────────────────────────────────────────────
-    const where: any = { estado: 'ACTIVO' }
+    const where: any = {estado: 'ACTIVO'}
 
-    if (filtros.categoria) {
-      const categoriasValidas: Categoria[] = ['CASA', 'DEPARTAMENTO', 'TERRENO', 'OFICINA']
-      const entrada = Array.isArray(filtros.categoria) ? filtros.categoria : [filtros.categoria]
-      const validas = entrada
-        .map((c) => c.toUpperCase() as Categoria)
-        .filter((c) => categoriasValidas.includes(c))
-      if (validas.length > 0) {
-        where.categoria = { in: validas }
+    const rawTipo = filtros.tipoInmueble || filtros.categoria
+    if (rawTipo) {
+      const valor = Array.isArray(rawTipo) ? rawTipo[0] : rawTipo
+      if (valor && valor !== 'Cualquier tipo') {
+        where.categoria = valor.toUpperCase().trim()
       }
     }
 
-    if (filtros.tipoAccion) {
-      const tipoUpper = filtros.tipoAccion.toUpperCase() as TipoAccion
-      const tiposValidos: TipoAccion[] = ['VENTA', 'ALQUILER', 'ANTICRETO']
-      if (tiposValidos.includes(tipoUpper)) {
-        where.tipoAccion = tipoUpper
+    if (filtros.modoInmueble) {
+    const valor = Array.isArray(filtros.modoInmueble) ? filtros.modoInmueble[0] : filtros.modoInmueble;
+    if (valor) {
+      const modoLimpio = valor.toUpperCase().includes('ANTICR') ? 'ANTICRETO' : valor.toUpperCase();
+      where.tipoAccion = modoLimpio; 
+    }
+  }
+
+  if (filtros.locationId || (filtros.query && filtros.query.trim() !== '')) {
+      where.OR = [];
+      
+      // 1. Buscar por ID de zona exacta (Ideal cuando pases a producción)
+      if (filtros.locationId) {
+        where.OR.push({
+          ubicacion: { ubicacionMaestraId: Number(filtros.locationId) }
+        });
+      }
+
+      // 2. Buscar por texto (Salva la vida con datos de prueba o sin ID enlazado)
+      if (filtros.query && filtros.query.trim() !== '') {
+        // Extraemos la primera parte (Ej: Saca "Cala Cala" de "Cala Cala - Cochabamba - Bolivia")
+        const textoLimpio = filtros.query.split('-')[0].trim();
+        
+        where.OR.push({ titulo: { contains: textoLimpio, mode: 'insensitive' } });
+        where.OR.push({ descripcion: { contains: textoLimpio, mode: 'insensitive' } });
+        
+        // También buscamos en la dirección textual de la ubicación
+        where.OR.push({ 
+          ubicacion: { direccion: { contains: textoLimpio, mode: 'insensitive' } } 
+        });
       }
     }
 
@@ -51,30 +73,24 @@ export const propertiesRepository = {
     //
     // Para precio y superficie: el frontend los maneja con criterioActivo,
     // así que el backend solo necesita proveer el default y popularidad.
-    let orderBy: any[]
+    const orderBy: any[] = []
 
-    if (filtros.fecha === 'mas-populares') {
-      orderBy = [
-        {
-          ubicacion: {
-            ubicacion_maestra: {
-              popularidad: 'desc'
-            }
-          }
-        },
-        // Desempate: más recientes primero entre inmuebles de igual popularidad
-        { fechaPublicacion: 'desc' }
-      ]
+    if (filtros.precio === 'menor-a-mayor') {
+      orderBy.push({ precio: 'asc' })
+      orderBy.push({ id: 'asc' })
+    } else if (filtros.precio === 'mayor-a-menor') {
+      orderBy.push({ precio: 'desc' })
+    } else if (filtros.superficie === 'menor-a-mayor') {
+      orderBy.push({ superficieM2: 'asc' })
+    } else if (filtros.superficie === 'mayor-a-menor') {
+      orderBy.push({ superficieM2: 'desc' })
+    } else if (filtros.fecha === 'mas-recientes') {
+      orderBy.push({ fechaPublicacion: 'desc' })
     } else if (filtros.fecha === 'mas-antiguos') {
-      orderBy = [{ fechaPublicacion: 'asc' }]
-    } else {
-      // default: mas-recientes
-      orderBy = [{ fechaPublicacion: 'desc' }]
+      orderBy.push({ fechaPublicacion: 'asc' })
     }
 
-    // ── QUERY ──────────────────────────────────────────────────────────────
-    console.log('WHERE clause:', JSON.stringify(where))
-    console.log('ORDER BY:', JSON.stringify(orderBy))
+    orderBy.push({ id: 'asc' }) // Desempate default
 
     return prisma.inmueble.findMany({
       where,
@@ -82,10 +98,12 @@ export const propertiesRepository = {
       include: {
         ubicacion: {
           include: {
-            // Necesario para que el orderBy por popularidad funcione
-            // y para exponer el valor al frontend si lo necesita
-            ubicacion_maestra: true
+            ubicacion_maestra: true // Vital para mostrar zonas de Cochabamba
           }
+        },
+        publicaciones: {
+          where: { estado: 'ACTIVA' },
+          include: { multimedia: true } // Para obtener las fotos reales
         }
       }
     })

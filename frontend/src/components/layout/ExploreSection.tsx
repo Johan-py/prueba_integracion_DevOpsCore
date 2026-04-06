@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { ComboBox } from '../ui/ComboBox'
 import { Home, Search, Building, Bed, Trees, Flower2 } from 'lucide-react'
 import { LocationSearch } from './LocationSearch'
+import { useRouter } from 'next/navigation'
+import { useSearchFilters } from '@/hooks/useSearchFilters'
 
 const searchOptions = [
   { id: 'venta', name: 'Venta' },
@@ -12,8 +14,10 @@ const searchOptions = [
 ]
 
 export default function ExploreSection() {
+  const router = useRouter()
   const [selectedOption, setSelectedOption] = useState<string[]>([])
   const [location, setLocation] = useState('')
+  const [propertyType, setPropertyType] = useState('Cualquier tipo')
   const [errorMessage, setErrorMessage] = useState('')
 
   const propertyTypes = [
@@ -23,6 +27,8 @@ export default function ExploreSection() {
     { label: 'Terrenos', icon: Trees },
     { label: 'Espacios Cementerio', icon: Flower2 }
   ]
+
+  const { updateFilters } = useSearchFilters(); // 🚀 1. Inicializamos el hook
 
   const handleSearch = () => {
     const hasOperationFilter = selectedOption.length > 0
@@ -34,6 +40,32 @@ export default function ExploreSection() {
     }
 
     setErrorMessage('')
+
+    const tipoMap: Record<string, string> = {
+      'Casas': 'CASA',
+      'Departamentos': 'DEPARTAMENTO',
+      'Cuartos': 'CASA', 
+      'Terrenos': 'TERRENO',
+      'Espacios Cementerio': 'TERRENO'
+    };
+    const tipoFinal = tipoMap[propertyType] || (propertyType !== 'Cualquier tipo' ? propertyType.toUpperCase() : '');
+
+    // 🚀 2. SINCRONIZAMOS EL STORAGE ANTES DE VIAJAR (Para que ResultadosBusqueda lo lea)
+    updateFilters({
+      tipoInmueble: tipoFinal ? [tipoFinal] : [],
+      modoInmueble: selectedOption.map(m => m.toUpperCase()),
+      query: location.trim()
+    });
+
+    // 3. NAVEGACIÓN INTACTA (Para no romper el mapa)
+    const params = new URLSearchParams();
+    selectedOption.forEach(modo => params.append('modoInmueble', modo.toUpperCase()));
+    if (tipoFinal) params.set('tipoInmueble', tipoFinal);
+    if (location.trim() !== '') params.set('query', location.trim());
+
+    const finalUrl = `/busqueda_mapa?${params.toString()}`;
+    console.log("🚀 Navegando desde Home a:", finalUrl);
+    router.push(finalUrl);
   }
 
   return (
@@ -81,6 +113,7 @@ export default function ExploreSection() {
                 placeholder="Cualquier tipo"
                 options={propertyTypes}
                 icon={Home}
+                onChange={(val) => setPropertyType(val)}
               />
             </div>
             <div className="w-full">

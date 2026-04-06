@@ -19,13 +19,8 @@
     "pg": "^8.20.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-<<<<<<< HEAD
     "react-leaflet": "4.2.1",
     "react-leaflet-cluster": "2.1.0",
-=======
-    "react-leaflet": "^5.0.0",
-    "react-leaflet-cluster": "^2.1.0",
->>>>>>> origin/develop
     "tailwind-merge": "^2.2.1"
   },
   "devDependencies": {

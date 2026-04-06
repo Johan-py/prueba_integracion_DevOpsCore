@@ -90,22 +90,27 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
       }
       setIsLoading(true)
       try {
-        const res = await fetch(
-          `http://localhost:5000/api/locations/search?q=${encodeURIComponent(value)}`
-        )
-        if (res.ok) {
-          const data = await res.json()
-          setSuggestions(data)
-          setIsOpen(true)
-        }
-      } catch {
-      } finally {
-        setIsLoading(false)
+        const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      
+      const res = await fetch(
+        `${API_BASE}/api/locations/search?q=${encodeURIComponent(value)}`
+      )
+      
+      if (res.ok) {
+        const data = await res.json()
+        setSuggestions(data)
+        setIsOpen(true)
       }
+    } catch (error) {
+      
+      console.error("Error buscando ubicaciones:", error);
+    } finally {
+      setIsLoading(false)
     }
-    const timer = setTimeout(fetchLocations, 300)
-    return () => clearTimeout(timer)
-  }, [value, isSelected])
+  }
+  const timer = setTimeout(fetchLocations, 300)
+  return () => clearTimeout(timer)
+}, [value, isSelected])
 
   return (
     <div className="w-full relative" ref={containerRef}>

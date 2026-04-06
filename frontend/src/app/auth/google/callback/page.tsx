@@ -13,15 +13,27 @@ export default function GoogleCallbackPage() {
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search)
-    const hasError = searchParams.get('error')
-
+    const error = searchParams.get('error')
+    const isCancelled = error === 'access_denied'
     let timeoutId: number | undefined
 
-    if (hasError) {
-      setMessage('No se pudo obtener la información de Google.')
-
+    if (isCancelled) {
+      setMessage('Cancelaste la autenticación con Google. Redirigiendo al login...')
       timeoutId = window.setTimeout(() => {
-        router.replace('/sign-up')
+        router.replace('/sign-in')
+      }, 1500)
+
+      return () => {
+        if (timeoutId) {
+          window.clearTimeout(timeoutId)
+        }
+      }
+    }
+
+    if (error) {
+      setMessage('No se pudo iniciar sesión con Google. Redirigiendo al login...')
+      timeoutId = window.setTimeout(() => {
+        router.replace('/sign-in')
       }, 1500)
 
       return () => {
