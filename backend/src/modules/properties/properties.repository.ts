@@ -9,20 +9,20 @@ const adapter = new PrismaPg({ connectionString: databaseUrl })
 const prisma = new PrismaClient({ adapter })
 
 export interface FiltrosBusqueda {
-  categoria?: string | string[];
-  tipoInmueble?: string | string[]; 
-  modoInmueble?: string | string[]; 
-  query?: string;
-  locationId?: number;                   
-  fecha?: 'mas-recientes' | 'mas-populares' | 'mas-antiguos';
-  precio?: 'menor-a-mayor' | 'mayor-a-menor';
-  superficie?: 'menor-a-mayor' | 'mayor-a-menor';
+  categoria?: string | string[]
+  tipoInmueble?: string | string[]
+  modoInmueble?: string | string[]
+  query?: string
+  locationId?: number
+  fecha?: 'mas-recientes' | 'mas-populares' | 'mas-antiguos'
+  precio?: 'menor-a-mayor' | 'mayor-a-menor'
+  superficie?: 'menor-a-mayor' | 'mayor-a-menor'
 }
 
 export const propertiesRepository = {
   async getAll(filtros: FiltrosBusqueda = {}) {
     // ── WHERE ──────────────────────────────────────────────────────────────
-    const where: any = {estado: 'ACTIVO'}
+    const where: any = { estado: 'ACTIVO' }
 
     const rawTipo = filtros.tipoInmueble || filtros.categoria
     if (rawTipo) {
@@ -33,35 +33,39 @@ export const propertiesRepository = {
     }
 
     if (filtros.modoInmueble) {
-    const valor = Array.isArray(filtros.modoInmueble) ? filtros.modoInmueble[0] : filtros.modoInmueble;
+      const valor = Array.isArray(filtros.modoInmueble)
+        ? filtros.modoInmueble[0]
+        : filtros.modoInmueble
     if (valor) {
-      const modoLimpio = valor.toUpperCase().includes('ANTICR') ? 'ANTICRETO' : valor.toUpperCase();
-      where.tipoAccion = modoLimpio; 
+        const modoLimpio = valor.toUpperCase().includes('ANTICR')
+          ? 'ANTICRETO'
+          : valor.toUpperCase()
+        where.tipoAccion = modoLimpio
     }
   }
 
   if (filtros.locationId || (filtros.query && filtros.query.trim() !== '')) {
-      where.OR = [];
+      where.OR = []
       
       // 1. Buscar por ID de zona exacta (Ideal cuando pases a producción)
       if (filtros.locationId) {
         where.OR.push({
           ubicacion: { ubicacionMaestraId: Number(filtros.locationId) }
-        });
+        })
       }
 
       // 2. Buscar por texto (Salva la vida con datos de prueba o sin ID enlazado)
       if (filtros.query && filtros.query.trim() !== '') {
         // Extraemos la primera parte (Ej: Saca "Cala Cala" de "Cala Cala - Cochabamba - Bolivia")
-        const textoLimpio = filtros.query.split('-')[0].trim();
+        const textoLimpio = filtros.query.split('-')[0].trim()
         
-        where.OR.push({ titulo: { contains: textoLimpio, mode: 'insensitive' } });
-        where.OR.push({ descripcion: { contains: textoLimpio, mode: 'insensitive' } });
+        where.OR.push({ titulo: { contains: textoLimpio, mode: 'insensitive' } })
+        where.OR.push({ descripcion: { contains: textoLimpio, mode: 'insensitive' } })
         
         // También buscamos en la dirección textual de la ubicación
         where.OR.push({ 
           ubicacion: { direccion: { contains: textoLimpio, mode: 'insensitive' } } 
-        });
+        })
       }
     }
 
