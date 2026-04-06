@@ -5,7 +5,11 @@ import { Request } from 'express'
 
 // Configurar almacenamiento
 const storage = multer.diskStorage({
-  destination: (_req: Request, _file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
+  destination: (
+    _req: Request,
+    _file: Express.Multer.File,
+    cb: (error: Error | null, destination: string) => void
+  ) => {
     const uploadDir = path.join(process.cwd(), 'uploads', 'avatars')
     // Crear directorio si no existe
     if (!fs.existsSync(uploadDir)) {
@@ -13,8 +17,12 @@ const storage = multer.diskStorage({
     }
     cb(null, uploadDir)
   },
-  filename: (_req: Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+  filename: (
+    _req: Request,
+    file: Express.Multer.File,
+    cb: (error: Error | null, filename: string) => void
+  ) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9)
     const extension = path.extname(file.originalname)
     cb(null, `avatar-${uniqueSuffix}${extension}`)
   }

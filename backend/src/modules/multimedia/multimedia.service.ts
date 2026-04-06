@@ -8,6 +8,7 @@ import {
 } from './multimedia.constants.js'
 import {
   countMultimediaByPublicationIdAndTypeRepository,
+  createManyMultimediaRepository,
   createMultimediaRepository,
   findPublicationByIdRepository,
   getMultimediaByPublicationIdRepository
@@ -24,30 +25,70 @@ const validatePositiveInteger = (value: number, fieldName: string) => {
   }
 }
 
-const isValidYoutubeUrl = (videoUrl: string): boolean => {
+const normalizeHttpUrl = (rawUrl: string, fieldName: string): string => {
+  const trimmedUrl = rawUrl.trim()
+
+  let parsedUrl: URL
+
+  try {
+    parsedUrl = new URL(trimmedUrl)
+  } catch {
+    throw new Error(`${fieldName} no válida`)
+  }
+
+  if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+    throw new Error(`${fieldName} no válida`)
+  }
+
+  return parsedUrl.toString()
+}
+
+const extractYoutubeVideoId = (videoUrl: string): string | null => {
   try {
     const parsedUrl = new URL(videoUrl.trim())
     const host = parsedUrl.hostname.toLowerCase()
 
     if (!ALLOWED_YOUTUBE_HOSTS.includes(host)) {
-      return false
+      return null
     }
 
     if (host === 'youtu.be') {
-      return parsedUrl.pathname.length > 1
+      const shortId = parsedUrl.pathname.replace('/', '').trim()
+      return /^[a-zA-Z0-9_-]{11}$/.test(shortId) ? shortId : null
     }
 
     if (host === 'youtube.com' || host === 'www.youtube.com') {
-      return parsedUrl.searchParams.has('v') || parsedUrl.pathname.startsWith('/shorts/')
+      const videoId = parsedUrl.searchParams.get('v')
+      if (videoId && /^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
+        return videoId
+      }
+
+      const shortsMatch = parsedUrl.pathname.match(/^\/shorts\/([a-zA-Z0-9_-]{11})$/)
+      if (shortsMatch) {
+        return shortsMatch[1]
+      }
     }
 
-    return false
+    return null
   } catch {
-    return false
+    return null
   }
 }
 
-const validatePublicationOwnership = async (publicacionId: number, usuarioId: number) => {
+const normalizeYoutubeUrl = (videoUrl: string): string => {
+  const videoId = extractYoutubeVideoId(videoUrl)
+
+  if (!videoId) {
+    throw new Error('Enlace de video no válido')
+  }
+
+  return `https://www.youtube.com/watch?v=${videoId}`
+}
+
+const validatePublicationOwnership = async (
+  publicacionId: number,
+  usuarioId: number
+) => {
   validatePositiveInteger(publicacionId, 'ID de publicación')
   validatePositiveInteger(usuarioId, 'Usuario')
 
@@ -73,7 +114,7 @@ const validateImagesInput = (images: RegisterImagesInput['images']) => {
     throw new Error('Límite de imágenes alcanzado')
   }
 
-  images.forEach((image, index) => {
+  return images.map((image, index) => {
     const imageIndex = index + 1
 
     if (!image || typeof image !== 'object') {
@@ -94,12 +135,27 @@ const validateImagesInput = (images: RegisterImagesInput['images']) => {
       throw new Error('Formato no permitido. Solo PNG, JPG o JPEG')
     }
 
-    if (typeof image.pesoMb !== 'number' || Number.isNaN(image.pesoMb) || image.pesoMb <= 0) {
+    if (
+      typeof image.pesoMb !== 'number' ||
+      Number.isNaN(image.pesoMb) ||
+      image.pesoMb <= 0
+    ) {
       throw new Error(`El tamaño de la imagen ${imageIndex} no es válido`)
     }
 
     if (image.pesoMb > MAX_IMAGE_SIZE_MB) {
       throw new Error('La imagen supera el tamaño máximo permitido de 5 MB')
+    }
+
+    const normalizedUrl = normalizeHttpUrl(
+      image.url,
+      `La URL de la imagen ${imageIndex}`
+    )
+
+    return {
+      url: normalizedUrl,
+      extension: normalizedExtension,
+      pesoMb: image.pesoMb
     }
   })
 }
@@ -128,11 +184,7 @@ export const registerVideoLinkService = async ({
     throw new Error('El enlace de video es obligatorio')
   }
 
-  const normalizedVideoUrl = videoUrl.trim()
-
-  if (!isValidYoutubeUrl(normalizedVideoUrl)) {
-    throw new Error('Enlace de video no válido')
-  }
+  const normalizedVideoUrl = normalizeYoutubeUrl(videoUrl)
 
   const totalVideos = await countMultimediaByPublicationIdAndTypeRepository(
     publicacionId,
@@ -163,26 +215,24 @@ export const registerImagesService = async ({
 }: RegisterImagesInput) => {
   const publication = await validatePublicationOwnership(publicacionId, usuarioId)
 
-  validateImagesInput(images)
+  const normalizedImages = validateImagesInput(images)
 
   const totalImages = await countMultimediaByPublicationIdAndTypeRepository(
     publicacionId,
     MULTIMEDIA_TYPES.IMAGE
   )
 
-  if (totalImages + images.length > MAX_IMAGES_PER_PUBLICATION) {
+  if (totalImages + normalizedImages.length > MAX_IMAGES_PER_PUBLICATION) {
     throw new Error('Límite de imágenes alcanzado')
   }
 
-  const createdImages = await Promise.all(
-    images.map((image) =>
-      createMultimediaRepository({
-        publicacionId,
-        tipo: MULTIMEDIA_TYPES.IMAGE,
-        url: image.url.trim(),
-        pesoMb: image.pesoMb
-      })
-    )
+  const createdImages = await createManyMultimediaRepository(
+    normalizedImages.map((image) => ({
+      publicacionId,
+      tipo: MULTIMEDIA_TYPES.IMAGE,
+      url: image.url,
+      pesoMb: image.pesoMb
+    }))
   )
 
   return {

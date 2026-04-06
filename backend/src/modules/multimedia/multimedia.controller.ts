@@ -45,19 +45,47 @@ const getErrorStatus = (message: string): number => {
       return 404
     case 'La publicación no pertenece al usuario autenticado':
       return 403
-    default:
+    case 'ID de publicación no válido':
+    case 'El enlace de video es obligatorio':
+    case 'Enlace de video no válido':
+    case 'Debe enviar al menos una imagen':
+    case 'Límite de imágenes alcanzado':
+    case 'Límite de videos alcanzado':
       return 400
+    default:
+      if (
+        message.includes('no válido') ||
+        message.includes('no válida') ||
+        message.includes('obligatoria') ||
+        message.includes('Formato no permitido') ||
+        message.includes('supera el tamaño máximo permitido')
+      ) {
+        return 400
+      }
+
+      return 500
   }
 }
 
 const handleControllerError = (error: unknown, res: Response) => {
-  const message = error instanceof Error ? error.message : 'Error interno del servidor'
+  const message =
+    error instanceof Error ? error.message : 'Error interno del servidor'
 
   const status = getErrorStatus(message)
-  res.status(status).json({ message })
+
+  if (status === 500) {
+    console.error('[multimedia.controller] Error inesperado:', error)
+  }
+
+  res.status(status).json({
+    message: status === 500 ? 'Error interno del servidor' : message
+  })
 }
 
-export const getPublicationMultimediaController = async (req: Request, res: Response) => {
+export const getPublicationMultimediaController = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const publicacionId = parsePublicacionId(req)
     const usuarioId = getAuthenticatedUserId(req as AuthenticatedRequest)
@@ -76,7 +104,10 @@ export const getPublicationMultimediaController = async (req: Request, res: Resp
   }
 }
 
-export const registerVideoLinkController = async (req: Request, res: Response) => {
+export const registerVideoLinkController = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const publicacionId = parsePublicacionId(req)
     const usuarioId = getAuthenticatedUserId(req as AuthenticatedRequest)
@@ -97,13 +128,18 @@ export const registerVideoLinkController = async (req: Request, res: Response) =
   }
 }
 
-export const registerImagesController = async (req: Request, res: Response) => {
+export const registerImagesController = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const publicacionId = parsePublicacionId(req)
     const usuarioId = getAuthenticatedUserId(req as AuthenticatedRequest)
     const { images } = req.body as Partial<RegisterImagesBody>
 
-    const normalizedImages: ImageUploadItemInput[] = Array.isArray(images) ? images : []
+    const normalizedImages: ImageUploadItemInput[] = Array.isArray(images)
+      ? images
+      : []
 
     const result = await registerImagesService({
       publicacionId,

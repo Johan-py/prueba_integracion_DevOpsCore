@@ -77,7 +77,19 @@ export default function UserMenu({ user, isPanelOpen, onTogglePanel, onClosePane
 
             <div className="flex flex-col mb-4">
               <MenuLink label="Mi cuenta" href="/cuenta" icon={UserIcon} onClick={onClosePanel} />
-              <MenuLink label="Mis publicaciones" href="/publicaciones" icon={FileText} onClick={onClosePanel} />
+              {/* ✅ Se mantienen ambas opciones: la nueva y la existente */}
+              <MenuLink
+                label="Mis propiedades vistas"
+                href="/vistas"
+                icon={Eye}
+                onClick={onClosePanel}
+              />
+              <MenuLink
+                label="Mis publicaciones"
+                href="/mis-publicaciones"
+                icon={FileText}
+                onClick={onClosePanel}
+              />
               <MenuLink label="Mis zonas" href="/zonas" icon={Map} onClick={onClosePanel} />
             </div>
 
