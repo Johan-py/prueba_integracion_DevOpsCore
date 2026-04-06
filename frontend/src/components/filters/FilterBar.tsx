@@ -44,7 +44,6 @@ export default function FilterBar({ onSearch, variant = 'home' }: FilterBarProps
   }, [])
 
   const handleSearch = () => {
-
     // Mapeo para el backend 
     const tipoMap: Record<string, string> = {
       Casa: 'CASA',
