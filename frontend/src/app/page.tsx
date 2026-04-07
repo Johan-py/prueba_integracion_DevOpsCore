@@ -5,8 +5,10 @@ import Modal from "@/components/Modal";
 import EditForm from "@/components/EditForm";
 import { initialProperties, currentUser, emptyErrors } from "@/data/properties";
 import { api } from "@/lib/api";
+import { toast } from "sonner";   // ← agrega este import arriba
 
 export default function Home() {
+  const [globalError, setGlobalError] = useState<string | null>(null);
   const [properties, setProperties] = useState(initialProperties);
   const [loading, setLoading] = useState(true);
   const [editingProperty, setEditingProperty] = useState(null);
@@ -107,39 +109,106 @@ export default function Home() {
         ))}
       </div>
 
-      {showConfirmEdit && (
-        <Modal onClose={() => setShowConfirmEdit(false)}>
-          <h2 className="text-xl font-bold mb-2">Editar publicación</h2>
-          <p className="text-gray-500 mb-6">¿Está seguro que desea editar?</p>
-          <div className="flex gap-3 justify-end">
-            <button className="btn btn-light" style={{minWidth:"120px"}} onClick={() => setShowConfirmEdit(false)}>Cancelar</button>
-            <button className="btn btn-primary" style={{background:"#1a1a1a", minWidth:"120px"}} onClick={handleConfirmEdit}>Editar</button>
-          </div>
-        </Modal>
-      )}
+      {/* MODAL 1: CONFIRMAR EDICIÓN (BOTÓN NEGRO) */}
+{showConfirmEdit && (
+  <Modal onClose={() => setShowConfirmEdit(false)}>
+    <h2 className="text-xl font-bold mb-2 text-gray-800">Editar publicación</h2>
+    <p className="text-gray-500 mb-6">¿Está seguro que desea editar?</p>
+    
+    {/* justify-end: Alinea los botones a la derecha sin estirarlos */}
+    <div className="flex gap-3 justify-end mt-4">
+      <button 
+        /* px-8: Padding a los lados para dar forma rectangular / py-2: Altura pequeña */
+        /* rounded-xl: Bordes muy redondeados como en tu imagen */
+        className="px-8 py-2 rounded-xl bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition-colors" 
+        onClick={() => setShowConfirmEdit(false)}
+      >
+        Cancelar
+      </button>
+      <button 
+        /* Eliminamos minWidth:"120px" para que no se estire como chicle */
+        className="px-10 py-2 rounded-xl text-white font-medium hover:opacity-90 transition-opacity" 
+        style={{ background: "#1a1a1a" }} // Color negro exacto
+        onClick={handleConfirmEdit}
+      >
+        Editar
+      </button>
+    </div>
+  </Modal>
+)}
+
+{/* MODAL 2: CONFIRMAR GUARDADO (BOTÓN NARANJA) */}
+{showConfirmSave && (
+  <Modal onClose={() => setShowConfirmSave(false)}>
+    <h2 className="text-xl font-bold mb-2 text-gray-800">Confirmar cambios</h2>
+    <p className="text-gray-500 mb-6">¿Desea guardar los cambios realizados en la publicación?</p>
+    
+    <div className="flex gap-3 justify-end mt-4">
+      <button 
+        className="px-8 py-2 rounded-xl bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition-colors" 
+        onClick={() => setShowConfirmSave(false)}
+      >
+        Cancelar
+      </button>
+      <button 
+        /* px-10: Hace que el botón sea ancho pero proporcional al texto */
+        className="px-10 py-2 rounded-xl text-white font-medium hover:opacity-90 transition-opacity" 
+        style={{ background: "#e67e22" }} // Color naranja de tu referencia
+        onClick={handleConfirmSave}
+      >
+        Guardar
+      </button>
+    </div>
+  </Modal>
+)}
 
       {editingProperty && formData && !showConfirmSave && (
-        <Modal onClose={() => setEditingProperty(null)}>
-          <EditForm
-            formData={formData}
-            fieldErrors={fieldErrors}
-            onChange={handleChange}
-            onSave={handleSaveClick}
-            onCancel={() => setEditingProperty(null)}
-          />
-        </Modal>
-      )}
+  <Modal onClose={() => setEditingProperty(null)}>
+    <EditForm
+      formData={formData}
+      fieldErrors={fieldErrors}
+      onChange={handleChange}
+      onSave={handleSaveClick}
+      onCancel={() => setEditingProperty(null)}
+      toast={toast}           // ← agregar
+      globalError={globalError || null}  // ← agregar
+    />
+  </Modal>
+)}
 
       {showConfirmSave && (
-        <Modal onClose={() => setShowConfirmSave(false)}>
-          <h2 className="text-xl font-bold mb-2">Confirmar cambios</h2>
-          <p className="text-gray-500 mb-6">¿Desea guardar los cambios realizados en la publicación?</p>
-          <div className="flex gap-3 justify-end">
-            <button className="btn btn-light" style={{minWidth:"120px"}} onClick={() => setShowConfirmSave(false)}>Cancelar</button>
-            <button className="btn btn-primary" style={{minWidth:"120px"}} onClick={handleConfirmSave}>Guardar</button>
-          </div>
-        </Modal>
-      )}
+  <Modal onClose={() => setShowConfirmSave(false)}>
+    {/* Contenedor principal con padding para que respire el texto */}
+    <div className="p-2"> 
+      <h2 className="text-2xl font-bold mb-3 text-gray-800">Confirmar cambios</h2>
+      <p className="text-gray-500 mb-8 text-lg">
+        ¿Desea guardar los cambios realizados en la publicación?
+      </p>
+      
+      {/* Contenedor de botones: gap-4 para separarlos bien */}
+      <div className="flex gap-4 justify-between items-center mt-6">
+        
+        {/* BOTÓN CANCELAR: Color crema/gris suave */}
+        <button 
+          className="px-8 py-3 rounded-xl bg-[#e5e1d8] text-gray-700 font-semibold hover:bg-gray-300 transition-all flex-1"
+          onClick={() => setShowConfirmSave(false)}
+        >
+          Cancelar
+        </button>
+
+        {/* BOTÓN GUARDAR: Naranja vibrante y más ancho */}
+        <button 
+          className="px-12 py-3 rounded-xl text-white font-bold hover:opacity-90 transition-all shadow-md flex-[1.5]" 
+          style={{ background: "#e67e22" }} // El naranja exacto de tu imagen
+          onClick={handleConfirmSave}
+        >
+          Guardar
+        </button>
+        
+      </div>
+    </div>
+  </Modal>
+)}
     </div>
   );
 }
