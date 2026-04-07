@@ -1,42 +1,44 @@
 // SecurityModal.tsx (añadir prop isLoading)
-'use client'
+"use client";
 
-import React, { useState } from 'react'
-import { Lock } from 'lucide-react'
+import React, { useState } from "react";
+import { Lock } from "lucide-react";
 
 interface SecurityModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onSubmit: (password: string) => void
-  isLoading?: boolean
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (password: string) => void;
+  isLoading?: boolean;
 }
 
 export default function SecurityModal({
   isOpen,
   onClose,
   onSubmit,
-  isLoading = false
+  isLoading = false,
 }: SecurityModalProps) {
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!password) {
-      setError('Por favor, ingresa tu contraseña para continuar.')
-      return
+      setError("Por favor, ingresa tu contraseña para continuar.");
+      return;
     }
-    setError('')
-    onSubmit(password)
-    setPassword('')
-  }
+    setError("");
+    onSubmit(password);
+    setPassword("");
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm mx-4 border-t-4 border-amber-600">
-        <h2 className="text-xl font-bold mb-2 text-stone-900">Seguridad Requerida</h2>
+        <h2 className="text-xl font-bold mb-2 text-stone-900">
+          Seguridad Requerida
+        </h2>
 
         <p className="text-sm text-stone-600 mb-4">
           Para editar tu correo electrónico, necesitamos verificar tu identidad.
@@ -74,11 +76,11 @@ export default function SecurityModal({
               className="px-4 py-2 bg-amber-600 text-white rounded hover:bg-amber-700 transition-colors font-medium disabled:bg-amber-400"
               disabled={isLoading}
             >
-              {isLoading ? 'Verificando...' : 'Verificar'}
+              {isLoading ? "Verificando..." : "Verificar"}
             </button>
           </div>
         </form>
       </div>
     </div>
-  )
+  );
 }

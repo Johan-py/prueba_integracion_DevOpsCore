@@ -1,22 +1,22 @@
-'use client'
+"use client";
 
-import PublicacionCard from '@/components/publicacion/PublicacionCard'
-import { useMisPublicaciones } from '@/hooks/useMisPublicaciones'
+import PublicacionCard from "@/components/publicacion/PublicacionCard";
+import { useMisPublicaciones } from "@/hooks/useMisPublicaciones";
 
 export default function MisPublicacionesPage() {
-  const {
-    publicaciones,
-    loading,
-    error,
-    removerPublicacionDeLista,
-  } = useMisPublicaciones()
+  const { publicaciones, loading, error, removerPublicacionDeLista } =
+    useMisPublicaciones();
 
   if (loading) {
-    return <div className="px-4 py-8 sm:px-6 lg:px-8">Cargando publicaciones...</div>
+    return (
+      <div className="px-4 py-8 sm:px-6 lg:px-8">Cargando publicaciones...</div>
+    );
   }
 
   if (error) {
-    return <div className="px-4 py-8 text-red-600 sm:px-6 lg:px-8">{error}</div>
+    return (
+      <div className="px-4 py-8 text-red-600 sm:px-6 lg:px-8">{error}</div>
+    );
   }
 
   return (
@@ -30,7 +30,10 @@ export default function MisPublicacionesPage() {
       ) : (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {publicaciones.map((publicacion) => (
-            <div key={publicacion.id} className="mx-auto w-full max-w-[360px] sm:max-w-none">
+            <div
+              key={publicacion.id}
+              className="mx-auto w-full max-w-[360px] sm:max-w-none"
+            >
               <PublicacionCard
                 publicacion={publicacion}
                 onDeleted={removerPublicacionDeLista}
@@ -40,5 +43,5 @@ export default function MisPublicacionesPage() {
         </div>
       )}
     </div>
-  )
+  );
 }

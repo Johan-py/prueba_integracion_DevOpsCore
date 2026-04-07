@@ -1,13 +1,13 @@
 type AboutUsSectionBlockProps = {
-  accent: string
-  paragraphs: readonly string[]
-  title: string
-}
+  accent: string;
+  paragraphs: readonly string[];
+  title: string;
+};
 
 export default function AboutUsSectionBlock({
   accent,
   paragraphs,
-  title
+  title,
 }: AboutUsSectionBlockProps) {
   return (
     <section className="space-y-4">
@@ -20,5 +20,5 @@ export default function AboutUsSectionBlock({
         </p>
       ))}
     </section>
-  )
+  );
 }

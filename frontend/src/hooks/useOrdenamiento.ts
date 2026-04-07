@@ -1,31 +1,26 @@
-import { useState, useMemo, useCallback, useEffect } from 'react'
-import { Inmueble, EstadoOrdenamiento, ORDENAMIENTO_DEFAULT } from '../types/inmueble'
-import { ordenarInmuebles } from '../utils/ordenarInmuebles'
+import { useState, useCallback, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { PropertyMapPin } from "../types/property";
+import { EstadoOrdenamiento, ORDENAMIENTO_DEFAULT } from "../types/inmueble";
 
-const STORAGE_KEY = 'propbol:ordenamiento'
+const STORAGE_KEY = "propbol:ordenamiento";
 
 function cargarOrdenGuardado(): EstadoOrdenamiento {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return ORDENAMIENTO_DEFAULT
-
-    const parsed = JSON.parse(raw) as EstadoOrdenamiento
-
-    const criteriosValidos = [null, 'fecha', 'precio', 'superficie']
-    if (!criteriosValidos.includes(parsed.criterioActivo)) return ORDENAMIENTO_DEFAULT
-
-    return parsed
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return ORDENAMIENTO_DEFAULT;
+    return JSON.parse(raw) as EstadoOrdenamiento;
   } catch {
-    return ORDENAMIENTO_DEFAULT
+    return ORDENAMIENTO_DEFAULT;
   }
 }
 
 function guardarOrden(orden: EstadoOrdenamiento): void {
   try {
     if (orden.criterioActivo === null) {
-      localStorage.removeItem(STORAGE_KEY)
+      localStorage.removeItem(STORAGE_KEY);
     } else {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(orden))
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(orden));
     }
   } catch {
     // localStorage puede estar bloqueado (modo privado estricto, Safari, etc.)
@@ -36,14 +31,14 @@ function guardarOrden(orden: EstadoOrdenamiento): void {
 // ── Hook ──────────────────────────────────────────────────────────────────────
 
 interface UseOrdenamientoProps {
-  inmuebles: Inmueble[]
-  ordenInicial?: EstadoOrdenamiento
+  inmuebles: PropertyMapPin[];
+  ordenInicial?: EstadoOrdenamiento;
 }
 
 interface UseOrdenamientoResult {
-  ordenActual: EstadoOrdenamiento
-  cambiarOrden: (nuevoOrden: EstadoOrdenamiento) => void
-  inmueblesOrdenados: Inmueble[]
+  ordenActual: EstadoOrdenamiento;
+  cambiarOrden: (nuevoOrden: EstadoOrdenamiento) => void;
+  inmueblesOrdenados: PropertyMapPin[];
 }
 
 /**
@@ -57,25 +52,45 @@ interface UseOrdenamientoResult {
  */
 export const useOrdenamiento = ({
   inmuebles,
-  ordenInicial
+  ordenInicial,
 }: UseOrdenamientoProps): UseOrdenamientoResult => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [ordenActual, setOrdenActual] = useState<EstadoOrdenamiento>(() => {
-    // Prioridad: ordenInicial (si se pasó explícitamente) → localStorage → default
-    return ordenInicial ?? cargarOrdenGuardado()
-  })
+    return ordenInicial ?? cargarOrdenGuardado();
+  });
 
-  // Persistir cada vez que el orden cambia
   useEffect(() => {
-    guardarOrden(ordenActual)
-  }, [ordenActual])
+    guardarOrden(ordenActual);
+  }, [ordenActual]);
 
-  const cambiarOrden = useCallback((nuevoOrden: EstadoOrdenamiento) => {
-    setOrdenActual(nuevoOrden)
-  }, [])
+  const cambiarOrden = useCallback(
+    (nuevoOrden: EstadoOrdenamiento) => {
+      setOrdenActual(nuevoOrden);
+      // Sincronización con la URL para que el Backend ordene
+      const params = new URLSearchParams(searchParams.toString());
 
-  const inmueblesOrdenados = useMemo(() => {
-    return ordenarInmuebles(inmuebles, ordenActual)
-  }, [inmuebles, ordenActual])
+      params.delete("precio");
+      params.delete("superficie");
+      params.delete("fecha");
 
-  return { ordenActual, cambiarOrden, inmueblesOrdenados }
-}
+      if (nuevoOrden.criterioActivo === "precio") {
+        params.set("precio", nuevoOrden.precio);
+      } else if (nuevoOrden.criterioActivo === "superficie") {
+        params.set("superficie", nuevoOrden.superficie);
+      } else if (nuevoOrden.criterioActivo === "fecha") {
+        params.set("fecha", nuevoOrden.fecha);
+      }
+
+      router.push(`?${params.toString()}`, { scroll: false });
+    },
+    [router, searchParams],
+  );
+
+  return {
+    ordenActual,
+    cambiarOrden,
+    inmueblesOrdenados: inmuebles, // Prisma ya los devuelve ordenados
+  };
+};

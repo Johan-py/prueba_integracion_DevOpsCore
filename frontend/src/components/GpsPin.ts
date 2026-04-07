@@ -1,8 +1,8 @@
-import L from 'leaflet'
+import L from "leaflet";
 
 export function createGpsIcon(): L.DivIcon {
   return L.divIcon({
-    className: '',
+    className: "",
     html: `
       <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
         <div style="
@@ -40,6 +40,6 @@ export function createGpsIcon(): L.DivIcon {
     `,
     iconSize: [48, 72],
     iconAnchor: [24, 72],
-    popupAnchor: [0, -74]
-  })
+    popupAnchor: [0, -74],
+  });
 }

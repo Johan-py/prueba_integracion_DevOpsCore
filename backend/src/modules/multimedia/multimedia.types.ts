@@ -1,46 +1,46 @@
-export type MultimediaType = 'IMAGEN' | 'VIDEO'
+export type MultimediaType = "IMAGEN" | "VIDEO";
 
 export interface MultimediaRecord {
-  id: number
-  publicacionId: number
-  tipo: MultimediaType
-  url: string
-  pesoMb: number | null
+  id: number;
+  publicacionId: number;
+  tipo: MultimediaType;
+  url: string;
+  pesoMb: number | null;
 }
 
 export interface PublicacionRecord {
-  id: number
-  usuarioId: number
-  titulo: string
+  id: number;
+  usuarioId: number;
+  titulo: string;
 }
 
 export interface GetPublicationMultimediaInput {
-  publicacionId: number
-  usuarioId: number
+  publicacionId: number;
+  usuarioId: number;
 }
 
 export interface RegisterVideoLinkInput {
-  publicacionId: number
-  usuarioId: number
-  videoUrl: string
+  publicacionId: number;
+  usuarioId: number;
+  videoUrl: string;
 }
 
 export interface ImageUploadItemInput {
-  url: string
-  extension: string
-  pesoMb: number
+  url: string;
+  extension: string;
+  pesoMb: number;
 }
 
 export interface RegisterImagesInput {
-  publicacionId: number
-  usuarioId: number
-  images: ImageUploadItemInput[]
+  publicacionId: number;
+  usuarioId: number;
+  images: ImageUploadItemInput[];
 }
 
 export interface RegisterVideoLinkBody {
-  videoUrl: string
+  videoUrl: string;
 }
 
 export interface RegisterImagesBody {
-  images: ImageUploadItemInput[]
+  images: ImageUploadItemInput[];
 }

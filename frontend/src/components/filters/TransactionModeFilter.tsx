@@ -1,25 +1,25 @@
-'use client'
+"use client";
 
 interface TransactionModeFilterProps {
-  modoSeleccionado: string[]
-  onModoChange: (modo: string[]) => void
+  modoSeleccionado: string[];
+  onModoChange: (modo: string[]) => void;
 }
 
 export default function TransactionModeFilter({
   modoSeleccionado,
-  onModoChange
+  onModoChange,
 }: TransactionModeFilterProps) {
   const modos = [
-    { id: 'VENTA', label: 'Venta' },
-    { id: 'ALQUILER', label: 'Alquiler' },
-    { id: 'ANTICRETO', label: 'Anticrético' }
-  ]
+    { id: "VENTA", label: "Venta" },
+    { id: "ALQUILER", label: "Alquiler" },
+    { id: "ANTICRETO", label: "Anticrético" },
+  ];
   const handleToggle = (id: string) => {
     const nuevos = modoSeleccionado.includes(id)
       ? modoSeleccionado.filter((m) => m !== id)
-      : [...modoSeleccionado, id]
-    onModoChange(nuevos)
-  }
+      : [...modoSeleccionado, id];
+    onModoChange(nuevos);
+  };
 
   return (
     <div className="flex gap-16">
@@ -36,17 +36,17 @@ export default function TransactionModeFilter({
               checked={modoSeleccionado.includes(modo.id)}
               onChange={() => {
                 if (modoSeleccionado.includes(modo.id)) {
-                  onModoChange(modoSeleccionado.filter((id) => id !== modo.id))
+                  onModoChange(modoSeleccionado.filter((id) => id !== modo.id));
                 } else {
-                  onModoChange([...modoSeleccionado, modo.id])
+                  onModoChange([...modoSeleccionado, modo.id]);
                 }
               }}
               className={`
                 w-[35px] h-[23px] rounded border cursor-pointer appearance-none
                 ${
                   modoSeleccionado.includes(modo.id)
-                    ? 'bg-[#d97706] border-[#d97706]'
-                    : 'bg-white border-gray-400'
+                    ? "bg-[#d97706] border-[#d97706]"
+                    : "bg-white border-gray-400"
                 }
               `}
             />
@@ -68,5 +68,5 @@ export default function TransactionModeFilter({
         </label>
       ))}
     </div>
-  )
+  );
 }

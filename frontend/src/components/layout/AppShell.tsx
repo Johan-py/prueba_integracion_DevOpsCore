@@ -1,35 +1,35 @@
-'use client'
+"use client";
 
-import { usePathname } from 'next/navigation'
-import { useState, useCallback, useEffect } from 'react'
-import Navbar from '@/components/layout/Navbar'
-import Footer from '@/components/layout/Footer'
-import RegisterSuccessToast from '@/components/layout/RegisterSuccessToast'
-import { useInactivityLogout } from '@/hooks/useInactivityLogout'
+import { usePathname } from "next/navigation";
+import { useState, useCallback, useEffect } from "react";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
+import RegisterSuccessToast from "@/components/layout/RegisterSuccessToast";
+import { useInactivityLogout } from "@/hooks/useInactivityLogout";
 
-const AUTH_ROUTES = ['/sign-in', '/sign-up']
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000'
-const USER_STORAGE_KEY = 'propbol_user'
-const SESSION_EXPIRES_KEY = 'propbol_session_expires'
-const TOKEN_STORAGE_KEY = 'token'
+const AUTH_ROUTES = ["/sign-in", "/sign-up"];
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
+const USER_STORAGE_KEY = "propbol_user";
+const SESSION_EXPIRES_KEY = "propbol_session_expires";
+const TOKEN_STORAGE_KEY = "token";
 
 function SessionManager() {
-  const [showWarning, setShowWarning] = useState(false)
+  const [showWarning, setShowWarning] = useState(false);
 
   const handleWarning = useCallback(() => {
-    setShowWarning(true)
-  }, [])
+    setShowWarning(true);
+  }, []);
 
   const handleLogout = useCallback(() => {
-    setShowWarning(false)
-  }, [])
+    setShowWarning(false);
+  }, []);
 
   const { resetInactivityTimer } = useInactivityLogout({
     onWarning: handleWarning,
-    onLogout: handleLogout
-  })
+    onLogout: handleLogout,
+  });
 
-  if (!showWarning) return null
+  if (!showWarning) return null;
 
   return (
     <div className="fixed bottom-4 right-4 z-50 max-w-sm rounded-lg border border-orange-200 bg-white p-4 shadow-lg">
@@ -39,85 +39,85 @@ function SessionManager() {
 
       <button
         onClick={() => {
-          setShowWarning(false)
-          resetInactivityTimer()
+          setShowWarning(false);
+          resetInactivityTimer();
         }}
         className="mt-2 text-xs font-semibold text-orange-500 hover:underline"
       >
         Seguir conectado
       </button>
     </div>
-  )
+  );
 }
 
 const clearSession = () => {
-  localStorage.removeItem(USER_STORAGE_KEY)
-  localStorage.removeItem(SESSION_EXPIRES_KEY)
-  localStorage.removeItem(TOKEN_STORAGE_KEY)
-}
+  localStorage.removeItem(USER_STORAGE_KEY);
+  localStorage.removeItem(SESSION_EXPIRES_KEY);
+  localStorage.removeItem(TOKEN_STORAGE_KEY);
+};
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname()
-  const isAuthRoute = AUTH_ROUTES.includes(pathname)
+  const pathname = usePathname();
+  const isAuthRoute = AUTH_ROUTES.includes(pathname);
 
   useEffect(() => {
     const validateSession = async () => {
-      const token = localStorage.getItem(TOKEN_STORAGE_KEY)
-      const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY)
+      const token = localStorage.getItem(TOKEN_STORAGE_KEY);
+      const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY);
 
       if (!token || !expiresAt) {
-        clearSession()
-        window.dispatchEvent(new Event('propbol:session-changed'))
-        return
+        clearSession();
+        window.dispatchEvent(new Event("propbol:session-changed"));
+        return;
       }
 
       if (Date.now() > Number(expiresAt)) {
-        clearSession()
-        window.dispatchEvent(new Event('propbol:session-changed'))
-        return
+        clearSession();
+        window.dispatchEvent(new Event("propbol:session-changed"));
+        return;
       }
 
       try {
         const response = await fetch(`${API_URL}/api/auth/me`, {
-          method: 'GET',
+          method: "GET",
           headers: {
-            authorization: `Bearer ${token}`
-          }
-        })
+            authorization: `Bearer ${token}`,
+          },
+        });
 
         if (!response.ok) {
-          clearSession()
-          window.dispatchEvent(new Event('propbol:session-changed'))
-          return
+          clearSession();
+          window.dispatchEvent(new Event("propbol:session-changed"));
+          return;
         }
 
-        const data = await response.json()
+        const data = await response.json();
 
         const userName =
           data.user?.nombre && data.user?.apellido
             ? `${data.user.nombre} ${data.user.apellido}`
-            : (data.user?.correo ?? '')
+            : (data.user?.correo ?? "");
 
         localStorage.setItem(
           USER_STORAGE_KEY,
           JSON.stringify({
             name: userName,
-            email: data.user?.correo ?? ''
-          })
-        )
+            email: data.user?.correo ?? "",
+          }),
+        );
 
-        window.dispatchEvent(new Event('propbol:session-changed'))
+        window.dispatchEvent(new Event("propbol:session-changed"));
       } catch {
-        clearSession()
-        window.dispatchEvent(new Event('propbol:session-changed'))
+        clearSession();
+        window.dispatchEvent(new Event("propbol:session-changed"));
       }
-    }
+    };
 
-    validateSession()
-  }, [pathname, API_URL])
+    validateSession();
+  }, [pathname, API_URL]);
 
   if (isAuthRoute) {
-    return <>{children}</>
+    return <>{children}</>;
   }
 
   return (
@@ -128,5 +128,5 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       <main className="flex-grow">{children}</main>
       <Footer />
     </>
-  )
+  );
 }

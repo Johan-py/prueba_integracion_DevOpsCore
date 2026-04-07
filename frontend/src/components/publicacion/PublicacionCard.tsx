@@ -1,15 +1,15 @@
-'use client'
+"use client";
 
-import { Bath, BedDouble, MapPin, Square } from 'lucide-react'
-import { useDeletePublicacion } from '@/hooks/useDeletePublicacion'
-import type { MisPublicacionesItem } from '@/types/publicacion'
-import ConfirmDeleteModal from './ConfirmDeleteModal'
-import DeleteSuccessModal from './DeleteSuccessModal'
-import DeleteErrorModal from './DeleteErrorModal'
+import { Bath, BedDouble, MapPin, Square } from "lucide-react";
+import { useDeletePublicacion } from "@/hooks/useDeletePublicacion";
+import type { MisPublicacionesItem } from "@/types/publicacion";
+import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import DeleteSuccessModal from "./DeleteSuccessModal";
+import DeleteErrorModal from "./DeleteErrorModal";
 
 interface Props {
-  publicacion: MisPublicacionesItem
-  onDeleted: (id: number) => void
+  publicacion: MisPublicacionesItem;
+  onDeleted: (id: number) => void;
 }
 
 export default function PublicacionCard({ publicacion, onDeleted }: Props) {
@@ -24,19 +24,19 @@ export default function PublicacionCard({ publicacion, onDeleted }: Props) {
     cerrarExito,
     cerrarError,
     confirmarEliminacion,
-  } = useDeletePublicacion(publicacion.id, () => onDeleted(publicacion.id))
+  } = useDeletePublicacion(publicacion.id, () => onDeleted(publicacion.id));
 
-  const precioFormateado = `$${publicacion.precio.toLocaleString()}`
+  const precioFormateado = `$${publicacion.precio.toLocaleString()}`;
   const areaFormateada = publicacion.superficieM2
     ? `${publicacion.superficieM2}m²`
-    : '-'
+    : "-";
 
   return (
     <>
       <div className="overflow-hidden rounded-2xl border border-[#e6ddd1] bg-[#F9F6EE] shadow-sm transition-shadow hover:shadow-md">
         <div className="overflow-hidden">
           <img
-            src={publicacion.imagenUrl || '/placeholder-house.jpg'}
+            src={publicacion.imagenUrl || "/placeholder-house.jpg"}
             alt={publicacion.titulo}
             className="h-40 w-full object-cover sm:h-44"
           />
@@ -64,14 +64,14 @@ export default function PublicacionCard({ publicacion, onDeleted }: Props) {
             <div className="flex items-center justify-center gap-2 border-r border-[#ddd4c8] px-2">
               <Bath className="h-4 w-4 shrink-0 text-[#e6a04b]" />
               <span className="text-[14px] text-[#444]">
-                {publicacion.nroBanos ?? '-'}
+                {publicacion.nroBanos ?? "-"}
               </span>
             </div>
 
             <div className="flex items-center justify-center gap-2 border-r border-[#ddd4c8] px-2">
               <BedDouble className="h-4 w-4 shrink-0 text-[#e6a04b]" />
               <span className="text-[14px] text-[#444]">
-                {publicacion.nroCuartos ?? '-'}
+                {publicacion.nroCuartos ?? "-"}
               </span>
             </div>
 
@@ -103,16 +103,15 @@ export default function PublicacionCard({ publicacion, onDeleted }: Props) {
         loading={loading}
       />
 
-      <DeleteSuccessModal
-        abierto={modalExitoAbierto}
-        onAceptar={cerrarExito}
-      />
+      <DeleteSuccessModal abierto={modalExitoAbierto} onAceptar={cerrarExito} />
 
       <DeleteErrorModal
         abierto={modalErrorAbierto}
-        mensaje={error || 'No se puede eliminar la publicación, intente nuevamente'}
+        mensaje={
+          error || "No se puede eliminar la publicación, intente nuevamente"
+        }
         onAceptar={cerrarError}
       />
     </>
-  )
+  );
 }

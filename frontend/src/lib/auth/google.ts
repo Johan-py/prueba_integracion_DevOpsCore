@@ -1,198 +1,209 @@
 export type GoogleSignupPrefill = {
-  email: string
-  firstName: string
-  lastName: string
-  fullName?: string
-}
+  email: string;
+  firstName: string;
+  lastName: string;
+  fullName?: string;
+};
 
-export type GoogleSignupMissingField = 'email' | 'firstName' | 'lastName'
+export type GoogleSignupMissingField = "email" | "firstName" | "lastName";
 
-const GOOGLE_SIGNUP_PREFILL_KEY = 'propbol_google_signup_prefill'
+const GOOGLE_SIGNUP_PREFILL_KEY = "propbol_google_signup_prefill";
 
 type GoogleCredentialPayload = {
-  email?: string
-  name?: string
-  given_name?: string
-  family_name?: string
-}
+  email?: string;
+  name?: string;
+  given_name?: string;
+  family_name?: string;
+};
 
 function decodeBase64Url(value: string): string | null {
   try {
-    const normalized = value.replace(/-/g, '+').replace(/_/g, '/')
-    const padding = normalized.length % 4 === 0 ? '' : '='.repeat(4 - (normalized.length % 4))
+    const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
+    const padding =
+      normalized.length % 4 === 0
+        ? ""
+        : "=".repeat(4 - (normalized.length % 4));
 
-    const decoded = atob(normalized + padding)
+    const decoded = atob(normalized + padding);
 
     return decodeURIComponent(
       Array.from(decoded)
-        .map((char) => `%${char.charCodeAt(0).toString(16).padStart(2, '0')}`)
-        .join('')
-    )
+        .map((char) => `%${char.charCodeAt(0).toString(16).padStart(2, "0")}`)
+        .join(""),
+    );
   } catch {
-    return null
+    return null;
   }
 }
 
 function splitFullName(fullName: string): {
-  firstName: string
-  lastName: string
+  firstName: string;
+  lastName: string;
 } {
-  const trimmed = fullName.trim()
+  const trimmed = fullName.trim();
 
   if (!trimmed) {
     return {
-      firstName: '',
-      lastName: ''
-    }
+      firstName: "",
+      lastName: "",
+    };
   }
 
-  const parts = trimmed.split(/\s+/)
+  const parts = trimmed.split(/\s+/);
 
   if (parts.length === 1) {
     return {
       firstName: parts[0],
-      lastName: ''
-    }
+      lastName: "",
+    };
   }
 
   return {
     firstName: parts[0],
-    lastName: parts.slice(1).join(' ')
-  }
+    lastName: parts.slice(1).join(" "),
+  };
 }
 
-export function extractGooglePrefillFromCredential(credential: string): GoogleSignupPrefill | null {
+export function extractGooglePrefillFromCredential(
+  credential: string,
+): GoogleSignupPrefill | null {
   if (!credential) {
-    return null
+    return null;
   }
 
-  const parts = credential.split('.')
+  const parts = credential.split(".");
 
   if (parts.length < 2) {
-    return null
+    return null;
   }
 
-  const payloadJson = decodeBase64Url(parts[1])
+  const payloadJson = decodeBase64Url(parts[1]);
 
   if (!payloadJson) {
-    return null
+    return null;
   }
 
   try {
-    const payload = JSON.parse(payloadJson) as GoogleCredentialPayload
-    const fallbackNames = splitFullName(payload.name ?? '')
+    const payload = JSON.parse(payloadJson) as GoogleCredentialPayload;
+    const fallbackNames = splitFullName(payload.name ?? "");
 
-    const email = payload.email?.trim() ?? ''
-    const firstName = payload.given_name?.trim() || fallbackNames.firstName
-    const lastName = payload.family_name?.trim() || fallbackNames.lastName
+    const email = payload.email?.trim() ?? "";
+    const firstName = payload.given_name?.trim() || fallbackNames.firstName;
+    const lastName = payload.family_name?.trim() || fallbackNames.lastName;
 
     if (!email && !firstName && !lastName) {
-      return null
+      return null;
     }
 
     return {
       email,
       firstName,
       lastName,
-      fullName: payload.name?.trim() || [firstName, lastName].filter(Boolean).join(' ').trim()
-    }
+      fullName:
+        payload.name?.trim() ||
+        [firstName, lastName].filter(Boolean).join(" ").trim(),
+    };
   } catch {
-    return null
+    return null;
   }
 }
 
-export function saveGoogleSignupPrefill(data: Partial<GoogleSignupPrefill>): void {
-  if (typeof window === 'undefined') {
-    return
+export function saveGoogleSignupPrefill(
+  data: Partial<GoogleSignupPrefill>,
+): void {
+  if (typeof window === "undefined") {
+    return;
   }
 
-  sessionStorage.setItem(GOOGLE_SIGNUP_PREFILL_KEY, JSON.stringify(data))
+  sessionStorage.setItem(GOOGLE_SIGNUP_PREFILL_KEY, JSON.stringify(data));
 }
 
 export function consumeGoogleSignupPrefill(): Partial<GoogleSignupPrefill> | null {
-  if (typeof window === 'undefined') {
-    return null
+  if (typeof window === "undefined") {
+    return null;
   }
 
-  const rawValue = sessionStorage.getItem(GOOGLE_SIGNUP_PREFILL_KEY)
+  const rawValue = sessionStorage.getItem(GOOGLE_SIGNUP_PREFILL_KEY);
 
   if (!rawValue) {
-    return null
+    return null;
   }
 
-  sessionStorage.removeItem(GOOGLE_SIGNUP_PREFILL_KEY)
+  sessionStorage.removeItem(GOOGLE_SIGNUP_PREFILL_KEY);
 
   try {
-    return JSON.parse(rawValue) as Partial<GoogleSignupPrefill>
+    return JSON.parse(rawValue) as Partial<GoogleSignupPrefill>;
   } catch {
-    return null
+    return null;
   }
 }
 
 export function buildGoogleSignupPrefillFromSearchParams(
-  searchParams: URLSearchParams
+  searchParams: URLSearchParams,
 ): Partial<GoogleSignupPrefill> | null {
-  const email = searchParams.get('email')?.trim() ?? ''
-  const firstName = searchParams.get('firstName')?.trim() ?? ''
-  const lastName = searchParams.get('lastName')?.trim() ?? ''
-  const fullName = searchParams.get('name')?.trim() ?? ''
+  const email = searchParams.get("email")?.trim() ?? "";
+  const firstName = searchParams.get("firstName")?.trim() ?? "";
+  const lastName = searchParams.get("lastName")?.trim() ?? "";
+  const fullName = searchParams.get("name")?.trim() ?? "";
 
-  const fallbackNames = splitFullName(fullName)
+  const fallbackNames = splitFullName(fullName);
 
-  const resolvedFirstName = firstName || fallbackNames.firstName
-  const resolvedLastName = lastName || fallbackNames.lastName
+  const resolvedFirstName = firstName || fallbackNames.firstName;
+  const resolvedLastName = lastName || fallbackNames.lastName;
 
   if (!email && !resolvedFirstName && !resolvedLastName && !fullName) {
-    return null
+    return null;
   }
 
   return {
     email,
     firstName: resolvedFirstName,
     lastName: resolvedLastName,
-    fullName
-  }
+    fullName,
+  };
 }
 
 export function getMissingGoogleSignupFields(
-  data: Partial<GoogleSignupPrefill> | null | undefined
+  data: Partial<GoogleSignupPrefill> | null | undefined,
 ): GoogleSignupMissingField[] {
   if (!data) {
-    return []
+    return [];
   }
 
-  const missingFields: GoogleSignupMissingField[] = []
+  const missingFields: GoogleSignupMissingField[] = [];
 
   if (!data.email?.trim()) {
-    missingFields.push('email')
+    missingFields.push("email");
   }
 
   if (!data.firstName?.trim()) {
-    missingFields.push('firstName')
+    missingFields.push("firstName");
   }
 
   if (!data.lastName?.trim()) {
-    missingFields.push('lastName')
+    missingFields.push("lastName");
   }
 
-  return missingFields
+  return missingFields;
 }
 
-export function extractGooglePrefillValidationFromCredential(credential: string): {
-  prefill: GoogleSignupPrefill | null
-  missingFields: GoogleSignupMissingField[]
+export function extractGooglePrefillValidationFromCredential(
+  credential: string,
+): {
+  prefill: GoogleSignupPrefill | null;
+  missingFields: GoogleSignupMissingField[];
 } {
-  const prefill = extractGooglePrefillFromCredential(credential)
+  const prefill = extractGooglePrefillFromCredential(credential);
 
   if (!prefill) {
     return {
       prefill: null,
-      missingFields: []
-    }
+      missingFields: [],
+    };
   }
 
   return {
     prefill,
-    missingFields: getMissingGoogleSignupFields(prefill)
-  }
+    missingFields: getMissingGoogleSignupFields(prefill),
+  };
 }
