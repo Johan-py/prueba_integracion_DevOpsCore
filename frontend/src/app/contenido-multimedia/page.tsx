@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import FotosSection from "@/components/contenido-multimedia/FotosSection";
 import VideosSection from "@/components/contenido-multimedia/VideosSection";
 import PublicarSection from "@/components/contenido-multimedia/PublicarSection";
@@ -34,6 +34,7 @@ export default function ContenidoMultimediaPage() {
 }
 
 function ContenidoMultimediaPageContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const publicacionId = Number(searchParams.get("publicacionId"));
 
@@ -272,6 +273,8 @@ function ContenidoMultimediaPageContent() {
       return;
     }
 
+    // Aquí luego irá tu llamada real al backend
+    // Si todo sale bien, abrimos el modal de éxito
     setShowSuccessModal(true);
   };
 
@@ -343,7 +346,10 @@ function ContenidoMultimediaPageContent() {
 
         <SuccessModal
           open={showSuccessModal}
-          onClose={() => setShowSuccessModal(false)}
+          onClose={() => {
+            setShowSuccessModal(false);
+            router.push("/");
+          }}
         />
 
         <PlanModal
