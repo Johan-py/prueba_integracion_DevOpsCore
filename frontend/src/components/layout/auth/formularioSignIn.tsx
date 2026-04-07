@@ -373,6 +373,7 @@ export default function LoginForm() {
           <input
             type="email"
             required
+            autoFocus
             placeholder="Ingresa tu correo electrónico"
             value={correo}
             onChange={(e) => {
@@ -403,6 +404,7 @@ export default function LoginForm() {
                 setPassword(e.target.value);
                 validate("password", e.target.value);
               }}
+              onBlur={() => setShowPassword(false)}
               className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 text-sm outline-none focus:border-orange-500"
             />
 
