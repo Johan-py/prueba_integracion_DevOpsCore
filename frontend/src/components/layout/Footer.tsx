@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { Facebook, Instagram } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -12,9 +12,21 @@ type FooterAction = {
 };
 
 const exploreActions: FooterAction[] = [
-  { label: "Comprar Propiedad", href: "/busqueda_mapa?modoInmueble=VENTA" },
-  { label: "Alquilar Inmueble", href: "/busqueda_mapa?modoInmueble=ALQUILER" },
-  { label: "Anticrético", href: "/busqueda_mapa?modoInmueble=ANTICRETO" },
+  {
+    label: "En venta",
+    href: "/busqueda_mapa?modoInmueble=VENTA",
+    requiresAuth: true,
+  },
+  {
+    label: "Alquileres",
+    href: "/busqueda_mapa?modoInmueble=ALQUILER",
+    requiresAuth: true,
+  },
+  {
+    label: "Anticrético",
+    href: "/busqueda_mapa?modoInmueble=ANTICRETO",
+    requiresAuth: true,
+  },
   { label: "Publica tu inmueble", href: "/registro-inmueble", requiresAuth: true },
 ];
 
@@ -70,17 +82,14 @@ function FooterBrand() {
             scrollToHomeTop();
           }
         }}
-        className="inline-flex items-center gap-3 transition-colors hover:text-amber-600"
+        className="flex items-center gap-2 p-1 text-xl font-bold text-black transition hover:opacity-80"
       >
-        <Image
-          src="/icons/temp-icon.svg"
-          alt="Logo temporal de PropBol"
-          width={44}
-          height={44}
-        />
-        <span className="text-2xl font-bold text-stone-900">PropBol</span>
+        <div className="h-8 w-8 rounded-sm bg-black" aria-hidden="true" />
+        <span>
+          Prop<span className="text-[#E68B25]">Bol</span>
+        </span>
       </Link>
-      <p className="mt-4 max-w-xs text-sm leading-8 text-stone-600">
+      <p className="mt-4 max-w-xs text-sm leading-7 text-stone-600">
         Revolucionando el mercado inmobiliario con tecnología de punta y diseño
         centrado en el usuario.
       </p>
@@ -161,17 +170,35 @@ function FooterSection({
 function FooterBottomBar() {
   return (
     <div className="border-t border-stone-200">
-      <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-5 text-sm text-stone-600 sm:flex-row sm:flex-wrap sm:items-center sm:px-8 lg:px-10">
-        <span
-          className="h-4 w-4 rounded-md border border-stone-400"
-          aria-hidden="true"
-        />
-        <span>2026 PropBol Inmobiliaria.</span>
-        <span
-          className="hidden h-1 w-1 rounded-full bg-stone-300 sm:block"
-          aria-hidden="true"
-        />
-        <span>Todos los derechos reservados</span>
+      <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-5 text-sm text-stone-600 sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:px-10">
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+          <span className="h-4 w-4 rounded-sm bg-black" aria-hidden="true" />
+          <span>2026 PropBol Inmobiliaria.</span>
+          <span
+            className="hidden h-1 w-1 rounded-full bg-stone-300 sm:block"
+            aria-hidden="true"
+          />
+          <span>Todos los derechos reservados</span>
+        </div>
+
+        <div className="flex items-center gap-3 text-stone-700">
+          {socialActions.map((action) => {
+            const Icon = action.label === "Instagram" ? Instagram : Facebook;
+
+            return (
+              <a
+                key={action.label}
+                href={action.href}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={action.label}
+                className="transition-colors hover:text-amber-600"
+              >
+                <Icon size={18} strokeWidth={2} />
+              </a>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
