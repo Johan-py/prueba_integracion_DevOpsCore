@@ -1,6 +1,6 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { verifyAuth } from "../../src/middleware/auth.middleware.js";
-import { getMeService } from "../../src/modules/auth/auth.service.js";
+import type { VercelRequest, VercelResponse } from '@vercel/node'
+import { verifyAuth } from '../../middleware/auth.middleware.js'
+import { getMeService } from '../../modules/auth/auth.service.js'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "GET") {

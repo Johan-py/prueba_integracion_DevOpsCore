@@ -1,5 +1,5 @@
-import { $Enums, Prisma } from "@prisma/client";
-import { prisma } from "../../db";
+import { $Enums } from '@prisma/client'
+import { prisma } from '../../lib/prisma.config.js'
 
 export class FiltersHomepageRepository {
   async getCountsByCity(tipoAccion: $Enums.TipoAccion) {

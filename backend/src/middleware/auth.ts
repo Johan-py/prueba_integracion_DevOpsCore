@@ -1,28 +1,9 @@
-import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
+import type { Request, Response, NextFunction } from 'express'
+import jwt from 'jsonwebtoken'
 
-interface UserPayload {
-  id: number;
-  correo: string;
-  iat?: number;
-  exp?: number;
-}
-
-declare global {
-  namespace Express {
-    interface Request {
-      user?: UserPayload;
-    }
-  }
-}
-
-export function verificarToken(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
-  const authHeader = req.headers.authorization;
-  const token = authHeader && authHeader.split(" ")[1];
+export function verificarToken(req: Request, res: Response, next: NextFunction) {
+  const authHeader = req.headers.authorization
+  const token = authHeader && authHeader.split(' ')[1]
 
   if (!token) {
     return res.status(401).json({
@@ -32,10 +13,15 @@ export function verificarToken(
   }
 
   try {
-    const secret = process.env.JWT_SECRET || "mi-secreto-temporal";
-    const decoded = jwt.verify(token, secret) as UserPayload;
-    req.user = decoded;
-    next();
+    const secret = process.env.JWT_SECRET || 'mi-secreto-temporal'
+    const decoded = jwt.verify(token, secret) as any
+
+    req.user = {
+      id: decoded.id,
+      correo: decoded.correo
+    }
+
+    next()
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
       return res.status(403).json({

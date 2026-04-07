@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "bun --hot src/index.ts",
+    "dev": "NODE_ENV=development bun --hot src/index.ts",
     "build": "tsc",
     "lint": "eslint . --quiet",
     "postinstall": "prisma generate --schema=./prisma/schema.prisma"
