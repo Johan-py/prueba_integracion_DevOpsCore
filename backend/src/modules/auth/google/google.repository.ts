@@ -1,4 +1,4 @@
-import { createSession, findUserByCorreo } from "../auth.repository.js";
+import { createSession, findUserByCorreo } from "../auth.repository.ts";
 
 export const findUserByGoogleEmail = async (correo: string) => {
   return await findUserByCorreo(correo);

@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express'
-import { obtenerConsumo } from '../services/consumo.service.js'
+import { obtenerConsumo } from '../services/consumo.service.ts'
 
 export const getConsumo = async (req: Request, res: Response) => {
   try {

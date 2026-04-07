@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
-import { env } from "../../../config/env.js";
-import { loginWithGoogleCodeService } from "./google.service.js";
-import { GoogleAuthError } from "./google.types.js";
+import { env } from "../../../config/env.ts";
+import { loginWithGoogleCodeService } from "./google.service.ts";
+import { GoogleAuthError } from "./google.types.ts";
 
 const buildGoogleAuthUrl = () => {
   return (

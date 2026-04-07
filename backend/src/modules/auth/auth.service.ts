@@ -1,9 +1,9 @@
 import crypto from "node:crypto";
 import jwt from "jsonwebtoken";
 
-import { env } from "../../config/env.js";
-import { enviarCodigoRegistro } from "../../lib/email.service.js";
-import { generateToken, type JwtPayload } from "../../utils/jwt.js";
+import { env } from "../../config/env.ts";
+import { enviarCodigoRegistro } from "../../lib/email.service.ts";
+import { generateToken, type JwtPayload } from "../../utils/jwt.ts";
 import {
   createSession,
   createUser,
@@ -11,7 +11,7 @@ import {
   findActiveSessionByToken,
   findUser,
   findUserByCorreo,
-} from "./auth.repository.js";
+} from "./auth.repository.ts";
 
 type LoginDTO = {
   correo: string;

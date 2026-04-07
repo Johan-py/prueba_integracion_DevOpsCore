@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { getConsumo } from '../controllers/consumo.controllers.js'
-import { getPlanLimit } from '../controllers/planController.js'; 
+import { getConsumo } from '../controllers/consumo.controllers.ts'
+import { getPlanLimit } from '../controllers/planController.ts'; 
 // import { verifyToken } from '../middleware/auth.middleware.js'
 
 const router = Router();

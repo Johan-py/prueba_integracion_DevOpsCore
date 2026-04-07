@@ -1,5 +1,5 @@
 // backend/src/modules/publicaciones/publicacion.repository.ts
-import { prisma } from '../../lib/prisma.config.js'
+import { prisma } from '../../lib/prisma.config.ts'
 
 const ESTADO_PUBLICACION_ELIMINADA = "ELIMINADA" as const;
 const ESTADO_INMUEBLE_INACTIVO = "INACTIVO" as const;

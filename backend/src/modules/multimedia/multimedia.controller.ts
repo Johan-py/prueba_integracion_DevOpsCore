@@ -3,12 +3,12 @@ import {
   getPublicationMultimediaService,
   registerImagesService,
   registerVideoLinkService,
-} from "./multimedia.service.js";
+} from "./multimedia.service.ts";
 import type {
   ImageUploadItemInput,
   RegisterImagesBody,
   RegisterVideoLinkBody,
-} from "./multimedia.types.js";
+} from "./multimedia.types.ts";
 
 type AuthenticatedRequest = Request & {
   user?: {

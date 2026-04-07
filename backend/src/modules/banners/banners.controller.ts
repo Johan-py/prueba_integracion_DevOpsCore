@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express'
-import { BannersService } from './banners.service.js'
+import { BannersService } from './banners.service.ts'
 
 export class BannersController {
   private service = new BannersService();

@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { verifyAuth } from '../../middleware/auth.middleware.js'
-import { logoutService } from '../../modules/auth/auth.service.js'
+import { verifyAuth } from '../../middleware/auth.middleware.ts'
+import { logoutService } from '../../modules/auth/auth.service.ts'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") {

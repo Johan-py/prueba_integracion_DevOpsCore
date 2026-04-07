@@ -3,10 +3,10 @@ import {
   verificarPassword,
   solicitarCambioEmail,
   confirmarCambioEmail,
-} from "./correoverificacion.controller.js";
+} from "./correoverificacion.controller.ts";
 
 // 🔥 tu nuevo middleware limpio
-import { validarJWT } from "../../middleware/validarJWT.js";
+import { validarJWT } from "../../middleware/validarJWT.ts";
 
 const router = Router();
 

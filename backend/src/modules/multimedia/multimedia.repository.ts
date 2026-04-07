@@ -1,10 +1,10 @@
 import type { TipoMultimedia } from '@prisma/client'
-import { prisma } from '../../lib/prisma.config.js'
+import { prisma } from '../../lib/prisma.config.ts'
 import type {
   MultimediaRecord,
   MultimediaType,
   PublicacionRecord,
-} from "./multimedia.types.js";
+} from "./multimedia.types.ts";
 
 const mapPublicationRecord = (publication: {
   id: number;

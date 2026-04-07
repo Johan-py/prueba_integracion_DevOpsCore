@@ -1,5 +1,5 @@
-import { propertiesRepository } from './properties.repository.js'
-import type { FiltrosBusqueda } from './properties.repository.js'
+import { propertiesRepository } from './properties.repository.ts'
+import type { FiltrosBusqueda } from './properties.repository.ts'
 
 type OrdenFecha = "mas-recientes" | "mas-populares" | "mas-antiguos";
 type OrdenDireccion = "menor-a-mayor" | "mayor-a-menor";

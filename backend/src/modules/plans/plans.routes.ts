@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { verificarToken } from '../../middleware/auth.js'
-import { getPlanes } from './plans.controller.js'
+import { verificarToken } from '../../middleware/auth.ts'
+import { getPlanes } from './plans.controller.ts'
 
 const router = Router();
 

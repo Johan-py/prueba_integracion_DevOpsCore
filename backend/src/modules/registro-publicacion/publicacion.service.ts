@@ -1,4 +1,4 @@
-import { prisma } from '../../lib/prisma.config.js'
+import { prisma } from '../../lib/prisma.config.ts'
 
 const createProperty = async (data: any, userId: number) => {
   const result = await prisma.$transaction(async (tx) => {

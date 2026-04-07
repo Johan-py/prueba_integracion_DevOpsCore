@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { loginService } from '../../modules/auth/auth.service.js'
+import { loginService } from '../../modules/auth/auth.service.ts'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") {

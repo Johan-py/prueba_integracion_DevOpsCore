@@ -1,6 +1,6 @@
 import express from 'express'
 import cors from 'cors'
-import { registerController, loginController } from '../../modules/auth/auth.controller.js'
+import { registerController, loginController } from '../../modules/auth/auth.controller.ts'
 
 const app = express();
 

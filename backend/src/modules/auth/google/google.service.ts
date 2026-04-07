@@ -1,15 +1,15 @@
-import { env } from "../../../config/env.js";
-import { generateToken, type JwtPayload } from "../../../utils/jwt.js";
+import { env } from "../../../config/env.ts";
+import { generateToken, type JwtPayload } from "../../../utils/jwt.ts";
 import {
   createGoogleSession,
   findUserByGoogleEmail,
-} from "./google.repository.js";
+} from "./google.repository.ts";
 import {
   GoogleAuthError,
   type GoogleLoginSuccess,
   type GoogleTokenResponse,
   type GoogleUserInfo,
-} from "./google.types.js";
+} from "./google.types.ts";
 
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const GOOGLE_USERINFO_URL = "https://openidconnect.googleapis.com/v1/userinfo";

@@ -3,8 +3,8 @@ import {
   crearPublicacion,
   listarPublicaciones,
   validarPublicacionesFree,
-} from "../controllers/publicacionesController.js";
-import { authMiddleware } from "../middleware/authMiddleware.js";
+} from "../controllers/publicacionesController.ts";
+import { authMiddleware } from "../middleware/authMiddleware.ts";
 
 const router = Router();
 

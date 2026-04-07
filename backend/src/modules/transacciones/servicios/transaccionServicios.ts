@@ -1,4 +1,4 @@
-import { prisma } from '../../../lib/prisma.config.js'
+import { prisma } from '../../../lib/prisma.config.ts'
 
 // Función auxiliar para redondear a 2 decimales
 function redondearADos(numero: number): number {

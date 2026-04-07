@@ -1,10 +1,10 @@
 // backend/src/modules/publicaciones/publicacion.routes.ts
 import { Router } from "express";
-import { requireAuth } from "../../middleware/auth.middleware.js";
+import { requireAuth } from "../../middleware/auth.middleware.ts";
 import {
   listarMisPublicacionesController,
   eliminarPublicacionController,
-} from "./publicacion.controller.js";
+} from "./publicacion.controller.ts";
 
 const router = Router();
 

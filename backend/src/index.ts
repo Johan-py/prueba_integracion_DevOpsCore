@@ -2,13 +2,13 @@ import path from 'path'
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
-import { env } from './config/env.js'
+import { env } from './config/env.ts'
 import type { Request, Response } from 'express'
 
 // --------------------
 // CONTROLLERS
 // --------------------
-import { propertiesController } from './modules/properties/properties.controller.js'
+import { propertiesController } from './modules/properties/properties.controller.ts'
 import {
   createNotificationController,
   deleteNotificationController,
@@ -16,9 +16,9 @@ import {
   getUnreadCountController,
   markAllNotificationsAsReadController,
   markNotificationAsReadController
-} from './modules/notificaciones/notificaciones.controller.js'
-import { BannersController } from './modules/banners/banners.controller.js'
-import { FiltersHomepageController } from './modules/filtershomepage/filtershomepage.controller.js'
+} from './modules/notificaciones/notificaciones.controller.ts'
+import { BannersController } from './modules/banners/banners.controller.ts'
+import { FiltersHomepageController } from './modules/filtershomepage/filtershomepage.controller.ts'
 
 // --------------------
 // AUTH
@@ -28,42 +28,41 @@ import {
   loginController,
   logoutController,
   verifyRegisterCodeController
-} from './modules/auth/auth.controller.js'
-import { requireAuth } from './middleware/auth.middleware.js'
+} from './modules/auth/auth.controller.ts'
+import { requireAuth } from './middleware/auth.middleware.ts'
 
 // --------------------
 // ROUTES / HANDLERS
 // --------------------
-import locationSearchHandler from './api/locations/search.js'
+import locationSearchHandler from './api/locations/search.ts'
 
-import correoverificacionRoutes from './modules/perfil/correoverificacion.routes.js'
-import perfilRoutes from './modules/perfil/perfil.routes.js'
+import correoverificacionRoutes from './modules/perfil/correoverificacion.routes.ts'
+import perfilRoutes from './modules/perfil/perfil.routes.ts'
 
 import {
   googleCallbackController,
   StratGoogleLoginController
-} from './modules/auth/google/google.controller.js'
+} from './modules/auth/google/google.controller.ts'
 
-import multimediaRoutes from './modules/multimedia/multimedia.routes.js'
-import publicacionRoutes from './modules/publicacion/publicacion.routes.js'
-import router from './modules/registro-publicacion/publicacion.routes.js'
+import multimediaRoutes from './modules/multimedia/multimedia.routes.ts'
+import publicacionRoutes from './modules/publicacion/publicacion.routes.ts'
+import router from './modules/registro-publicacion/publicacion.routes.ts'
 
 // --------------------
 // LEGACY
 // --------------------
-import authRoutes from './routes/auth.routes.js'
-import publicacionesRoutes from './routes/publicaciones.js'
-import { authMiddleware } from './middleware/authMiddleware.js'
+import authRoutes from './routes/auth.routes.ts'
+import publicacionesRoutes from './routes/publicaciones.ts'
+import { authMiddleware } from './middleware/authMiddleware.ts'
 
 // --------------------
 // SERVICES
 // --------------------
-import { verifyNotificationEmailTransport } from './modules/email/notification-email.service.js'
+import { verifyNotificationEmailTransport } from './modules/email/notification-email.service.ts'
 
 // --------------------
 // SERVER
 // --------------------
-import serverless from 'serverless-http'
 const app = express()
 
 // --------------------
@@ -74,21 +73,14 @@ const allowedOrigins = [
   'http://localhost:3000'
 ]
 
-// Configuración de CORS con soporte para preflight en serverless
+// Middleware CORS global
 app.use(cors({
   origin: (origin, callback) => {
-    // Permitir requests sin origin (postman o server-side)
     if (!origin || allowedOrigins.includes(origin)) return callback(null, true)
     return callback(new Error(`CORS policy: Origin not allowed: ${origin}`))
   },
   methods: ["GET","POST","PUT","PATCH","DELETE","OPTIONS"],
   allowedHeaders: ["Content-Type","Authorization"],
-  credentials: true
-}))
-
-// Responder correctamente OPTIONS para preflight
-app.options("*", cors({
-  origin: allowedOrigins,
   credentials: true
 }))
 
@@ -178,22 +170,19 @@ app.post('/api/publicaciones', (req, res) => {
   res.json({ message: 'Publicación creada', publicacion: nuevaPublicacion })
 })
 
-// --------------------
-// LOCAL SERVER (solo para dev)
+
+// --- Dev-only logic ---
 if (process.env.NODE_ENV !== 'production') {
-  const PORT = Number(process.env.PORT) || 5000
-  app.listen(PORT, async () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`)
-    console.log(`Health: http://localhost:${PORT}/health`)
-    try {
-      await verifyNotificationEmailTransport()
-      console.log('✅ Email listo')
-    } catch (error) {
-      console.error('❌ Email error:', error)
-    }
-  })
+  verifyNotificationEmailTransport()
+    .then(() => console.log('✅ Email listo'))
+    .catch(err => console.error('❌ Email error:', err))
 }
 
-// --------------------
-// EXPORT PARA VERCEL
-export default serverless(app)
+// --- Levantar servidor ---
+const PORT = Number(process.env.PORT) || 5000
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`)
+  console.log(`Health check: http://localhost:${PORT}/health`)
+})
+
+export default app

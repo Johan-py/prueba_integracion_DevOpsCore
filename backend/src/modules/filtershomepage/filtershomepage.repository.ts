@@ -1,5 +1,5 @@
 import { $Enums } from '@prisma/client'
-import { prisma } from '../../lib/prisma.config.js'
+import { prisma } from '../../lib/prisma.config.ts'
 
 export class FiltersHomepageRepository {
   async getCountsByCity(tipoAccion: $Enums.TipoAccion) {

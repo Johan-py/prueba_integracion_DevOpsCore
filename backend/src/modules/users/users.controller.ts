@@ -1,4 +1,4 @@
-import { getUsersService, createUserService } from "./users.service.js";
+import { getUsersService, createUserService } from "./users.service.ts";
 type payload = {
   name: string;
 };
