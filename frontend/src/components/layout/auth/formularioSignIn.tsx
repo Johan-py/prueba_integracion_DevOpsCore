@@ -38,6 +38,8 @@ type GooglePopupMessage = GooglePopupSuccessMessage | GooglePopupErrorMessage;
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
 const LOGIN_TIMEOUT_MS = 10000;
 const GOOGLE_LOGIN_TIMEOUT_MS = 2 * 60 * 1000;
+const DEFAULT_POST_LOGIN_REDIRECT = "/";
+const REDIRECT_AFTER_LOGIN_KEY = "redirectAfterLogin";
 
 const NO_CONNECTION_MESSAGE =
   "Sin conexión a internet. Verifica tu red e intenta nuevamente.";
@@ -71,6 +73,20 @@ const saveSession = (token: string, user?: LoginResponse["user"]) => {
 
   window.dispatchEvent(new Event("propbol:login"));
   window.dispatchEvent(new Event("propbol:session-changed"));
+};
+
+const getRedirectAfterLogin = () => {
+  const redirect = localStorage.getItem(REDIRECT_AFTER_LOGIN_KEY);
+
+  if (!redirect || !redirect.startsWith("/")) {
+    return DEFAULT_POST_LOGIN_REDIRECT;
+  }
+
+  return redirect;
+};
+
+const clearRedirectAfterLogin = () => {
+  localStorage.removeItem(REDIRECT_AFTER_LOGIN_KEY);
 };
 
 const isGooglePopupMessage = (value: unknown): value is GooglePopupMessage => {
@@ -114,6 +130,12 @@ export default function LoginForm() {
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [googleError, setGoogleError] = useState("");
+
+  const redirectAfterSuccessfulLogin = () => {
+    const redirect = getRedirectAfterLogin();
+    clearRedirectAfterLogin();
+    router.push(redirect);
+  };
 
   const isFormValid =
     correo.length > 0 &&
@@ -222,7 +244,7 @@ export default function LoginForm() {
         popup.close();
 
         window.setTimeout(() => {
-          router.push("/");
+          redirectAfterSuccessfulLogin();
         }, 1000);
 
         return;
@@ -349,7 +371,7 @@ export default function LoginForm() {
       setSuccessMessage(data.message || "Inicio de sesión exitoso");
 
       window.setTimeout(() => {
-        router.push("/");
+        redirectAfterSuccessfulLogin();
       }, 1000);
     } catch (error) {
       setPassword("");
