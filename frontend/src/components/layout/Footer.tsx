@@ -12,9 +12,9 @@ type FooterAction = {
 };
 
 const exploreActions: FooterAction[] = [
-  { label: "Comprar Propiedad" }, // TODO: users -> '/propiedades/en-venta' | visitors -> '/auth/login'
-  { label: "Alquilar Inmueble" }, // TODO: users -> '/propiedades/alquiler' | visitors -> '/auth/login'
-  { label: "Anticrético" }, // TODO: users -> '/propiedades/anticretico' | visitors -> '/auth/login'
+  { label: "Comprar Propiedad", href: "/busqueda_mapa?modoInmueble=VENTA" },
+  { label: "Alquilar Inmueble", href: "/busqueda_mapa?modoInmueble=ALQUILER" },
+  { label: "Anticrético", href: "/busqueda_mapa?modoInmueble=ANTICRETO" },
   { label: "Publica tu inmueble", href: "/registro-inmueble", requiresAuth: true },
 ];
 
