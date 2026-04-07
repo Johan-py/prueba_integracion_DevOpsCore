@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { verifyRegisterCodeService } from '../../src/modules/auth/auth.service.js'
+import { verifyRegisterCodeService } from '../../src/modules/auth/auth.service'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {

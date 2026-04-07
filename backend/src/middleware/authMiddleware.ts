@@ -1,7 +1,7 @@
 // backend/src/middleware/auth.middleware.ts
 import type { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
-import { env } from '../config/env.js'
+import { env } from '../config/env'
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const token = req.headers['authorization']?.split(' ')[1]

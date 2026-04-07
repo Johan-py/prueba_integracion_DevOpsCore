@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { obtenerConsumo } from '../services/consumo.service.js'
+import { obtenerConsumo } from '../services/consumo.service'
 
 export const getConsumo = async (req: Request, res: Response) => {
   try {

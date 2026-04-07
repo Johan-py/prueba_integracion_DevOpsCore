@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { LocationsService } from '../../src/modules/locations/locations.service.js'
+import { LocationsService } from '../../src/modules/locations/locations.service'
 
 const locationsService = new LocationsService()
 

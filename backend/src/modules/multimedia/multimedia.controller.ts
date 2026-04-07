@@ -3,12 +3,12 @@ import {
   getPublicationMultimediaService,
   registerImagesService,
   registerVideoLinkService
-} from './multimedia.service.js'
+} from './multimedia.service'
 import type {
   ImageUploadItemInput,
   RegisterImagesBody,
   RegisterVideoLinkBody
-} from './multimedia.types.js'
+} from './multimedia.types'
 
 type AuthenticatedRequest = Request & {
   user?: {

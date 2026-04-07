@@ -1,6 +1,6 @@
 // backend/src/modules/publicacion/publicacion.controller.ts
 import { Response } from 'express'
-import { eliminarPublicacionService, listarMisPublicacionesService } from './publicacion.service.js'
+import { eliminarPublicacionService, listarMisPublicacionesService } from './publicacion.service'
 
 // Extiende Request para incluir el usuario autenticado
 import type { Request } from 'express'

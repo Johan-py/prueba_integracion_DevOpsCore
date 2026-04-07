@@ -7,9 +7,9 @@ import {
   markAllNotificationsAsReadRepository,
   markNotificationAsReadRepository,
   softDeleteNotificationRepository
-} from '../notificaciones/notificaciones.repository.js'
-import { findUserById } from '../auth/auth.repository.js'
-import { sendNotificationEmail } from '../email/notification-email.service.js'
+} from '../notificaciones/notificaciones.repository'
+import { findUserById } from '../auth/auth.repository'
+import { sendNotificationEmail } from '../email/notification-email.service'
 
 type NotificationFilter = 'todas' | 'leida' | 'no leida' | 'archivada'
 type SupportedNotificationFilter = Exclude<NotificationFilter, 'archivada'>

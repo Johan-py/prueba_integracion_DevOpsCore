@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { propertiesService } from './properties.service.js'
+import { propertiesService } from './properties.service'
 import { FiltrosBusqueda } from './properties.repository'
 
 export const propertiesController = {

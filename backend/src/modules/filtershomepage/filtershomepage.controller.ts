@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { FiltersHomepageService } from './filtershomepage.service.js'
+import { FiltersHomepageService } from './filtershomepage.service'
 
 export class FiltersHomepageController {
   private service = new FiltersHomepageService()

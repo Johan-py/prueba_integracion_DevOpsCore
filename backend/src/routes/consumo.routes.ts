@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { getConsumo } from '../controllers/consumo.controllers.js'
+import { getConsumo } from '../controllers/consumo.controllers'
 import { getPlanLimit } from '../controllers/planController'; 
 // import { verifyToken } from '../middleware/auth.middleware.js'
 

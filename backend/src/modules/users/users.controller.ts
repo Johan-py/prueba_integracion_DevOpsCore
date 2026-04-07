@@ -1,4 +1,4 @@
-import { getUsersService, createUserService } from './users.service.js'
+import { getUsersService, createUserService } from './users.service'
 type payload = {
   name: string
 }

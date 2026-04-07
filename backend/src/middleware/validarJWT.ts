@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
-import { verifyJwtToken } from '../utils/jwt.js'
-import { findActiveSessionByToken } from '../modules/auth/auth.repository.js'
+import { verifyJwtToken } from '../utils/jwt'
+import { findActiveSessionByToken } from '../modules/auth/auth.repository'
 
 // Extender Request
 export interface AuthRequest extends Request {
