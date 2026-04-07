@@ -18,31 +18,31 @@ export const requireAuth = async (
     return res.status(401).json({ message: 'Token no proporcionado' })
   }
 
-  const token = authHeader.split(' ')[1]
+  const token = authHeader.split(" ")[1];
 
   if (!token) {
     return res.status(401).json({ message: 'Token inválido' })
   }
 
   try {
-    verifyJwtToken(token)
+    verifyJwtToken(token);
 
-    const session = await findActiveSessionByToken(token)
+    const session = await findActiveSessionByToken(token);
 
     if (!session) {
-      return res.status(401).json({ message: 'Sesión inválida o expirada' })
+      return res.status(401).json({ message: "Sesión inválida o expirada" });
     }
 
     req.user = {
       id: session.usuario.id,
-      correo: session.usuario.correo
-    }
+      correo: session.usuario.correo,
+    };
 
-    next()
+    next();
   } catch {
-    return res.status(401).json({ message: 'Token inválido' })
+    return res.status(401).json({ message: "Token inválido" });
   }
-}
+};
 
 // ----------------------------------------
 // ✅ VERCEL HELPER
@@ -66,7 +66,7 @@ export const verifyAuth = async (
     return null
   }
 
-  const token = authHeader.split(' ')[1]
+  const token = authHeader.split(" ")[1];
 
   if (!token) {
     res.status(401).json({ message: 'Token inválido' })
@@ -74,13 +74,13 @@ export const verifyAuth = async (
   }
 
   try {
-    verifyJwtToken(token)
+    verifyJwtToken(token);
 
-    const session = await findActiveSessionByToken(token)
+    const session = await findActiveSessionByToken(token);
 
     if (!session) {
-      res.status(401).json({ message: 'Sesión inválida o expirada' })
-      return null
+      res.status(401).json({ message: "Sesión inválida o expirada" });
+      return null;
     }
 
     return {
@@ -91,7 +91,7 @@ export const verifyAuth = async (
       }
     }
   } catch {
-    res.status(401).json({ message: 'Token inválido' })
-    return null
+    res.status(401).json({ message: "Token inválido" });
+    return null;
   }
 }

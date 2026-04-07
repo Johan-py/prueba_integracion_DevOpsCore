@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
-import { Suspense } from 'react'
-import { ResultadosBusqueda } from '../../components/busqueda/ResultadosBusqueda'
+import { Suspense } from "react";
+import { ResultadosBusqueda } from "../../components/busqueda/ResultadosBusqueda";
 
 // Componente intermedio para asegurar el aislamiento de los params
 function BusquedaContent() {
@@ -14,13 +14,15 @@ function BusquedaContent() {
         {/* Aquí puedes poner un placeholder del mapa si quieres */}
       </div>
     </div>
-  )
+  );
 }
 export default function BusquedaPage() {
   return (
     // El Suspense debe ser lo único que devuelva el export default
-    <Suspense fallback={<div className="p-10 text-center">Cargando buscador...</div>}>
+    <Suspense
+      fallback={<div className="p-10 text-center">Cargando buscador...</div>}
+    >
       <BusquedaContent />
     </Suspense>
-  )
+  );
 }

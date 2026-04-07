@@ -65,19 +65,19 @@ import { verifyNotificationEmailTransport } from './modules/email/notification-e
 
 // --------------------------------------------------
 
-const app = express()
+const app = express();
 
 // --------------------
 // MIDDLEWARES
 // --------------------
 app.use(
   cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
-  })
-)
+    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  }),
+);
 
 app.use(express.json())
 app.use('/uploads', express.static(path.resolve('uploads')))
@@ -126,9 +126,9 @@ app.post('/api/auth/verify-register', verifyRegisterCodeController)
 app.get('/api/auth/google/login', StratGoogleLoginController)
 app.get('/api/auth/google/callback', googleCallbackController)
 
-app.get('/api/auth/me', async (req, res) => {
-  await meHandler(req as any, res as any)
-})
+// 👇 AQUÍ ESTÁ TU NUEVA RUTA DE TRANSACCIONES
+// actualizar despues de esta pr
+// app.use("/api/transacciones", transaccionesRoutes);
 
 // --------------------
 // BANNERS & FILTERS
@@ -149,9 +149,8 @@ app.get('/api/locations/search', async (req, res) => {
   )
 })
 
-app.post('/api/locations/popularidad', async (req, res) => {
-  await popularidadHandler(req as any, res as any)
-})
+app.get("/api/filters", filtersController.getFilters);
+app.get("/api/banners", (req, res) => bannersController.getBanners(req, res));
 
 // --------------------
 // HEALTH
@@ -185,13 +184,25 @@ app.post('/api/publicaciones', (req, res) => {
   res.json({ message: 'Publicación creada', publicacion: nuevaPublicacion })
 })
 
-app.get('/api/publicaciones', (_req, res) => {
-  res.json({ message: 'Listado de publicaciones' })
-})
+app.post("/notificaciones", requireAuth, createNotificationController);
+app.get("/notificaciones", requireAuth, getNotificationsController);
+app.get("/notificaciones/unread-count", requireAuth, getUnreadCountController);
+app.patch(
+  "/notificaciones/:id/read",
+  requireAuth,
+  markNotificationAsReadController,
+);
+app.patch(
+  "/notificaciones/read-all",
+  requireAuth,
+  markAllNotificationsAsReadController,
+);
+app.delete("/notificaciones/:id", requireAuth, deleteNotificationController);
 
-app.get('/api/publicaciones/gratis', (_req, res) => {
-  res.json({ message: 'Listado de publicaciones gratuitas' })
-})
+app.post("/api/publicaciones", (req, res) => {
+  const nuevaPublicacion = req.body;
+  res.json({ message: "Publicación creada", publicacion: nuevaPublicacion });
+});
 
 // --------------------
 // SERVER LOCAL
