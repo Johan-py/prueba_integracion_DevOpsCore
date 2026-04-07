@@ -1,4 +1,4 @@
-import { LocationsService } from '../../src/modules/locations/locations.service'
+import { LocationsService } from '../../src/modules/locations/locations.service.js'
 
 const locationsService = new LocationsService()
 const popularidadHandler = async (req: any, res: any) => {

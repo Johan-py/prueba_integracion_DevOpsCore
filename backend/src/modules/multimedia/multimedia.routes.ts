@@ -1,10 +1,10 @@
 import { Router } from 'express'
-import { requireAuth } from '../../middleware/auth.middleware'
+import { requireAuth } from '../../middleware/auth.middleware.js'
 import {
   getPublicationMultimediaController,
   registerImagesController,
   registerVideoLinkController
-} from './multimedia.controller'
+} from './multimedia.controller.js'
 
 const multimediaRoutes = Router()
 

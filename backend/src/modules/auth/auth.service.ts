@@ -1,9 +1,9 @@
 import crypto from 'node:crypto'
 import jwt from 'jsonwebtoken'
 
-import { env } from '../../config/env'
-import { enviarCodigoRegistro } from '../../lib/email.service'
-import { generateToken, type JwtPayload } from '../../utils/jwt'
+import { env } from '../../config/env.js'
+import { enviarCodigoRegistro } from '../../lib/email.service.js'
+import { generateToken, type JwtPayload } from '../../utils/jwt.js'
 import {
   createSession,
   createUser,

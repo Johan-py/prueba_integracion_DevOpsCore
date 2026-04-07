@@ -7,7 +7,7 @@ import {
   markAllNotificationsAsReadService,
   markNotificationAsReadService,
   ServiceError
-} from '../notificaciones/notificaciones.service'
+} from '../notificaciones/notificaciones.service.js'
 
 type AuthenticatedRequest = Request & {
   user?: {

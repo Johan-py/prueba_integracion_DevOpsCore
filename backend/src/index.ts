@@ -2,14 +2,14 @@ import path from 'path'
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
-import { env } from './config/env'
+import { env } from './config/env.js'
 
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 
 // --------------------
 // CONTROLLERS
 // --------------------
-import { propertiesController } from './modules/properties/properties.controller'
+import { propertiesController } from './modules/properties/properties.controller.js'
 import {
   createNotificationController,
   deleteNotificationController,
@@ -17,9 +17,9 @@ import {
   getUnreadCountController,
   markAllNotificationsAsReadController,
   markNotificationAsReadController
-} from './modules/notificaciones/notificaciones.controller'
-import { BannersController } from './modules/banners/banners.controller'
-import { FiltersHomepageController } from './modules/filtershomepage/filtershomepage.controller'
+} from './modules/notificaciones/notificaciones.controller.js'
+import { BannersController } from './modules/banners/banners.controller.js'
+import { FiltersHomepageController } from './modules/filtershomepage/filtershomepage.controller.js'
 
 // --------------------
 // AUTH
@@ -29,39 +29,39 @@ import {
   loginController,
   logoutController,
   verifyRegisterCodeController
-} from './modules/auth/auth.controller'
-import { requireAuth } from './middleware/auth.middleware'
+} from './modules/auth/auth.controller.js'
+import { requireAuth } from './middleware/auth.middleware.js'
 
 // --------------------
 // ROUTES / HANDLERS
 // --------------------
-import locationSearchHandler from '../api/locations/search'
-import popularidadHandler from '../api/locations/popularidad'
-import meHandler from '../api/auth/me'
+import locationSearchHandler from '../api/locations/search.js'
+import popularidadHandler from '../api/locations/popularidad.js'
+import meHandler from '../api/auth/me.js'
 
-import correoverificacionRoutes from './modules/perfil/correoverificacion.routes'
-import perfilRoutes from './modules/perfil/perfil.routes'
+import correoverificacionRoutes from './modules/perfil/correoverificacion.routes.js'
+import perfilRoutes from './modules/perfil/perfil.routes.js'
 
 import {
   googleCallbackController,
   StratGoogleLoginController
-} from './modules/auth/google/google.controller'
+} from './modules/auth/google/google.controller.js'
 
-import multimediaRoutes from './modules/multimedia/multimedia.routes'
-import publicacionRoutes from './modules/publicacion/publicacion.routes'
-import router from './modules/registro-publicacion/publicacion.routes'
+import multimediaRoutes from './modules/multimedia/multimedia.routes.js'
+import publicacionRoutes from './modules/publicacion/publicacion.routes.js'
+import router from './modules/registro-publicacion/publicacion.routes.js'
 
 // --------------------
 // LEGACY
 // --------------------
-import authRoutes from './routes/auth.routes'
-import publicacionesRoutes from './routes/publicaciones'
-import { authMiddleware } from './middleware/authMiddleware'
+import authRoutes from './routes/auth.routes.js'
+import publicacionesRoutes from './routes/publicaciones.js'
+import { authMiddleware } from './middleware/authMiddleware.js'
 
 // --------------------
 // SERVICES
 // --------------------
-import { verifyNotificationEmailTransport } from './modules/email/notification-email.service'
+import { verifyNotificationEmailTransport } from './modules/email/notification-email.service.js'
 
 // --------------------------------------------------
 

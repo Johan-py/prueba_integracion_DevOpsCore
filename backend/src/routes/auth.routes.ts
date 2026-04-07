@@ -1,7 +1,7 @@
 // backend/src/routes/auth.routes.ts
 import { Router } from 'express'
 import jwt from 'jsonwebtoken'
-import { env } from '../config/env'
+import { env } from '../config/env.js'
 
 const router = Router()
 

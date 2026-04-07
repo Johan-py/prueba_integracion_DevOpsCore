@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
-import { propertiesService } from './properties.service'
-import { FiltrosBusqueda } from './properties.repository'
+import { propertiesService } from './properties.service.js'
+import { FiltrosBusqueda } from './properties.repository.js'
 
 export const propertiesController = {
   async getAll(req: Request, res: Response) {

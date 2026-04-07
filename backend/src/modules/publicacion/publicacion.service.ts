@@ -3,7 +3,7 @@ import {
   buscarPublicacionesPorUsuarioRepository,
   buscarPublicacionPorIdRepository,
   eliminarLogicamentePublicacionRepository
-} from './publicacion.repository'
+} from './publicacion.repository.js'
 
 /**
  * HU1 - Listar publicaciones propias

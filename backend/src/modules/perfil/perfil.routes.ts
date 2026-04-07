@@ -7,9 +7,9 @@ import {
   editarDireccion,
   editarFotoPerfil,
   editarTelefonos
-} from './perfil.controller'
-import { validarJWT } from '../../middleware/validarJWT'
-import { upload } from '../../middleware/upload'
+} from './perfil.controller.js'
+import { validarJWT } from '../../middleware/validarJWT.js'
+import { upload } from '../../middleware/upload.js'
 
 const router = Router()
 

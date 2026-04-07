@@ -1,4 +1,4 @@
-import { prisma } from '../../lib/prisma.config'
+import { prisma } from '../../lib/prisma.config.js'
 
 export interface FiltrosBusqueda {
   categoria?: string | string[];

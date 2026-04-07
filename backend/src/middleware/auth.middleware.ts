@@ -1,8 +1,8 @@
 import type { NextFunction, Request, Response } from 'express'
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 
-import { verifyJwtToken } from '../utils/jwt'
-import { findActiveSessionByToken } from '../modules/auth/auth.repository'
+import { verifyJwtToken } from '../utils/jwt.js'
+import { findActiveSessionByToken } from '../modules/auth/auth.repository.js'
 
 // ----------------------------------------
 // ✅ EXPRESS MIDDLEWARE

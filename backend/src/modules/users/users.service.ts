@@ -1,4 +1,4 @@
-import { getUsersRepository, createUserRepository } from './users.repository'
+import { getUsersRepository, createUserRepository } from './users.repository.js'
 type payload = {
   name: string
   password: string
