@@ -7,7 +7,11 @@
     "build": "tsc",
     "lint": "eslint . --quiet",
     "postinstall": "prisma generate --schema=./prisma/schema.prisma",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "tsc": "tsc --noEmit",
+    "prisma": "prisma generate --schema=./prisma/schema.prisma"
+
+
   },
   "prisma": {
     "schema": "prisma/schema.prisma"
