@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import type { Request, Response } from 'express'
 import { FiltersHomepageService } from './filtershomepage.service.js'
 
 export class FiltersHomepageController {

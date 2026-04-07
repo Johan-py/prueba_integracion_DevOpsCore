@@ -4,14 +4,16 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
 
+    "rootDir": "./src",
+    "outDir": "./dist",
+
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
 
-    "rootDir": "./src",
-    "outDir": "./dist"
+    "resolveJsonModule": true,
+
+    "verbatimModuleSyntax": true
   },
-  "include": ["src", "src/api"],
-  "exclude": ["node_modules"]
+  "include": ["src/**/*"]
 }
