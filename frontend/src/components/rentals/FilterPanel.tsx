@@ -89,9 +89,9 @@ export default function FilterPanel() {
     setHasError(false);
     try {
       const API_BASE_URL =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/";
 
-      const response = await fetch(`${API_BASE_URL}/api/filters`);
+      const response = await fetch(`${API_BASE_URL}api/filters`);
       const result = await response.json();
 
       if (result.success) {
