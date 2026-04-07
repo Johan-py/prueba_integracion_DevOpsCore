@@ -1,7 +1,6 @@
 import { Request, Response } from 'express'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '../lib/prisma.config'
 
-const prisma = new PrismaClient()
 
 // Crear publicación
 export const crearPublicacion = async (req: Request, res: Response) => {

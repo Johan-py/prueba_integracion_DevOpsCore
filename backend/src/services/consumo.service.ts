@@ -1,4 +1,4 @@
-import { prisma } from '../db'
+import { prisma } from '../lib/prisma.config'
 
 export const obtenerConsumo = async (userId: number) => {
   const usuario = await prisma.usuario.findUnique({

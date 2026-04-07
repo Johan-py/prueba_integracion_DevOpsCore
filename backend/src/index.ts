@@ -46,7 +46,17 @@ app.use(
     credentials: true
   })
 )
+import authRoutes from './routes/auth.routes.js'
+import publicacionesRoutes from './routes/publicaciones.js'
+import { authMiddleware } from './middleware/authMiddleware.js'
 
+// 🔐 Auth routes legacy (server.ts)
+app.use('/api/auth-legacy', authRoutes)
+app.get('/api/users/:id/publicaciones/free', authMiddleware, (req, res) => {
+  res.json({ restantes: 2 })
+})
+// 📦 Publicaciones legacy
+app.use('/api/publicaciones-legacy', publicacionesRoutes)
 app.use(express.json())
 
 app.use('/api/publicaciones', publicacionRoutes) // lista de publicaciones
@@ -113,14 +123,18 @@ app.get('/api/publicaciones/gratis', (_req, res) => {
 
 const PORT = Number(process.env.PORT) || 5000
 
-app.listen(PORT, async () => {
-  console.log(`Server running on http://localhost:${PORT}`)
-  console.log(`Health check: http://localhost:${PORT}/health`)
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, async () => {
+    console.log(`🚀 Server running on http://localhost:${PORT}`)
+    console.log(`Health: http://localhost:${PORT}/health`)
 
-  try {
-    await verifyNotificationEmailTransport()
-    console.log('✅ Servicio de email para notificaciones listo')
-  } catch (error) {
-    console.error('❌ Error en configuración de email para notificaciones:', error)
-  }
-})
+    try {
+      await verifyNotificationEmailTransport()
+      console.log('✅ Email listo')
+    } catch (error) {
+      console.error('❌ Email error:', error)
+    }
+  })
+}
+
+export default app

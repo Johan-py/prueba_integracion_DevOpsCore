@@ -1,4 +1,4 @@
-import { prisma } from '../../db'
+import { prisma } from '../../lib/prisma.config'
 
 type SupportedNotificationFilter = 'todas' | 'leida' | 'no leida'
 
