@@ -7,9 +7,9 @@ import {
   markAllNotificationsAsReadRepository,
   markNotificationAsReadRepository,
   softDeleteNotificationRepository,
-} from "../notificaciones/notificaciones.repository.ts";
-import { findUserById } from "../auth/auth.repository.ts";
-import { sendNotificationEmail } from "../email/notification-email.service.ts";
+} from "../notificaciones/notificaciones.repository.js";
+import { findUserById } from "../auth/auth.repository.js";
+import { sendNotificationEmail } from "../email/notification-email.service.js";
 
 type NotificationFilter = "todas" | "leida" | "no leida" | "archivada";
 type SupportedNotificationFilter = Exclude<NotificationFilter, "archivada">;

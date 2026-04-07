@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express'
 import { validationResult } from 'express-validator'
-import propertyService from '../registro-publicacion/publicacion.service.ts'
+import propertyService from '../registro-publicacion/publicacion.service.js'
 
 export const createProperty = async (req: Request, res: Response) => {
   const errors = validationResult(req);

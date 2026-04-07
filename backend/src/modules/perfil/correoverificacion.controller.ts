@@ -1,7 +1,7 @@
 // correoverificacion.controller.ts
 import type { Request, Response } from 'express'
-import { prisma } from '../../lib/prisma.config.ts'
-import { enviarCodigoCambioEmail } from '../../lib/email.service.ts'
+import { prisma } from '../../lib/prisma.config.js'
+import { enviarCodigoCambioEmail } from '../../lib/email.service.js'
 
 interface AuthRequest extends Request {
   usuario?: {

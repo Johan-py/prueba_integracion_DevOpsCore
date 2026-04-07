@@ -1,4 +1,4 @@
-import { LocationsRepository } from "./locations.repository.ts";
+import { LocationsRepository } from "./locations.repository.js";
 
 export class LocationsService {
   private repository = new LocationsRepository();

@@ -1,4 +1,4 @@
-import { BannersRepository } from "./banners.repository.ts";
+import { BannersRepository } from "./banners.repository.js";
 
 export class BannersService {
   private repository = new BannersRepository();

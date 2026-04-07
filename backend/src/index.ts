@@ -2,13 +2,13 @@ import path from 'path'
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
-import { env } from './config/env.ts'
+import { env } from './config/env.js'
 import type { Request, Response } from 'express'
 
 // --------------------
 // CONTROLLERS
 // --------------------
-import { propertiesController } from './modules/properties/properties.controller.ts'
+import { propertiesController } from './modules/properties/properties.controller.js'
 import {
   createNotificationController,
   deleteNotificationController,
@@ -16,9 +16,9 @@ import {
   getUnreadCountController,
   markAllNotificationsAsReadController,
   markNotificationAsReadController
-} from './modules/notificaciones/notificaciones.controller.ts'
-import { BannersController } from './modules/banners/banners.controller.ts'
-import { FiltersHomepageController } from './modules/filtershomepage/filtershomepage.controller.ts'
+} from './modules/notificaciones/notificaciones.controller.js'
+import { BannersController } from './modules/banners/banners.controller.js'
+import { FiltersHomepageController } from './modules/filtershomepage/filtershomepage.controller.js'
 
 // --------------------
 // AUTH
@@ -28,37 +28,37 @@ import {
   loginController,
   logoutController,
   verifyRegisterCodeController
-} from './modules/auth/auth.controller.ts'
-import { requireAuth } from './middleware/auth.middleware.ts'
+} from './modules/auth/auth.controller.js'
+import { requireAuth } from './middleware/auth.middleware.js'
 
 // --------------------
 // ROUTES / HANDLERS
 // --------------------
-import locationSearchHandler from './api/locations/search.ts'
+import locationSearchHandler from './api/locations/search.js'
 
-import correoverificacionRoutes from './modules/perfil/correoverificacion.routes.ts'
-import perfilRoutes from './modules/perfil/perfil.routes.ts'
+import correoverificacionRoutes from './modules/perfil/correoverificacion.routes.js'
+import perfilRoutes from './modules/perfil/perfil.routes.js'
 
 import {
   googleCallbackController,
   StratGoogleLoginController
-} from './modules/auth/google/google.controller.ts'
+} from './modules/auth/google/google.controller.js'
 
-import multimediaRoutes from './modules/multimedia/multimedia.routes.ts'
-import publicacionRoutes from './modules/publicacion/publicacion.routes.ts'
-import router from './modules/registro-publicacion/publicacion.routes.ts'
+import multimediaRoutes from './modules/multimedia/multimedia.routes.js'
+import publicacionRoutes from './modules/publicacion/publicacion.routes.js'
+import router from './modules/registro-publicacion/publicacion.routes.js'
 
 // --------------------
 // LEGACY
 // --------------------
-import authRoutes from './routes/auth.routes.ts'
-import publicacionesRoutes from './routes/publicaciones.ts'
-import { authMiddleware } from './middleware/authMiddleware.ts'
+import authRoutes from './routes/auth.routes.js'
+import publicacionesRoutes from './routes/publicaciones.js'
+import { authMiddleware } from './middleware/authMiddleware.js'
 
 // --------------------
 // SERVICES
 // --------------------
-import { verifyNotificationEmailTransport } from './modules/email/notification-email.service.ts'
+import { verifyNotificationEmailTransport } from './modules/email/notification-email.service.js'
 
 // --------------------
 // SERVER

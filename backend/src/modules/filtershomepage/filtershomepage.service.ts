@@ -1,5 +1,5 @@
 import { $Enums } from "@prisma/client";
-import { FiltersHomepageRepository } from "./filtershomepage.repository.ts";
+import { FiltersHomepageRepository } from "./filtershomepage.repository.js";
 
 export class FiltersHomepageService {
   private repository = new FiltersHomepageRepository();

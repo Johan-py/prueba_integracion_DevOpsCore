@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { requireAuth } from "../../middleware/auth.middleware.ts";
+import { requireAuth } from "../../middleware/auth.middleware.js";
 import {
   getPublicationMultimediaController,
   registerImagesController,
   registerVideoLinkController,
-} from "./multimedia.controller.ts";
+} from "./multimedia.controller.js";
 
 const multimediaRoutes = Router();
 

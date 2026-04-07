@@ -5,7 +5,7 @@ import {
   logoutService,
   registerUser,
   verifyRegisterCodeService,
-} from "./auth.service.ts";
+} from "./auth.service.js";
 
 type RegisterBody = {
   nombre: string;

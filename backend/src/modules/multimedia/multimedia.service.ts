@@ -5,19 +5,19 @@ import {
   MAX_IMAGES_PER_PUBLICATION,
   MAX_VIDEOS_PER_PUBLICATION,
   MULTIMEDIA_TYPES,
-} from "./multimedia.constants.ts";
+} from "./multimedia.constants.js";
 import {
   countMultimediaByPublicationIdAndTypeRepository,
   createManyMultimediaRepository,
   createMultimediaRepository,
   findPublicationByIdRepository,
   getMultimediaByPublicationIdRepository,
-} from "./multimedia.repository.ts";
+} from "./multimedia.repository.js";
 import type {
   GetPublicationMultimediaInput,
   RegisterImagesInput,
   RegisterVideoLinkInput,
-} from "./multimedia.types.ts";
+} from "./multimedia.types.js";
 
 const validatePositiveInteger = (value: number, fieldName: string) => {
   if (!Number.isInteger(value) || value <= 0) {

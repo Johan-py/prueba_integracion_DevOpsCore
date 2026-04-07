@@ -4,7 +4,7 @@ import {
   obtenerPagoPendiente,
   actualizarEstadoPago,
   consultarEstadoPago,
-} from "../controllers/transacciones.controller.ts";
+} from "../controllers/transacciones.controller.js";
 
 const router = Router();
 

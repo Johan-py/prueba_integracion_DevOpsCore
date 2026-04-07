@@ -1,7 +1,7 @@
 import {
   getUsersRepository,
   createUserRepository,
-} from "./users.repository.ts";
+} from "./users.repository.js";
 type payload = {
   name: string;
   password: string;
