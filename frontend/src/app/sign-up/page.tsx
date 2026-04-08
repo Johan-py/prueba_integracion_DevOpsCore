@@ -1,5 +1,5 @@
-import RegisterForm from '@/components/layout/auth/formularioSignUp'
+import RegisterForm from "@/components/layout/auth/formularioSignUp";
 
 export default function RegisterPage() {
-  return <RegisterForm />
+  return <RegisterForm />;
 }

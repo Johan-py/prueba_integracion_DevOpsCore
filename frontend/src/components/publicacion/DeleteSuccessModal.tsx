@@ -1,16 +1,21 @@
 interface DeleteSuccessModalProps {
-  abierto: boolean
-  onAceptar: () => void
+  abierto: boolean;
+  onAceptar: () => void;
 }
 
-export default function DeleteSuccessModal({ abierto, onAceptar }: DeleteSuccessModalProps) {
-  if (!abierto) return null
+export default function DeleteSuccessModal({
+  abierto,
+  onAceptar,
+}: DeleteSuccessModalProps) {
+  if (!abierto) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="w-full max-w-sm overflow-hidden rounded-2xl bg-[#F9F6EE] shadow-xl ">
         <div className="bg-[#F9F6EE] px-6 py-5">
-          <h2 className="text-lg font-semibold text-gray-800 text-center">Publicación eliminada</h2>
+          <h2 className="text-lg font-semibold text-gray-800 text-center">
+            Publicación eliminada
+          </h2>
         </div>
 
         <hr className="h-[2px] bg-gray-800" />
@@ -29,5 +34,5 @@ export default function DeleteSuccessModal({ abierto, onAceptar }: DeleteSuccess
         </div>
       </div>
     </div>
-  )
+  );
 }

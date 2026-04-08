@@ -1,7 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap");
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@700;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@700;800&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -18,13 +18,13 @@
   }
 
   body {
-    font-family: 'Montserrat', sans-serif;
+    font-family: "Montserrat", sans-serif;
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
   }
 
   body {
-    font-family: 'Inter', sans-serif;
+    font-family: "Inter", sans-serif;
   }
 }
 
@@ -34,7 +34,7 @@
     background-color: #d97706; /* amber-600 */
 
     .font-heading {
-      font-family: 'Montserrat', sans-serif;
+      font-family: "Montserrat", sans-serif;
     }
 
     .border-border {
@@ -79,7 +79,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Inter', sans-serif;
+    font-family: "Inter", sans-serif;
     font-weight: 700;
     color: #ffffff;
     border: 3px solid rgba(255, 255, 255, 0.85);
@@ -204,7 +204,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-weight: 700;
   color: #ffffff;
   border: 3px solid rgba(255, 255, 255, 0.85);

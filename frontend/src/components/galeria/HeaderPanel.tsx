@@ -1,18 +1,18 @@
-'use client'
-import React, { useState } from 'react'
+"use client";
+import React, { useState } from "react";
 
 // Ya no necesitamos la prop 'resultados' si solo son botones
 const HeaderPanel = () => {
-  const [activeView, setActiveView] = useState<'grid' | 'list'>('grid')
+  const [activeView, setActiveView] = useState<"grid" | "list">("grid");
 
   return (
     <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg shadow-sm shrink-0">
       <button
-        onClick={() => setActiveView('grid')}
+        onClick={() => setActiveView("grid")}
         className={`p-1.5 rounded-md transition-all ${
-          activeView === 'grid'
-            ? 'bg-white shadow-sm border border-gray-200'
-            : 'hover:bg-gray-200 text-gray-400'
+          activeView === "grid"
+            ? "bg-white shadow-sm border border-gray-200"
+            : "hover:bg-gray-200 text-gray-400"
         }`}
         title="Vista Grilla"
       >
@@ -22,7 +22,7 @@ const HeaderPanel = () => {
           height="18"
           viewBox="0 0 24 24"
           fill="none"
-          stroke={activeView === 'grid' ? '#ea580c' : 'currentColor'}
+          stroke={activeView === "grid" ? "#ea580c" : "currentColor"}
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -35,11 +35,11 @@ const HeaderPanel = () => {
       </button>
 
       <button
-        onClick={() => setActiveView('list')}
+        onClick={() => setActiveView("list")}
         className={`p-1.5 rounded-md transition-all ${
-          activeView === 'list'
-            ? 'bg-white shadow-sm border border-gray-200'
-            : 'hover:bg-gray-200 text-gray-400'
+          activeView === "list"
+            ? "bg-white shadow-sm border border-gray-200"
+            : "hover:bg-gray-200 text-gray-400"
         }`}
         title="Vista Lista"
       >
@@ -49,7 +49,7 @@ const HeaderPanel = () => {
           height="18"
           viewBox="0 0 24 24"
           fill="none"
-          stroke={activeView === 'list' ? '#ea580c' : 'currentColor'}
+          stroke={activeView === "list" ? "#ea580c" : "currentColor"}
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -63,7 +63,7 @@ const HeaderPanel = () => {
         </svg>
       </button>
     </div>
-  )
-}
+  );
+};
 
-export default HeaderPanel
+export default HeaderPanel;

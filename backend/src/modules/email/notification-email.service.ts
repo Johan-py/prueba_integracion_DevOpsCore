@@ -1,45 +1,45 @@
-import nodemailer from 'nodemailer'
+import nodemailer from "nodemailer";
 
-const emailUser = process.env.EMAIL_USER
-const emailPassword = process.env.EMAIL_PASSWORD
+const emailUser = process.env.EMAIL_USER;
+const emailPassword = process.env.EMAIL_PASSWORD;
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: "gmail",
   auth: {
     user: emailUser,
-    pass: emailPassword
-  }
-})
+    pass: emailPassword,
+  },
+});
 
 export const verifyNotificationEmailTransport = async () => {
   if (!emailUser || !emailPassword) {
-    throw new Error('Las credenciales de email no están configuradas')
+    throw new Error("Las credenciales de email no están configuradas");
   }
 
-  await transporter.verify()
-}
+  await transporter.verify();
+};
 
 type SendNotificationEmailParams = {
-  emailDestino: string
-  titulo: string
-  mensaje: string
-  nombreUsuario?: string
-}
+  emailDestino: string;
+  titulo: string;
+  mensaje: string;
+  nombreUsuario?: string;
+};
 
 export const sendNotificationEmail = async ({
   emailDestino,
   titulo,
   mensaje,
-  nombreUsuario
+  nombreUsuario,
 }: SendNotificationEmailParams) => {
   try {
     if (!emailUser || !emailPassword) {
-      throw new Error('Las credenciales de email no están configuradas')
+      throw new Error("Las credenciales de email no están configuradas");
     }
 
     const saludo = nombreUsuario
       ? `<p style="font-size: 16px; color: #333;">Hola <strong>${nombreUsuario}</strong>,</p>`
-      : '<p style="font-size: 16px; color: #333;">Hola,</p>'
+      : '<p style="font-size: 16px; color: #333;">Hola,</p>';
 
     const info = await transporter.sendMail({
       from: `"PropBol" <${emailUser}>`,
@@ -84,7 +84,7 @@ export const sendNotificationEmail = async ({
       text: `
 Nueva notificación en PropBol
 
-${nombreUsuario ? `Hola ${nombreUsuario},` : 'Hola,'}
+${nombreUsuario ? `Hola ${nombreUsuario},` : "Hola,"}
 
 Título: ${titulo}
 
@@ -93,21 +93,23 @@ ${mensaje}
 
 ---
 Este es un mensaje automático, por favor no responder.
-      `
-    })
+      `,
+    });
 
-    console.log(`Email de notificación enviado a ${emailDestino} - ID: ${info.messageId}`)
+    console.log(
+      `Email de notificación enviado a ${emailDestino} - ID: ${info.messageId}`,
+    );
 
     return {
       success: true,
-      messageId: info.messageId
-    }
+      messageId: info.messageId,
+    };
   } catch (error) {
-    console.error('Error al enviar email de notificación:', error)
+    console.error("Error al enviar email de notificación:", error);
 
     return {
       success: false,
-      error
-    }
+      error,
+    };
   }
-}
+};

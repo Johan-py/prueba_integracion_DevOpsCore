@@ -1,4 +1,4 @@
-import { prisma } from '../../db.js'
+import { prisma } from "../../db.js";
 
 const createProperty = async (data: any, userId: number) => {
   const result = await prisma.$transaction(async (tx) => {
@@ -12,18 +12,18 @@ const createProperty = async (data: any, userId: number) => {
         nroCuartos: data.nroCuartos,
         nroBanos: data.nroBanos,
         descripcion: data.descripcion,
-        propietarioId: userId
-      }
-    })
+        propietarioId: userId,
+      },
+    });
 
     const publicacion = await tx.publicacion.create({
       data: {
         titulo: data.titulo,
         descripcion: data.descripcion,
         usuarioId: userId,
-        inmuebleId: inmueble.id
-      }
-    })
+        inmuebleId: inmueble.id,
+      },
+    });
 
     await tx.$executeRaw`
       INSERT INTO ubicacion_inmueble ("inmuebleId", "direccion", "latitud", "longitud")
@@ -33,12 +33,12 @@ const createProperty = async (data: any, userId: number) => {
         ${data.latitud ?? 0},
         ${data.longitud ?? 0}
       )
-    `
+    `;
 
-    return { inmueble, publicacion }
-  })
+    return { inmueble, publicacion };
+  });
 
-  return result
-}
+  return result;
+};
 
-export default { createProperty }
+export default { createProperty };
