@@ -14,11 +14,12 @@ import { useEffect, useState } from "react";
 
 // Fix íconos default de Leaflet en Next.js
 if (typeof window !== "undefined") {
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-});}
+  delete (L.Icon.Default.prototype as any)._getIconUrl;
+  L.Icon.Default.mergeOptions({
+    iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+  });
+}
 
 const PIN_FILL: Record<PropertyMapPin["type"], string> = {
   casa: "#3b82f6",
@@ -95,12 +96,12 @@ function formatPrice(price: number, currency: "USD" | "BOB"): string {
 }
 
 interface MapViewProps {
-  properties: PropertyMapPin[]
-  center?: [number, number]
-  zoom?: number
-  selectedId?: string | null
-  onSelect?: (id: string) => void
-  isLoading?: boolean
+  properties: PropertyMapPin[];
+  center?: [number, number];
+  zoom?: number;
+  selectedId?: string | null;
+  onSelect?: (id: string) => void;
+  isLoading?: boolean;
   error?: string | null;
 }
 
@@ -119,7 +120,8 @@ export default function MapView({
     setIsMounted(true);
   }, []);
 
-  if (!isMounted) return <div className="w-full h-full bg-gray-100 animate-pulse" />;
+  if (!isMounted)
+    return <div className="w-full h-full bg-gray-100 animate-pulse" />;
 
   return (
     <div className="relative w-full h-full">

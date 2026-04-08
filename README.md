@@ -7,7 +7,7 @@
 - Tests con **Bun**
 - Docker para contenedores
 - Scripts de desarrollo y CI/CD listos para pipelines
-**PropBol** es una plataforma web enfocada en la **compra, venta y gestión de inmuebles** en Bolivia.
+  **PropBol** es una plataforma web enfocada en la **compra, venta y gestión de inmuebles** en Bolivia.
 
 Permite a usuarios:
 
@@ -88,6 +88,7 @@ GET /api/calculator?a=10&b=2&op=divide
 ## 🐳 Docker
 
 Levantar contenedor de desarrollo:
+
 ## 📂 Estructura del Proyecto
 
 ```bash
@@ -111,13 +112,12 @@ Levantar contenedor de desarrollo:
 
 ## ⚙️ Requisitos
 
-
 - Usa `bun test` para todos los tests; no es necesario configurar Jest manualmente
 - Toda la lógica de API está en `app/api/calculator/route.ts`
 - Layout obligatorio en `app/layout.tsx` para evitar errores de Next.js con App Router
 
 > Este repositorio sirve como **base para construir escenarios de estrés realistas para el equipo de DevOps**.
-Asegúrate de tener instalado:
+> Asegúrate de tener instalado:
 
 - Bun >= 1.x
 - Node.js >= 18

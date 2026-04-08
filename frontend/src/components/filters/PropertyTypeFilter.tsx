@@ -6,21 +6,24 @@ interface PropertyTypeVisualProps {
   onTipoChange: (tipo: string) => void;
 }
 
-export default function PropertyTypeVisual({ tiposSeleccionados, onTipoChange }: PropertyTypeVisualProps) {
+export default function PropertyTypeVisual({
+  tiposSeleccionados,
+  onTipoChange,
+}: PropertyTypeVisualProps) {
   const options = ["CASA", "DEPARTAMENTO", "TERRENO", "HABITACION", "LOCAL"];
-  const [open, setOpen] = useState(false)
-  
+  const [open, setOpen] = useState(false);
+
   const getDisplayName = (option: string) => {
     const names: Record<string, string> = {
-      "CASA": "Casa",
-      "DEPARTAMENTO": "Departamento",
-      "TERRENO": "Terreno",
-      "HABITACION": "Habitación",
-      "LOCAL": "Local"
+      CASA: "Casa",
+      DEPARTAMENTO: "Departamento",
+      TERRENO: "Terreno",
+      HABITACION: "Habitación",
+      LOCAL: "Local",
     };
     return names[option] || option;
   };
-  
+
   const toggleOption = (option: string) => {
     onTipoChange(option);
   };
@@ -34,12 +37,14 @@ export default function PropertyTypeVisual({ tiposSeleccionados, onTipoChange }:
       <div
         onClick={() => setOpen(!open)}
         className="flex items-center justify-between border rounded-md px-3 py-2 bg-white cursor-pointer"
-        style={{ border: '1px solid #8C8787' }}
+        style={{ border: "1px solid #8C8787" }}
       >
         <span className="text-sm text-stone-500">
-          {tiposSeleccionados.length === 0 ? "Todos" : tiposSeleccionados.map(getDisplayName).join(", ")}
+          {tiposSeleccionados.length === 0
+            ? "Todos"
+            : tiposSeleccionados.map(getDisplayName).join(", ")}
         </span>
-        
+
         <span className="text-stone-500 text-sm flex items-center">
           <svg
             width="18"
@@ -47,8 +52,8 @@ export default function PropertyTypeVisual({ tiposSeleccionados, onTipoChange }:
             viewBox="0 0 18 8"
             fill="none"
             style={{
-              transition: 'transform 0.2s ease',
-              transform: open ? 'rotate(180deg)' : 'rotate(0deg)'
+              transition: "transform 0.2s ease",
+              transform: open ? "rotate(180deg)" : "rotate(0deg)",
             }}
           >
             <path
@@ -65,7 +70,7 @@ export default function PropertyTypeVisual({ tiposSeleccionados, onTipoChange }:
 
       {open && (
         <div className="absolute mt-1 w-full bg-white border rounded-md shadow-md p-2 flex flex-col gap-3 z-10">
-          {options.map(option => {
+          {options.map((option) => {
             const isSelected = tiposSeleccionados.includes(option);
             return (
               <div
