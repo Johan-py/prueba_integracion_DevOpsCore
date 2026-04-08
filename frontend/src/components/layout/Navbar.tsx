@@ -26,9 +26,20 @@ export type User = {
   avatar?: string | null;
 };
 
+type MeResponse = {
+  message?: string;
+  user?: {
+    id: number;
+    nombre?: string;
+    apellido?: string;
+    correo: string;
+    avatar?: string | null;
+  };
+};
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
 const USER_STORAGE_KEY = "propbol_user";
 const SESSION_EXPIRES_KEY = "propbol_session_expires";
-const SESSION_DURATION_MS = 60 * 60 * 1000;
 
 const filters: NotificationFilter[] = ["todas", "leida", "no leida"];
 
@@ -52,7 +63,6 @@ export default function Navbar() {
     isLoadingMore,
     error,
     isOnline,
-    notificationRef,
     toggleNotifications,
     setFilter,
     markAsRead,
@@ -89,14 +99,27 @@ export default function Navbar() {
     return Date.now() > Number(expiresAt);
   };
 
-  const restoreSession = () => {
+  const fetchCurrentUser = async (token: string) => {
+    const response = await fetch(`${API_URL}/api/auth/me`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = (await response.json()) as MeResponse;
+
+    if (!response.ok || !data.user) {
+      throw new Error(data.message || "Sesión inválida o expirada");
+    }
+
+    return data.user;
+  };
+
+  const restoreSession = async () => {
     const savedUser = localStorage.getItem(USER_STORAGE_KEY);
     const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY);
     const token = localStorage.getItem("token");
-
-    const updatedName = localStorage.getItem("nombre");
-    const updatedEmail = localStorage.getItem("correo");
-    const updatedAvatar = localStorage.getItem("avatar");
 
     if (!savedUser || !expiresAt || !token) {
       clearSession(false);
@@ -108,13 +131,37 @@ export default function Navbar() {
       return;
     }
 
+    if (!navigator.onLine) {
+      clearSession(false);
+      return;
+    }
+
     try {
-      const parsedUser = JSON.parse(savedUser);
+      const validatedUser = await fetchCurrentUser(token);
+
+      const finalName =
+        validatedUser.nombre && validatedUser.apellido
+          ? `${validatedUser.nombre} ${validatedUser.apellido}`
+          : validatedUser.nombre || validatedUser.correo;
+
       const finalUser: User = {
-        name: updatedName || parsedUser.name,
-        email: updatedEmail || parsedUser.email,
-        avatar: updatedAvatar || parsedUser.avatar || null,
+        name: finalName,
+        email: validatedUser.correo,
+        avatar: validatedUser.avatar ?? null,
       };
+
+      localStorage.setItem(
+        USER_STORAGE_KEY,
+        JSON.stringify({
+          name: finalUser.name,
+          email: finalUser.email,
+          avatar: finalUser.avatar,
+        }),
+      );
+      localStorage.setItem("nombre", finalUser.name);
+      localStorage.setItem("correo", finalUser.email);
+      localStorage.setItem("avatar", finalUser.avatar ?? "");
+
       setUser(finalUser);
       setIsLoggedIn(true);
     } catch {
@@ -123,13 +170,20 @@ export default function Navbar() {
   };
 
   useEffect(() => {
-    restoreSession();
+    void restoreSession();
 
-    const handleSessionChange = () => restoreSession();
+    const handleSessionChange = () => {
+      void restoreSession();
+    };
+
+    const handleOnline = () => {
+      void restoreSession();
+    };
 
     window.addEventListener("storage", handleSessionChange);
     window.addEventListener("propbol:login", handleSessionChange);
     window.addEventListener("propbol:session-changed", handleSessionChange);
+    window.addEventListener("online", handleOnline);
 
     return () => {
       window.removeEventListener("storage", handleSessionChange);
@@ -138,6 +192,7 @@ export default function Navbar() {
         "propbol:session-changed",
         handleSessionChange,
       );
+      window.removeEventListener("online", handleOnline);
     };
   }, []);
 
@@ -168,6 +223,7 @@ export default function Navbar() {
         router.push("/");
       }
     }, 10000);
+
     return () => clearInterval(interval);
   }, [user, router]);
 
@@ -200,19 +256,19 @@ export default function Navbar() {
 
   const handleConfirmLogout = async () => {
     if (isLoggingOut) return;
+
     setIsLoggingOut(true);
     const token = localStorage.getItem("token");
+
     if (token) {
       try {
-        await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/auth/logout`,
-          {
-            method: "POST",
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
+        await fetch(`${API_URL}/api/auth/logout`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
       } catch {}
     }
+
     clearSession();
     setIsLoggingOut(false);
     router.push("/");
@@ -229,7 +285,6 @@ export default function Navbar() {
             </div>
 
             <div className="flex items-center gap-4">
-              {/* NOTIFICACIONES */}
               <div className="relative" ref={notificationPanelRef}>
                 <button
                   type="button"
@@ -334,6 +389,7 @@ export default function Navbar() {
                             const reachedBottom =
                               target.scrollTop + target.clientHeight >=
                               target.scrollHeight - 10;
+
                             if (reachedBottom && hasMore && !isLoadingMore) {
                               void loadMoreNotifications();
                             }
@@ -419,6 +475,7 @@ export default function Navbar() {
                                   </div>
                                 </div>
                               ))}
+
                               {isLoadingMore && (
                                 <p className="px-4 py-3 text-center text-xs text-stone-400">
                                   Cargando más notificaciones...
@@ -427,6 +484,7 @@ export default function Navbar() {
                             </>
                           )}
                         </div>
+
                         <div className="border-t border-stone-100 px-4 py-3 text-center">
                           <Link
                             href="/notificaciones"
@@ -442,7 +500,6 @@ export default function Navbar() {
                 )}
               </div>
 
-              {/* USER MENU */}
               <div className="relative" ref={panelRef}>
                 <UserMenu
                   user={user}
@@ -454,7 +511,6 @@ export default function Navbar() {
                 />
               </div>
 
-              {/* MOBILE MENU BUTTON */}
               <button
                 type="button"
                 onClick={() => setIsMobileMenuOpen(true)}
@@ -475,7 +531,6 @@ export default function Navbar() {
         onConfirm={handleConfirmLogout}
       />
 
-      {/* MOBILE MENU PANEL */}
       {isMobileMenuOpen && (
         <div
           className="fixed inset-0 z-50 bg-black/40 md:hidden"

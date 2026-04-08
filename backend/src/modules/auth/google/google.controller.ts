@@ -13,6 +13,7 @@ const buildGoogleAuthUrl = () => {
       scope: "openid email profile",
       access_type: "offline",
       prompt: "consent select_account",
+      include_granted_scopes: "true",
     }).toString()
   );
 };
