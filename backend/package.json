@@ -9,7 +9,9 @@
     "tsc": "tsc --noEmit",
     "start": "node dist/index.js",
     "prisma:generate": "prisma generate --schema=./prisma/schema.prisma",
-    "prisma:migrate": "prisma migrate dev"
+    "prisma:migrate": "prisma migrate dev",
+    "prisma": "prisma generate --schema=./prisma/schema.prisma"
+
   },
   "prisma": {
     "schema": "prisma/schema.prisma"
