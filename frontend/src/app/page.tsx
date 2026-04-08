@@ -48,7 +48,7 @@ export default async function Home() {
 
       {/* Contenido Unificado: Tu FilterPanel + ExploreSection */}
       <div className="container mx-auto px-4 py-12">
-        <div className="flex flex-col-reverse lg:flex-row gap-8 items-start">
+        <div className="flex flex-col-reverse md:flex-row gap-8 items-start">
           {/* Sección de Filtros (Columna Izquierda) */}
           <FilterPanel />
 

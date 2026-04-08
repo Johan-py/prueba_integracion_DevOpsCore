@@ -1,4 +1,4 @@
-import { prisma } from "../../db.js";
+import { prisma } from '../../lib/prisma.config.js'
 export class BannersRepository {
   async getActiveBanners() {
     // Se utiliza la instancia global del archivo db.ts para ejecutar la consulta a la base de datos.

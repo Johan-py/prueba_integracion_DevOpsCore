@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
-import { prisma } from "../config/prisma.js";
+import type { Request, Response } from "express";
+import { prisma } from "../lib/prisma.config.js";
 
 // Generar Pago QR
 export const generarPagoQr = async (

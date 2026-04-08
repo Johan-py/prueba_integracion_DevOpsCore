@@ -1,12 +1,14 @@
 {
-  "name": "social-is-frontend",
+  "name": "frontend",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "bun x next dev",
-    "build": "bun x next build",
-    "start": "bun x next start",
-    "lint": "bun x next lint"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "tsc": "tsc --noEmit"
+
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.6.0",
@@ -30,6 +32,7 @@
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.1",
     "autoprefixer": "10.4.17",
+    "eslint-config-next": "16.2.2",
     "postcss": "8.4.35",
     "tailwindcss": "3.4.1",
     "typescript": "^5.3.3"

@@ -7,10 +7,10 @@
     "frontend"
   ],
   "scripts": {
-    "install:all": "bun install",
-    "dev:back": "cd backend && bun run dev",
-    "dev:front": "cd frontend && bun run dev",
-    "dev": "concurrently \"bun run dev:back\" \"bun run dev:front\"",
+    "install:all": "pnpm install",
+    "dev:back": "pnpm --filter ./backend run dev",
+    "dev:front": "pnpm --filter ./frontend run dev",
+    "dev": "concurrently \"pnpm run dev:back\" \"pnpm run dev:front\"",
     "lab:chaos": "cd scripts && sh chaos_devs.sh",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -20,12 +20,14 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@next/eslint-plugin-next": "^16.2.0",
+    "@prisma/client": "^7.6.0",
     "@types/leaflet": "^1.9.21",
     "@types/nodemailer": "^7.0.11",
     "@typescript-eslint/eslint-plugin": "^8.57.1",
     "@typescript-eslint/parser": "^8.57.1",
     "concurrently": "^9.2.1",
-    "eslint": "^10.1.0"
+    "eslint": "^10.1.0",
+    "prisma": "^7.6.0"
   },
   "dependencies": {
     "@prisma/config": "^7.5.0",

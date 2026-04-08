@@ -1,10 +1,7 @@
-import { Router } from "express";
-import {
-  createProperty,
-  cancelProperty,
-} from "../registro-publicacion/publicacion.controller.js";
-import { propertyValidationRules } from "../registro-publicacion/publicacion.validator.js";
-//import { verifyToken } from '../middleware/auth.middleware.js'
+import { Router } from 'express'
+import { createProperty, cancelProperty } from '../registro-publicacion/publicacion.controller.js'
+import { propertyValidationRules } from '../registro-publicacion/publicacion.validator.js'
+//import { verifyToken } from '../middleware/auth.middleware'
 
 const router = Router();
 

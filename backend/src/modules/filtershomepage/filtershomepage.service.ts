@@ -16,13 +16,26 @@ export class FiltersHomepageService {
       count: item.count,
     });
 
+    const requiredCategories = [
+      { id: 'CASA', label: 'Casa' },
+      { id: 'DEPARTAMENTO', label: 'Departamento' },
+      { id: 'OFICINA', label: 'Oficina' },
+      { id: 'TERRENO', label: 'Terreno' },
+      { id: 'CEMENTERIO', label: 'Cementerio' }
+    ];
+
+    const categoriesMapped = requiredCategories.map(reqCat => {
+      const found = categoriesRaw.find((c: any) => c.categoria === reqCat.id);
+      return {
+        name: reqCat.label,
+        count: found ? found._count.id : 0
+      };
+    });
+
     return {
       rentals: rentalsRaw.map(mapToHomeFilter),
       sales: salesRaw.map(mapToHomeFilter),
-      categories: categoriesRaw.map((c: any) => ({
-        name: c.categoria || "Otros",
-        count: c._count.id,
-      })),
-    };
+      categories: categoriesMapped
+    }
   }
 }
