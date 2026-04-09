@@ -11,6 +11,11 @@ export interface FiltrosBusqueda {
   superficie?: "menor-a-mayor" | "mayor-a-menor";
 }
 
+function normalizarModoAccion(m: string): string {
+  const v = m.toUpperCase().trim();
+  return v.includes("ANTICR") ? "ANTICRETO" : v;
+}
+
 export const propertiesRepository = {
   async getAll(filtros: FiltrosBusqueda = {}) {
     // ── WHERE ──────────────────────────────────────────────────────────────
@@ -18,21 +23,27 @@ export const propertiesRepository = {
 
     const rawTipo = filtros.tipoInmueble || filtros.categoria;
     if (rawTipo) {
-      const valor = Array.isArray(rawTipo) ? rawTipo[0] : rawTipo;
-      if (valor && valor !== "Cualquier tipo") {
-        where.categoria = valor.toUpperCase().trim();
+      const tipos = (Array.isArray(rawTipo) ? rawTipo : [rawTipo])
+        .map((t) => String(t).toUpperCase().trim())
+        .filter((t) => t && t !== "CUALQUIER TIPO");
+      if (tipos.length === 1) {
+        where.categoria = tipos[0];
+      } else if (tipos.length > 1) {
+        where.categoria = { in: tipos };
       }
     }
 
     if (filtros.modoInmueble) {
-      const valor = Array.isArray(filtros.modoInmueble)
-        ? filtros.modoInmueble[0]
-        : filtros.modoInmueble;
-      if (valor) {
-        const modoLimpio = valor.toUpperCase().includes("ANTICR")
-          ? "ANTICRETO"
-          : valor.toUpperCase();
-        where.tipoAccion = modoLimpio;
+      const modosRaw = Array.isArray(filtros.modoInmueble)
+        ? filtros.modoInmueble
+        : [filtros.modoInmueble];
+      const modos = modosRaw
+        .filter((m) => m && String(m).trim() !== "")
+        .map((m) => normalizarModoAccion(String(m)));
+      if (modos.length === 1) {
+        where.tipoAccion = modos[0];
+      } else if (modos.length > 1) {
+        where.tipoAccion = { in: modos };
       }
     }
 

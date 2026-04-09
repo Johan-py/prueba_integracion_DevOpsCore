@@ -59,6 +59,16 @@ export default function ExploreSection() {
     });
 
     const params = new URLSearchParams();
+    try {
+      const merged = JSON.parse(
+        sessionStorage.getItem("propbol_global_filters") || "{}",
+      ) as { locationId?: string | number };
+      if (merged.locationId != null && merged.locationId !== "") {
+        params.set("locationId", String(merged.locationId));
+      }
+    } catch {
+      /* ignore */
+    }
     selectedOption.forEach((modo) =>
       params.append("modoInmueble", modo.toUpperCase()),
     );

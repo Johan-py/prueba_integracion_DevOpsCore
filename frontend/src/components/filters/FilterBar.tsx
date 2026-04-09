@@ -65,8 +65,7 @@ export default function FilterBar({
       (tipoInmueble !== "Cualquier tipo" ? tipoInmueble.toUpperCase() : null);
 
     const nuevosFiltros = {
-      tipoInmueble:
-        tipoInmueble !== "Cualquier tipo" ? [tipoInmueble.toUpperCase()] : [],
+      tipoInmueble: tipoFinal ? [tipoFinal] : [],
       modoInmueble: modosSeleccionados,
       query: ubicacionTexto,
       updatedAt: new Date().toISOString(),
@@ -74,6 +73,17 @@ export default function FilterBar({
 
     updateFilters(nuevosFiltros);
     const params = new URLSearchParams();
+
+    try {
+      const merged = JSON.parse(
+        sessionStorage.getItem("propbol_global_filters") || "{}",
+      ) as { locationId?: string | number };
+      if (merged.locationId != null && merged.locationId !== "") {
+        params.set("locationId", String(merged.locationId));
+      }
+    } catch {
+      /* ignore */
+    }
 
     modosSeleccionados.forEach((modo) => params.append("modoInmueble", modo));
     if (tipoFinal) params.set("tipoInmueble", tipoFinal);
