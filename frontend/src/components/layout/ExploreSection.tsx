@@ -44,7 +44,7 @@ export default function ExploreSection() {
     const tipoMap: Record<string, string> = {
       Casas: "CASA",
       Departamentos: "DEPARTAMENTO",
-      Cuartos: "CASA",
+      Cuartos: "CUARTO",
       Terrenos: "TERRENO",
       "Espacios Cementerio": "TERRENO",
     };
