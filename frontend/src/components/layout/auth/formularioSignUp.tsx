@@ -152,7 +152,7 @@ export default function SignUpForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [serverError, setServerError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const [googleButtonResetKey, setGoogleButtonResetKey] = useState(0)
   const onlyLettersRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
   const onlyNumbersRegex = /^[0-9]*$/;
 
@@ -362,7 +362,8 @@ export default function SignUpForm() {
     setShowConfirmPassword(false)
     setServerError('')
     setIsSubmitting(false)
-  }
+    setGoogleButtonResetKey((prev) => prev + 1)
+}
 
   const hasFormContent = useMemo(() => {
     return (
@@ -752,6 +753,7 @@ export default function SignUpForm() {
             </div>
 
             <GoogleRegisterButton
+              key={googleButtonResetKey}
               onCredentialReceived={handleGoogleCredential}
               onError={setServerError}
               disabled={isSubmitting}
