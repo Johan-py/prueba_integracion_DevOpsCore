@@ -203,6 +203,8 @@ export default function MapView({
         style={{ height: "100%", width: "100%" }}
         preferCanvas={true}
         bounceAtZoomLimits={false}
+        inertia={true}
+        inertiaDeceleration={3000}
         className="z-0"
       >
         <TileLayer
