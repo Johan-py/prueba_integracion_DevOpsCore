@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
+  Archive,
   Bell,
   CheckCheck,
   Loader2,
@@ -41,12 +42,13 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
 const USER_STORAGE_KEY = "propbol_user";
 const SESSION_EXPIRES_KEY = "propbol_session_expires";
 
-const filters: NotificationFilter[] = ["todas", "leida", "no leida"];
+const filters: NotificationFilter[] = ["todas", "leida", "no leida", "archivada"];
 
 export default function Navbar() {
   const router = useRouter();
   const panelRef = useRef<HTMLDivElement | null>(null);
   const notificationPanelRef = useRef<HTMLDivElement | null>(null);
+ const [, setTick] = useState(0)
 
   const [user, setUser] = useState<User | null>(null);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -63,11 +65,14 @@ export default function Navbar() {
     isLoadingMore,
     error,
     isOnline,
+    scrollContainerRef,
+    saveScrollPosition,
     toggleNotifications,
     setFilter,
     markAsRead,
     markAllAsRead,
     deleteNotification,
+    archiveNotification,
     loadMoreNotifications,
     hasMore,
     refreshNotifications,
@@ -168,6 +173,34 @@ export default function Navbar() {
       clearSession(false);
     }
   };
+
+ const formatRelativeTime = (fecha: string | null): string => {
+  if (!fecha) return "";
+  const diff = Date.now() - new Date(fecha).getTime();
+  const mins = Math.floor(diff / 60000);
+
+  if (mins < 1) return "hace un momento";
+  if (mins < 60) return `hace ${mins} min`;
+
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `hace ${hours} h`;
+
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `hace ${days} d`;
+
+  return new Date(fecha).toLocaleDateString("es-BO", {
+    day: "numeric",
+    month: "short",
+  });
+};
+
+useEffect(() => {
+  const interval = setInterval(() => {
+    setTick((t) => t + 1);
+  }, 60000);
+
+  return () => clearInterval(interval);
+}, []);
 
   useEffect(() => {
     void restoreSession();
@@ -310,9 +343,7 @@ export default function Navbar() {
                     className="fixed left-0 right-0 top-[57px] z-50 mx-2 overflow-hidden rounded-xl border border-stone-200 bg-white shadow-lg sm:absolute sm:left-auto sm:right-0 sm:top-12 sm:mx-0 sm:w-80"
                   >
                     <div className="flex items-center justify-between border-b border-stone-100 px-4 py-3">
-                      <h3 className="text-sm font-semibold text-stone-900">
-                        Notificaciones
-                      </h3>
+                      <h3 className="text-sm font-semibold text-stone-900">Notificaciones</h3>
                       {isLoggedIn && (
                         <button
                           type="button"
@@ -370,28 +401,33 @@ export default function Navbar() {
                                   : "bg-stone-100 text-stone-700 hover:bg-stone-200"
                               }`}
                             >
-                              {item === "todas"
-                                ? "Todas"
-                                : item === "leida"
-                                  ? "Leídas"
-                                  : "No leídas"}
+                              {item === 'todas'
+                                ? 'Todas'
+                                : item === 'leida'
+                                  ? 'Leídas'
+                                  : item === 'no leida'
+                                    ? 'No leídas'
+                                    : 'Archivadas'}
                             </button>
                           ))}
                         </div>
 
                         <div
+                          ref={scrollContainerRef}
                           role="list"
                           aria-label="Lista de notificaciones"
                           aria-live="polite"
                           className="max-h-[60vh] overflow-y-auto sm:max-h-80"
                           onScroll={(e) => {
-                            const target = e.currentTarget;
+                            const target = e.currentTarget
+
+                            saveScrollPosition(target.scrollTop)
+
                             const reachedBottom =
-                              target.scrollTop + target.clientHeight >=
-                              target.scrollHeight - 10;
+                              target.scrollTop + target.clientHeight >= target.scrollHeight - 10
 
                             if (reachedBottom && hasMore && !isLoadingMore) {
-                              void loadMoreNotifications();
+                              void loadMoreNotifications()
                             }
                           }}
                         >
@@ -445,6 +481,7 @@ export default function Navbar() {
                                       <span className="mt-2 inline-block text-[10px] uppercase text-stone-400">
                                         {notification.status}
                                       </span>
+                                      
                                     </div>
                                     <div className="flex shrink-0 items-center gap-2">
                                       {notification.status === "no leida" && (
@@ -457,6 +494,17 @@ export default function Navbar() {
                                           className="text-xs text-amber-600 transition hover:text-amber-700 disabled:cursor-not-allowed disabled:opacity-40"
                                         >
                                           Leer
+                                        </button>
+                                      )}
+                                      {!notification.archivada && (
+                                        <button
+                                          type="button"
+                                          onClick={() => void archiveNotification(notification.id)}
+                                          
+                                          aria-label="Archivar notificación"
+                                          className="text-stone-400 transition hover:text-amber-600 disabled:cursor-not-allowed disabled:opacity-40"
+                                        >
+                                          <Archive className="h-4 w-4" /> 
                                         </button>
                                       )}
                                       <button
