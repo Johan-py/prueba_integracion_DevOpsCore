@@ -5,6 +5,7 @@ import { useOrdenamiento } from "../../hooks/useOrdenamiento";
 import { MenuOrdenamiento } from "./ordenamiento/MenuOrdenamiento";
 import { TarjetaInmueble } from "./TarjetaInmueble";
 import { Inmueble } from "../../types/inmueble";
+import { useSearchParams } from 'next/navigation'
 
 // ── Tipos de filtros globales (los que guarda FilterBar) ──────────────────────
 interface FiltrosGlobales {
@@ -54,6 +55,7 @@ function construirParams(filtros: FiltrosGlobales): URLSearchParams {
 }
 
 export const ResultadosBusqueda = () => {
+  const searchParams = useSearchParams()
   const [inmueblesRaw, setInmueblesRaw] = useState<Inmueble[]>([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(false);
@@ -62,43 +64,42 @@ export const ResultadosBusqueda = () => {
   });
   useEffect(() => {
     // Función reutilizable para hacer el fetch con filtros
-    function fetchInmuebles() {
-      setCargando(true);
-      setError(false);
+    const fetchInmuebles = async () => {
+      setCargando(true)
+      setError(false)
+      try {
+        const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+        
+        // Construimos la query string usando directamente lo que Next.js lee de la URL
+        const queryStr = searchParams.toString() ? `?${searchParams.toString()}` : ''
+        const url = `${API_BASE}/api/properties/inmuebles${queryStr}`
 
-      const filtros = leerFiltrosGuardados();
-      const params = construirParams(filtros);
-
-      const API_BASE =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-      const queryStr = params.toString() ? `?${params.toString()}` : "";
-      const url = `${API_BASE}/api/properties/inmuebles${queryStr}`;
-
-      fetch(url)
-        .then((res) => {
-          if (!res.ok) throw new Error("Error de red");
-          return res.json();
-        })
-        .then((data) => {
-          // Ajustamos según la respuesta de tu API (data.ok o data directo)
-          if (data && data.ok === true && Array.isArray(data.data)) {
-            console.log("✅ Datos recibidos con éxito:", data.data.length);
-            setInmueblesRaw(data.data); // Guardamos solo el arreglo de inmuebles
-          } else {
-            console.error("❌ Formato de datos inesperado:", data);
-            setError(true);
-          }
-        })
-        .finally(() => setCargando(false));
+        const res = await fetch(url)
+        if (!res.ok) throw new Error('Error de red al conectar con el servidor')
+        
+        const data = await res.json()
+        
+        if (data && data.ok === true && Array.isArray(data.data)) {
+          console.log("✅ Datos recibidos con éxito:", data.data.length);
+          // BUG-02-01 FIX: Actualiza con los nuevos datos (si es 0, setea [] y limpia la pantalla)
+          setInmueblesRaw(data.data); 
+        } else {
+          console.error("❌ Formato de datos inesperado:", data);
+          // Limpiamos los datos anteriores para no mostrar fantasmas
+          setInmueblesRaw([]);
+          setError(true);
+        }
+      } catch (err) {
+        console.error("Error en fetchInmuebles:", err);
+        // Limpiamos el array si el servidor explota o la conexión falla
+        setInmueblesRaw([]);
+        setError(true);
+      } finally {
+        setCargando(false);
+      }
     }
-
-    // Carga inicial
-    fetchInmuebles();
-
-    // Escuchar actualizaciones de filtros desde FilterBar
-    window.addEventListener("filterUpdate", fetchInmuebles);
-    return () => window.removeEventListener("filterUpdate", fetchInmuebles);
-  }, []);
+    fetchInmuebles()
+}, [searchParams])
 
   // ── Render ──────────────────────────────────────────────────────────────────
 

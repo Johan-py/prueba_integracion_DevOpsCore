@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -54,7 +55,14 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value;
-    const cleanValue = rawValue.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s\-]/gi, "");
+
+    // Filtro: Solo letras (incluye tildes y ñ), números, espacios y guiones.
+    // Todo lo demás (emojis, @, #, $, etc.) se elimina al instante.
+    // Si el usuario presiona "Espacio" con el input vacío, el valor se mantiene en "".
+    const cleanValue = rawValue
+      .replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s\-]/gi, "")
+      .trimStart();
+
     onChange(cleanValue);
   };
 
@@ -102,11 +110,10 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
       </label>
 
       <div
-        className={`h-[46px] rounded-xl border transition-all flex items-center gap-3 px-4 bg-white shadow-sm ${
-          isOpen && suggestions.length > 0
-            ? "border-amber-600 ring-2 ring-amber-100"
-            : "border-stone-300"
-        }`}
+        className={`h-[46px] rounded-xl border transition-all flex items-center gap-3 px-4 bg-white shadow-sm ${isOpen && suggestions.length > 0
+          ? "border-amber-600 ring-2 ring-amber-100"
+          : "border-stone-300"
+          }`}
       >
         <MapPin className={`w-5 h-5 flex-shrink-0 ${value ? "text-amber-600" : "text-stone-400"}`} />
 
@@ -149,12 +156,28 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
               )
             )}
           </div>
+
+          <input
+            type="text"
+            value={value}
+            onChange={handleInputChange}
+            onFocus={() => setIsOpen(true)} // Al hacer clic, abrimos el desplegable
+            // Cerramos el panel si el usuario presiona Enter para buscar
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setIsOpen(false);
+              }
+            }}
+            placeholder="Cochabamba, La Paz..."
+            className="w-full bg-transparent outline-none text-sm text-stone-900 placeholder:text-stone-400 font-inter relative z-10"
+          />
         </div>
       </div>
 
       {isOpen && (
         <div className="absolute z-[100] w-full mt-2 bg-white border border-stone-200 rounded-xl shadow-xl overflow-hidden">
-          {value.trim().length === 0 && history.length > 0 && (
+          {/* CASO A: MOSTRAR HISTORIAL (Input vacío) */}
+          {value === "" && history.length > 0 && (
             <div>
               <div className="px-4 py-2 bg-stone-50 border-b border-stone-100">
                 <span className="text-[10px] uppercase font-bold text-stone-400 tracking-wider">
