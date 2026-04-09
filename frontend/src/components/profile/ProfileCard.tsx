@@ -516,19 +516,19 @@ export default function ProfileCard() {
 
         {/* AVATAR */}
         <div className="w-28 h-28 rounded-full bg-white border border-gray-300 flex items-center justify-center shadow-sm overflow-hidden">
-  {(previewAvatar || avatar) ? (
-    <img
-      src={
-        previewAvatar ||
-        (avatar?.startsWith('http') ? avatar : `${API_URL}${avatar}`)
-      }
-      alt="Foto de perfil"
-      className="w-full h-full object-cover"
-    />
-  ) : (
-    <User className="w-10 h-10 text-gray-400" />
-  )}
-</div>
+           {(previewAvatar || (avatar && avatar.trim() !== "")) ? (
+            <img
+               src={
+                 previewAvatar ||
+                 (avatar?.startsWith('http') ? avatar : `${API_URL}${avatar}`)
+               }
+                 alt="Foto de perfil"
+                 className="w-full h-full object-cover"
+             />
+            ) : (
+             <User className="w-10 h-10 text-gray-400" />
+         )}
+        </div>
 
         {/* BOTÓN + */}
         <button
