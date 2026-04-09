@@ -80,13 +80,13 @@ function BusquedaMapaContent() {
                     <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-1">
                       <Filter className="w-4 h-4 text-orange-500" />
-                      <h1 className="text-sm font-semibold text-stone-900 uppercase tracking-wide">Filtros </h1>
+                      <h1 className="text-base font-semibold text-stone-900 uppercase tracking-wide">Filtros </h1>
                       </div>
-                    <h2 className="text-2xl font-bold text-slate-900">
+                    <h2 className="text-sm font-bold text-slate-900">
                       <span className="text-orange-500">
                         {properties.length}
                       </span>
-                      <span className="ml-2 text-gray-600 font-normal text-lg">
+                      <span className="ml-2 text-gray-600 font-normal text-sm">
                         {properties.length === 1
                           ? "propiedad encontrada"
                           : "propiedades encontradas"}
