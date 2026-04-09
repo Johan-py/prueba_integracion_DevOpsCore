@@ -59,7 +59,7 @@ import { authMiddleware } from "./middleware/authMiddleware.js";
 // --------------------
 // SERVICES
 // --------------------
-import { verifyNotificationEmailTransport } from "./modules/email/notification-email.service.js";
+import { verifyEmailTransport } from "./lib/email.service.js";
 
 // --------------------
 // SERVER
@@ -78,8 +78,9 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin))
+      if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
+      }
       return callback(new Error(`CORS policy: Origin not allowed: ${origin}`));
     },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -133,6 +134,7 @@ app.get("/api/auth/google/callback", googleCallbackController);
 // --------------------
 const bannersController = new BannersController();
 const filtersController = new FiltersHomepageController();
+
 app.get("/api/filters", filtersController.getFilters);
 app.get("/api/banners", (req, res) => bannersController.getBanners(req, res));
 
@@ -183,18 +185,21 @@ app.post("/api/publicaciones", (req, res) => {
   res.json({ message: "Publicación creada", publicacion: nuevaPublicacion });
 });
 
-// --- Dev-only logic ---
-if (process.env.NODE_ENV !== "production") {
-  verifyNotificationEmailTransport()
-    .then(() => console.log("✅ Email listo"))
-    .catch((err) => console.error("❌ Email error:", err));
-}
-
-// --- Levantar servidor ---
+// --------------------
+// LEVANTAR SERVIDOR
+// --------------------
 const PORT = Number(process.env.PORT) || 5000;
-app.listen(PORT, () => {
+
+app.listen(PORT, async () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/health`);
+
+  try {
+    await verifyEmailTransport();
+    console.log("✅ Servicio de email de registro listo");
+  } catch (error) {
+    console.error("❌ Error en configuración de email de registro:", error);
+  }
 });
 
 export default app;

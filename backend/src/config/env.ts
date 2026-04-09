@@ -4,7 +4,7 @@ const requireEnv = (name: string) => {
   const value = process.env[name];
 
   if (!value) {
-    throw new Error(`Missing required enviroment variable: ${name}`);
+    throw new Error(`Missing required environment variable: ${name}`);
   }
 
   return value;
@@ -19,4 +19,6 @@ export const env = {
     process.env.GOOGLE_CALLBACK_URL ??
     "http://localhost:5000/api/auth/google/callback",
   FRONTEND_URL: process.env.FRONTEND_URL ?? "http://localhost:3000",
+  EMAIL_USER: requireEnv("EMAIL_USER"),
+  EMAIL_PASSWORD: requireEnv("EMAIL_PASSWORD"),
 };

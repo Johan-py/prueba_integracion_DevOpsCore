@@ -1,4 +1,4 @@
-import { env } from "../config/env.js";
+import { env } from "../../config/env.js";
 
 const BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
 
@@ -30,7 +30,7 @@ const sendBrevoEmail = async ({
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "api-key": env.EMAIL_PASSWORD, // tu API key de Brevo
+        "api-key": env.EMAIL_PASSWORD,
       },
       body: JSON.stringify({
         sender: { name: "PropBol", email: env.EMAIL_USER },
