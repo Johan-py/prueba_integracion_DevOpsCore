@@ -223,6 +223,7 @@ export default function MapView({
         <MarkerClusterGroup
           iconCreateFunction={(cluster: any) => createClusterIcon(cluster)}
           maxClusterRadius={CLUSTER_CONFIG.maxClusterRadius}
+          disableClusteringAtZoom={18}
           disableClusteringAtZoom={CLUSTER_CONFIG.disableClusteringAtZoom}
           animate={true}
           animateAddingMarkers={true}
