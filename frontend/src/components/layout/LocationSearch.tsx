@@ -23,58 +23,81 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [history, setHistory] = useState<string[]>([])
   const containerRef = useRef<HTMLDivElement>(null)
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({})
 
   const { updateFilters } = useSearchFilters()
   const { registrarConsulta } = usePopularidad()
 
+  // ── Dropdown position: fixed so overflow:auto parents can't clip it ────────
+  const recalcDropdown = () => {
+    if (!containerRef.current) return
+    const rect = containerRef.current.getBoundingClientRect()
+    setDropdownStyle({
+      position: 'fixed',
+      top: rect.bottom + 8,
+      left: rect.left,
+      width: rect.width,
+      zIndex: 9999,
+    })
+  }
+
+  useEffect(() => {
+    if (!isOpen) return
+    recalcDropdown()
+  }, [isOpen])
+
+  useEffect(() => {
+    if (!isOpen) return
+    window.addEventListener('resize', recalcDropdown)
+    window.addEventListener('scroll', recalcDropdown, true)
+    return () => {
+      window.removeEventListener('resize', recalcDropdown)
+      window.removeEventListener('scroll', recalcDropdown, true)
+    }
+  }, [isOpen])
+
+  // ── Selección de ubicación ─────────────────────────────────────────────────
   const handleSelectLocation = (loc: Location) => {
     const fullName = `${loc.nombre} - ${loc.departamento} - Bolivia`
-    updateFilters({
-      locationId: loc.id,
-      query: fullName
-    })
+    updateFilters({ locationId: loc.id, query: fullName })
     onChange(fullName)
     saveToHistory(fullName)
     setIsOpen(false)
     registrarConsulta(loc.id, fullName)
   }
 
+  // ── Historial ──────────────────────────────────────────────────────────────
   useEffect(() => {
     const savedHistory = localStorage.getItem('searchHistory')
-    if (savedHistory) {
-      setHistory(JSON.parse(savedHistory))
-    }
+    if (savedHistory) setHistory(JSON.parse(savedHistory))
   }, [])
 
   const saveToHistory = (item: string) => {
-    const updatedHistory = [item, ...history.filter((i) => i !== item)].slice(0, 5)
-    setHistory(updatedHistory)
-    localStorage.setItem('searchHistory', JSON.stringify(updatedHistory))
+    const updated = [item, ...history.filter((i) => i !== item)].slice(0, 5)
+    setHistory(updated)
+    localStorage.setItem('searchHistory', JSON.stringify(updated))
   }
 
+  // ── Input sanitizado ───────────────────────────────────────────────────────
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawValue = e.target.value
-
-    // Filtro: Solo letras (incluye tildes y ñ), números, espacios y guiones.
-    // Todo lo demás (emojis, @, #, $, etc.) se elimina al instante.
-    // Si el usuario presiona "Espacio" con el input vacío, el valor se mantiene en "".
-    const cleanValue = rawValue.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s\-]/gi, '').trimStart()
-
-    onChange(cleanValue)
+    const clean = e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s\-]/gi, '')
+    onChange(clean)
   }
 
   const isSelected = value.includes('Bolivia')
 
+  // ── Click outside ──────────────────────────────────────────────────────────
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
+    const handler = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setIsOpen(false)
       }
     }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
   }, [])
 
+  // ── Fetch sugerencias ──────────────────────────────────────────────────────
   useEffect(() => {
     const fetchLocations = async () => {
       if (value.trim().length < 2 || isSelected) {
@@ -90,14 +113,14 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
           setSuggestions(data)
           setIsOpen(true)
         }
-      } catch (error) {
-        console.error('Error buscando ubicaciones:', error)
+      } catch (err) {
+        console.error('Error buscando ubicaciones:', err)
       } finally {
         setIsLoading(false)
       }
     }
-    const timer = setTimeout(fetchLocations, 300)
-    return () => clearTimeout(timer)
+    const t = setTimeout(fetchLocations, 300)
+    return () => clearTimeout(t)
   }, [value, isSelected])
 
   return (
@@ -113,70 +136,51 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
             : 'border-stone-300'
         }`}
       >
-        <MapPin
-          className={`w-5 h-5 flex-shrink-0 ${value ? 'text-amber-600' : 'text-stone-400'}`}
-        />
+        <MapPin className={`w-5 h-5 flex-shrink-0 ${value ? 'text-amber-600' : 'text-stone-400'}`} />
 
-        <div className="relative flex-1 flex items-center w-full h-full min-w-0">
+        <div className="relative flex-1 flex items-center h-full min-w-0">
           <input
             type="text"
             value={value}
             onChange={handleInputChange}
             onFocus={() => setIsOpen(true)}
+            onKeyDown={(e) => { if (e.key === 'Enter') setIsOpen(false) }}
             placeholder="Cochabamba, La Paz..."
-            className="w-full bg-transparent outline-none text-sm text-stone-900 placeholder:text-stone-400 font-inter pr-[70px] md:truncate overflow-x-auto whitespace-nowrap"
+            className="w-full bg-transparent outline-none text-sm text-stone-900 placeholder:text-stone-400 font-inter"
           />
-
-          <div className="absolute right-0 flex items-center gap-2 bg-white pl-2 h-full">
-            {isSelected && (
-              <Image
-                src="https://flagcdn.com/w20/bo.png"
-                alt="BO"
-                width={20}
-                height={14}
-                className="rounded-sm flex-shrink-0"
-              />
-            )}
-
-            {isLoading ? (
-              <Loader2 className="w-4 h-4 animate-spin text-amber-600" />
-            ) : (
-              value && (
-                <button
-                  onClick={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    onChange('')
-                  }}
-                  type="button"
-                  className="p-1 hover:bg-stone-100 rounded-full transition-colors flex-shrink-0"
-                >
-                  <X className="w-4 h-4 text-stone-400 hover:text-red-500" />
-                </button>
-              )
-            )}
-          </div>
-
-          <input
-            type="text"
-            value={value}
-            onChange={handleInputChange}
-            onFocus={() => setIsOpen(true)} // Al hacer clic, abrimos el desplegable
-            // Cerramos el panel si el usuario presiona Enter para buscar
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                setIsOpen(false)
-              }
-            }}
-            placeholder="Cochabamba, La Paz..."
-            className="w-full bg-transparent outline-none text-sm text-stone-900 placeholder:text-stone-400 font-inter relative z-10"
-          />
+          {isSelected && (
+            <Image
+              src="https://flagcdn.com/w20/bo.png"
+              alt="BO"
+              width={20}
+              height={14}
+              className="rounded-sm flex-shrink-0 ml-2"
+            />
+          )}
         </div>
+
+        {isLoading ? (
+          <Loader2 className="w-4 h-4 animate-spin text-amber-600 flex-shrink-0" />
+        ) : (
+          value && (
+            <button
+              onClick={() => onChange('')}
+              type="button"
+              className="flex-shrink-0"
+            >
+              <X className="w-4 h-4 text-stone-400 hover:text-red-500" />
+            </button>
+          )
+        )}
       </div>
 
+      {/* PANEL DESPLEGABLE — position:fixed para no ser clipeado por overflow del padre */}
       {isOpen && (
-        <div className="absolute z-[100] w-full mt-2 bg-white border border-stone-200 rounded-xl shadow-xl overflow-hidden">
-          {/* CASO A: MOSTRAR HISTORIAL (Input vacío) */}
+        <div
+          className="bg-white border border-stone-200 rounded-xl shadow-xl overflow-hidden"
+          style={dropdownStyle}
+        >
+          {/* CASO A: Historial (input vacío) */}
           {value === '' && history.length > 0 && (
             <div>
               <div className="px-4 py-2 bg-stone-50 border-b border-stone-100">
@@ -202,6 +206,7 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
             </div>
           )}
 
+          {/* CASO B: Sugerencias (escribiendo) */}
           {value.trim().length >= 2 && !isSelected && (
             <>
               {isLoading ? (
@@ -237,6 +242,7 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
               ) : (
                 <div className="px-4 py-8 text-center bg-stone-50/50">
                   <p className="text-sm text-stone-600 font-medium">No se encontraron resultados</p>
+                  <p className="text-xs text-stone-400 mt-1 italic">Pruebe con "Cala Cala"</p>
                 </div>
               )}
             </>

@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useCallback, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { PropertyMapPin } from '../types/property'
@@ -23,12 +25,9 @@ function guardarOrden(orden: EstadoOrdenamiento): void {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(orden))
     }
   } catch {
-    // localStorage puede estar bloqueado (modo privado estricto, Safari, etc.)
-    // Fallamos silenciosamente — la app sigue funcionando sin persistencia.
+    // sin persistencia si localStorage falla
   }
 }
-
-// ── Hook ──────────────────────────────────────────────────────────────────────
 
 interface UseOrdenamientoProps {
   inmuebles: PropertyMapPin[]
@@ -41,15 +40,6 @@ interface UseOrdenamientoResult {
   inmueblesOrdenados: PropertyMapPin[]
 }
 
-/**
- * Hook para manejar el ordenamiento de inmuebles con persistencia.
- *
- * Comportamiento:
- * - Primera visita o sin criterio guardado → ordena por fecha más recientes (default)
- * - Si el usuario eligió un criterio antes → lo recupera al refrescar
- * - Si el usuario limpia el ordenamiento → borra la preferencia guardada
- * - Falla silenciosamente si localStorage no está disponible
- */
 export const useOrdenamiento = ({
   inmuebles,
   ordenInicial
@@ -57,20 +47,27 @@ export const useOrdenamiento = ({
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  const [ordenActual, setOrdenActual] = useState<EstadoOrdenamiento>(() => {
-    return ordenInicial ?? cargarOrdenGuardado()
-  })
+  const [ordenActual, setOrdenActual] = useState<EstadoOrdenamiento>(
+    ordenInicial ?? ORDENAMIENTO_DEFAULT
+  )
+
+  const [hydrated, setHydrated] = useState(false)
+  useEffect(() => {
+    const ordenGuardado = cargarOrdenGuardado()
+    setOrdenActual(ordenInicial ?? ordenGuardado)
+    setHydrated(true)
+  }, [ordenInicial])
 
   useEffect(() => {
+    if (!hydrated) return
     guardarOrden(ordenActual)
-  }, [ordenActual])
+  }, [ordenActual, hydrated])
 
   const cambiarOrden = useCallback(
     (nuevoOrden: EstadoOrdenamiento) => {
       setOrdenActual(nuevoOrden)
-      // Sincronización con la URL para que el Backend ordene
-      const params = new URLSearchParams(searchParams.toString())
 
+      const params = new URLSearchParams(searchParams.toString())
       params.delete('precio')
       params.delete('superficie')
       params.delete('fecha')
@@ -91,6 +88,6 @@ export const useOrdenamiento = ({
   return {
     ordenActual,
     cambiarOrden,
-    inmueblesOrdenados: inmuebles // Prisma ya los devuelve ordenados
+    inmueblesOrdenados: inmuebles
   }
 }
