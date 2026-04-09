@@ -226,6 +226,8 @@ export default function MapView({
           chunkedLoading={true}
           showCoverageOnHover={false}
           zoomToBoundsOnClick={true}
+          spiderfyOnMaxZoom={true}
+          spiderfyDistanceMultiplier={2}
           removeOutsideVisibleBounds={false}
           clusterPane="markerPane"
         >
