@@ -525,27 +525,27 @@ export default function ProfileCard() {
 
         <div className="relative mb-10">
 
-          {/* AVATAR */}
-          <div className="w-28 h-28 rounded-full bg-white border border-gray-300 flex items-center justify-center shadow-sm overflow-hidden">
-            {(previewAvatar || avatar) ? (
-              <img
-                src={
-                  previewAvatar ||
-                  (avatar?.startsWith('http') ? avatar : `${API_URL}${avatar}`)
-                }
-                alt="Foto de perfil"
-                className="w-full h-full object-cover"
-              />
+        {/* AVATAR */}
+        <div className="w-28 h-28 rounded-full bg-white border border-gray-300 flex items-center justify-center shadow-sm overflow-hidden">
+           {(previewAvatar || (avatar && avatar.trim() !== "")) ? (
+            <img
+               src={
+                 previewAvatar ||
+                 (avatar?.startsWith('http') ? avatar : `${API_URL}${avatar}`)
+               }
+                 alt="Foto de perfil"
+                 className="w-full h-full object-cover"
+             />
             ) : (
-              <User className="w-10 h-10 text-gray-400" />
-            )}
-          </div>
+             <User className="w-10 h-10 text-gray-400" />
+         )}
+        </div>
 
-          {/* BOTÓN + */}
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isUploading}
-            className="
+        {/* BOTÓN + */}
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isUploading}
+          className="
             absolute
             right-0 top-1/2 translate-x-1/3 -translate-y-1/2   /* 📱 móvil → derecha */
             md:right-1/2 md:translate-x-1/2 md:top-full md:mt-6  /* 💻 pc → abajo con espacio */
