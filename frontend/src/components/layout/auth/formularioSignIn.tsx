@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -179,6 +179,7 @@ export default function LoginForm() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
+  const passwordContainerRef = useRef<HTMLDivElement>(null);
   const [correo, setCorreo] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<{ correo?: string; password?: string }>(
@@ -512,7 +513,15 @@ export default function LoginForm() {
             Contraseña
           </label>
 
-          <div className="relative">
+          <div
+            className="relative"
+            ref={passwordContainerRef}
+            onBlur={(e) => {
+              if (!passwordContainerRef.current?.contains(e.relatedTarget as Node)) {
+                setShowPassword(false);
+              }
+            }}
+          >
             <input
               type={showPassword ? "text" : "password"}
               required
@@ -523,7 +532,6 @@ export default function LoginForm() {
                 setPassword(e.target.value);
                 validate("password", e.target.value);
               }}
-              onBlur={() => setShowPassword(false)}
               className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 text-sm outline-none focus:border-orange-500"
             />
 
