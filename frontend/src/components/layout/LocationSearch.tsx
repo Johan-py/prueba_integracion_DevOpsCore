@@ -138,17 +138,15 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
       >
         <MapPin className={`w-5 h-5 flex-shrink-0 ${value ? 'text-amber-600' : 'text-stone-400'}`} />
 
-        <div className="relative flex-1 flex items-center h-full min-w-0 overflow-hidden">
+        <div className="relative flex-1 flex items-center h-full min-w-0">
           <input
             type="text"
             value={value}
             onChange={handleInputChange}
             onFocus={() => setIsOpen(true)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') setIsOpen(false)
-            }}
+            onKeyDown={(e) => { if (e.key === 'Enter') setIsOpen(false) }}
             placeholder="Cochabamba, La Paz..."
-            className="w-full min-w-0 truncate bg-transparent outline-none text-sm text-stone-900 placeholder:text-stone-400 font-inter"
+            className="w-full bg-transparent outline-none text-sm text-stone-900 placeholder:text-stone-400 font-inter"
           />
           {isSelected && (
             <Image
@@ -166,11 +164,7 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
         ) : (
           value && (
             <button
-              onClick={() => {
-                onChange('')
-                setSuggestions([])
-                setIsOpen(true)
-              }}
+              onClick={() => onChange('')}
               type="button"
               className="flex-shrink-0"
             >
@@ -180,9 +174,81 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
         )}
       </div>
 
-      {typeof document !== 'undefined' && dropdown
-        ? createPortal(dropdown, document.body)
-        : null}
+      {/* PANEL DESPLEGABLE — position:fixed para no ser clipeado por overflow del padre */}
+      {isOpen && (
+        <div
+          className="bg-white border border-stone-200 rounded-xl shadow-xl overflow-hidden"
+          style={dropdownStyle}
+        >
+          {/* CASO A: Historial (input vacío) */}
+          {value === '' && history.length > 0 && (
+            <div>
+              <div className="px-4 py-2 bg-stone-50 border-b border-stone-100">
+                <span className="text-[10px] uppercase font-bold text-stone-400 tracking-wider">
+                  Búsquedas recientes
+                </span>
+              </div>
+              {history.map((item, idx) => (
+                <button
+                  key={`hist-${idx}`}
+                  type="button"
+                  onClick={() => {
+                    onChange(item)
+                    setIsOpen(false)
+                    updateFilters({ query: item })
+                  }}
+                  className="w-full px-4 py-3 flex items-center gap-3 hover:bg-amber-50 transition-colors text-left border-b border-stone-50 last:border-0"
+                >
+                  <History className="w-3.5 h-3.5 text-stone-300" />
+                  <span className="text-sm text-stone-600">{item}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* CASO B: Sugerencias (escribiendo) */}
+          {value.trim().length >= 2 && !isSelected && (
+            <>
+              {isLoading ? (
+                <div className="px-4 py-6 text-center flex flex-col items-center gap-2">
+                  <Loader2 className="w-5 h-5 animate-spin text-amber-600" />
+                  <span className="text-sm text-stone-500 italic">Buscando zonas...</span>
+                </div>
+              ) : suggestions.length > 0 ? (
+                <div className="max-h-[300px] overflow-y-auto">
+                  {suggestions.slice(0, 5).map((loc) => (
+                    <button
+                      key={loc.id}
+                      type="button"
+                      onClick={() => handleSelectLocation(loc)}
+                      className="w-full px-4 py-3 flex items-center justify-between hover:bg-amber-50 transition-colors text-left border-b border-stone-50 last:border-0"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Search className="w-3.5 h-3.5 text-stone-500" />
+                        <span className="text-sm font-bold text-stone-600">
+                          {loc.nombre} - {loc.departamento} - Bolivia
+                        </span>
+                      </div>
+                      <Image
+                        src="https://flagcdn.com/w20/bo.png"
+                        alt="BO"
+                        width={20}
+                        height={14}
+                        className="rounded-sm"
+                      />
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="px-4 py-8 text-center bg-stone-50/50">
+                  <p className="text-sm text-stone-600 font-medium">No se encontraron resultados</p>
+                  <p className="text-xs text-stone-400 mt-1 italic">Pruebe con "Cala Cala"</p>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
     </div>
   )
 }
