@@ -1,6 +1,7 @@
-import type { Request, Response } from 'express'
+import type { Request, Response } from "express";
 import {
   AuthError,
+  getMeService,
   loginService,
   logoutService,
   registerUser,
@@ -103,7 +104,9 @@ export const registerController = async (
     const message =
       error instanceof Error ? error.message : "Error interno del servidor";
 
-    return res.status(400).json({ message });
+    return res.status(getRegisterErrorStatus(message)).json({
+      message: getRegisterErrorMessage(message),
+    });
   }
 };
 
@@ -139,6 +142,38 @@ export const verifyRegisterCodeController = async (
   }
 };
 
+export const getMeController = async (req: Request, res: Response) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({
+      message: "Token no proporcionado",
+    });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({
+      message: "Token no proporcionado",
+    });
+  }
+
+  try {
+    const result = await getMeService(token);
+
+    return res.status(200).json({
+      message: "Sesión válida",
+      ...result,
+    });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Sesión inválida o expirada";
+
+    return res.status(401).json({ message });
+  }
+};
+
 export const logoutController = async (req: Request, res: Response) => {
   const authHeader = req.headers.authorization;
 
@@ -146,7 +181,7 @@ export const logoutController = async (req: Request, res: Response) => {
     return res.status(401).json({ message: "Token no proporcionado" });
   }
 
-  const token = authHeader.split("Bearer ")[1];
+  const token = authHeader.split(" ")[1];
 
   try {
     const result = await logoutService(token);

@@ -90,7 +90,7 @@ export const loginWithGoogleCodeService = async (
 
   if (!existingUser) {
     throw new GoogleAuthError(
-      "La cuenta de Google no está registrada en la base de datos.",
+      "Este usuario no esta registrado. Puedes crear un cuenta para continuar.",
       "ACCOUNT_NOT_REGISTERED",
       404,
     );

@@ -124,18 +124,12 @@ export default function UserMenu({
               </div>
             </div>
 
-            <Link
-              href="/profile"
-              onClick={onClosePanel}
-              className="flex justify-between items-center w-full text-black font-bold py-3 border-t border-b border-gray-200 hover:bg-black/5 px-2 mb-2 transition text-sm"
-            >
-              Mi perfil <span className="text-lg">›</span>
-            </Link>
+
 
             <div className="flex flex-col mb-4">
               <MenuLink
                 label="Mi cuenta"
-                href="/cuenta"
+                href="/profile"
                 icon={UserIcon}
                 onClick={onClosePanel}
               />
@@ -156,6 +150,12 @@ export default function UserMenu({
                 label="Mis zonas"
                 href="/zonas"
                 icon={Map}
+                onClick={onClosePanel}
+              />
+              <MenuLink
+                label="Mis comparaciones"
+                href="/mis-comparaciones"
+                icon={FileText}
                 onClick={onClosePanel}
               />
             </div>

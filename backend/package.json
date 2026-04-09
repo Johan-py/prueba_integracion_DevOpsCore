@@ -3,14 +3,14 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "pnpm build && node dist/index.js",
+    "dev": "tsx src/index.ts",
     "build": "tsc",
     "lint": "eslint . --quiet",
-    "postinstall": "prisma generate --schema=./prisma/schema.prisma",
-    "start": "node dist/index.js",
     "tsc": "tsc --noEmit",
+    "start": "node dist/index.js",
+    "prisma:generate": "prisma generate --schema=./prisma/schema.prisma",
+    "prisma:migrate": "prisma migrate dev",
     "prisma": "prisma generate --schema=./prisma/schema.prisma"
-
 
   },
   "prisma": {
@@ -47,9 +47,7 @@
     "prisma": "^7.6.0",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.3.3"
-  },
-  "pnpm": {
-  "hoistingLimits": "none"
-}
+  }
 }

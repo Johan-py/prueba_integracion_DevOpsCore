@@ -7,6 +7,7 @@ import {
   ChevronRight,
   List as ListIcon,
   LayoutGrid,
+  Filter,
 } from "lucide-react";
 
 // === HOOKS ===
@@ -76,16 +77,27 @@ function BusquedaMapaContent() {
               <div className="p-4 bg-white shrink-0">
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex flex-col">
-                    <h2 className="text-2xl font-bold text-slate-900">
+                    <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1">
+                      <Filter className="w-4 h-4 text-orange-500" />
+                      <h1 className="text-base font-semibold text-stone-900 uppercase tracking-wide">Filtros </h1>
+                      </div>
+                      <div className="flex items-center gap-2 mb-2">
+                       <h1 className="text-xl font-semibold text-slate-800">
+                          Resultados de búsqueda
+                          </h1>
+                         </div>
+                    <h2 className="text-sm font-bold text-slate-900">
                       <span className="text-orange-500">
                         {properties.length}
                       </span>
-                      <span className="ml-2 text-gray-600 font-normal text-lg">
+                      <span className="ml-2 text-gray-600 font-normal text-sm">
                         {properties.length === 1
                           ? "propiedad encontrada"
                           : "propiedades encontradas"}
                       </span>
                     </h2>
+                    </div>
                   </div>
                   <button
                     onClick={() => setIsSidebarOpen(false)}

@@ -8,9 +8,16 @@
   ],
   "scripts": {
     "install:all": "pnpm install",
-    "dev:back": "pnpm --filter ./backend run dev",
-    "dev:front": "pnpm --filter ./frontend run dev",
-    "dev": "concurrently \"pnpm run dev:back\" \"pnpm run dev:front\"",
+
+    "dev:back": "pnpm --filter backend run dev",
+    "dev:back:setup": "pnpm --filter backend run prisma:generate && pnpm --filter backend run dev",
+
+    "dev:front": "pnpm --filter frontend run dev",
+    "dev": "concurrently \"pnpm run dev:back:setup\" \"pnpm run dev:front\"",
+    
+    "build:back": "pnpm --filter backend run build",
+    "start:back": "pnpm --filter backend run start",
+
     "lab:chaos": "cd scripts && sh chaos_devs.sh",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -20,18 +27,19 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@next/eslint-plugin-next": "^16.2.0",
-    "@prisma/client": "^7.6.0",
     "@types/leaflet": "^1.9.21",
     "@types/nodemailer": "^7.0.11",
     "@typescript-eslint/eslint-plugin": "^8.57.1",
     "@typescript-eslint/parser": "^8.57.1",
     "concurrently": "^9.2.1",
-    "eslint": "^10.1.0",
-    "prisma": "^7.6.0"
+    "eslint": "^10.1.0"
   },
   "dependencies": {
-    "@prisma/config": "^7.5.0",
     "cors": "^2.8.6",
     "tailwind": "^4.0.0"
-  }
+  },
+  "engines": {
+    "node": "20.x"
+  },
+  "packageManager": "pnpm@10.33.0"
 }

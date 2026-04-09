@@ -12,6 +12,18 @@ type LoginResponse = {
     correo: string;
     nombre?: string;
     apellido?: string;
+    avatar?: string | null;
+  };
+};
+
+type MeResponse = {
+  message?: string;
+  user?: {
+    id: number;
+    correo: string;
+    nombre?: string;
+    apellido?: string;
+    avatar?: string | null;
   };
 };
 
@@ -40,6 +52,7 @@ const LOGIN_TIMEOUT_MS = 10000;
 const GOOGLE_LOGIN_TIMEOUT_MS = 2 * 60 * 1000;
 const DEFAULT_POST_LOGIN_REDIRECT = "/";
 const REDIRECT_AFTER_LOGIN_KEY = "redirectAfterLogin";
+const SESSION_DURATION_MS = 3 * 60 * 1000;
 
 const NO_CONNECTION_MESSAGE =
   "Sin conexión a internet. Verifica tu red e intenta nuevamente.";
@@ -50,29 +63,55 @@ const LOGIN_TIMEOUT_MESSAGE =
 const GOOGLE_TIMEOUT_MESSAGE =
   "La autenticación con Google tardó demasiado. Por favor intenta nuevamente.";
 
-const saveSession = (token: string, user?: LoginResponse["user"]) => {
+const clearClientSession = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("propbol_user");
+  localStorage.removeItem("propbol_session_expires");
+  localStorage.removeItem("nombre");
+  localStorage.removeItem("correo");
+  localStorage.removeItem("avatar");
+
+  window.dispatchEvent(new Event("propbol:session-changed"));
+  window.dispatchEvent(new Event("auth-state-changed"));
+};
+
+const saveSession = (
+  token: string,
+  user?: {
+    id: number;
+    correo: string;
+    nombre?: string;
+    apellido?: string;
+    avatar?: string | null;
+  },
+) => {
   localStorage.setItem("token", token);
 
   const userName =
     user?.nombre && user?.apellido
       ? `${user.nombre} ${user.apellido}`
-      : (user?.correo ?? "Usuario");
+      : user?.nombre || user?.correo || "Usuario";
 
   localStorage.setItem(
     "propbol_user",
     JSON.stringify({
       name: userName,
       email: user?.correo ?? "",
+      avatar: user?.avatar ?? null,
     }),
   );
 
+  localStorage.setItem("nombre", userName);
+  localStorage.setItem("correo", user?.correo ?? "");
+  localStorage.setItem("avatar", user?.avatar ?? "");
   localStorage.setItem(
     "propbol_session_expires",
-    String(Date.now() + 60 * 60 * 1000),
+    String(Date.now() + SESSION_DURATION_MS),
   );
 
   window.dispatchEvent(new Event("propbol:login"));
   window.dispatchEvent(new Event("propbol:session-changed"));
+  window.dispatchEvent(new Event("auth-state-changed"));
 };
 
 const getRedirectAfterLogin = () => {
@@ -115,6 +154,25 @@ const getRequestErrorMessage = (error: unknown) => {
   }
 
   return SERVER_CONNECTION_MESSAGE;
+};
+
+const fetchCurrentUser = async (
+  token: string,
+): Promise<NonNullable<MeResponse["user"]>> => {
+  const response = await fetch(`${API_URL}/api/auth/me`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = (await response.json()) as MeResponse;
+
+  if (!response.ok || !data.user) {
+    throw new Error(data.message || "No se pudo validar la sesión");
+  }
+
+  return data.user;
 };
 
 export default function LoginForm() {
@@ -170,7 +228,27 @@ export default function LoginForm() {
     setErrors(newErrors);
   };
 
+  const finalizeValidatedSession = async (
+    token: string,
+    fallbackUser?: LoginResponse["user"],
+  ) => {
+    const validatedUser = await fetchCurrentUser(token);
+
+    if (!validatedUser) {
+      throw new Error("No se pudo obtener el usuario autenticado.");
+    }
+
+    saveSession(token, {
+      id: validatedUser.id,
+      correo: validatedUser.correo,
+      nombre: validatedUser.nombre ?? fallbackUser?.nombre,
+      apellido: validatedUser.apellido ?? fallbackUser?.apellido,
+      avatar: validatedUser.avatar ?? fallbackUser?.avatar ?? null,
+    });
+  };
+
   const handleGoogleLogin = () => {
+    clearClientSession();
     setGoogleError("");
     setErrorMessage("");
     setSuccessMessage("");
@@ -223,7 +301,7 @@ export default function LoginForm() {
       }
     }
 
-    function handleMessage(event: MessageEvent<GooglePopupMessage>) {
+    async function handleMessage(event: MessageEvent<GooglePopupMessage>) {
       if (event.origin !== expectedOrigin) {
         return;
       }
@@ -236,20 +314,34 @@ export default function LoginForm() {
       cleanup(false);
 
       if (event.data.type === "propbol:google-login-success") {
-        saveSession(event.data.token, event.data.user);
-        setSuccessMessage(
-          event.data.message || "Inicio de sesión con Google exitoso",
-        );
-        setIsLoadingGoogle(false);
-        popup.close();
+        try {
+          await finalizeValidatedSession(event.data.token, event.data.user);
 
-        window.setTimeout(() => {
-          redirectAfterSuccessfulLogin();
-        }, 1000);
+          setSuccessMessage(
+            event.data.message || "Inicio de sesión con Google exitoso",
+          );
+          setGoogleError("");
+          setIsLoadingGoogle(false);
+          popup.close();
+
+          window.setTimeout(() => {
+            redirectAfterSuccessfulLogin();
+          }, 1000);
+        } catch (error) {
+          clearClientSession();
+          setGoogleError(
+            error instanceof Error
+              ? error.message
+              : "No se pudo consolidar la sesión con Google.",
+          );
+          setIsLoadingGoogle(false);
+          popup.close();
+        }
 
         return;
       }
 
+      clearClientSession();
       setGoogleError(
         event.data.message || "No se pudo iniciar sesión con Google.",
       );
@@ -265,23 +357,22 @@ export default function LoginForm() {
       cleanup();
 
       if (!authWasResolved) {
+        clearClientSession();
+
         if (hasNoInternetConnection()) {
           setGoogleError(NO_CONNECTION_MESSAGE);
           return;
         }
 
-        const tokenGuardado = localStorage.getItem("token");
-
-        if (!tokenGuardado) {
-          setGoogleError(
-            "Cancelaste el inicio de sesión con Google. Puedes intentarlo nuevamente.",
-          );
-        }
+        setGoogleError(
+          "Cancelaste el inicio de sesión con Google. Puedes intentarlo nuevamente.",
+        );
       }
     }, 500);
 
     googleTimeoutId = window.setTimeout(() => {
       cleanup();
+      clearClientSession();
 
       if (!popup.closed) {
         popup.close();
@@ -331,6 +422,7 @@ export default function LoginForm() {
     }
 
     setIsLoading(true);
+    clearClientSession();
 
     const controller = new AbortController();
     const timeoutId = window.setTimeout(() => {
@@ -364,9 +456,13 @@ export default function LoginForm() {
         return;
       }
 
-      if (data.token) {
-        saveSession(data.token, data.user);
+      if (!data.token) {
+        clearClientSession();
+        setErrorMessage("El servidor no devolvió un token válido");
+        return;
       }
+
+      await finalizeValidatedSession(data.token, data.user);
 
       setSuccessMessage(data.message || "Inicio de sesión exitoso");
 
@@ -374,6 +470,7 @@ export default function LoginForm() {
         redirectAfterSuccessfulLogin();
       }, 1000);
     } catch (error) {
+      clearClientSession();
       setPassword("");
       setErrorMessage(getRequestErrorMessage(error));
     } finally {
@@ -395,6 +492,7 @@ export default function LoginForm() {
           <input
             type="email"
             required
+            autoFocus
             placeholder="Ingresa tu correo electrónico"
             value={correo}
             onChange={(e) => {
@@ -425,6 +523,7 @@ export default function LoginForm() {
                 setPassword(e.target.value);
                 validate("password", e.target.value);
               }}
+              onBlur={() => setShowPassword(false)}
               className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 text-sm outline-none focus:border-orange-500"
             />
 

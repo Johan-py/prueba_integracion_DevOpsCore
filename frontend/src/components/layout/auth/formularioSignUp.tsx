@@ -547,6 +547,7 @@ export default function SignUpForm() {
                   id="email"
                   name="email"
                   type="email"
+                  autoFocus
                   value={formData.email}
                   onChange={handleChange("email")}
                   onBlur={handleBlur("email")}
@@ -649,7 +650,7 @@ export default function SignUpForm() {
                   type={showPassword ? "text" : "password"}
                   value={formData.password}
                   onChange={handleChange("password")}
-                  onBlur={handleBlur("password")}
+                  onBlur={() => { setShowPassword(false); handleBlur("password")(); }}
                   placeholder="Ingresa tu contraseña"
                   maxLength={255}
                   className={`${getInputClasses(
@@ -688,7 +689,7 @@ export default function SignUpForm() {
                   type={showConfirmPassword ? "text" : "password"}
                   value={formData.confirmPassword}
                   onChange={handleChange("confirmPassword")}
-                  onBlur={handleBlur("confirmPassword")}
+                  onBlur={() => { setShowConfirmPassword(false); handleBlur("confirmPassword")(); }}
                   placeholder="Ingresa tu contraseña"
                   maxLength={255}
                   className={`${getInputClasses(

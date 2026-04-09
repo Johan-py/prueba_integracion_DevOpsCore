@@ -3,6 +3,7 @@
 import { Facebook, Instagram } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import Logo, { LogoMark } from "../navbar/Logo";
 
 type FooterAction = {
   href?: string;
@@ -74,21 +75,18 @@ function FooterBrand() {
 
   return (
     <section className="border-t border-amber-600 pt-4">
-      <Link
-        href="/"
+      <Logo
+        className="w-fit"
+        iconClassName="shadow-sm"
+        iconSize={40}
         onClick={(event) => {
           if (pathname === "/") {
             event.preventDefault();
             scrollToHomeTop();
           }
         }}
-        className="flex items-center gap-2 p-1 text-xl font-bold text-black transition hover:opacity-80"
-      >
-        <div className="h-8 w-8 rounded-sm bg-black" aria-hidden="true" />
-        <span>
-          Prop<span className="text-[#E68B25]">Bol</span>
-        </span>
-      </Link>
+        textClassName="text-[2rem] sm:text-[2.15rem]"
+      />
       <p className="mt-4 max-w-xs text-sm leading-7 text-stone-600">
         Revolucionando el mercado inmobiliario con tecnología de punta y diseño
         centrado en el usuario.
@@ -172,7 +170,7 @@ function FooterBottomBar() {
     <div className="border-t border-stone-200">
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-5 text-sm text-stone-600 sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:px-10">
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-          <span className="h-4 w-4 rounded-sm bg-black" aria-hidden="true" />
+          <LogoMark className="rounded-md shadow-none" size={16} />
           <span>2026 PropBol Inmobiliaria.</span>
           <span
             className="hidden h-1 w-1 rounded-full bg-stone-300 sm:block"
