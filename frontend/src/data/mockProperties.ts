@@ -1,6 +1,6 @@
 import { PropertyMapPin } from "@/types/property";
 
-const TYPES = ["casa", "departamento", "terreno", "local"] as const;
+const TYPES = ["casa", "departamento", "terreno", "oficina"] as const;
 const TITLES = [
   "Zona Norte",
   "Centro",

@@ -44,15 +44,25 @@ function BusquedaMapaContent() {
     null,
   );
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [isHoveringList, setIsHoveringList] = useState(false); // Controlar hover en tarjeta inmueble
 
   // Hover con debounce de 200 ms → vuela el mapa al marcador
   useEffect(() => {
-    if (!hoveredId) return;
-    const timeout = setTimeout(() => {
+  if (!hoveredId) {
+    if (!isHoveringList) {
+      setSelectedPropertyId(null);
+    }
+    return;
+  }
+  
+  const timeout = setTimeout(() => {
+    if (isHoveringList) {
       setSelectedPropertyId(hoveredId);
-    }, 200);
-    return () => clearTimeout(timeout);
-  }, [hoveredId]);
+    }
+  }, 200);
+  
+  return () => clearTimeout(timeout);
+  }, [hoveredId, isHoveringList]);
 
   return (
     <div className="flex flex-col h-screen bg-white overflow-hidden">
@@ -123,7 +133,14 @@ function BusquedaMapaContent() {
               </div>
 
               {/* Lista de propiedades con hover → fly-to en mapa */}
-              <div className="flex-1 overflow-y-auto p-4 bg-stone-50 no-scrollbar">
+              <div className="flex-1 overflow-y-auto p-4 bg-stone-50 no-scrollbar"
+                  onMouseEnter={() => setIsHoveringList(true)}
+                  onMouseLeave={() => {
+                   setIsHoveringList(false);
+                   setSelectedPropertyId(null);
+                   setHoveredId(null);
+                 }} 
+              >
                 {isLoading ? (
                   <div className="flex flex-col justify-center items-center h-full text-stone-400 text-sm gap-2 animate-pulse">
                     <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
