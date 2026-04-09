@@ -238,7 +238,13 @@ export default function MapView({
         zoomControl={false}
         touchZoom={true}
         dragging={true}
+        wheelDebounceTime={150}
+        wheelPxPerZoomLevel={120}
         style={{ height: "100%", width: "100%" }}
+        preferCanvas={true}
+        bounceAtZoomLimits={false}
+        inertia={true}
+        inertiaDeceleration={3000}
         className="z-0"
       >
         <TileLayer
@@ -265,8 +271,12 @@ export default function MapView({
           animateAddingMarkers={true}
           chunkedLoading={true}
           showCoverageOnHover={false}
+          polygonOptions={{ opacity: 0 }}
+          singleMarkerMode={false}
           zoomToBoundsOnClick={true}
-          removeOutsideVisibleBounds={true}
+          spiderfyOnMaxZoom={true}
+          spiderfyDistanceMultiplier={2}
+          removeOutsideVisibleBounds={false}
           clusterPane="markerPane"
         >
           {properties.map((property) => {
