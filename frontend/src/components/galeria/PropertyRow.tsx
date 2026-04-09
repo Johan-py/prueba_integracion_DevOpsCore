@@ -8,13 +8,13 @@ export default function PropertyRow({
   price,
   size,
   contactType,
-  image,
+  image
 }: {
-  title: string;
-  price: string;
-  size: string;
-  contactType: string;
-  image: string;
+  title: string
+  price: string
+  size: string
+  contactType: string
+  image: string
 }) {
 
   const [isHovered, setIsHovered] = useState(false);
@@ -55,9 +55,7 @@ export default function PropertyRow({
 
       {/* DETALLE */}
       <div className="flex flex-col overflow-hidden min-w-0">
-        <span className="text-[11px] font-medium text-gray-800 truncate">
-          {title}
-        </span>
+        <span className="text-[11px] font-medium text-gray-800 truncate">{title}</span>
         <span className="text-[10px] text-gray-500">{size}</span>
       </div>
 
@@ -67,5 +65,5 @@ export default function PropertyRow({
       </div>
 
     </div>
-  );
+);
 }

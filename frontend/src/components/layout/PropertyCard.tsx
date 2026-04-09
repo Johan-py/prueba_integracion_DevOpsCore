@@ -4,15 +4,16 @@ import ContactButton from "../galeria/ContactButton";
 import { useState } from "react";
 
 type PropsTarjeta = {
-  imagen?: string;
-  estado: string;
-  precio: string;
-  descripcion: string;
-  camas: number;
-  banos: number;
-  metros: number;
-};
+  imagen?: string
+  estado: string
+  precio: string
+  descripcion: string
+  camas: number
+  banos: number
+  metros: number
+}
 
+// 1. Definimos una constante para el color gris de fondo cuando no hay imagen
 const COLOR_GRIS_PLACEHOLDER = "bg-gray-200";
 
 export default function PropertyCard({
@@ -22,7 +23,7 @@ export default function PropertyCard({
   descripcion,
   camas,
   banos,
-  metros,
+  metros
 }: PropsTarjeta) {
 
   const [isHovered, setIsHovered] = useState(false);
@@ -58,9 +59,7 @@ export default function PropertyCard({
         ) : (
           <div className="flex flex-col items-center text-gray-400">
             <ImageOff className="w-12 h-12 mb-1" />
-            <span className="text-[10px] font-medium uppercase">
-              Sin foto disponible
-            </span>
+            <span className="text-[10px] font-medium uppercase">Sin foto disponible</span>
           </div>
         )}
 
@@ -110,5 +109,5 @@ export default function PropertyCard({
       </div>
 
     </div>
-  );
+);
 }

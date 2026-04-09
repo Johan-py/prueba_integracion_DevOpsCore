@@ -1,22 +1,22 @@
-import { Inmueble } from "../../types/inmueble";
-import { BedDouble, Bath, Maximize, MapPin, Star } from "lucide-react";
-import Image from "next/image";
+import { Inmueble } from '../../types/inmueble'
+import { BedDouble, Bath, Maximize, MapPin, Star } from 'lucide-react'
+import Image from 'next/image'
 
 interface TarjetaInmuebleProps {
-  inmueble: Inmueble;
+  inmueble: Inmueble
 }
 
 export const TarjetaInmueble = ({ inmueble }: TarjetaInmuebleProps) => {
-  const formatoMoneda = new Intl.NumberFormat("es-BO", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  });
+  const formatoMoneda = new Intl.NumberFormat('es-BO', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0
+  })
 
   const ubicacionTexto =
-    typeof inmueble.ubicacion === "object" && inmueble.ubicacion !== null
-      ? `${inmueble.ubicacion.zona ?? ""}, ${inmueble.ubicacion.ciudad ?? ""}`
-      : "";
+    typeof inmueble.ubicacion === 'object' && inmueble.ubicacion !== null
+      ? `${inmueble.ubicacion.zona ?? ''}, ${inmueble.ubicacion.ciudad ?? ''}`
+      : ''
 
   return (
     <div className="group flex flex-col w-full bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300">
@@ -54,18 +54,18 @@ export const TarjetaInmueble = ({ inmueble }: TarjetaInmuebleProps) => {
         <div className="mt-auto border-t border-gray-100 pt-3 flex items-center justify-between text-gray-600 text-sm font-medium">
           <div className="flex items-center gap-1.5" title="Habitaciones">
             <BedDouble className="w-4 h-4 text-blue-500" />
-            <span>{inmueble.nroCuartos ?? "-"}</span>
+            <span>{inmueble.nroCuartos ?? '-'}</span>
           </div>
           <div className="flex items-center gap-1.5" title="Baños">
             <Bath className="w-4 h-4 text-orange-500" />
-            <span>{inmueble.nroBanos ?? "-"}</span>
+            <span>{inmueble.nroBanos ?? '-'}</span>
           </div>
           <div className="flex items-center gap-1.5" title="Superficie total">
             <Maximize className="w-4 h-4 text-blue-500" />
-            <span>{inmueble.superficieM2 ?? "-"} m²</span>
+            <span>{inmueble.superficieM2 ?? '-'} m²</span>
           </div>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}

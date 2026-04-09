@@ -1,22 +1,16 @@
-import type { MouseEventHandler } from "react";
-import Link from "next/link";
+import type { MouseEventHandler } from 'react'
+import Link from 'next/link'
 
 type LogoProps = {
-  className?: string;
-  iconClassName?: string;
-  iconSize?: number;
-  onClick?: MouseEventHandler<HTMLAnchorElement>;
-  textClassName?: string;
-};
+  className?: string
+  iconClassName?: string
+  iconSize?: number
+  onClick?: MouseEventHandler<HTMLAnchorElement>
+  textClassName?: string
+}
 
-export function LogoMark({
-  className = "",
-  size = 44,
-}: {
-  className?: string;
-  size?: number;
-}) {
-  const iconSize = Math.max(18, Math.round(size * 0.6));
+export function LogoMark({ className = '', size = 44 }: { className?: string; size?: number }) {
+  const iconSize = Math.max(18, Math.round(size * 0.6))
 
   return (
     <span
@@ -42,15 +36,15 @@ export function LogoMark({
         <rect x="9.5" y="16" width="7" height="7" rx="2.5" fill="#D97706" />
       </svg>
     </span>
-  );
+  )
 }
 
 export default function Logo({
-  className = "",
+  className = '',
   iconClassName,
   iconSize = 44,
   onClick,
-  textClassName = "",
+  textClassName = ''
 }: LogoProps) {
   return (
     <Link
@@ -65,5 +59,5 @@ export default function Logo({
         Prop<span className="text-amber-600">Bol</span>
       </span>
     </Link>
-  );
+  )
 }

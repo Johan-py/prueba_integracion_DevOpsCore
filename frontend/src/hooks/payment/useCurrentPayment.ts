@@ -1,27 +1,24 @@
-import { useState, useEffect } from "react";
-import { PaymentData } from "@/types/payment";
+import { useState, useEffect } from 'react'
+import { PaymentData } from '@/types/payment'
 
 export function useCurrentPayment() {
-  const [payment, setPayment] = useState<PaymentData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [payment, setPayment] = useState<PaymentData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchPayment = async () => {
       try {
         // Cambie el fetch me leia mal la ruta
-        const response = await fetch(
-          "http://localhost:5000/api/transacciones/pendiente/1",
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          },
-        );
+        const response = await fetch('http://localhost:5000/api/transacciones/pendiente/1', {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
 
-        if (!response.ok) throw new Error("Error al obtener la transacción");
+        if (!response.ok) throw new Error('Error al obtener la transacción')
 
-        const data = await response.json();
+        const data = await response.json()
 
         const realPayment: PaymentData = {
           id: data.id,
@@ -29,19 +26,19 @@ export function useCurrentPayment() {
           referencia: data.referencia,
           qrContent: data.qrContent,
           estado: data.estado,
-          fechaExpiracion: data.fechaExpiracion,
-        };
+          fechaExpiracion: data.fechaExpiracion
+        }
 
-        setPayment(realPayment);
+        setPayment(realPayment)
       } catch (err) {
-        setError("Error al cargar el pago");
+        setError('Error al cargar el pago')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchPayment();
-  }, []);
+    fetchPayment()
+  }, [])
 
-  return { payment, loading, error };
+  return { payment, loading, error }
 }
