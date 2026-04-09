@@ -82,9 +82,10 @@ function BusquedaMapaContent() {
         >
           {isSidebarOpen && (
             <div className="flex flex-col h-full">
-              {/* Cabecera del panel */}
+              {/* Cabecera del panel (FUSIONADA) */}
               <div className="p-4 bg-white shrink-0">
-                <div className="flex justify-between items-start mb-4">
+                <div className="flex justify-between items-center mb-4">
+                  {/* Lado Izquierdo: Título y cantidad */}
                   <div className="flex flex-col">
                     <h2 className="text-2xl font-bold text-slate-900">
                       <span className="text-orange-500">
@@ -97,6 +98,8 @@ function BusquedaMapaContent() {
                       </span>
                     </h2>
                   </div>
+
+                  {/* Lado Derecho: SOLO Botón cerrar */}
                   <button
                     onClick={() => setIsSidebarOpen(false)}
                     className="p-1 hover:bg-stone-100 rounded-full transition-colors text-stone-400"
@@ -105,32 +108,33 @@ function BusquedaMapaContent() {
                   </button>
                 </div>
 
-                <div className="border-b border-stone-100 pb-4 [&>div>div:first-child]:hidden">
+                {/* Contenedor relativo para el Menú y el Switch flotante */}
+                {/* Aumentamos pb-4 para darle espacio al posicionamiento absoluto */}
+                <div className="relative border-b border-stone-100 pb-4 [&>div>div:first-child]:hidden [&>div]:mb-0">
                   <MenuOrdenamiento
                     totalResultados={properties.length}
                     ordenActual={ordenActual}
                     onOrdenChange={cambiarOrden}
                   />
-                </div>
-              </div>
 
-              {/* Toggle vista grid / lista */}
-              <div className="px-4 py-2 border-b border-stone-50 flex justify-end bg-white">
-                <div className="flex bg-stone-100 p-1 rounded-md border border-stone-200 shadow-inner scale-90">
-                  <button
-                    onClick={() => setViewMode("grid")}
-                    className={`p-1 rounded transition-colors ${viewMode === "grid" ? "bg-white text-[#ea580c] shadow-sm" : "text-stone-400"}`}
-                  >
-                    <LayoutGrid size={16} />
-                  </button>
-                  <button
-                    onClick={() => setViewMode("list")}
-                    className={`p-1 rounded transition-colors ${viewMode === "list" ? "bg-white text-[#ea580c] shadow-sm" : "text-stone-400"}`}
-                  >
-                    <ListIcon size={16} />
-                  </button>
+                  {/* NUEVO: Switch flotante alineado a la derecha de los filtros */}
+                  <div className="absolute right-0 bottom-4 flex bg-stone-100 p-1 rounded-md border border-stone-200 shadow-inner scale-90 origin-bottom-right">
+                    <button
+                      onClick={() => setViewMode("grid")}
+                      className={`p-1 rounded transition-colors ${viewMode === "grid" ? "bg-white text-[#ea580c] shadow-sm" : "text-stone-400"}`}
+                    >
+                      <LayoutGrid size={16} />
+                    </button>
+                    <button
+                      onClick={() => setViewMode("list")}
+                      className={`p-1 rounded transition-colors ${viewMode === "list" ? "bg-white text-[#ea580c] shadow-sm" : "text-stone-400"}`}
+                    >
+                      <ListIcon size={16} />
+                    </button>
+                  </div>
                 </div>
               </div>
+              
 
               {/* Lista de propiedades con hover → fly-to en mapa */}
               <div className="flex-1 overflow-y-auto p-4 bg-stone-50 no-scrollbar">
