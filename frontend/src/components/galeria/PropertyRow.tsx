@@ -1,6 +1,7 @@
 import ContactButton from "./ContactButton";
 import Image from "next/image";
-import { useState } from "react";  // ← IMPORTAR useState
+import { useState } from "react";
+import { MapPin } from "lucide-react";
 
 export default function PropertyRow({
   title,
@@ -15,14 +16,23 @@ export default function PropertyRow({
   contactType: string;
   image: string;
 }) {
-  const [isHovered, setIsHovered] = useState(false);  // ← AGREGAR ESTADO
+
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <div 
-      className="grid grid-cols-[40px_70px_minmax(0,1fr)_50px] gap-2 px-3 py-2 items-center transition-all duration-200 hover:bg-gray-50 cursor-pointer"
-      onMouseEnter={() => setIsHovered(true)}   // ← AGREGAR
-      onMouseLeave={() => setIsHovered(false)}  // ← AGREGAR
+    <div
+      className="relative grid grid-cols-[40px_70px_minmax(0,1fr)_50px] gap-2 px-3 py-2 items-center transition-all duration-200 hover:bg-gray-50 cursor-pointer"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
+
+      {/* PIN EN HOVER */}
+      {isHovered && (
+        <div className="absolute top-1 right-1 z-20 bg-white rounded-full shadow p-1 border border-gray-200">
+          <MapPin className="w-4 h-4 text-[#ea580c]" />
+        </div>
+      )}
+
       {/* FOTO */}
       <div className="w-[40px] h-[40px] rounded-md overflow-hidden bg-gray-200">
         <Image
@@ -34,8 +44,8 @@ export default function PropertyRow({
         />
       </div>
 
-      {/* PRECIO - Con tamaño dinámico al hover */}
-      <span 
+      {/* PRECIO */}
+      <span
         className={`font-semibold text-gray-700 transition-all duration-300 ease-in-out ${
           isHovered ? "text-sm" : "text-[11px]"
         }`}
@@ -55,6 +65,7 @@ export default function PropertyRow({
       <div className="flex justify-center">
         <ContactButton type={contactType} variant="table" />
       </div>
+
     </div>
   );
 }

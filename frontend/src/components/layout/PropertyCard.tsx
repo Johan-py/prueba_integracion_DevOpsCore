@@ -1,6 +1,5 @@
-// frontend/src/components/layout/PropertyCard.tsx
 import Image from "next/image";
-import { BedDouble, Bath, Square, ImageOff } from "lucide-react";
+import { BedDouble, Bath, Square, ImageOff, MapPin } from "lucide-react";
 import ContactButton from "../galeria/ContactButton";
 import { useState } from "react";
 
@@ -30,10 +29,17 @@ export default function PropertyCard({
 
   return (
     <div
-      className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 border border-gray-100 group cursor-pointer"
+      className="relative bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 border border-gray-100 group cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+
+      {/* PIN EN HOVER */}
+      {isHovered && (
+        <div className="absolute top-3 right-3 z-30 bg-white rounded-full shadow-md p-2 border border-gray-200">
+          <MapPin className="w-5 h-5 text-[#ea580c]" />
+        </div>
+      )}
 
       {/* Imagen */}
       <div
@@ -66,7 +72,6 @@ export default function PropertyCard({
       {/* Contenido */}
       <div className="p-4 flex flex-col gap-3">
 
-        {/* Precio */}
         <h2
           className={`font-extrabold text-gray-950 tracking-tight transition-all duration-300 ${
             isHovered ? "text-2xl md:text-3xl" : "text-xl md:text-2xl"
@@ -75,32 +80,35 @@ export default function PropertyCard({
           {precio}
         </h2>
 
-        {/* Descripción */}
         <p className="text-sm text-gray-800 line-clamp-2 font-medium leading-relaxed min-h-[40px]">
           {descripcion}
         </p>
 
-        {/* Características */}
         <div className="flex items-center gap-4 text-gray-600 border-t border-gray-100 pt-3">
+
           <span className="flex items-center gap-1.5 text-sm font-semibold">
-            <BedDouble className="w-4 h-4 text-[#ea580c]" /> {camas}
+            <BedDouble className="w-4 h-4 text-[#ea580c]" />
+            {camas}
           </span>
 
           <span className="flex items-center gap-1.5 text-sm font-semibold">
-            <Bath className="w-4 h-4 text-[#ea580c]" /> {banos}
+            <Bath className="w-4 h-4 text-[#ea580c]" />
+            {banos}
           </span>
 
           <span className="flex items-center gap-1.5 text-sm font-semibold border border-gray-200 bg-gray-50 px-2 py-0.5 rounded">
-            <Square className="w-4 h-4 text-gray-500" /> {metros} m²
+            <Square className="w-4 h-4 text-gray-500" />
+            {metros} m²
           </span>
+
         </div>
 
-        {/* Botón contacto */}
         <div className="mt-1 w-full">
           <ContactButton type="whatsapp" variant="grid" />
         </div>
 
       </div>
+
     </div>
   );
 }
