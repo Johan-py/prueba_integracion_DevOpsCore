@@ -21,7 +21,8 @@ export class FiltersHomepageService {
       { id: 'DEPARTAMENTO', label: 'Departamento' },
       { id: 'OFICINA', label: 'Oficina' },
       { id: 'TERRENO', label: 'Terreno' },
-      { id: 'CEMENTERIO', label: 'Cementerio' }
+      { id: 'CEMENTERIO', label: 'Cementerio' },
+      { id: 'CUARTO', label: 'cuarto' }  
     ];
 
     const categoriesMapped = requiredCategories.map(reqCat => {

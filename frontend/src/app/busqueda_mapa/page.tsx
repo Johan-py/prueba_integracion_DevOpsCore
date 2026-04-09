@@ -7,6 +7,7 @@ import {
   ChevronRight,
   List as ListIcon,
   LayoutGrid,
+  Filter,
 } from "lucide-react";
 
 // === HOOKS ===
@@ -44,18 +45,28 @@ function BusquedaMapaContent() {
     null,
   );
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [isHoveringList, setIsHoveringList] = useState(false); // Controlar hover en tarjeta inmueble
 
   // Hover con debounce de 200 ms → vuela el mapa al marcador
   useEffect(() => {
-    if (!hoveredId) return;
-    const timeout = setTimeout(() => {
+  if (!hoveredId) {
+    if (!isHoveringList) {
+      setSelectedPropertyId(null);
+    }
+    return;
+  }
+  
+  const timeout = setTimeout(() => {
+    if (isHoveringList) {
       setSelectedPropertyId(hoveredId);
-    }, 200);
-    return () => clearTimeout(timeout);
-  }, [hoveredId]);
+    }
+  }, 200);
+  
+  return () => clearTimeout(timeout);
+  }, [hoveredId, isHoveringList]);
 
   return (
-    <div className="flex flex-col h-screen bg-white overflow-hidden">
+    <div className="flex flex-col h-screen bg-white">
       <FilterBar
         variant="map"
         onSearch={(nuevosFiltros) => {
@@ -73,19 +84,30 @@ function BusquedaMapaContent() {
           {isSidebarOpen && (
             <div className="flex flex-col h-full">
               {/* Cabecera del panel */}
-              <div className="p-4 bg-white shrink-0">
+              <div className="flex-none px-4 py-3 bg-white border-b border-stone-200 flex flex-col gap-2">
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex flex-col">
-                    <h2 className="text-2xl font-bold text-slate-900">
+                    <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1">
+                      <Filter className="w-4 h-4 text-orange-500" />
+                      <h1 className="text-base font-semibold text-stone-900 uppercase tracking-wide">Filtros </h1>
+                      </div>
+                      <div className="flex items-center gap-2 mb-2">
+                       <h1 className="text-xl font-semibold text-slate-800">
+                          Resultados de búsqueda
+                          </h1>
+                         </div>
+                    <h2 className="text-sm font-bold text-slate-900">
                       <span className="text-orange-500">
                         {properties.length}
                       </span>
-                      <span className="ml-2 text-gray-600 font-normal text-lg">
+                      <span className="ml-2 text-gray-600 font-normal text-sm">
                         {properties.length === 1
                           ? "propiedad encontrada"
                           : "propiedades encontradas"}
                       </span>
                     </h2>
+                    </div>
                   </div>
                   <button
                     onClick={() => setIsSidebarOpen(false)}
@@ -111,19 +133,26 @@ function BusquedaMapaContent() {
                     onClick={() => setViewMode("grid")}
                     className={`p-1 rounded transition-colors ${viewMode === "grid" ? "bg-white text-[#ea580c] shadow-sm" : "text-stone-400"}`}
                   >
-                    <LayoutGrid size={16} />
+                    <LayoutGrid size={20} />
                   </button>
                   <button
                     onClick={() => setViewMode("list")}
-                    className={`p-1 rounded transition-colors ${viewMode === "list" ? "bg-white text-[#ea580c] shadow-sm" : "text-stone-400"}`}
+                    className={`p-2 rounded transition-colors ${viewMode === "list" ? "bg-white text-[#ea580c] shadow-sm" : "text-stone-00"}`}
                   >
-                    <ListIcon size={16} />
+                    <ListIcon size={20} />
                   </button>
                 </div>
               </div>
 
               {/* Lista de propiedades con hover → fly-to en mapa */}
-              <div className="flex-1 overflow-y-auto p-4 bg-stone-50 no-scrollbar">
+              <div className="flex-1 overflow-y-auto p-4 bg-stone-50 no-scrollbar"
+                  onMouseEnter={() => setIsHoveringList(true)}
+                  onMouseLeave={() => {
+                   setIsHoveringList(false);
+                   setSelectedPropertyId(null);
+                   setHoveredId(null);
+                 }} 
+              >
                 {isLoading ? (
                   <div className="flex flex-col justify-center items-center h-full text-stone-400 text-sm gap-2 animate-pulse">
                     <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
@@ -133,7 +162,11 @@ function BusquedaMapaContent() {
                   <EmptyState />
                 ) : (
                   <div
-                    className={`gap-4 flex flex-col ${viewMode === "list" ? "divide-y divide-gray-100 bg-white border border-gray-100 rounded-xl shadow-sm" : ""}`}
+                    className={`gap-4 flex flex-col h-fit w-full ${
+                      viewMode === "list"
+                        ? "divide-y divide-gray-100 bg-white border border-gray-100 rounded-xl shadow-sm"
+                        : ""
+                         }`  }
                   >
                     {properties.map((property: any) => (
                       <div
@@ -150,7 +183,8 @@ function BusquedaMapaContent() {
                       >
                         {viewMode === "grid" ? (
                           <PropertyCard
-                            imagen=""
+                            imagen={property.imagen || "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=800&q=80"
+                              ||"https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"||"https://images.unsplash.com/photo-1512917774085-9988501fc184?auto=format&fit=crop&w=800&q=80"}
                             estado={property.type}
                             precio={
                               property.currency === "USD"
@@ -172,7 +206,7 @@ function BusquedaMapaContent() {
                             }
                             size="3 Dorm. • 150 m²"
                             contactType="whatsapp"
-                            image=""
+                            image={property.imagen || "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80"}
                           />
                         )}
                       </div>

@@ -37,6 +37,11 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
     saveToHistory(fullName);
     setIsOpen(false);
     registrarConsulta(loc.id, fullName);
+
+    // Auto-submit tras elegir sugerencia
+    setTimeout(() => {
+      containerRef.current?.closest("form")?.requestSubmit();
+    }, 100);
   };
 
   useEffect(() => {
@@ -54,7 +59,10 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value;
-    const cleanValue = rawValue.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s\-]/gi, "");
+    const cleanValue = rawValue
+      .replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s\-]/gi, "")
+      .trimStart();
+
     onChange(cleanValue);
   };
 
@@ -97,16 +105,13 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
 
   return (
     <div className="w-full relative" ref={containerRef}>
-      <label className="block text-sm font-medium text-stone-700 mb-2 text-left md:text-center uppercase tracking-wide font-montserrat">
-        Ciudad / Zona
-      </label>
-
+      {/* ELIMINADO EL LABEL CIUDAD/ZONA */}
+      
       <div
-        className={`h-[46px] rounded-xl border transition-all flex items-center gap-3 px-4 bg-white shadow-sm ${
-          isOpen && suggestions.length > 0
-            ? "border-amber-600 ring-2 ring-amber-100"
-            : "border-stone-300"
-        }`}
+        className={`h-[46px] rounded-xl border transition-all flex items-center gap-3 px-4 bg-white shadow-sm ${isOpen && suggestions.length > 0
+          ? "border-amber-600 ring-2 ring-amber-100"
+          : "border-stone-300"
+          }`}
       >
         <MapPin className={`w-5 h-5 flex-shrink-0 ${value ? "text-amber-600" : "text-stone-400"}`} />
 
@@ -116,10 +121,15 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
             value={value}
             onChange={handleInputChange}
             onFocus={() => setIsOpen(true)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setIsOpen(false);
+              }
+            }}
             placeholder="Cochabamba, La Paz..."
             className="w-full bg-transparent outline-none text-sm text-stone-900 placeholder:text-stone-400 font-inter pr-[70px] md:truncate overflow-x-auto whitespace-nowrap"
           />
-          
+         
           <div className="absolute right-0 flex items-center gap-2 bg-white pl-2 h-full">
             {isSelected && (
               <Image
@@ -130,17 +140,17 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
                 className="rounded-sm flex-shrink-0"
               />
             )}
-            
+           
             {isLoading ? (
               <Loader2 className="w-4 h-4 animate-spin text-amber-600" />
             ) : (
               value && (
-                <button 
+                <button
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     onChange("");
-                  }} 
+                  }}
                   type="button"
                   className="p-1 hover:bg-stone-100 rounded-full transition-colors flex-shrink-0"
                 >
@@ -154,7 +164,7 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
 
       {isOpen && (
         <div className="absolute z-[100] w-full mt-2 bg-white border border-stone-200 rounded-xl shadow-xl overflow-hidden">
-          {value.trim().length === 0 && history.length > 0 && (
+          {value === "" && history.length > 0 && (
             <div>
               <div className="px-4 py-2 bg-stone-50 border-b border-stone-100">
                 <span className="text-[10px] uppercase font-bold text-stone-400 tracking-wider">
@@ -169,6 +179,9 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
                     onChange(item);
                     setIsOpen(false);
                     updateFilters({ query: item });
+                    setTimeout(() => {
+                        containerRef.current?.closest("form")?.requestSubmit();
+                    }, 100);
                   }}
                   className="w-full px-4 py-3 flex items-center gap-3 hover:bg-amber-50 transition-colors text-left border-b border-stone-50 last:border-0"
                 >

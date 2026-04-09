@@ -12,6 +12,7 @@ interface ComboBoxProps {
   placeholder?: string;
   options?: (string | ComboBoxOption)[];
   icon?: LucideIcon;
+  value?: string;
   onChange?: (value: string) => void;
 }
 

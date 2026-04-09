@@ -54,12 +54,12 @@ export default function PropertyCard({
         </span>
       </div>
 
-      <div className="p-4 flex flex-col gap-3">
+      <div className="p-3 flex flex-col gap-2">
         <h2 className="text-xl md:text-2xl font-extrabold text-gray-950 tracking-tight">
           {precio}
         </h2>
 
-        <p className="text-sm text-gray-800 line-clamp-2 font-medium leading-relaxed min-h-[40px]">
+        <p className="text-sm text-gray-900 line-clamp-2 font-medium leading-snug">
           {descripcion}
         </p>
 
