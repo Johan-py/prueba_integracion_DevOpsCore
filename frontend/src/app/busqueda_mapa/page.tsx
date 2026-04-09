@@ -73,18 +73,11 @@ function BusquedaMapaContent() {
           {isSidebarOpen && (
             <div className="flex flex-col h-full">
               {/* Cabecera del panel */}
-              <div className="p-4 bg-white shrink-0">
+              <div className="flex-none px-4 py-3 bg-white border-b border-stone-200 flex flex-col gap-2">
                 <div className="flex justify-between items-start mb-4">
-                  <div className="flex flex-col">
-                    <h2 className="text-2xl font-bold text-slate-900">
-                      <span className="text-orange-500">
-                        {properties.length}
-                      </span>
-                      <span className="ml-2 text-gray-600 font-normal text-lg">
-                        {properties.length === 1
-                          ? "propiedad encontrada"
-                          : "propiedades encontradas"}
-                      </span>
+                  <div className="flex items-center gap-1">
+                    <h2 className="text-2xl font-bold text-slate-600">
+                     
                     </h2>
                   </div>
                   <button
@@ -111,13 +104,13 @@ function BusquedaMapaContent() {
                     onClick={() => setViewMode("grid")}
                     className={`p-1 rounded transition-colors ${viewMode === "grid" ? "bg-white text-[#ea580c] shadow-sm" : "text-stone-400"}`}
                   >
-                    <LayoutGrid size={16} />
+                    <LayoutGrid size={20} />
                   </button>
                   <button
                     onClick={() => setViewMode("list")}
-                    className={`p-1 rounded transition-colors ${viewMode === "list" ? "bg-white text-[#ea580c] shadow-sm" : "text-stone-400"}`}
+                    className={`p-2 rounded transition-colors ${viewMode === "list" ? "bg-white text-[#ea580c] shadow-sm" : "text-stone-00"}`}
                   >
-                    <ListIcon size={16} />
+                    <ListIcon size={20} />
                   </button>
                 </div>
               </div>
@@ -133,7 +126,11 @@ function BusquedaMapaContent() {
                   <EmptyState />
                 ) : (
                   <div
-                    className={`gap-4 flex flex-col ${viewMode === "list" ? "divide-y divide-gray-100 bg-white border border-gray-100 rounded-xl shadow-sm" : ""}`}
+                    className={`gap-4 flex flex-col h-fit w-full ${
+                      viewMode === "list"
+                        ? "divide-y divide-gray-100 bg-white border border-gray-100 rounded-xl shadow-sm"
+                        : ""
+                         }`  }
                   >
                     {properties.map((property: any) => (
                       <div
@@ -150,7 +147,8 @@ function BusquedaMapaContent() {
                       >
                         {viewMode === "grid" ? (
                           <PropertyCard
-                            imagen=""
+                            imagen={property.imagen || "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=800&q=80"
+                              ||"https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"||"https://images.unsplash.com/photo-1512917774085-9988501fc184?auto=format&fit=crop&w=800&q=80"}
                             estado={property.type}
                             precio={
                               property.currency === "USD"
@@ -172,7 +170,7 @@ function BusquedaMapaContent() {
                             }
                             size="3 Dorm. • 150 m²"
                             contactType="whatsapp"
-                            image=""
+                            image={property.imagen || "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80"}
                           />
                         )}
                       </div>
