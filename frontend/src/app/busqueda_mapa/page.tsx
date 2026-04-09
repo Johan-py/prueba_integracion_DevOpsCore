@@ -54,7 +54,7 @@ function BusquedaMapaContent() {
     return () => clearTimeout(timeout);
   }, [hoveredId]);
 
-  // 👇 NUEVO: Sincronización del mapa con el colapso del panel lateral
+  //Sincronización del mapa con el colapso del panel lateral
   useEffect(() => {
     // 300ms es exactamente el tiempo que dura su clase 'duration-300'
     const resizeTimeout = setTimeout(() => {
@@ -65,7 +65,7 @@ function BusquedaMapaContent() {
   }, [isSidebarOpen]);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-180px)] bg-white overflow-hidden">
+    <div className="flex flex-col bg-white w-full h-[calc(100dvh-80px)] md:h-[calc(100dvh-99px)] overflow-hidden">
       <FilterBar
         variant="map"
         onSearch={(nuevosFiltros) => {
@@ -73,7 +73,7 @@ function BusquedaMapaContent() {
         }}
       />
 
-      <main className="flex flex-1 overflow-hidden relative border-b border-stone-200">
+      <main className="flex w-full flex-1 relative overflow-hidden border-b border-stone-200">
         {/* Panel lateral colapsable */}
         <aside
           className={`bg-white border-r border-stone-200 flex flex-col z-10 transition-all duration-300 ${
