@@ -57,7 +57,7 @@ export default async function Home() {
           </div>
 
           {/* EXPLORE SECTION */}
-          <section className="flex-1 w-full md:pl-20">
+          <section className="flex-1 w-full md:pl-20 -mt-16 md:mt-0">
             <ExploreSection />
           </section>
         </div>
