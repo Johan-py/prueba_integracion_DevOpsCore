@@ -1,20 +1,20 @@
 // frontend/src/components/layout/PropertyCard.tsx
-import Image from "next/image";
-import { BedDouble, Bath, Square, ImageOff } from "lucide-react"; // Quité MessageSquareText porque ya viene en tu botón
-import ContactButton from "../galeria/ContactButton"; // <-- Tu botón modular importado
+import Image from 'next/image'
+import { BedDouble, Bath, Square, ImageOff } from 'lucide-react' // Quité MessageSquareText porque ya viene en tu botón
+import ContactButton from '../galeria/ContactButton' // <-- Tu botón modular importado
 
 type PropsTarjeta = {
-  imagen?: string;
-  estado: string;
-  precio: string;
-  descripcion: string;
-  camas: number;
-  banos: number;
-  metros: number;
-};
+  imagen?: string
+  estado: string
+  precio: string
+  descripcion: string
+  camas: number
+  banos: number
+  metros: number
+}
 
 // 1. Definimos una constante para el color gris de fondo cuando no hay imagen
-const COLOR_GRIS_PLACEHOLDER = "bg-gray-200";
+const COLOR_GRIS_PLACEHOLDER = 'bg-gray-200'
 
 export default function PropertyCard({
   imagen,
@@ -23,13 +23,13 @@ export default function PropertyCard({
   descripcion,
   camas,
   banos,
-  metros,
+  metros
 }: PropsTarjeta) {
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300 border border-gray-100 group">
       {/* 2. Implementación de Imagen o Cuadro Gris (Misión Día 3) */}
       <div
-        className={`relative aspect-[16/10] overflow-hidden ${!imagen ? COLOR_GRIS_PLACEHOLDER : ""} flex items-center justify-center`}
+        className={`relative aspect-[16/10] overflow-hidden ${!imagen ? COLOR_GRIS_PLACEHOLDER : ''} flex items-center justify-center`}
       >
         {imagen ? (
           <Image
@@ -43,9 +43,7 @@ export default function PropertyCard({
           /* Icono de cámara tachada si no hay foto para que no se vea feo */
           <div className="flex flex-col items-center text-gray-400">
             <ImageOff className="w-12 h-12 mb-1" />
-            <span className="text-[10px] font-medium uppercase">
-              Sin foto disponible
-            </span>
+            <span className="text-[10px] font-medium uppercase">Sin foto disponible</span>
           </div>
         )}
 
@@ -81,5 +79,5 @@ export default function PropertyCard({
         </div>
       </div>
     </div>
-  );
+  )
 }

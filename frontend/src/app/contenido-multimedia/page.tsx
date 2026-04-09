@@ -1,302 +1,287 @@
-"use client";
+'use client'
 
-import { Suspense, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import FotosSection from "@/components/contenido-multimedia/FotosSection";
-import VideosSection from "@/components/contenido-multimedia/VideosSection";
-import PublicarSection from "@/components/contenido-multimedia/PublicarSection";
-import SuccessModal from "@/components/contenido-multimedia/SuccessModal";
-import PlanModal from "@/components/contenido-multimedia/PlanModal";
+import { Suspense, useRef, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import FotosSection from '@/components/contenido-multimedia/FotosSection'
+import VideosSection from '@/components/contenido-multimedia/VideosSection'
+import PublicarSection from '@/components/contenido-multimedia/PublicarSection'
+import SuccessModal from '@/components/contenido-multimedia/SuccessModal'
+import PlanModal from '@/components/contenido-multimedia/PlanModal'
 
 type ImageItem = {
-  id: string;
-  file: File;
-  previewUrl: string;
-  name: string;
-};
+  id: string
+  file: File
+  previewUrl: string
+  name: string
+}
 
 type VideoItem = {
-  id: string;
-  type: "file" | "youtube";
-  name: string;
-  previewUrl?: string;
-  embedUrl?: string;
-  file?: File;
-  sourceUrl?: string;
-};
+  id: string
+  type: 'file' | 'youtube'
+  name: string
+  previewUrl?: string
+  embedUrl?: string
+  file?: File
+  sourceUrl?: string
+}
 
 export default function ContenidoMultimediaPage() {
   return (
-    <Suspense fallback={<div style={{ padding: "24px" }}>Cargando...</div>}>
+    <Suspense fallback={<div style={{ padding: '24px' }}>Cargando...</div>}>
       <ContenidoMultimediaPageContent />
     </Suspense>
-  );
+  )
 }
 
 function ContenidoMultimediaPageContent() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const publicacionId = Number(searchParams.get("publicacionId"));
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const publicacionId = Number(searchParams.get('publicacionId'))
 
-  const [images, setImages] = useState<ImageItem[]>([]);
-  const [videos, setVideos] = useState<VideoItem[]>([]);
-  const [videoUrl, setVideoUrl] = useState("");
-  const [confirmed, setConfirmed] = useState(false);
+  const [images, setImages] = useState<ImageItem[]>([])
+  const [videos, setVideos] = useState<VideoItem[]>([])
+  const [videoUrl, setVideoUrl] = useState('')
+  const [confirmed, setConfirmed] = useState(false)
 
-  const [imageError, setImageError] = useState("");
-  const [videoError, setVideoError] = useState("");
-  const [publishError, setPublishError] = useState("");
+  const [imageError, setImageError] = useState('')
+  const [videoError, setVideoError] = useState('')
+  const [publishError, setPublishError] = useState('')
 
-  const [isUploadingImages, setIsUploadingImages] = useState(false);
-  const [isUploadingVideos, setIsUploadingVideos] = useState(false);
+  const [isUploadingImages, setIsUploadingImages] = useState(false)
+  const [isUploadingVideos, setIsUploadingVideos] = useState(false)
 
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [showPlanModal, setShowPlanModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [showPlanModal, setShowPlanModal] = useState(false)
 
-  const imageInputRef = useRef<HTMLInputElement | null>(null);
-  const videoInputRef = useRef<HTMLInputElement | null>(null);
+  const imageInputRef = useRef<HTMLInputElement | null>(null)
+  const videoInputRef = useRef<HTMLInputElement | null>(null)
 
-  const hasMultimedia = images.length > 0 || videos.length > 0;
+  const hasMultimedia = images.length > 0 || videos.length > 0
 
   const handleOpenImagePicker = () => {
-    imageInputRef.current?.click();
-  };
+    imageInputRef.current?.click()
+  }
 
   const handleOpenVideoPicker = () => {
-    videoInputRef.current?.click();
-  };
+    videoInputRef.current?.click()
+  }
 
-  const handleImageChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const files = Array.from(event.target.files || []);
-    if (!files.length) return;
+  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || [])
+    if (!files.length) return
 
-    setImageError("");
+    setImageError('')
 
     if (images.length + files.length > 5) {
-      setImageError("Límite alcanzado. Solo puedes subir máximo 5 imágenes.");
-      event.target.value = "";
-      return;
+      setImageError('Límite alcanzado. Solo puedes subir máximo 5 imágenes.')
+      event.target.value = ''
+      return
     }
 
-    const allowedTypes = ["image/png", "image/jpeg"];
-    const maxSize = 5 * 1024 * 1024;
+    const allowedTypes = ['image/png', 'image/jpeg']
+    const maxSize = 5 * 1024 * 1024
 
-    setIsUploadingImages(true);
+    setIsUploadingImages(true)
 
-    const validImages: ImageItem[] = [];
+    const validImages: ImageItem[] = []
 
     for (const file of files) {
       if (!allowedTypes.includes(file.type)) {
-        setImageError("Formato no permitido. Solo PNG o JPG");
-        continue;
+        setImageError('Formato no permitido. Solo PNG o JPG')
+        continue
       }
 
       if (file.size > maxSize) {
-        setImageError("Una de las imágenes supera los 5 MB.");
-        continue;
+        setImageError('Una de las imágenes supera los 5 MB.')
+        continue
       }
 
       validImages.push({
         id: `${file.name}-${Date.now()}-${Math.random()}`,
         file,
         previewUrl: URL.createObjectURL(file),
-        name: file.name,
-      });
+        name: file.name
+      })
     }
 
-    setImages((prev) => [...prev, ...validImages].slice(0, 5));
-    setIsUploadingImages(false);
-    event.target.value = "";
-  };
+    setImages((prev) => [...prev, ...validImages].slice(0, 5))
+    setIsUploadingImages(false)
+    event.target.value = ''
+  }
 
   const handleRemoveImage = (id: string) => {
     setImages((prev) => {
-      const target = prev.find((img) => img.id === id);
-      if (target) URL.revokeObjectURL(target.previewUrl);
-      return prev.filter((img) => img.id !== id);
-    });
-  };
+      const target = prev.find((img) => img.id === id)
+      if (target) URL.revokeObjectURL(target.previewUrl)
+      return prev.filter((img) => img.id !== id)
+    })
+  }
 
-  const handleVideoFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const files = Array.from(event.target.files || []);
-    if (!files.length) return;
+  const handleVideoFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || [])
+    if (!files.length) return
 
-    setVideoError("");
+    setVideoError('')
 
     if (videos.length + files.length > 2) {
-      setVideoError("Límite alcanzado. Solo puedes subir máximo 2 videos.");
-      event.target.value = "";
-      return;
+      setVideoError('Límite alcanzado. Solo puedes subir máximo 2 videos.')
+      event.target.value = ''
+      return
     }
 
-    const allowedTypes = [
-      "video/mp4",
-      "video/x-matroska",
-      "video/avi",
-      "video/x-msvideo",
-    ];
+    const allowedTypes = ['video/mp4', 'video/x-matroska', 'video/avi', 'video/x-msvideo']
 
-    const maxSize = 20 * 1024 * 1024;
+    const maxSize = 20 * 1024 * 1024
 
-    setIsUploadingVideos(true);
+    setIsUploadingVideos(true)
 
-    const validVideos: VideoItem[] = [];
+    const validVideos: VideoItem[] = []
 
     for (const file of files) {
-      const extension = file.name.toLowerCase().split(".").pop();
-      const extensionAllowed = ["mp4", "mkv", "avi"].includes(extension || "");
+      const extension = file.name.toLowerCase().split('.').pop()
+      const extensionAllowed = ['mp4', 'mkv', 'avi'].includes(extension || '')
 
       if (!allowedTypes.includes(file.type) && !extensionAllowed) {
-        setVideoError("Formato no permitido. Solo MP4, MKV o AVI");
-        continue;
+        setVideoError('Formato no permitido. Solo MP4, MKV o AVI')
+        continue
       }
 
       if (file.size > maxSize) {
-        setVideoError("Uno de los videos supera los 20 MB.");
-        continue;
+        setVideoError('Uno de los videos supera los 20 MB.')
+        continue
       }
 
       validVideos.push({
         id: `${file.name}-${Date.now()}-${Math.random()}`,
-        type: "file",
+        type: 'file',
         name: file.name,
         file,
-        previewUrl: URL.createObjectURL(file),
-      });
+        previewUrl: URL.createObjectURL(file)
+      })
     }
 
-    setVideos((prev) => [...prev, ...validVideos].slice(0, 2));
-    setIsUploadingVideos(false);
-    event.target.value = "";
-  };
+    setVideos((prev) => [...prev, ...validVideos].slice(0, 2))
+    setIsUploadingVideos(false)
+    event.target.value = ''
+  }
 
   const getYoutubeData = (url: string) => {
-    const trimmed = url.trim();
+    const trimmed = url.trim()
 
-    const shortMatch = trimmed.match(
-      /(?:https?:\/\/)?(?:www\.)?youtu\.be\/([a-zA-Z0-9_-]{11})/
-    );
+    const shortMatch = trimmed.match(/(?:https?:\/\/)?(?:www\.)?youtu\.be\/([a-zA-Z0-9_-]{11})/)
 
     if (shortMatch) {
       return {
         embedUrl: `https://www.youtube.com/embed/${shortMatch[1]}`,
-        sourceUrl: trimmed,
-      };
+        sourceUrl: trimmed
+      }
     }
 
     const normalMatch = trimmed.match(
       /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/
-    );
+    )
 
     if (normalMatch) {
       return {
         embedUrl: `https://www.youtube.com/embed/${normalMatch[1]}`,
-        sourceUrl: trimmed,
-      };
+        sourceUrl: trimmed
+      }
     }
 
     const embedMatch = trimmed.match(
       /(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/
-    );
+    )
 
     if (embedMatch) {
       return {
         embedUrl: `https://www.youtube.com/embed/${embedMatch[1]}`,
-        sourceUrl: trimmed,
-      };
+        sourceUrl: trimmed
+      }
     }
 
-    return null;
-  };
+    return null
+  }
 
   const handleAddVideoLink = () => {
-    setVideoError("");
+    setVideoError('')
 
     if (!videoUrl.trim()) {
-      setVideoError("Debes ingresar un enlace de video.");
-      return;
+      setVideoError('Debes ingresar un enlace de video.')
+      return
     }
 
     if (videos.length >= 2) {
-      setVideoError("Límite alcanzado. Solo puedes agregar máximo 2 videos.");
-      return;
+      setVideoError('Límite alcanzado. Solo puedes agregar máximo 2 videos.')
+      return
     }
 
-    const parsed = getYoutubeData(videoUrl);
+    const parsed = getYoutubeData(videoUrl)
 
     if (!parsed) {
-      setVideoError("Enlace de video no válido");
-      return;
+      setVideoError('Enlace de video no válido')
+      return
     }
 
     const newVideo: VideoItem = {
       id: `youtube-${Date.now()}-${Math.random()}`,
-      type: "youtube",
-      name: "Video de YouTube",
+      type: 'youtube',
+      name: 'Video de YouTube',
       embedUrl: parsed.embedUrl,
-      sourceUrl: parsed.sourceUrl,
-    };
+      sourceUrl: parsed.sourceUrl
+    }
 
-    setVideos((prev) => [...prev, newVideo].slice(0, 2));
-    setVideoUrl("");
-  };
+    setVideos((prev) => [...prev, newVideo].slice(0, 2))
+    setVideoUrl('')
+  }
 
   const handleRemoveVideo = (id: string) => {
     setVideos((prev) => {
-      const target = prev.find((video) => video.id === id);
-      if (target?.previewUrl) URL.revokeObjectURL(target.previewUrl);
-      return prev.filter((video) => video.id !== id);
-    });
-  };
+      const target = prev.find((video) => video.id === id)
+      if (target?.previewUrl) URL.revokeObjectURL(target.previewUrl)
+      return prev.filter((video) => video.id !== id)
+    })
+  }
 
   const handlePublish = async () => {
-    setPublishError("");
+    setPublishError('')
 
     if (!publicacionId || Number.isNaN(publicacionId)) {
-      setPublishError("No se recibió el ID de la publicación.");
-      return;
+      setPublishError('No se recibió el ID de la publicación.')
+      return
     }
 
     if (!hasMultimedia) {
-      setPublishError(
-        "Debes agregar al menos una imagen o un video antes de publicar el inmueble."
-      );
-      return;
+      setPublishError('Debes agregar al menos una imagen o un video antes de publicar el inmueble.')
+      return
     }
 
     if (!confirmed) {
-      setPublishError("Debes confirmar que la información es correcta.");
-      return;
+      setPublishError('Debes confirmar que la información es correcta.')
+      return
     }
 
     // Aquí luego irá tu llamada real al backend
     // Si todo sale bien, abrimos el modal de éxito
-    setShowSuccessModal(true);
-  };
+    setShowSuccessModal(true)
+  }
 
   return (
     <main
       style={{
-        minHeight: "100vh",
-        background: "#fdf7f5",
-        padding: "24px",
+        minHeight: '100vh',
+        background: '#fdf7f5',
+        padding: '24px'
       }}
     >
-      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-        <h1 style={{ fontSize: "40px", marginBottom: "8px" }}>
-          Contenido Multimedia
-        </h1>
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        <h1 style={{ fontSize: '40px', marginBottom: '8px' }}>Contenido Multimedia</h1>
 
-        <p style={{ fontSize: "20px", color: "#666", marginBottom: "24px" }}>
+        <p style={{ fontSize: '20px', color: '#666', marginBottom: '24px' }}>
           Agrega hasta 5 fotos y 2 videos para mostrar mejor tu inmueble
         </p>
 
-        <p style={{ fontSize: "14px", color: "#888", marginBottom: "18px" }}>
-          Publicación actual: #{publicacionId || "sin id"}
+        <p style={{ fontSize: '14px', color: '#888', marginBottom: '18px' }}>
+          Publicación actual: #{publicacionId || 'sin id'}
         </p>
 
         <input
@@ -304,7 +289,7 @@ function ContenidoMultimediaPageContent() {
           type="file"
           accept=".png,.jpg,.jpeg,image/png,image/jpeg"
           multiple
-          style={{ display: "none" }}
+          style={{ display: 'none' }}
           onChange={handleImageChange}
         />
 
@@ -313,7 +298,7 @@ function ContenidoMultimediaPageContent() {
           type="file"
           accept=".mp4,.mkv,.avi,video/mp4,video/x-matroska,video/avi,video/x-msvideo"
           multiple
-          style={{ display: "none" }}
+          style={{ display: 'none' }}
           onChange={handleVideoFileChange}
         />
 
@@ -347,17 +332,17 @@ function ContenidoMultimediaPageContent() {
         <SuccessModal
           open={showSuccessModal}
           onClose={() => {
-            setShowSuccessModal(false);
-            router.push("/");
+            setShowSuccessModal(false)
+            router.push('/')
           }}
         />
 
         <PlanModal
           open={showPlanModal}
           onClose={() => setShowPlanModal(false)}
-          onPayNow={() => alert("Aquí luego conectas el flujo de pago")}
+          onPayNow={() => alert('Aquí luego conectas el flujo de pago')}
         />
       </div>
     </main>
-  );
+  )
 }
