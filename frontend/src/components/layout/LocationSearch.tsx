@@ -117,7 +117,7 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
             onChange={handleInputChange}
             onFocus={() => setIsOpen(true)}
             placeholder="Cochabamba, La Paz..."
-            className="w-full bg-transparent outline-none text-sm text-stone-900 placeholder:text-stone-400 font-inter pr-[70px] truncate"
+            className="w-full bg-transparent outline-none text-sm text-stone-900 placeholder:text-stone-400 font-inter pr-[70px] md:truncate overflow-x-auto whitespace-nowrap"
           />
           
           <div className="absolute right-0 flex items-center gap-2 bg-white pl-2 h-full">
