@@ -25,15 +25,16 @@ export const propertiesRepository = {
     }
 
     if (filtros.modoInmueble) {
-      const valor = Array.isArray(filtros.modoInmueble)
-        ? filtros.modoInmueble[0]
-        : filtros.modoInmueble;
-      if (valor) {
-        const modoLimpio = valor.toUpperCase().includes("ANTICR")
-          ? "ANTICRETO"
-          : valor.toUpperCase();
-        where.tipoAccion = modoLimpio;
-      }
+      const modos = Array.isArray(filtros.modoInmueble)
+        ? filtros.modoInmueble
+        : [filtros.modoInmueble];
+
+      const modosLimpios = modos.map(modo => {
+        const modoUpper = modo.toUpperCase();
+        return modoUpper.includes("ANTICR") ? "ANTICRETO" : modoUpper;
+      });
+
+      where.tipoAccion = { in: modosLimpios };
     }
 
     if (filtros.locationId || (filtros.query && filtros.query.trim() !== "")) {
