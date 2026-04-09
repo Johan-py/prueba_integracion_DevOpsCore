@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Home, Search as SearchIcon } from "lucide-react";
+import { Home, Search as SearchIcon, DollarSign, Users, Maximize, SlidersHorizontal, ChevronDown} from "lucide-react";
 import { useSearchFilters } from "@/hooks/useSearchFilters";
 import { LocationSearch } from "../layout/LocationSearch";
 import { ComboBox } from "../ui/ComboBox";
@@ -27,6 +27,21 @@ type LocationValue =
       value?: string;
     };
   };
+
+  // Componente visual para los botones que aún no tienen funcionalidad
+const MockFilterBtn = ({ icon: Icon, text, hasChevron = true }: { icon?: any, text: string, hasChevron?: boolean }) => (
+  <button
+    type="button"
+    className="h-[46px] flex items-center justify-between bg-white border border-stone-200 text-stone-600 px-4 rounded-xl shadow-sm hover:border-stone-300 transition-all font-inter text-sm whitespace-nowrap gap-3 shrink-0 focus:outline-none cursor-default"
+    onClick={(e) => e.preventDefault()}
+  >
+    <div className="flex items-center gap-2">
+      {Icon && <Icon className="w-4 h-4 text-stone-500" />}
+      <span>{text}</span>
+    </div>
+    {hasChevron && <ChevronDown className="w-4 h-4 text-stone-400" />}
+  </button>
+);
 
 export default function FilterBar({
   onSearch,
@@ -157,6 +172,16 @@ export default function FilterBar({
             }}
           />
         </div>
+
+        {/* 🔸 NUEVOS BOTONES ACORDE AL MOCKUP (Solo visibles en el mapa) */}
+        {variant === "map" && (
+          <>
+            <MockFilterBtn icon={DollarSign} text="Precio" />
+            <MockFilterBtn icon={Users} text="Capacidad" />
+            <MockFilterBtn icon={Maximize} text="Metros" />
+            <MockFilterBtn icon={SlidersHorizontal} text="Más Filtros" hasChevron={false} />
+          </>
+        )}
 
         {/* 🔸 Botón */}
         <div className="w-full md:w-auto">
