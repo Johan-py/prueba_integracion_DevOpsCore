@@ -12,7 +12,7 @@ import { createClusterIcon, CLUSTER_CONFIG } from "@/lib/clusterIcon";
 
 import type { PropertyMapPin } from "@/types/property";
 
-// Fix Leaflet SSR
+// Fix SSR
 if (typeof window !== "undefined") {
   delete (L.Icon.Default.prototype as any)._getIconUrl;
   L.Icon.Default.mergeOptions({
@@ -54,10 +54,10 @@ const SELECTED_ICONS: Record<string, string> = {
   local: "/local.svg",
 };
 
+// 🔵 normal pin
 function createPinIcon(type: string): L.DivIcon {
   const fill = PIN_FILL[type] ?? "#6b7280";
   const halo = PIN_HALO[type] ?? "rgba(107,114,128,0.25)";
-
   const outer = 28;
   const inner = 20;
   const half = outer / 2;
@@ -74,6 +74,7 @@ function createPinIcon(type: string): L.DivIcon {
   });
 }
 
+// 🔴 seleccionado / hover
 function createSelectedIcon(type: string, isHover = false): L.DivIcon {
   const scale = isHover ? 1.8 : 1.6;
   const iconPath = SELECTED_ICONS[type];
@@ -91,7 +92,7 @@ function createSelectedIcon(type: string, isHover = false): L.DivIcon {
   });
 }
 
-// handlers mapa
+// 🖱 click mapa → deseleccionar
 function MapClickHandler({ onMapClick }: { onMapClick: () => void }) {
   const map = useMap();
   useEffect(() => {
@@ -101,6 +102,7 @@ function MapClickHandler({ onMapClick }: { onMapClick: () => void }) {
   return null;
 }
 
+// 🖱 salir del mapa → quitar hover
 function MapMouseHandler({ onLeave }: { onLeave: () => void }) {
   const map = useMap();
   useEffect(() => {
@@ -110,6 +112,7 @@ function MapMouseHandler({ onLeave }: { onLeave: () => void }) {
   return null;
 }
 
+// 🔧 fix resize
 function MapResizer() {
   const map = useMap();
   useEffect(() => {
@@ -121,12 +124,21 @@ function MapResizer() {
   return null;
 }
 
+// 🎯 fly to propiedad
 function FlyToSelected({ lat, lng }: { lat: number; lng: number }) {
   const map = useMap();
 
   useEffect(() => {
     if (!lat || !lng) return;
-    map.flyTo([lat, lng], 18, { duration: 1.2 });
+    const zoom = 18;
+
+    map.flyTo([lat, lng], zoom, { duration: 1.2 });
+
+    const t = setTimeout(() => {
+      map.setView([lat, lng], zoom);
+    }, 1200);
+
+    return () => clearTimeout(t);
   }, [lat, lng, map]);
 
   return null;
@@ -144,7 +156,6 @@ interface MapViewProps {
   zoom?: number;
   selectedId?: string | null;
   onSelect?: (id: string | null) => void;
-  isLoading?: boolean;
   error?: string | null;
 }
 
@@ -177,6 +188,7 @@ export default function MapView({
 
         <MapResizer />
         <ZoomControls />
+
         <MapClickHandler onMapClick={() => onSelect?.(null)} />
         <MapMouseHandler onLeave={() => setHoveredPinId(null)} />
 
@@ -190,6 +202,21 @@ export default function MapView({
           iconCreateFunction={(c) => createClusterIcon(c)}
           maxClusterRadius={CLUSTER_CONFIG.maxClusterRadius}
           disableClusteringAtZoom={CLUSTER_CONFIG.disableClusteringAtZoom}
+          animate
+          animateAddingMarkers
+          chunkedLoading
+          showCoverageOnHover={false}
+          polygonOptions={{ opacity: 0 }}
+          zoomToBoundsOnClick
+          spiderfyOnMaxZoom
+          spiderfyDistanceMultiplier={2}
+          removeOutsideVisibleBounds={false}
+          clusterPane="markerPane"
+          eventHandlers={{
+            clusterclick: (e: any) => {
+              e.layer.zoomToBounds({ padding: [20, 20] });
+            },
+          }}
         >
           {properties.map((p) => {
             const isSelected = p.id === selectedId;
@@ -212,7 +239,7 @@ export default function MapView({
               >
                 <Popup>
                   <div className="text-sm">
-                    <p>{p.title}</p>
+                    <p className="font-semibold">{p.title}</p>
                     <p style={{ color: PIN_LABEL[p.type] }}>
                       {formatPrice(p.price, p.currency)}
                     </p>
