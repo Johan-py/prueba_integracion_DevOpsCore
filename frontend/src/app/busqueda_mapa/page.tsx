@@ -132,7 +132,7 @@ function BusquedaMapaContent() {
 
                 {/* Contenedor relativo para el Menú y el Switch flotante */}
                 {/* Aumentamos pb-4 para darle espacio al posicionamiento absoluto */}
-                <div className="relative border-b border-stone-100 pb-4 [&>div>div:first-child]:hidden [&>div]:mb-0">
+                <div className="relative border-b border-stone-100 pb-4 [&>div]:mb-0">
                   <MenuOrdenamiento
                     totalResultados={properties.length}
                     ordenActual={ordenActual}
