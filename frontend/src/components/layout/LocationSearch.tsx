@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -125,11 +126,10 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
       </label>
 
       <div
-        className={`h-[46px] rounded-xl border transition-all flex items-center gap-3 px-4 bg-white shadow-sm ${
-          isOpen && suggestions.length > 0
-            ? "border-amber-600 ring-2 ring-amber-100"
-            : "border-stone-300"
-        }`}
+        className={`h-[46px] rounded-xl border transition-all flex items-center gap-3 px-4 bg-white shadow-sm ${isOpen && suggestions.length > 0
+          ? "border-amber-600 ring-2 ring-amber-100"
+          : "border-stone-300"
+          }`}
       >
         <MapPin
           className={`w-5 h-5 flex-shrink-0 ${value ? "text-amber-600" : "text-stone-400"}`}
