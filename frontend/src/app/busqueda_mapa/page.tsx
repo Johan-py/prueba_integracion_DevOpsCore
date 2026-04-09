@@ -7,24 +7,21 @@ import {
   ChevronRight,
   List as ListIcon,
   LayoutGrid,
-  Filter,
-  ChevronUp,
-  ChevronDown,
-  X
+  Filter
 } from 'lucide-react'
 
-// === HOOKS ===
+// HOOKS
 import { useProperties } from '@/hooks/useProperties'
 import { useOrdenamiento } from '@/hooks/useOrdenamiento'
 
-// === COMPONENTES ===
+// COMPONENTES
 import FilterBar from '@/components/filters/FilterBar'
 import PropertyCard from '@/components/layout/PropertyCard'
 import PropertyRow from '@/components/galeria/PropertyRow'
 import EmptyState from '@/components/galeria/EmptyState'
 import { MenuOrdenamiento } from '@/components/busqueda/ordenamiento/MenuOrdenamiento'
 
-// Carga dinámica del mapa (sin SSR)
+// MAPA dinámico
 const MapView = nextDynamic(() => import('./MapView'), {
   ssr: false,
   loading: () => (
@@ -33,45 +30,6 @@ const MapView = nextDynamic(() => import('./MapView'), {
     </div>
   )
 })
-
-// Hooks mobile (no afectan si no se usan aún)
-function useIsMobile(breakpoint = 768) {
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    const mql = window.matchMedia(`(max-width: ${breakpoint - 1}px)`)
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches)
-
-    mql.addEventListener('change', handler)
-    setIsMobile(mql.matches)
-
-    return () => mql.removeEventListener('change', handler)
-  }, [breakpoint])
-
-  return isMobile
-}
-
-function useIsLandscapeMobile() {
-  const [isLandscape, setIsLandscape] = useState(false)
-
-  useEffect(() => {
-    const handler = () => {
-      setIsLandscape(window.innerWidth > window.innerHeight && window.innerHeight < 500)
-    }
-
-    window.addEventListener('resize', handler)
-    window.addEventListener('orientationchange', handler)
-
-    handler()
-
-    return () => {
-      window.removeEventListener('resize', handler)
-      window.removeEventListener('orientationchange', handler)
-    }
-  }, [])
-
-  return isLandscape
-}
 
 function BusquedaMapaContent() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
@@ -87,25 +45,21 @@ function BusquedaMapaContent() {
   const [hoveredId, setHoveredId] = useState<string | null>(null)
   const [isHoveringList, setIsHoveringList] = useState(false)
 
-  // Hover con debounce → flyTo
+  // Hover con debounce
   useEffect(() => {
     if (!hoveredId) {
-      if (!isHoveringList) {
-        setSelectedPropertyId(null)
-      }
+      if (!isHoveringList) setSelectedPropertyId(null)
       return
     }
 
     const timeout = setTimeout(() => {
-      if (isHoveringList) {
-        setSelectedPropertyId(hoveredId)
-      }
+      if (isHoveringList) setSelectedPropertyId(hoveredId)
     }, 200)
 
     return () => clearTimeout(timeout)
   }, [hoveredId, isHoveringList])
 
-  // Resize sync mapa
+  // Sync resize mapa
   useEffect(() => {
     const resizeTimeout = setTimeout(() => {
       window.dispatchEvent(new Event('resize'))
@@ -119,6 +73,7 @@ function BusquedaMapaContent() {
       <FilterBar variant="map" />
 
       <main className="flex flex-col md:flex-row w-full flex-1 min-h-0 relative overflow-hidden border-b border-stone-200">
+        
         {/* SIDEBAR */}
         <aside
           className={`bg-white border-r border-stone-200 flex flex-col z-10 transition-all duration-300 min-h-0 overflow-hidden ${
@@ -127,16 +82,22 @@ function BusquedaMapaContent() {
         >
           {isSidebarOpen && (
             <div className="flex flex-col h-full min-h-0">
+              
+              {/* HEADER */}
               <div className="p-4 bg-white shrink-0">
                 <div className="flex justify-between items-center mb-4">
                   <div>
                     <div className="flex items-center gap-1">
                       <Filter className="w-4 h-4 text-orange-500" />
-                      <h1 className="text-base font-semibold uppercase">Filtros</h1>
+                      <h1 className="text-base font-semibold uppercase">
+                        Filtros
+                      </h1>
                     </div>
 
                     <h2 className="text-sm mt-2">
-                      <span className="text-orange-500 font-bold">{properties.length}</span>{' '}
+                      <span className="text-orange-500 font-bold">
+                        {properties.length}
+                      </span>{' '}
                       resultados
                     </h2>
                   </div>
@@ -152,6 +113,7 @@ function BusquedaMapaContent() {
                   onOrdenChange={cambiarOrden}
                 />
 
+                {/* Toggle vista */}
                 <div className="flex gap-2 mt-2">
                   <button onClick={() => setViewMode('grid')}>
                     <LayoutGrid size={16} />
@@ -162,6 +124,7 @@ function BusquedaMapaContent() {
                 </div>
               </div>
 
+              {/* LISTA */}
               <div
                 className="flex-1 overflow-y-auto p-4 bg-stone-50"
                 onMouseEnter={() => setIsHoveringList(true)}
@@ -171,36 +134,56 @@ function BusquedaMapaContent() {
                   setHoveredId(null)
                 }}
               >
-                {properties.map((property: any) => (
-                  <div
-                    key={property.id}
-                    onMouseEnter={() => setHoveredId(property.id)}
-                    onClick={() => setSelectedPropertyId(property.id)}
-                    className={`cursor-pointer ${
-                      selectedPropertyId === property.id ? 'ring-2 ring-orange-400' : ''
-                    }`}
-                  >
-                    {viewMode === 'grid' ? (
-                      <PropertyCard
-                        imagen=""
-                        estado={property.type}
-                        precio={property.price}
-                        descripcion={property.title}
-                        camas={3}
-                        banos={2}
-                        metros={150}
-                      />
-                    ) : (
-                      <PropertyRow
-                        title={property.title}
-                        price={property.price}
-                        size="150m²"
-                        contactType="whatsapp"
-                        image=""
-                      />
-                    )}
+                {isLoading ? (
+                  <div className="flex justify-center items-center h-full text-stone-400">
+                    Cargando...
                   </div>
-                ))}
+                ) : properties.length === 0 ? (
+                  <EmptyState />
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    {properties.map((property: any) => (
+                      <div
+                        key={property.id}
+                        onMouseEnter={() => setHoveredId(property.id)}
+                        onClick={() => setSelectedPropertyId(property.id)}
+                        className={`cursor-pointer ${
+                          selectedPropertyId === property.id
+                            ? 'ring-2 ring-orange-400'
+                            : ''
+                        }`}
+                      >
+                        {viewMode === 'grid' ? (
+                          <PropertyCard
+                            imagen=""
+                            estado={property.type}
+                            precio={
+                              property.currency === 'USD'
+                                ? `$${property.price.toLocaleString('es-BO')} USD`
+                                : `Bs ${property.price.toLocaleString('es-BO')}`
+                            }
+                            descripcion={property.title}
+                            camas={3}
+                            banos={2}
+                            metros={150}
+                          />
+                        ) : (
+                          <PropertyRow
+                            title={property.title}
+                            price={
+                              property.currency === 'USD'
+                                ? `$${property.price.toLocaleString('es-BO')} USD`
+                                : `Bs ${property.price.toLocaleString('es-BO')}`
+                            }
+                            size="150m²"
+                            contactType="whatsapp"
+                            image=""
+                          />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
