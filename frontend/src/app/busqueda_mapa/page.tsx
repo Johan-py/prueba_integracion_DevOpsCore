@@ -238,61 +238,195 @@ function BusquedaMapaContent() {
           ))}
         </div>
       )}
+    </div>
+  )
 
-      <MapContainer
-        center={center}
-        zoom={zoom}
-        zoomControl={false}
-        style={{ height: "100%", width: "100%" }}
-      >
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+  // ────────────────────────────────────────────────────────────────────────────
+  // RENDER LANDSCAPE MÓVIL
+  // Pantalla ancha pero baja. Layout: mapa | lista (side by side, 50/50)
+  // sin FilterBar encima para no desperdiciar altura
+  // ────────────────────────────────────────────────────────────────────────────
+  if (isMounted && (isMobile || isLandscape)) {
+    if (isLandscape) {
+      return (
+        <div className="flex flex-col bg-white overflow-hidden" style={{ height: '100dvh' }}>
+          {/* FilterBar compacto arriba */}
+          <div className="shrink-0" style={{ zIndex: 1002, position: 'relative' }}>
+            <FilterBar variant="map" onSearch={(f) => console.log('🔍 Filtros:', f)} />
+          </div>
+          {/* Mapa + lista lado a lado */}
+          <div className="flex flex-1 overflow-hidden">
+            {/* Mapa */}
+            <div className="flex-1 relative">
+              <div className="absolute inset-0">
+                <MapView
+                  properties={properties}
+                  selectedId={selectedPropertyId}
+                  onSelect={(id) => {
+                    setSelectedPropertyId(id)
+                    setPinnedProperty(properties.find((p: any) => p.id === id) ?? null)
+                  }}
+                  isLoading={isLoading}
+                  error={error}
+                />
+              </div>
+            </div>
+            {/* Lista — ancho fijo 280px */}
+            <div className="w-[280px] flex flex-col bg-white border-l border-stone-200 overflow-hidden shrink-0">
+              <div className="px-3 py-2 border-b border-stone-100 flex items-center justify-between shrink-0">
+                <span className="text-sm font-semibold text-slate-700">
+                  <span className="text-orange-500">{properties.length}</span>
+                  <span className="ml-1 text-gray-500 font-normal text-xs">props.</span>
+                </span>
+                <div className="flex bg-stone-100 p-0.5 rounded border border-stone-200">
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className={`p-1 rounded ${viewMode === 'grid' ? 'bg-white text-[#ea580c] shadow-sm' : 'text-stone-400'}`}
+                  >
+                    <LayoutGrid size={13} />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`p-1 rounded ${viewMode === 'list' ? 'bg-white text-[#ea580c] shadow-sm' : 'text-stone-400'}`}
+                  >
+                    <ListIcon size={13} />
+                  </button>
+                </div>
+              </div>
+              <div className="flex-1 overflow-y-auto p-2 bg-stone-50 no-scrollbar">
+                {properties.map((property: any) => (
+                  <div
+                    key={property.id}
+                    onClick={() => {
+                      setSelectedPropertyId(property.id)
+                      setPinnedProperty(property)
+                    }}
+                    className={`cursor-pointer mb-2 rounded-xl transition-all ${selectedPropertyId === property.id ? 'ring-2 ring-orange-400 ring-offset-1' : ''}`}
+                  >
+                    <PropertyRow
+                      title={property.title}
+                      price={
+                        property.currency === 'USD'
+                          ? `$${property.price.toLocaleString('es-BO')} USD`
+                          : `Bs ${property.price.toLocaleString('es-BO')}`
+                      }
+                      size="150 m²"
+                      contactType="whatsapp"
+                      image=""
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    }
 
-        <MapResizer />
-        <ZoomControls />
+    // ────────────────────────────────────────────────────────────────────────────
+    // RENDER PORTRAIT MÓVIL — Bottom Sheet
+    // ────────────────────────────────────────────────────────────────────────────
+    // (landscape ya fue manejado arriba)
+    return (
+      <div className="flex flex-col overflow-hidden bg-white" style={{ height: '100dvh' }}>
+        <div className="shrink-0 overflow-x-auto" style={{ zIndex: 1002, position: 'relative' }}>
+          <div className="min-w-max">
+            <FilterBar variant="map" onSearch={(f) => console.log('🔍 Filtros:', f)} />
+          </div>
+        </div>
 
-        <MapClickHandler onMapClick={() => onSelect?.(null)} />
-        <MapMouseHandler onLeave={() => setHoveredPinId(null)} />
+        {/* Área mapa + sheet */}
+        <div className="flex-1 relative overflow-hidden">
+          {/* Mapa — ocupa todo este bloque */}
+          <div className="absolute inset-0">
+            <MapView
+              properties={properties}
+              selectedId={selectedPropertyId}
+              onSelect={handleMapSelect}
+              isLoading={isLoading}
+              error={error}
+            />
+          </div>
 
-        {selected && <FlyToSelected lat={selected.lat} lng={selected.lng} />}
+          {/* ── Botón flotante "Ver lista" — siempre visible cuando sheet está hidden ──
+               z-[1001] para quedar encima del mapa y de los controles de Leaflet */}
+          {sheetState === 'hidden' && (
+            <button
+              onClick={() => setSheetState('peek')}
+              className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[1001] bg-white rounded-full px-5 py-3 shadow-xl border border-stone-200 flex items-center gap-2 text-sm font-semibold text-slate-700 active:scale-95 transition-transform"
+              style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.18)' }}
+            >
+              <ListIcon size={16} className="text-orange-500" />
+              Ver lista
+              {properties.length > 0 && (
+                <span className="bg-orange-100 text-orange-600 text-xs font-bold px-2 py-0.5 rounded-full">
+                  {properties.length}
+                </span>
+              )}
+              <ChevronUp size={16} className="text-stone-400" />
+            </button>
+          )}
 
-        <Marker position={center} icon={createGpsIcon()}>
-          <Popup>Tu ubicación</Popup>
-        </Marker>
+          {/* ── Bottom Sheet ── */}
+          {sheetState !== 'hidden' && (
+            <div
+              className="absolute left-0 right-0 bottom-0 z-[400] bg-white rounded-t-2xl shadow-[0_-4px_24px_rgba(0,0,0,0.12)] flex flex-col"
+              style={{
+                height: SHEET_H[sheetState],
+                transition: 'height 0.3s cubic-bezier(0.32,0.72,0,1)'
+              }}
+              onTouchStart={onTouchStart}
+              onTouchEnd={onTouchEnd}
+            >
+              {/* Handle drag + tap en el pill para toggle */}
+              <div className="shrink-0 flex flex-col items-center pt-3 pb-1 cursor-grab active:cursor-grabbing select-none">
+                <div
+                  className="w-10 h-1.5 bg-stone-300 hover:bg-orange-400 rounded-full mb-3 transition-colors"
+                  onClick={() => setSheetState((s) => (s === 'full' ? 'peek' : 'full'))}
+                  title="Tocá para expandir o reducir"
+                />
 
-        <MarkerClusterGroup
-          iconCreateFunction={(c) => createClusterIcon(c)}
-          maxClusterRadius={CLUSTER_CONFIG.maxClusterRadius}
-          disableClusteringAtZoom={CLUSTER_CONFIG.disableClusteringAtZoom}
-          animate
-          chunkedLoading
-          showCoverageOnHover={false}
-          zoomToBoundsOnClick
-        >
-          {properties.map((p) => {
-            const isSelected = p.id === selectedId;
-            const isHover = p.id === hoveredPinId;
+                <div className="flex items-center justify-between w-full px-4 pb-2">
+                  <span className="text-sm font-semibold text-slate-700 flex items-center gap-1.5">
+                    <span className="text-orange-500">{properties.length}</span>
+                    <span className="text-gray-500 font-normal">propiedades</span>
+                  </span>
 
-            let icon = createPinIcon(p.type);
-            if (isSelected) icon = createSelectedIcon(p.type);
-            else if (isHover) icon = createSelectedIcon(p.type, true);
+                  <div className="flex items-center gap-2">
+                    {/* Botón cerrar sheet → vuelve a hidden (mapa limpio) */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setSheetState('hidden')
+                      }}
+                      className="flex items-center gap-1 text-xs text-stone-400 hover:text-stone-600 bg-stone-100 rounded-full px-2 py-1"
+                    >
+                      <X size={12} />
+                      <span>Ocultar</span>
+                    </button>
 
-            return (
-              <Marker
-                key={p.id}
-                position={[p.lat, p.lng]}
-                icon={icon}
-                eventHandlers={{
-                  click: () => onSelect?.(p.id),
-                  mouseover: () => setHoveredPinId(p.id),
-                  mouseout: () => setHoveredPinId(null),
-                }}
-              >
-                <Popup>
-                  <div className="text-sm">
-                    <p>{p.title}</p>
-                    <p style={{ color: PIN_LABEL[p.type] }}>
-                      {formatPrice(p.price, p.currency)}
-                    </p>
+                    {/* Toggle peek ↔ full */}
+                    {sheetState === 'peek' ? (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setSheetState('full')
+                        }}
+                        className="text-stone-400 hover:text-stone-600 p-1"
+                      >
+                        <ChevronUp size={18} />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setSheetState('peek')
+                        }}
+                        className="text-stone-400 hover:text-stone-600 p-1"
+                      >
+                        <ChevronDown size={18} />
+                      </button>
+                    )}
                   </div>
                 </Popup>
               </Marker>
