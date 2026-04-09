@@ -1,16 +1,12 @@
-import Image from "next/image";
+import Image from 'next/image'
 
 type AboutUsImageProps = {
-  alt: string;
-  className: string;
-  src: string;
-};
+  alt: string
+  className: string
+  src: string
+}
 
-export default function AboutUsImage({
-  alt,
-  className,
-  src,
-}: AboutUsImageProps) {
+export default function AboutUsImage({ alt, className, src }: AboutUsImageProps) {
   return (
     <div className={`relative overflow-hidden ${className}`}>
       <Image
@@ -21,5 +17,5 @@ export default function AboutUsImage({
         sizes="(min-width: 1280px) 560px, (min-width: 640px) 80vw, 100vw"
       />
     </div>
-  );
+  )
 }

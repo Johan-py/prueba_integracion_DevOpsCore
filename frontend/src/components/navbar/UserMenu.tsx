@@ -1,34 +1,28 @@
-import Link from "next/link";
-import type { User } from "../layout/Navbar";
-import {
-  User as UserIcon,
-  Eye,
-  FileText,
-  Map,
-  ArrowLeftRight,
-} from "lucide-react";
+import Link from 'next/link'
+import type { User } from '../layout/Navbar'
+import { User as UserIcon, Eye, FileText, Map, ArrowLeftRight } from 'lucide-react'
 
 type UserMenuProps = {
-  user: User | null;
-  isPanelOpen: boolean;
-  onTogglePanel: () => void;
-  onClosePanel: () => void;
-  onLogin: () => void;
-  onOpenLogoutModal: () => void;
-};
+  user: User | null
+  isPanelOpen: boolean
+  onTogglePanel: () => void
+  onClosePanel: () => void
+  onLogin: () => void
+  onOpenLogoutModal: () => void
+}
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
 
 const MenuLink = ({
   label,
   href,
   onClick,
-  icon: Icon,
+  icon: Icon
 }: {
-  label: string;
-  href: string;
-  onClick: () => void;
-  icon: any;
+  label: string
+  href: string
+  onClick: () => void
+  icon: any
 }) => (
   <Link
     href={href}
@@ -38,7 +32,7 @@ const MenuLink = ({
     <Icon size={18} strokeWidth={1.5} />
     {label}
   </Link>
-);
+)
 
 export default function UserMenu({
   user,
@@ -46,7 +40,7 @@ export default function UserMenu({
   onTogglePanel,
   onClosePanel,
   onLogin,
-  onOpenLogoutModal,
+  onOpenLogoutModal
 }: UserMenuProps) {
   return (
     <>
@@ -57,21 +51,12 @@ export default function UserMenu({
       >
         {user?.avatar ? (
           <img
-            src={
-              user.avatar.startsWith("http")
-                ? user.avatar
-                : `${API_URL}${user.avatar}`
-            }
+            src={user.avatar.startsWith('http') ? user.avatar : `${API_URL}${user.avatar}`}
             alt={user.name}
             className="w-6 h-6 rounded-full object-cover"
           />
         ) : (
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -83,12 +68,10 @@ export default function UserMenu({
       </button>
 
       <div
-        className={`absolute right-0 mt-3 w-72 rounded-xl border border-gray-200 bg-[#F9F6EE] shadow-lg p-5 z-50 transition-all duration-200 ${isPanelOpen ? "opacity-100 translate-y-0 visible" : "opacity-0 -translate-y-2 invisible pointer-events-none"}`}
+        className={`absolute right-0 mt-3 w-72 rounded-xl border border-gray-200 bg-[#F9F6EE] shadow-lg p-5 z-50 transition-all duration-200 ${isPanelOpen ? 'opacity-100 translate-y-0 visible' : 'opacity-0 -translate-y-2 invisible pointer-events-none'}`}
       >
         <div className="flex justify-between items-center mb-4 border-b border-gray-300 pb-2">
-          <span className="font-bold text-sm text-gray-900">
-            Bienvenido a PropBol
-          </span>
+          <span className="font-bold text-sm text-gray-900">Bienvenido a PropBol</span>
           <button
             onClick={onClosePanel}
             className="text-gray-500 hover:text-black"
@@ -104,11 +87,7 @@ export default function UserMenu({
               <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 overflow-hidden border border-gray-100">
                 {user.avatar ? (
                   <img
-                    src={
-                      user.avatar.startsWith("http")
-                        ? user.avatar
-                        : `${API_URL}${user.avatar}`
-                    }
+                    src={user.avatar.startsWith('http') ? user.avatar : `${API_URL}${user.avatar}`}
                     alt={user.name}
                     className="w-full h-full object-cover"
                   />
@@ -117,22 +96,13 @@ export default function UserMenu({
                 )}
               </div>
               <div className="flex flex-col">
-                <p className="font-bold text-gray-800 text-sm leading-tight">
-                  {user.name}
-                </p>
+                <p className="font-bold text-gray-800 text-sm leading-tight">{user.name}</p>
                 <p className="text-xs text-gray-500">{user.email}</p>
               </div>
             </div>
 
-
-
             <div className="flex flex-col mb-4">
-              <MenuLink
-                label="Mi cuenta"
-                href="/profile"
-                icon={UserIcon}
-                onClick={onClosePanel}
-              />
+              <MenuLink label="Mi cuenta" href="/profile" icon={UserIcon} onClick={onClosePanel} />
               {/* ✅ Se mantienen ambas opciones: la nueva y la existente */}
               <MenuLink
                 label="Mis propiedades vistas"
@@ -146,12 +116,7 @@ export default function UserMenu({
                 icon={FileText}
                 onClick={onClosePanel}
               />
-              <MenuLink
-                label="Mis zonas"
-                href="/zonas"
-                icon={Map}
-                onClick={onClosePanel}
-              />
+              <MenuLink label="Mis zonas" href="/zonas" icon={Map} onClick={onClosePanel} />
               <MenuLink
                 label="Mis comparaciones"
                 href="/mis-comparaciones"
@@ -169,9 +134,7 @@ export default function UserMenu({
           </>
         ) : (
           <div className="text-center py-2 flex flex-col items-center">
-            <p className="text-sm text-gray-600 mb-5">
-              Encuentra tu hogar ideal hoy mismo.
-            </p>
+            <p className="text-sm text-gray-600 mb-5">Encuentra tu hogar ideal hoy mismo.</p>
             <button
               onClick={onLogin}
               className="w-full bg-[#E68B25] text-white py-2.5 rounded-xl text-sm font-bold shadow-md"
@@ -182,5 +145,5 @@ export default function UserMenu({
         )}
       </div>
     </>
-  );
+  )
 }

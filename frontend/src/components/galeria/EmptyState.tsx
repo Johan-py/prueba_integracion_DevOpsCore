@@ -1,4 +1,4 @@
-import { SearchX } from "lucide-react";
+import { SearchX } from 'lucide-react'
 
 export default function EmptyState() {
   return (
@@ -11,9 +11,8 @@ export default function EmptyState() {
         Uy, no encontramos casas con esos filtros
       </h3>
       <p className="text-sm text-gray-500 max-w-[250px]">
-        Intenta quitando algunos filtros o buscando en otra zona para ver más
-        resultados.
+        Intenta quitando algunos filtros o buscando en otra zona para ver más resultados.
       </p>
     </div>
-  );
+  )
 }
