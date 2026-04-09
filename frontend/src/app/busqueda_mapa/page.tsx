@@ -84,16 +84,16 @@ function BusquedaMapaContent() {
         }}
       />
 
-      <main className="flex w-full flex-1 relative overflow-hidden border-b border-stone-200">
-        {/* Panel lateral colapsable */}
-        <aside
-          className={`bg-white border-r border-stone-200 flex flex-col z-10 transition-all duration-300 ${
-            isSidebarOpen ? "w-full md:w-[450px]" : "w-0"
-          }`}
-        >
+<main className="flex flex-col md:flex-row w-full flex-1 min-h-0 relative overflow-hidden border-b border-stone-200">
+          {/* Panel lateral colapsable */}
+       <aside
+  className={`bg-white border-r border-stone-200 flex flex-col z-10 transition-all duration-300 min-h-0 overflow-hidden ${
+    isSidebarOpen ? "w-full md:w-[450px] h-[55dvh] md:h-full" : "w-0"
+  }`}
+>
           {isSidebarOpen && (
-            <div className="flex flex-col h-full">
-              {/* Cabecera del panel (FUSIONADA) */}
+<div className="flex flex-col h-full min-h-0">
+                {/* Cabecera del panel (FUSIONADA) */}
               <div className="p-4 bg-white shrink-0">
                 <div className="flex justify-between items-center mb-4">
                   {/* Lado Izquierdo: Título y cantidad */}
@@ -159,7 +159,7 @@ function BusquedaMapaContent() {
               
 
               {/* Lista de propiedades con hover → fly-to en mapa */}
-              <div className="flex-1 overflow-y-auto p-4 bg-stone-50 no-scrollbar"
+<div className="flex-1 min-h-0 overflow-y-auto p-4 bg-stone-50 no-scrollbar"
                   onMouseEnter={() => setIsHoveringList(true)}
                   onMouseLeave={() => {
                    setIsHoveringList(false);
