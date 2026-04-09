@@ -11,14 +11,13 @@
     "prisma:generate": "prisma generate --schema=./prisma/schema.prisma",
     "prisma:migrate": "prisma migrate dev",
     "prisma": "prisma generate --schema=./prisma/schema.prisma"
-
   },
   "prisma": {
     "schema": "prisma/schema.prisma"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.6.0",
-    "@prisma/client": "^7.6.0",
+    "@prisma/client": "^7.7.0",
     "@supabase/supabase-js": "^2.101.0",
     "@vercel/node": "^5.6.22",
     "cors": "^2.8.6",
@@ -44,7 +43,7 @@
     "@typescript-eslint/eslint-plugin": "^8.57.2",
     "@typescript-eslint/parser": "^8.57.2",
     "eslint": "^10.1.0",
-    "prisma": "^7.6.0",
+    "prisma": "^7.7.0",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "tsx": "^4.21.0",

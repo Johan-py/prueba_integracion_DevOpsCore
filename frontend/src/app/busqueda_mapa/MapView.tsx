@@ -206,11 +206,13 @@ export default function MapView({
 
         <ZoomControls />
 
-        {selectedProperty && (
-          <FlyToSelected
-            lat={selectedProperty.lat}
-            lng={selectedProperty.lng}
-          />
+        {selectedProperty &&
+           Number.isFinite(Number(selectedProperty.lat)) &&
+          Number.isFinite(Number(selectedProperty.lng)) && (
+         <FlyToSelected
+          lat={Number(selectedProperty.lat)}
+          lng={Number(selectedProperty.lng)}
+           />
         )}
 
         <Marker position={center} icon={createGpsIcon()}>
