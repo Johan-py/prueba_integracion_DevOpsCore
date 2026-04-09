@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Home, Search as SearchIcon, DollarSign, Users, Maximize, SlidersHorizontal, ChevronDown} from "lucide-react";
+import { Home, Search as SearchIcon, DollarSign, Users, Maximize, SlidersHorizontal, ChevronDown } from "lucide-react";
 import { useSearchFilters } from "@/hooks/useSearchFilters";
 import { LocationSearch } from "../layout/LocationSearch";
 import { ComboBox } from "../ui/ComboBox";
@@ -18,17 +18,16 @@ interface FilterBarProps {
   variant?: "home" | "map";
 }
 
-// ✅ Tipo seguro (sin any)
 type LocationValue =
   | string
   | {
-    nombre?: string;
-    target?: {
-      value?: string;
+      nombre?: string;
+      target?: {
+        value?: string;
+      };
     };
-  };
 
-  // Componente visual para los botones que aún no tienen funcionalidad
+// Botón Mock
 const MockFilterBtn = ({ icon: Icon, text, hasChevron = true }: { icon?: any, text: string, hasChevron?: boolean }) => (
   <button
     type="button"
@@ -50,9 +49,7 @@ export default function FilterBar({
   const router = useRouter();
 
   const { updateFilters } = useSearchFilters();
-  const [modosSeleccionados, setModosSeleccionados] = useState<string[]>([
-    "VENTA",
-  ]);
+  const [modosSeleccionados, setModosSeleccionados] = useState<string[]>(["VENTA"]);
   const [tipoInmueble, setTipoInmueble] = useState<string>("Cualquier tipo");
   const [ubicacionTexto, setUbicacionTexto] = useState("");
 
@@ -77,7 +74,6 @@ export default function FilterBar({
 
   const handleSearch = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    // Mapeo para el backend
     const tipoMap: Record<string, string> = {
       Casa: "CASA",
       Departamento: "DEPARTAMENTO",
@@ -87,17 +83,10 @@ export default function FilterBar({
       Cementerio: "CEMENTERIO",
     };
 
-    const tipoFinal =
-      tipoMap[tipoInmueble] ||
-      (tipoInmueble !== "Cualquier tipo"
-        ? tipoInmueble.toUpperCase()
-        : null);
+    const tipoFinal = tipoMap[tipoInmueble] || (tipoInmueble !== "Cualquier tipo" ? tipoInmueble.toUpperCase() : null);
 
     const nuevosFiltros = {
-      tipoInmueble:
-        tipoInmueble !== "Cualquier tipo"
-          ? [tipoInmueble.toUpperCase()]
-          : [],
+      tipoInmueble: tipoInmueble !== "Cualquier tipo" ? [tipoInmueble.toUpperCase()] : [],
       modoInmueble: modosSeleccionados,
       query: ubicacionTexto,
       updatedAt: new Date().toISOString(),
@@ -106,103 +95,94 @@ export default function FilterBar({
     updateFilters(nuevosFiltros);
 
     const params = new URLSearchParams();
-    modosSeleccionados.forEach((modo) =>
-      params.append("modoInmueble", modo)
-    );
-
+    modosSeleccionados.forEach((modo) => params.append("modoInmueble", modo));
     if (tipoFinal) params.set("tipoInmueble", tipoFinal);
-
-    if (ubicacionTexto.trim() !== "")
-      params.set("query", ubicacionTexto.trim());
+    if (ubicacionTexto.trim() !== "") params.set("query", ubicacionTexto.trim());
 
     const queryString = params.toString();
     const targetUrl = `/busqueda_mapa${queryString ? `?${queryString}` : ""}`;
 
     router.push(targetUrl);
-
     if (onSearch) onSearch(nuevosFiltros);
   };
 
-  // ✅ CONTENEDOR RESPONSIVE
+  // 🚀 FIX Z-INDEX MASIVO: Agregamos z-[99999] y !overflow-visible para aplastar al mapa
   const containerStyles =
     variant === "map"
-      ? "bg-white border-b border-stone-200 p-3 flex flex-col md:flex-row items-stretch md:items-center gap-3 w-full shadow-sm"
-      : "bg-white shadow-lg rounded-[30px] p-6 flex flex-col gap-6 w-full max-w-[921px]";
+      ? "bg-[#faf9f6] border-b border-stone-200 py-5 px-6 w-full flex flex-col gap-5 shadow-sm relative z-[99999] !overflow-visible"
+      : "bg-white shadow-lg rounded-[30px] p-6 flex flex-col gap-6 w-full max-w-[921px] relative z-[99999] !overflow-visible";
 
   return (
     <form className={containerStyles} onSubmit={handleSearch}>
       
       {/* =========================================
-          FILA SUPERIOR: Tipo y Ubicación (Centrada)
+          FILA SUPERIOR: Checkboxes (Protegidos con z-index)
           ========================================= */}
-      <div className={`flex w-full ${variant === "map" ? "justify-center" : ""}`}>
-        <div className={`flex items-end gap-3 ${variant === "map" ? "w-full max-w-2xl" : "w-full"}`}>
-           {/* 🔸 Tipo */}
-           <div className="w-full md:w-64 shrink-0">
-             <ComboBox
-               label={variant === "map" ? "" : "Tipo"}
-               placeholder="Cualquier tipo"
-               icon={Home}
-               options={["Casa", "Departamento", "Terreno", "Cuarto", "Espacios", "Cementerio"]}
-               onChange={(val: string) => setTipoInmueble(val)}
-               value={tipoInmueble}
-             />
-           </div>
-
-           {/* 🔸 Ubicación */}
-           <div className="w-full flex-1">
-             <LocationSearch
-               value={ubicacionTexto}
-               onChange={(val: LocationValue) => {
-                 const text = typeof val === "string" ? val : val?.nombre || val?.target?.value || "";
-                 setUbicacionTexto(text);
-               }}
-             />
-           </div>
-        </div>
+      <div className={`flex w-full relative z-[100] !overflow-visible ${variant === "map" ? "justify-start md:justify-center pl-2" : ""}`}>
+        <TransactionModeFilter
+          modoSeleccionado={modosSeleccionados}
+          onModoChange={setModosSeleccionados}
+        />
       </div>
 
       {/* =========================================
-          FILA INFERIOR: Modos, Botones Mock y Buscar
+          FILA INFERIOR: Todo lo demás
           ========================================= */}
       <div 
-        className={`flex items-center justify-between w-full ${
-          variant === "map"
-            ? "flex-nowrap overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] gap-4"
-            : "flex-col md:flex-row flex-wrap gap-3"
+        className={`flex items-center w-full gap-3 relative z-[90] !overflow-visible ${
+          variant === "map" 
+            ? "flex-nowrap" 
+            : "flex-col md:flex-row flex-wrap"
         }`}
       >
-        <div className="flex items-center gap-4 shrink-0">
-            {/* 🔹 Modo venta/alquiler */}
-            <TransactionModeFilter
-              modoSeleccionado={modosSeleccionados}
-              onModoChange={setModosSeleccionados}
-            />
-
-            {/* 🔸 NUEVOS BOTONES MOCKUP (Solo visibles en el mapa) */}
-            {variant === "map" && (
-              <>
-                <MockFilterBtn icon={DollarSign} text="Precio" />
-                <MockFilterBtn icon={Users} text="Capacidad" />
-                <MockFilterBtn icon={Maximize} text="Metros" />
-                <MockFilterBtn icon={SlidersHorizontal} text="Más Filtros" hasChevron={false} />
-              </>
-            )}
+        {/* 🔸 Tipo (Aislado con z-[100] para que salte por encima de todo) */}
+        <div className={`relative z-[100] !overflow-visible ${variant === "map" ? "w-48 shrink-0" : "w-full md:w-64"}`}>
+          <ComboBox
+            label={variant === "map" ? "" : "Tipo"}
+            placeholder="Cualquier tipo"
+            icon={Home}
+            options={["Casa", "Departamento", "Terreno", "Cuarto", "Espacios", "Cementerio"]}
+            onChange={(val: string) => setTipoInmueble(val)}
+            value={tipoInmueble}
+          />
         </div>
 
+        {/* 🔸 Ubicación (Z-[90] para no tapar a Tipo, pero estar encima de lo demás) */}
+        <div className={`relative z-[90] !overflow-visible ${variant === "map" ? "w-[300px] shrink-0" : "w-full flex-1"}`}>
+          <LocationSearch
+            value={ubicacionTexto}
+            onChange={(val: LocationValue) => {
+              const text = typeof val === "string" ? val : val?.nombre || val?.target?.value || "";
+              setUbicacionTexto(text);
+            }}
+          />
+        </div>
+
+        {/* 🚀 FIX AISLAMIENTO DE SCROLL: 
+            Solo estos botones tienen overflow-x-auto. Así los menús de la izquierda no se cortan. */}
+        {variant === "map" && (
+          <div className="flex items-center gap-3 flex-1 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            <div className="shrink-0"><MockFilterBtn icon={DollarSign} text="Precio" /></div>
+            <div className="shrink-0"><MockFilterBtn icon={Users} text="Capacidad" /></div>
+            <div className="shrink-0"><MockFilterBtn icon={Maximize} text="Metros" /></div>
+            <div className="shrink-0"><MockFilterBtn icon={SlidersHorizontal} text="Más Filtros" hasChevron={false} /></div>
+          </div>
+        )}
+
         {/* 🔸 Botón Buscar */}
-        <div className="shrink-0">
+        <div className={variant === "map" ? "shrink-0 ml-auto relative z-10" : "w-full md:w-auto flex justify-end relative z-10"}>
           <button
             type="submit"
             className={`${
-              variant === "map" ? "h-[46px] px-6" : "w-full md:w-auto h-[46px] px-10"
+              variant === "map" ? "h-[46px] px-8 shadow-md" : "w-full md:w-auto h-[46px] px-10"
             } bg-[#d97706] hover:bg-[#b95e00] text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95`}
           >
             <SearchIcon size={18} />
-            {variant === "map" ? "" : "BUSCAR"}
+            {variant === "home" && "BUSCAR"}
           </button>
         </div>
       </div>
+      
     </form>
   );
 }
