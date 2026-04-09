@@ -24,7 +24,9 @@ function guardarOrden(orden: EstadoOrdenamiento): void {
     } else {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(orden))
     }
-  } catch {}
+  } catch {
+    // sin persistencia si localStorage falla
+  }
 }
 
 interface UseOrdenamientoProps {
@@ -50,7 +52,6 @@ export const useOrdenamiento = ({
   )
 
   const [hydrated, setHydrated] = useState(false)
-
   useEffect(() => {
     const ordenGuardado = cargarOrdenGuardado()
     setOrdenActual(ordenInicial ?? ordenGuardado)
