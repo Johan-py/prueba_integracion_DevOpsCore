@@ -1,99 +1,45 @@
-"use client";
+'use client'
 
-import "leaflet/dist/leaflet.css";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
-import MarkerClusterGroup from "react-leaflet-cluster";
-import L from "leaflet";
-import { useEffect, useState } from "react";
+import { useState, useEffect, useRef, Suspense } from 'react'
+import nextDynamic from 'next/dynamic'
+import {
+  ChevronLeft,
+  ChevronRight,
+  List as ListIcon,
+  LayoutGrid,
+  ChevronUp,
+  ChevronDown,
+  X
+} from 'lucide-react'
 
-import ZoomControls from "@/components/ZoomControls";
-import { createGpsIcon } from "@/components/GpsPin";
-import { createClusterIcon, CLUSTER_CONFIG } from "@/lib/clusterIcon";
+import { useProperties } from '@/hooks/useProperties'
+import { useOrdenamiento } from '@/hooks/useOrdenamiento'
+import FilterBar from '@/components/filters/FilterBar'
+import PropertyCard from '@/components/layout/PropertyCard'
+import PropertyRow from '@/components/galeria/PropertyRow'
+import EmptyState from '@/components/galeria/EmptyState'
+import { MenuOrdenamiento } from '@/components/busqueda/ordenamiento/MenuOrdenamiento'
 
-import type { PropertyMapPin } from "@/types/property";
+const MapView = nextDynamic(() => import('./MapView'), {
+  ssr: false,
+  loading: () => (
+    <div className="h-full w-full bg-stone-100 animate-pulse flex items-center justify-center text-stone-400">
+      Cargando mapa de Bolivia...
+    </div>
+  )
+})
 
-// Fix Leaflet SSR
-if (typeof window !== "undefined") {
-  delete (L.Icon.Default.prototype as any)._getIconUrl;
-  L.Icon.Default.mergeOptions({
-    iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-  });
-}
-
-
-const PIN_FILL: Record<string, string> = {
-  casa: "#3b82f6",
-  departamento: "#8b5cf6",
-  terreno: "#f59e0b",
-  oficina: "#10b981",
-  local: "#10b981",
-};
-
-const PIN_HALO: Record<string, string> = {
-  casa: "rgba(59,130,246,0.25)",
-  departamento: "rgba(139,92,246,0.25)",
-  terreno: "rgba(245,158,11,0.25)",
-  oficina: "rgba(16,185,129,0.25)",
-  local: "rgba(16,185,129,0.25)",
-};
-
-const PIN_LABEL: Record<string, string> = {
-  casa: "#2563eb",
-  departamento: "#7c3aed",
-  terreno: "#d97706",
-  oficina: "#059669",
-  local: "#059669",
-};
-
-const SELECTED_ICONS: Record<string, string> = {
-  casa: "/house.svg",
-  departamento: "/department.svg",
-  terreno: "/land.svg",
-  oficina: "/office.svg",
-  local: "/local.svg",
-};
-
-function createPinIcon(type: string): L.DivIcon {
-  const fill = PIN_FILL[type] ?? "#6b7280";
-  const halo = PIN_HALO[type] ?? "rgba(107,114,128,0.25)";
-
-  return L.divIcon({
-    className: "",
-    html: `
-      <div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;">
-        <div style="position:absolute;width:28px;height:28px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${halo};"></div>
-        <div style="position:relative;width:20px;height:20px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${fill};border:2px solid white;"></div>
-      </div>`,
-    iconSize: [28, 28],
-    iconAnchor: [14, 28],
-  });
-}
-
-function createSelectedIcon(type: string, isHover = false): L.DivIcon {
-  const scale = isHover ? 1.8 : 1.6;
-  const iconPath = SELECTED_ICONS[type];
-
-  return L.divIcon({
-    className: "",
-    html: `
-      <div style="transform:scale(${scale});display:flex;justify-content:center;">
-        <div style="width:36px;height:36px;border-radius:50%;background:#ef4444;display:flex;align-items:center;justify-content:center;border:2px solid white;">
-          <img src="${iconPath}" style="width:20px;height:20px;" />
-        </div>
-      </div>`,
-    iconSize: [36, 36],
-    iconAnchor: [18, 36],
-  });
-}
-
-function MapClickHandler({ onMapClick }: { onMapClick: () => void }) {
-  const map = useMap();
+function useIsMobile(breakpoint = 768) {
+  // Siempre false en el primer render (igual que SSR) para evitar hydration mismatch
+  const [isMobile, setIsMobile] = useState(false)
   useEffect(() => {
-    map.on("click", onMapClick);
-    return () => map.off("click", onMapClick);
-  }, [map, onMapClick]);
-  return null;
+    const mql = window.matchMedia(`(max-width: ${breakpoint - 1}px)`)
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches)
+    mql.addEventListener('change', handler)
+    setIsMobile(mql.matches) // actualiza solo en cliente post-mount
+    return () => mql.removeEventListener('change', handler)
+  }, [breakpoint])
+  return isMobile
 }
 
 function MapMouseHandler({ onLeave }: { onLeave: () => void }) {
