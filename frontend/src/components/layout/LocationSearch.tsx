@@ -22,23 +22,55 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [history, setHistory] = useState<string[]>([])
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({})
   const containerRef = useRef<HTMLDivElement>(null)
 
   const { updateFilters } = useSearchFilters()
   const { registrarConsulta } = usePopularidad()
 
+  // ✅ POSICIÓN FIXED (clave para evitar overflow issues)
+  useEffect(() => {
+    if (!isOpen || !containerRef.current) return
+
+    const updatePosition = () => {
+      if (!containerRef.current) return
+      const rect = containerRef.current.getBoundingClientRect()
+      setDropdownStyle({
+        position: 'fixed',
+        top: rect.bottom + 8,
+        left: rect.left,
+        width: rect.width,
+        zIndex: 9999
+      })
+    }
+
+    updatePosition()
+    window.addEventListener('resize', updatePosition)
+    window.addEventListener('scroll', updatePosition, true)
+
+    return () => {
+      window.removeEventListener('resize', updatePosition)
+      window.removeEventListener('scroll', updatePosition, true)
+    }
+  }, [isOpen])
+
   const handleSelectLocation = (loc: Location) => {
     const fullName = `${loc.nombre} - ${loc.departamento} - Bolivia`
+
+    // sync sistema
     updateFilters({
       locationId: loc.id,
       query: fullName
     })
+
+    // lógica UI
     onChange(fullName)
     saveToHistory(fullName)
     setIsOpen(false)
     registrarConsulta(loc.id, fullName)
   }
 
+  // historial
   useEffect(() => {
     const savedHistory = localStorage.getItem('searchHistory')
     if (savedHistory) {
@@ -55,10 +87,8 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value
 
-    // Filtro: Solo letras (incluye tildes y ñ), números, espacios y guiones.
-    // Todo lo demás (emojis, @, #, $, etc.) se elimina al instante.
-    // Si el usuario presiona "Espacio" con el input vacío, el valor se mantiene en "".
-    const cleanValue = rawValue.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s\-]/gi, '').trimStart()
+    // ✅ mejor versión: limpia chars pero NO rompe espacios iniciales raro
+    const cleanValue = rawValue.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s\-]/gi, '')
 
     onChange(cleanValue)
   }
@@ -81,10 +111,15 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
         setSuggestions([])
         return
       }
+
       setIsLoading(true)
+
       try {
         const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
-        const res = await fetch(`${API_BASE}/api/locations/search?q=${encodeURIComponent(value)}`)
+        const res = await fetch(
+          `${API_BASE}/api/locations/search?q=${encodeURIComponent(value)}`
+        )
+
         if (res.ok) {
           const data = await res.json()
           setSuggestions(data)
@@ -96,6 +131,7 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
         setIsLoading(false)
       }
     }
+
     const timer = setTimeout(fetchLocations, 300)
     return () => clearTimeout(timer)
   }, [value, isSelected])
@@ -114,7 +150,9 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
         }`}
       >
         <MapPin
-          className={`w-5 h-5 flex-shrink-0 ${value ? 'text-amber-600' : 'text-stone-400'}`}
+          className={`w-5 h-5 flex-shrink-0 ${
+            value ? 'text-amber-600' : 'text-stone-400'
+          }`}
         />
 
         <div className="relative flex-1 flex items-center w-full h-full min-w-0">
@@ -123,6 +161,9 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
             value={value}
             onChange={handleInputChange}
             onFocus={() => setIsOpen(true)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') setIsOpen(false)
+            }}
             placeholder="Cochabamba, La Paz..."
             className="w-full bg-transparent outline-none text-sm text-stone-900 placeholder:text-stone-400 font-inter pr-[70px] md:truncate overflow-x-auto whitespace-nowrap"
           />
@@ -156,27 +197,15 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
               )
             )}
           </div>
-
-          <input
-            type="text"
-            value={value}
-            onChange={handleInputChange}
-            onFocus={() => setIsOpen(true)} // Al hacer clic, abrimos el desplegable
-            // Cerramos el panel si el usuario presiona Enter para buscar
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                setIsOpen(false)
-              }
-            }}
-            placeholder="Cochabamba, La Paz..."
-            className="w-full bg-transparent outline-none text-sm text-stone-900 placeholder:text-stone-400 font-inter relative z-10"
-          />
         </div>
       </div>
 
       {isOpen && (
-        <div className="absolute z-[100] w-full mt-2 bg-white border border-stone-200 rounded-xl shadow-xl overflow-hidden">
-          {/* CASO A: MOSTRAR HISTORIAL (Input vacío) */}
+        <div
+          className="bg-white border border-stone-200 rounded-xl shadow-xl overflow-hidden"
+          style={dropdownStyle}
+        >
+          {/* HISTORIAL */}
           {value === '' && history.length > 0 && (
             <div>
               <div className="px-4 py-2 bg-stone-50 border-b border-stone-100">
@@ -202,12 +231,15 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
             </div>
           )}
 
+          {/* RESULTADOS */}
           {value.trim().length >= 2 && !isSelected && (
             <>
               {isLoading ? (
                 <div className="px-4 py-6 text-center flex flex-col items-center gap-2">
                   <Loader2 className="w-5 h-5 animate-spin text-amber-600" />
-                  <span className="text-sm text-stone-500 italic">Buscando zonas...</span>
+                  <span className="text-sm text-stone-500 italic">
+                    Buscando zonas...
+                  </span>
                 </div>
               ) : suggestions.length > 0 ? (
                 <div className="max-h-[300px] overflow-y-auto">
@@ -236,7 +268,12 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
                 </div>
               ) : (
                 <div className="px-4 py-8 text-center bg-stone-50/50">
-                  <p className="text-sm text-stone-600 font-medium">No se encontraron resultados</p>
+                  <p className="text-sm text-stone-600 font-medium">
+                    No se encontraron resultados
+                  </p>
+                  <p className="text-xs text-stone-400 mt-1 italic">
+                    Pruebe con "Cala Cala"
+                  </p>
                 </div>
               )}
             </>
