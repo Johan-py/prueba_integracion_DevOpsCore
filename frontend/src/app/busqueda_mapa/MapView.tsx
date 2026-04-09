@@ -196,6 +196,8 @@ export default function MapView({
         zoomControl={false}
         touchZoom={true}
         dragging={true}
+        tap={true}
+        tapTolerance={15}
         style={{ height: "100%", width: "100%" }}
         className="z-0"
       >
