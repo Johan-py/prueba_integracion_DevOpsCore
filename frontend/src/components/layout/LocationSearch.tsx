@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import { MapPin, Search, Loader2, X, History } from 'lucide-react'
 import { usePopularidad } from '@/hooks/usePopularidad'
@@ -24,10 +25,12 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
   const [history, setHistory] = useState<string[]>([])
   const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({})
   const containerRef = useRef<HTMLDivElement>(null)
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({})
 
   const { updateFilters } = useSearchFilters()
   const { registrarConsulta } = usePopularidad()
 
+<<<<<<< HEAD
   // ✅ POSICIÓN FIXED (clave para evitar overflow issues)
   useEffect(() => {
     if (!isOpen || !containerRef.current) return
@@ -51,11 +54,40 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
     return () => {
       window.removeEventListener('resize', updatePosition)
       window.removeEventListener('scroll', updatePosition, true)
+=======
+  const recalcDropdown = () => {
+    if (!containerRef.current) return
+    const rect = containerRef.current.getBoundingClientRect()
+
+    setDropdownStyle({
+      position: 'fixed',
+      top: rect.bottom + 8,
+      left: rect.left,
+      width: rect.width,
+      zIndex: 99999,
+    })
+  }
+
+  useEffect(() => {
+    if (!isOpen) return
+    recalcDropdown()
+  }, [isOpen, value, suggestions.length])
+
+  useEffect(() => {
+    if (!isOpen) return
+    window.addEventListener('resize', recalcDropdown)
+    window.addEventListener('scroll', recalcDropdown, true)
+
+    return () => {
+      window.removeEventListener('resize', recalcDropdown)
+      window.removeEventListener('scroll', recalcDropdown, true)
+>>>>>>> 9d8b0ea (fix(HU2): Corregir location search para movil responsive)
     }
   }, [isOpen])
 
   const handleSelectLocation = (loc: Location) => {
     const fullName = `${loc.nombre} - ${loc.departamento} - Bolivia`
+<<<<<<< HEAD
 
     // sync sistema
     updateFilters({
@@ -64,8 +96,12 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
     })
 
     // lógica UI
+=======
+    updateFilters({ locationId: loc.id, query: fullName })
+>>>>>>> 9d8b0ea (fix(HU2): Corregir location search para movil responsive)
     onChange(fullName)
     saveToHistory(fullName)
+    setSuggestions([])
     setIsOpen(false)
     registrarConsulta(loc.id, fullName)
   }
@@ -73,36 +109,40 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
   // historial
   useEffect(() => {
     const savedHistory = localStorage.getItem('searchHistory')
-    if (savedHistory) {
-      setHistory(JSON.parse(savedHistory))
-    }
+    if (savedHistory) setHistory(JSON.parse(savedHistory))
   }, [])
 
   const saveToHistory = (item: string) => {
-    const updatedHistory = [item, ...history.filter((i) => i !== item)].slice(0, 5)
-    setHistory(updatedHistory)
-    localStorage.setItem('searchHistory', JSON.stringify(updatedHistory))
+    const updated = [item, ...history.filter((i) => i !== item)].slice(0, 5)
+    setHistory(updated)
+    localStorage.setItem('searchHistory', JSON.stringify(updated))
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+<<<<<<< HEAD
     const rawValue = e.target.value
 
     // ✅ mejor versión: limpia chars pero NO rompe espacios iniciales raro
     const cleanValue = rawValue.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s\-]/gi, '')
 
     onChange(cleanValue)
+=======
+    const clean = e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s\-]/gi, '')
+    onChange(clean)
+>>>>>>> 9d8b0ea (fix(HU2): Corregir location search para movil responsive)
   }
 
-  const isSelected = value.includes('Bolivia')
+  const isSelected = value.trim().endsWith(' - Bolivia')
 
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
+    const handler = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setIsOpen(false)
       }
     }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+
+    document.addEventListener('click', handler)
+    return () => document.removeEventListener('click', handler)
   }, [])
 
   useEffect(() => {
