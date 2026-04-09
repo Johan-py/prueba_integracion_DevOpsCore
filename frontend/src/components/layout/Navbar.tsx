@@ -100,20 +100,20 @@ export default function Navbar() {
   };
 
   const fetchCurrentUser = async (token: string) => {
-    const response = await fetch(`${API_URL}/api/auth/me`, {
+    const response = await fetch(`${API_URL}/api/perfil/usuario`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
 
-    const data = (await response.json()) as MeResponse;
+    const data = await response.json();
 
-    if (!response.ok || !data.user) {
+    if (!response.ok || !data.perfil) {
       throw new Error(data.message || "Sesión inválida o expirada");
     }
 
-    return data.user;
+    return data.perfil;
   };
 
   const restoreSession = async () => {

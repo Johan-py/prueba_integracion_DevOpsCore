@@ -7,6 +7,7 @@ import {
   ChevronRight,
   List as ListIcon,
   LayoutGrid,
+  Filter,
 } from "lucide-react";
 
 // === HOOKS ===
@@ -44,15 +45,25 @@ function BusquedaMapaContent() {
     null,
   );
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [isHoveringList, setIsHoveringList] = useState(false); // Controlar hover en tarjeta inmueble
 
   // Hover con debounce de 200 ms → vuela el mapa al marcador
   useEffect(() => {
-    if (!hoveredId) return;
-    const timeout = setTimeout(() => {
+  if (!hoveredId) {
+    if (!isHoveringList) {
+      setSelectedPropertyId(null);
+    }
+    return;
+  }
+  
+  const timeout = setTimeout(() => {
+    if (isHoveringList) {
       setSelectedPropertyId(hoveredId);
-    }, 200);
-    return () => clearTimeout(timeout);
-  }, [hoveredId]);
+    }
+  }, 200);
+  
+  return () => clearTimeout(timeout);
+  }, [hoveredId, isHoveringList]);
 
   //Sincronización del mapa con el colapso del panel lateral
   useEffect(() => {
@@ -73,32 +84,47 @@ function BusquedaMapaContent() {
         }}
       />
 
-      <main className="flex w-full flex-1 relative overflow-hidden border-b border-stone-200">
-        {/* Panel lateral colapsable — overlay en móvil, sidebar en desktop */}
+      <main className="flex flex-col md:flex-row w-full flex-1 min-h-0 relative overflow-hidden border-b border-stone-200">
+        {/* Panel lateral colapsable */}
         <aside
-          className={`bg-white border-r border-stone-200 flex flex-col transition-all duration-300 ${
-            isSidebarOpen
-              ? "absolute inset-0 z-20 md:relative md:inset-auto md:z-10 md:w-[450px]"
-              : "w-0 z-10"
+          className={`bg-white border-r border-stone-200 flex flex-col z-10 transition-all duration-300 min-h-0 overflow-hidden ${
+            isSidebarOpen 
+              ? "w-full md:w-[450px] h-[65dvh] md:h-full" 
+              : "w-0"
           }`}
         >
+
           {isSidebarOpen && (
-            <div className="flex flex-col h-full">
-              {/* Cabecera del panel */}
+<div className="flex flex-col h-full min-h-0">
+                {/* Cabecera del panel (FUSIONADA) */}
               <div className="p-4 bg-white shrink-0">
-                <div className="flex justify-between items-start mb-4">
+                <div className="flex justify-between items-center mb-4">
+                  {/* Lado Izquierdo: Título y cantidad */}
                   <div className="flex flex-col">
-                    <h2 className="text-2xl font-bold text-slate-900">
+                    <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1">
+                      <Filter className="w-4 h-4 text-orange-500" />
+                      <h1 className="text-base font-semibold text-stone-900 uppercase tracking-wide">Filtros </h1>
+                      </div>
+                      <div className="flex items-center gap-2 mb-2">
+                       <h1 className="text-xl font-semibold text-slate-800">
+                          Resultados de búsqueda
+                          </h1>
+                         </div>
+                    <h2 className="text-sm font-bold text-slate-900">
                       <span className="text-orange-500">
                         {properties.length}
                       </span>
-                      <span className="ml-2 text-gray-600 font-normal text-lg">
+                      <span className="ml-2 text-gray-600 font-normal text-sm">
                         {properties.length === 1
                           ? "propiedad encontrada"
                           : "propiedades encontradas"}
                       </span>
                     </h2>
+                    </div>
                   </div>
+
+                  {/* Lado Derecho: SOLO Botón cerrar */}
                   <button
                     onClick={() => setIsSidebarOpen(false)}
                     className="p-1 hover:bg-stone-100 rounded-full transition-colors text-stone-400"
@@ -107,35 +133,43 @@ function BusquedaMapaContent() {
                   </button>
                 </div>
 
-                <div className="border-b border-stone-100 pb-4">
+                {/* Contenedor relativo para el Menú y el Switch flotante */}
+                {/* Aumentamos pb-4 para darle espacio al posicionamiento absoluto */}
+                <div className="relative border-b border-stone-100 pb-4 [&>div]:mb-0">
                   <MenuOrdenamiento
                     totalResultados={properties.length}
                     ordenActual={ordenActual}
                     onOrdenChange={cambiarOrden}
                   />
-                </div>
-              </div>
 
-              {/* Toggle vista grid / lista */}
-              <div className="px-4 py-2 border-b border-stone-50 flex justify-end bg-white">
-                <div className="flex bg-stone-100 p-1 rounded-md border border-stone-200 shadow-inner scale-90">
-                  <button
-                    onClick={() => setViewMode("grid")}
-                    className={`p-1 rounded transition-colors ${viewMode === "grid" ? "bg-white text-[#ea580c] shadow-sm" : "text-stone-400"}`}
-                  >
-                    <LayoutGrid size={16} />
-                  </button>
-                  <button
-                    onClick={() => setViewMode("list")}
-                    className={`p-1 rounded transition-colors ${viewMode === "list" ? "bg-white text-[#ea580c] shadow-sm" : "text-stone-400"}`}
-                  >
-                    <ListIcon size={16} />
-                  </button>
+                  {/* NUEVO: Switch flotante alineado a la derecha de los filtros */}
+                  <div className="absolute right-0 bottom-4 flex bg-stone-100 p-1 rounded-md border border-stone-200 shadow-inner scale-90 origin-bottom-right">
+                    <button
+                      onClick={() => setViewMode("grid")}
+                      className={`p-1 rounded transition-colors ${viewMode === "grid" ? "bg-white text-[#ea580c] shadow-sm" : "text-stone-400"}`}
+                    >
+                      <LayoutGrid size={16} />
+                    </button>
+                    <button
+                      onClick={() => setViewMode("list")}
+                      className={`p-1 rounded transition-colors ${viewMode === "list" ? "bg-white text-[#ea580c] shadow-sm" : "text-stone-400"}`}
+                    >
+                      <ListIcon size={16} />
+                    </button>
+                  </div>
                 </div>
               </div>
+              
 
               {/* Lista de propiedades con hover → fly-to en mapa */}
-              <div className="flex-1 overflow-y-auto p-4 bg-stone-50 no-scrollbar">
+<div className="flex-1 min-h-0 overflow-y-auto p-4 bg-stone-50 no-scrollbar"
+                  onMouseEnter={() => setIsHoveringList(true)}
+                  onMouseLeave={() => {
+                   setIsHoveringList(false);
+                   setSelectedPropertyId(null);
+                   setHoveredId(null);
+                 }} 
+              >
                 {isLoading ? (
                   <div className="flex flex-col justify-center items-center h-full text-stone-400 text-sm gap-2 animate-pulse">
                     <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
@@ -202,9 +236,10 @@ function BusquedaMapaContent() {
           )}
         </aside>
 
-        {/* Área del mapa — siempre ocupa todo el espacio disponible */}
-        <section className="flex-1 relative bg-stone-200 min-w-0">
+        {/* Área del mapa */}
+        <section className="relative bg-stone-200 w-full h-[35dvh] md:flex-1 md:h-auto min-w-0">
           {/* Botón para reabrir el panel cuando está colapsado */}
+
           {!isSidebarOpen && (
             <button
               onClick={() => setIsSidebarOpen(true)}

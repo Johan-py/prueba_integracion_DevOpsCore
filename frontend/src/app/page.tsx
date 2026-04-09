@@ -8,6 +8,7 @@ interface BannerData {
   subtitulo?: string;
 }
 
+
 const fetchBanners = async (): Promise<BannerData[]> => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -46,14 +47,17 @@ export default async function Home() {
         />
       )}
 
-      {/* Contenido Unificado: Tu FilterPanel + ExploreSection */}
-      <div className="container mx-auto px-4 py-12">
-        <div className="flex flex-col-reverse md:flex-row gap-8 items-start">
-          {/* Sección de Filtros (Columna Izquierda) */}
-          <FilterPanel />
+      {/* CONTENEDOR PRINCIPAL */}
+      <div className="w-full px-2 md:px-6 py-12">
+        <div className="flex flex-col-reverse md:flex-row items-start">
 
-          {/* Sección de Explorar (Columna Derecha) */}
-          <section className="flex-1 w-full">
+          {/* FILTER PANEL */}
+          <div className="w-full md:w-[240px] lg:w-[260px] shrink-0">
+            <FilterPanel />
+          </div>
+
+          {/* EXPLORE SECTION */}
+          <section className="flex-1 w-full md:pl-20 -mt-16 md:mt-0">
             <ExploreSection />
           </section>
         </div>
