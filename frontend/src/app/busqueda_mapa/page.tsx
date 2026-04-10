@@ -226,58 +226,21 @@ function BusquedaMapaContent() {
             <FilterBar variant="map" onSearch={(f) => console.log('🔍 Filtros:', f)} />
           </div>
         </div>
-
-        {/* Área mapa + sheet */}
         <div className="flex-1 relative overflow-hidden">
-          {/* Mapa — ocupa todo este bloque */}
           <div className="absolute inset-0">
-            <MapView
-              properties={properties}
-              selectedId={selectedPropertyId}
-              onSelect={handleMapSelect}
-              isLoading={isLoading}
-              error={error}
-            />
+            <MapView properties={properties} selectedId={selectedPropertyId} onSelect={handleMapSelect} isLoading={isLoading} error={error} />
           </div>
-
-          {/* ── Botón flotante "Ver lista" — siempre visible cuando sheet está hidden ──
-               z-[1001] para quedar encima del mapa y de los controles de Leaflet */}
           {sheetState === 'hidden' && (
-            <button
-              onClick={() => setSheetState('peek')}
-              className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[1001] bg-white rounded-full px-5 py-3 shadow-xl border border-stone-200 flex items-center gap-2 text-sm font-semibold text-slate-700 active:scale-95 transition-transform"
-              style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.18)' }}
-            >
-              <ListIcon size={16} className="text-orange-500" />
-              Ver lista
-              {properties.length > 0 && (
-                <span className="bg-orange-100 text-orange-600 text-xs font-bold px-2 py-0.5 rounded-full">
-                  {properties.length}
-                </span>
-              )}
+            <button onClick={() => setSheetState('peek')} className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[1001] bg-white rounded-full px-5 py-3 shadow-xl border border-stone-200 flex items-center gap-2 text-sm font-semibold text-slate-700 active:scale-95 transition-transform" style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.18)' }}>
+              <ListIcon size={16} className="text-orange-500" /> Ver lista
+              {properties.length > 0 && <span className="bg-orange-100 text-orange-600 text-xs font-bold px-2 py-0.5 rounded-full">{properties.length}</span>}
               <ChevronUp size={16} className="text-stone-400" />
             </button>
           )}
-
-          {/* ── Bottom Sheet ── */}
           {sheetState !== 'hidden' && (
-            <div
-              className="absolute left-0 right-0 bottom-0 z-[400] bg-white rounded-t-2xl shadow-[0_-4px_24px_rgba(0,0,0,0.12)] flex flex-col"
-              style={{
-                height: SHEET_H[sheetState],
-                transition: 'height 0.3s cubic-bezier(0.32,0.72,0,1)'
-              }}
-              onTouchStart={onTouchStart}
-              onTouchEnd={onTouchEnd}
-            >
-              {/* Handle drag + tap en el pill para toggle */}
+            <div className="absolute left-0 right-0 bottom-0 z-[400] bg-white rounded-t-2xl shadow-[0_-4px_24px_rgba(0,0,0,0.12)] flex flex-col" style={{ height: SHEET_H[sheetState], transition: 'height 0.3s cubic-bezier(0.32,0.72,0,1)' }} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
               <div className="shrink-0 flex flex-col items-center pt-3 pb-1 cursor-grab active:cursor-grabbing select-none">
-                <div
-                  className="w-10 h-1.5 bg-stone-300 hover:bg-orange-400 rounded-full mb-3 transition-colors"
-                  onClick={() => setSheetState((s) => (s === 'full' ? 'peek' : 'full'))}
-                  title="Tocá para expandir o reducir"
-                />
-
+                <div className="w-10 h-1.5 bg-stone-300 hover:bg-orange-400 rounded-full mb-3 transition-colors" onClick={() => setSheetState((s) => (s === 'full' ? 'peek' : 'full'))} />
                 <div className="flex items-center justify-between w-full px-4 pb-2">
                   <span className="text-sm font-semibold text-slate-700 flex items-center gap-1.5">
                     <span className="text-orange-500">{properties.length}</span>
