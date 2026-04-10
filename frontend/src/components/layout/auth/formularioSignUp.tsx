@@ -28,7 +28,20 @@ type RegisterResponse = {
   expiresInMinutes?: number;
 };
 
+type GoogleAuthSuccessPayload = {
+  type: "propbol:google-login-success";
+  message: string;
+  token: string;
+  user: {
+    id: number;
+    correo: string;
+    nombre: string;
+    apellido: string;
+  };
+};
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const SESSION_DURATION_MS = 3 * 60 * 1000;
 
 const initialFormData: FormData = {
   email: "",
@@ -128,6 +141,34 @@ function FieldError({ id, error }: { id: string; error?: string }) {
     </p>
   );
 }
+
+const saveSession = (payload: GoogleAuthSuccessPayload) => {
+  const userName =
+    payload.user.nombre && payload.user.apellido
+      ? `${payload.user.nombre} ${payload.user.apellido}`
+      : payload.user.nombre || payload.user.correo || "Usuario";
+
+  localStorage.setItem("token", payload.token);
+  localStorage.setItem(
+    "propbol_user",
+    JSON.stringify({
+      name: userName,
+      email: payload.user.correo,
+      avatar: null,
+    }),
+  );
+  localStorage.setItem("nombre", userName);
+  localStorage.setItem("correo", payload.user.correo);
+  localStorage.setItem("avatar", "");
+  localStorage.setItem(
+    "propbol_session_expires",
+    String(Date.now() + SESSION_DURATION_MS),
+  );
+
+  window.dispatchEvent(new Event("propbol:login"));
+  window.dispatchEvent(new Event("propbol:session-changed"));
+  window.dispatchEvent(new Event("auth-state-changed"));
+};
 
 export default function SignUpForm() {
   const router = useRouter();
@@ -373,12 +414,9 @@ export default function SignUpForm() {
         throw new Error("No se recibió el token de verificación");
       }
 
-      sessionStorage.setItem("propbol_register_email", payload.correo);
-      sessionStorage.setItem("propbol_register_password", payload.password);
-      sessionStorage.setItem(
-        "propbol_register_verification_token",
-        verificationToken,
-      );
+      sessionStorage.setItem("pendingRegisterEmail", payload.correo);
+      sessionStorage.setItem("pendingRegisterPassword", payload.password);
+      sessionStorage.setItem("pendingRegisterToken", verificationToken);
 
       router.push("/verify-email");
     } catch (error) {
@@ -641,8 +679,8 @@ export default function SignUpForm() {
               <GoogleRegisterButton
                 disabled={isSubmitting}
                 onError={(message) => setServerError(message)}
-                onSuccess={async ({ token }) => {
-                  localStorage.setItem("token", token);
+                onSuccess={async (payload) => {
+                  saveSession(payload);
                   router.push("/");
                 }}
               />
