@@ -9,13 +9,24 @@ const TOAST_DURATION_MS = 5000;
 export default function RegisterSuccessToast() {
   const [message, setMessage] = useState("");
 
-  useEffect(() => {
+  const tryShowMessage = () => {
     const savedMessage = sessionStorage.getItem(STORAGE_KEY);
-
     if (savedMessage) {
-      setMessage(savedMessage);
       sessionStorage.removeItem(STORAGE_KEY);
+      setMessage(savedMessage);
     }
+  };
+
+  useEffect(() => {
+    tryShowMessage();
+
+    window.addEventListener("propbol:session-changed", tryShowMessage);
+    window.addEventListener("propbol:login", tryShowMessage);
+
+    return () => {
+      window.removeEventListener("propbol:session-changed", tryShowMessage);
+      window.removeEventListener("propbol:login", tryShowMessage);
+    };
   }, []);
 
   useEffect(() => {
