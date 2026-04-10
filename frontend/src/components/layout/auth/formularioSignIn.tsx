@@ -206,10 +206,9 @@ export default function LoginForm() {
     const newErrors = { ...errors };
 
     if (field === "correo") {
-      const trimmed = value.trim();
-      if (!trimmed) {
+      if (!value) {
         newErrors.correo = "El correo es obligatorio";
-      } else if (/\s/.test(trimmed) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      } else if (!/\S+@\S+\.\S+/.test(value)) {
         newErrors.correo = "Formato de correo inválido";
       } else {
         delete newErrors.correo;
@@ -219,10 +218,9 @@ export default function LoginForm() {
     if (field === "password") {
       if (!value) {
         newErrors.password = "La contraseña es obligatoria";
-      } else if (value.length < 8) {
-        newErrors.password = "La contraseña debe tener mínimo 8 caracteres";
       } else if (value.length > 16) {
-        newErrors.password = "La contraseña no puede tener más de 16 caracteres";
+        newErrors.password =
+          "La contraseña no puede tener más de 16 caracteres";
       } else {
         delete newErrors.password;
       }
@@ -401,16 +399,12 @@ export default function LoginForm() {
 
     if (!trimmedCorreo) {
       newErrors.correo = "El correo es obligatorio";
-    } else if (/\s/.test(trimmedCorreo) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedCorreo)) {
+    } else if (!/\S+@\S+\.\S+/.test(trimmedCorreo)) {
       newErrors.correo = "Formato de correo inválido";
     }
 
     if (!trimmedPassword) {
       newErrors.password = "La contraseña es obligatoria";
-    } else if (trimmedPassword.length < 8) {
-      newErrors.password = "La contraseña debe tener mínimo 8 caracteres";
-    } else if (trimmedPassword.length > 16) {
-      newErrors.password = "La contraseña no puede tener más de 16 caracteres";
     }
 
     setErrors(newErrors);
@@ -506,7 +500,6 @@ export default function LoginForm() {
               setCorreo(e.target.value);
               validate("correo", e.target.value);
             }}
-            onBlur={(e) => validate("correo", e.target.value)}
             className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-orange-500"
           />
 
@@ -539,7 +532,6 @@ export default function LoginForm() {
                 setPassword(e.target.value);
                 validate("password", e.target.value);
               }}
-              onBlur={(e) => validate("password", e.target.value)}
               className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 text-sm outline-none focus:border-orange-500"
             />
 

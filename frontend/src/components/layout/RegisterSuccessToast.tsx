@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
 import { CheckCircle } from "lucide-react";
 
 const STORAGE_KEY = "register_success_message";
@@ -9,25 +8,14 @@ const TOAST_DURATION_MS = 5000;
 
 export default function RegisterSuccessToast() {
   const [message, setMessage] = useState("");
-  const pathname = usePathname();
 
-  const tryShowMessage = () => {
+  useEffect(() => {
     const savedMessage = sessionStorage.getItem(STORAGE_KEY);
+
     if (savedMessage) {
-      sessionStorage.removeItem(STORAGE_KEY);
       setMessage(savedMessage);
+      sessionStorage.removeItem(STORAGE_KEY);
     }
-  };
-
-  useEffect(() => {
-    tryShowMessage();
-  }, [pathname]);
-
-  useEffect(() => {
-    window.addEventListener("propbol:register-success", tryShowMessage);
-    return () => {
-      window.removeEventListener("propbol:register-success", tryShowMessage);
-    };
   }, []);
 
   useEffect(() => {

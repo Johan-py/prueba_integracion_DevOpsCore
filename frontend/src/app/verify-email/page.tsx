@@ -95,17 +95,13 @@ export default function VerifyEmailPage() {
       sessionStorage.removeItem("pendingRegisterEmail");
       sessionStorage.setItem(
         "register_success_message",
-        data.message || "Correo verificado y usuario creado correctamente",
+        data.message || "Correo verificado correctamente",
       );
 
       window.dispatchEvent(new Event("propbol:login"));
       window.dispatchEvent(new Event("propbol:session-changed"));
 
       router.replace("/");
-
-      setTimeout(() => {
-        window.dispatchEvent(new Event("propbol:register-success"));
-      }, 100);
     } catch (error) {
       setError(
         error instanceof Error
