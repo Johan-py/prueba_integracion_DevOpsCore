@@ -3,9 +3,9 @@ import { createProperty, cancelProperty } from '../registro-publicacion/publicac
 import { propertyValidationRules } from '../registro-publicacion/publicacion.validator.js'
 //import { verifyToken } from '../middleware/auth.middleware'
 
-const router = Router();
+const router = Router()
 
-router.post("/properties", propertyValidationRules, createProperty);
-router.post("/properties/cancel", cancelProperty);
+router.post('/properties', propertyValidationRules, createProperty)
+router.post('/properties/cancel', cancelProperty)
 
-export default router;
+export default router

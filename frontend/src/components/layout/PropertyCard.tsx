@@ -81,5 +81,5 @@ export default function PropertyCard({
         </div>
       </div>
     </div>
-  );
+  )
 }

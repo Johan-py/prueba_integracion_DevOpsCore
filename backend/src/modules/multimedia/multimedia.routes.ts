@@ -1,29 +1,21 @@
-import { Router } from "express";
-import { requireAuth } from "../../middleware/auth.middleware.js";
+import { Router } from 'express'
+import { requireAuth } from '../../middleware/auth.middleware.js'
 import {
   getPublicationMultimediaController,
   registerImagesController,
-  registerVideoLinkController,
-} from "./multimedia.controller.js";
+  registerVideoLinkController
+} from './multimedia.controller.js'
 
-const multimediaRoutes = Router();
+const multimediaRoutes = Router()
 
-multimediaRoutes.get(
-  "/:publicacionId/multimedia",
-  requireAuth,
-  getPublicationMultimediaController,
-);
+multimediaRoutes.get('/:publicacionId/multimedia', requireAuth, getPublicationMultimediaController)
 
 multimediaRoutes.post(
-  "/:publicacionId/multimedia/video-link",
+  '/:publicacionId/multimedia/video-link',
   requireAuth,
-  registerVideoLinkController,
-);
+  registerVideoLinkController
+)
 
-multimediaRoutes.post(
-  "/:publicacionId/multimedia/images",
-  requireAuth,
-  registerImagesController,
-);
+multimediaRoutes.post('/:publicacionId/multimedia/images', requireAuth, registerImagesController)
 
-export default multimediaRoutes;
+export default multimediaRoutes

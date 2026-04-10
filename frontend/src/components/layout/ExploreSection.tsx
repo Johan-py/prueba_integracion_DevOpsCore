@@ -216,5 +216,5 @@ export default function ExploreSection() {
         </div>
       </div>
     </section>
-  );
+  )
 }

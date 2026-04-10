@@ -215,5 +215,5 @@ export default function Footer() {
       </div>
       <FooterBottomBar />
     </footer>
-  );
+  )
 }

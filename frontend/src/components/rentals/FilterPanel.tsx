@@ -297,5 +297,5 @@ export default function FilterPanel() {
         </div>
       </aside>
     </>
-  );
+  )
 }
