@@ -1,137 +1,115 @@
-import { env } from "../config/env.js";
+import nodemailer from "nodemailer";
 
-const BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
+const emailUser = process.env.EMAIL_USER;
+const emailPassword = process.env.EMAIL_PASSWORD;
 
-interface EnviarCodigoParams {
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: emailUser,
+    pass: emailPassword,
+  },
+});
+
+export const verifyNotificationEmailTransport = async () => {
+  if (!emailUser || !emailPassword) {
+    throw new Error("Las credenciales de email no están configuradas");
+  }
+
+  await transporter.verify();
+};
+
+type SendNotificationEmailParams = {
   emailDestino: string;
-  codigo: string;
+  titulo: string;
+  mensaje: string;
   nombreUsuario?: string;
-}
+};
 
-interface EmailSendResult {
-  success: boolean;
-  messageId?: string;
-  error?: unknown;
-}
-
-const sendBrevoEmail = async ({
-  to,
-  subject,
-  htmlContent,
-  textContent,
-}: {
-  to: string;
-  subject: string;
-  htmlContent: string;
-  textContent: string;
-}): Promise<EmailSendResult> => {
+export const sendNotificationEmail = async ({
+  emailDestino,
+  titulo,
+  mensaje,
+  nombreUsuario,
+}: SendNotificationEmailParams) => {
   try {
-    const response = await fetch(BREVO_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "api-key": env.EMAIL_PASSWORD, // tu API key de Brevo
-      },
-      body: JSON.stringify({
-        sender: { name: "PropBol", email: env.EMAIL_USER },
-        to: [{ email: to }],
-        subject,
-        htmlContent,
-        textContent,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("❌ Error al enviar email:", errorData);
-      return { success: false, error: errorData };
+    if (!emailUser || !emailPassword) {
+      throw new Error("Las credenciales de email no están configuradas");
     }
 
-    const data = (await response.json()) as { messageId?: string };
-    console.log(`✅ Email enviado a ${to} - ID: ${data.messageId}`);
-    return { success: true, messageId: data.messageId };
+    const saludo = nombreUsuario
+      ? `<p style="font-size: 16px; color: #333;">Hola <strong>${nombreUsuario}</strong>,</p>`
+      : '<p style="font-size: 16px; color: #333;">Hola,</p>';
+
+    const info = await transporter.sendMail({
+      from: `"PropBol" <${emailUser}>`,
+      to: emailDestino,
+      subject: `Nueva notificación - ${titulo}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        </head>
+        <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px;">
+          <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <div style="background-color: #d97706; padding: 20px; text-align: center;">
+              <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Nueva notificación</h1>
+            </div>
+
+            <div style="padding: 30px;">
+              ${saludo}
+
+              <p style="font-size: 16px; color: #333; margin-top: 15px;">
+                Has recibido una nueva notificación en PropBol:
+              </p>
+
+              <div style="background-color: #fffbeb; padding: 20px; margin: 25px 0; border-radius: 8px; border: 1px solid #fde68a;">
+                <h2 style="font-size: 20px; color: #92400e; margin: 0 0 12px 0;">${titulo}</h2>
+                <p style="font-size: 15px; color: #444; margin: 0;">${mensaje}</p>
+              </div>
+            </div>
+
+            <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+              <p style="font-size: 12px; color: #9ca3af; margin: 0;">
+                Este es un mensaje automático, por favor no responder.<br />
+                © ${new Date().getFullYear()} PropBol.
+              </p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `,
+      text: `
+Nueva notificación en PropBol
+
+${nombreUsuario ? `Hola ${nombreUsuario},` : "Hola,"}
+
+Título: ${titulo}
+
+Mensaje:
+${mensaje}
+
+---
+Este es un mensaje automático, por favor no responder.
+      `,
+    });
+
+    console.log(
+      `Email de notificación enviado a ${emailDestino} - ID: ${info.messageId}`,
+    );
+
+    return {
+      success: true,
+      messageId: info.messageId,
+    };
   } catch (error) {
-    console.error("❌ Error al enviar email:", error);
-    return { success: false, error };
+    console.error("Error al enviar email de notificación:", error);
+
+    return {
+      success: false,
+      error,
+    };
   }
-};
-
-export const verifyEmailTransport = async (): Promise<void> => {
-  if (!env.EMAIL_USER || !env.EMAIL_PASSWORD) {
-    throw new Error("Credenciales de email no configuradas");
-  }
-  console.log("✅ Servicio de email listo (Brevo API)");
-};
-
-export const enviarCodigoCambioEmail = async ({
-  emailDestino,
-  codigo,
-  nombreUsuario,
-}: EnviarCodigoParams): Promise<EmailSendResult> => {
-  const saludo = nombreUsuario ? `Hola ${nombreUsuario},` : "Hola,";
-
-  return sendBrevoEmail({
-    to: emailDestino,
-    subject: "Código de verificación - Cambio de email",
-    htmlContent: `
-      <!DOCTYPE html><html><head><meta charset="UTF-8"/></head>
-      <body style="font-family:Arial,sans-serif;background:#f4f4f4;margin:0;padding:20px;">
-        <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:10px;overflow:hidden;">
-          <div style="background:#d97706;padding:20px;text-align:center;">
-            <h1 style="color:#fff;margin:0;font-size:24px;">Verificación de Email</h1>
-          </div>
-          <div style="padding:30px;">
-            <p style="font-size:16px;color:#333;">${saludo}</p>
-            <p style="font-size:16px;color:#333;">Has solicitado cambiar el email de tu cuenta. Ingresa el siguiente código:</p>
-            <div style="background:#fef3c7;padding:20px;text-align:center;margin:25px 0;border-radius:8px;border:1px solid #fde68a;">
-              <span style="font-size:36px;font-weight:bold;letter-spacing:5px;color:#92400e;">${codigo}</span>
-            </div>
-            <p style="font-size:14px;color:#666;">Este código expirará en <strong style="color:#d97706;">5 minutos</strong>.</p>
-            <div style="background:#fffbeb;border-left:4px solid #d97706;padding:12px;margin:20px 0;">
-              <p style="margin:0;font-size:13px;color:#78350f;">Si no solicitaste este cambio, ignora este mensaje.</p>
-            </div>
-          </div>
-          <div style="background:#f9fafb;padding:20px;text-align:center;border-top:1px solid #e5e7eb;">
-            <p style="font-size:12px;color:#9ca3af;margin:0;">Mensaje automático, por favor no responder.</p>
-          </div>
-        </div>
-      </body></html>
-    `,
-    textContent: `${saludo}\n\nTu código de verificación es: ${codigo}\n\nExpira en 5 minutos.`,
-  });
-};
-
-export const enviarCodigoRegistro = async ({
-  emailDestino,
-  codigo,
-  nombreUsuario,
-}: EnviarCodigoParams): Promise<EmailSendResult> => {
-  const saludo = nombreUsuario ? `Hola ${nombreUsuario},` : "Hola,";
-
-  return sendBrevoEmail({
-    to: emailDestino,
-    subject: "Código de verificación - Registro PropBol",
-    htmlContent: `
-      <!DOCTYPE html><html><head><meta charset="UTF-8"/></head>
-      <body style="font-family:Arial,sans-serif;background:#f4f4f4;margin:0;padding:20px;">
-        <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:10px;overflow:hidden;">
-          <div style="background:#d97706;padding:20px;text-align:center;">
-            <h1 style="color:#fff;margin:0;font-size:24px;">Verifica tu cuenta</h1>
-          </div>
-          <div style="padding:30px;">
-            <p style="font-size:16px;color:#333;">${saludo}</p>
-            <p style="font-size:16px;color:#333;">Usa este código para completar tu registro en PropBol:</p>
-            <div style="background:#fef3c7;padding:20px;text-align:center;margin:25px 0;border-radius:8px;border:1px solid #fde68a;">
-              <span style="font-size:36px;font-weight:bold;letter-spacing:5px;color:#92400e;">${codigo}</span>
-            </div>
-            <p style="font-size:14px;color:#666;">Este código expirará en <strong style="color:#d97706;">5 minutos</strong>.</p>
-          </div>
-          <div style="background:#f9fafb;padding:20px;text-align:center;border-top:1px solid #e5e7eb;">
-            <p style="font-size:12px;color:#9ca3af;margin:0;">Mensaje automático, por favor no responder.</p>
-          </div>
-        </div>
-      </body></html>
-    `,
-    textContent: `${saludo}\n\nTu código de verificación es: ${codigo}\n\nExpira en 5 minutos.`,
-  });
 };
