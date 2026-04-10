@@ -263,61 +263,134 @@ function BusquedaMapaContent() {
                 <div className="px-4 shrink-0 border-b border-stone-100 pb-2">
                   <MenuOrdenamiento totalResultados={properties.length} ordenActual={ordenActual} onOrdenChange={cambiarOrden} />
                 </div>
-
-                {/* Toggle grid/lista */}
                 <div className="px-4 py-2 flex justify-end shrink-0">
-                  <div className="flex bg-stone-100 p-1 rounded-md border border-stone-200 shadow-inner scale-90">
-                    <button
-                      onClick={() => setViewMode('grid')}
-                      className={`p-1 rounded transition-colors ${viewMode === 'grid' ? 'bg-white text-[#ea580c] shadow-sm' : 'text-stone-400'}`}
-                    >
-                      <LayoutGrid size={16} />
-                    </button>
-                    <button
-                      onClick={() => setViewMode('list')}
-                      className={`p-1 rounded transition-colors ${viewMode === 'list' ? 'bg-white text-[#ea580c] shadow-sm' : 'text-stone-400'}`}
-                    >
-                      <ListIcon size={16} />
-                    </button>
-                  </div>
+                  {MenuToggleComponent}
                 </div>
-
-                <PropertyList
-                  onClickItem={(p) => {
-                    setPinnedProperty(p)
-                    setSheetState('peek')
-                  }}
-                />
+                <PropertyListMobile onClickItem={(p) => { setPinnedProperty(p); setSheetState('peek') }} />
               </div>
             </div>
           )}
         </div>
       </div>
-    ) // end portrait
-  } // end if(isMobile || isLandscape)
+    )
+  }
 
   // ────────────────────────────────────────────────────────────────────────────
-  // DESKTOP / TABLET
+  // RENDER DESKTOP (Su versión local original preservada)
   // ────────────────────────────────────────────────────────────────────────────
   return (
-    <div
-      className="flex flex-col bg-white overflow-hidden"
-      style={{ height: 'calc(100dvh - 180px)' }}
-    >
-      <FilterBar variant="map" onSearch={(f) => console.log('🔍 Filtros:', f)} />
-      <main className="flex flex-1 overflow-hidden relative border-b border-stone-200">
+    <div className="flex flex-col bg-white w-full h-[calc(100dvh-80px)] md:h-[calc(100dvh-99px)] overflow-hidden">
+      <FilterBar
+        variant="map"
+        onSearch={(nuevosFiltros) => {
+          console.log('🔍 Buscando con filtros:', nuevosFiltros)
+        }}
+      />
+
+      <main className="flex flex-col md:flex-row w-full flex-1 min-h-0 relative overflow-hidden border-b border-stone-200">
+        {/* Panel lateral colapsable (Su versión exacta) */}
         <aside
-          className={`bg-white border-r border-stone-200 flex flex-col z-10 transition-all duration-300 overflow-hidden ${isSidebarOpen ? 'w-[450px]' : 'w-0'}`}
+          className={`bg-white border-r border-stone-200 flex flex-col z-10 transition-all duration-300 min-h-0 overflow-hidden ${
+            isSidebarOpen ? "w-full md:w-[450px] h-[65dvh] md:h-full" : "w-0"
+          }`}
         >
           {isSidebarOpen && (
-            <div className="flex flex-col h-full w-[450px]">
-              {PanelHeader}
-              {ViewToggle}
-              <PropertyList />
+            <div className="flex flex-col h-full min-h-0">
+              <div className="p-4 bg-white shrink-0">
+                <div className="flex justify-between items-center mb-4">
+                  <div className="flex flex-col">
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-1">
+                        <Filter className="w-4 h-4 text-orange-500" />
+                        <h1 className="text-base font-semibold text-stone-900 uppercase tracking-wide">
+                          Filtros{' '}
+                        </h1>
+                      </div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <h1 className="text-xl font-semibold text-slate-800">
+                          Resultados de búsqueda
+                        </h1>
+                      </div>
+                      <h2 className="text-sm font-bold text-slate-900">
+                        <span className="text-orange-500">{properties.length}</span>
+                        <span className="ml-2 text-gray-600 font-normal text-sm">
+                          {properties.length === 1 ? 'propiedad encontrada' : 'propiedades encontradas'}
+                        </span>
+                      </h2>
+                    </div>
+                  </div>
+                  <button onClick={() => setIsSidebarOpen(false)} className="p-1 hover:bg-stone-100 rounded-full transition-colors text-stone-400">
+                    <ChevronLeft size={20} />
+                  </button>
+                </div>
+
+                <div className="relative border-b border-stone-100 pb-4 [&>div]:mb-0">
+                  <MenuOrdenamiento totalResultados={properties.length} ordenActual={ordenActual} onOrdenChange={cambiarOrden} />
+                  <div className="absolute right-0 bottom-4 flex bg-stone-100 p-1 rounded-md border border-stone-200 shadow-inner scale-90 origin-bottom-right">
+                    <button onClick={() => setViewMode('grid')} className={`p-1 rounded transition-colors ${viewMode === 'grid' ? 'bg-white text-[#ea580c] shadow-sm' : 'text-stone-400'}`}>
+                      <LayoutGrid size={16} />
+                    </button>
+                    <button onClick={() => setViewMode('list')} className={`p-1 rounded transition-colors ${viewMode === 'list' ? 'bg-white text-[#ea580c] shadow-sm' : 'text-stone-400'}`}>
+                      <ListIcon size={16} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Su lista original con el hover personalizado y control de estado isHoveringList */}
+              <div
+                className="flex-1 min-h-0 overflow-y-auto p-4 bg-stone-50 no-scrollbar"
+                onMouseEnter={() => setIsHoveringList(true)}
+                onMouseLeave={() => {
+                  setIsHoveringList(false)
+                  setSelectedPropertyId(null)
+                  setHoveredId(null)
+                }}
+              >
+                {isLoading ? (
+                  <div className="flex flex-col justify-center items-center h-full text-stone-400 text-sm gap-2 animate-pulse">
+                    <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+                    Actualizando resultados...
+                  </div>
+                ) : properties.length === 0 ? (
+                  <EmptyState />
+                ) : (
+                  <div className={`gap-4 flex flex-col ${viewMode === 'list' ? 'divide-y divide-gray-100 bg-white border border-gray-100 rounded-xl shadow-sm' : ''}`}>
+                    {properties.map((property: any) => (
+                      <div
+                        key={property.id}
+                        onMouseEnter={() => setHoveredId(property.id)}
+                        onMouseLeave={() => setHoveredId(null)}
+                        onClick={() => setSelectedPropertyId(property.id)}
+                        className={`cursor-pointer transition-all duration-200 rounded-xl relative ${
+                          viewMode === 'grid' ? 'transform scale-95 origin-top mx-auto mb-[-4%]' : 'w-full py-1 hover:bg-stone-100'
+                        } ${selectedPropertyId === property.id ? 'ring-2 ring-orange-400 ring-offset-1 z-10' : ''}`}
+                      >
+                        {viewMode === 'grid' ? (
+                          <PropertyCard
+                            imagen=""
+                            estado={property.type}
+                            precio={property.currency === 'USD' ? `$${property.price.toLocaleString('es-BO')} USD` : `Bs ${property.price.toLocaleString('es-BO')}`}
+                            descripcion={property.title} camas={3} banos={2} metros={150}
+                          />
+                        ) : (
+                          <PropertyRow
+                            title={property.title}
+                            price={property.currency === 'USD' ? `$${property.price.toLocaleString('es-BO')} USD` : `Bs ${property.price.toLocaleString('es-BO')}`}
+                            size="3 Dorm. • 150 m²" contactType="whatsapp" image=""
+                          />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </aside>
-        <section className="flex-1 relative bg-stone-200">
+
+        {/* Su sección de mapa original blindada con min-w-0 */}
+        <section className="relative bg-stone-200 w-full h-[35dvh] md:flex-1 md:h-auto min-w-0">
           {!isSidebarOpen && (
             <button
               onClick={() => setIsSidebarOpen(true)}
