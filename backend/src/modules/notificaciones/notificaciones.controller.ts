@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express'
 import {
+  archiveNotificationService,
   createNotificationService,
   deleteNotificationService,
   getNotificationsService,
@@ -20,7 +21,7 @@ type NotificationParams = {
 }
 
 type CreateNotificationBody = {
-  usuarioId?: number | string
+  correo?: string
   titulo?: string
   mensaje?: string
 }
@@ -123,11 +124,8 @@ export const createNotificationController = async (
       })
     }
 
-    const bodyUserId =
-      req.body.usuarioId !== undefined ? Number(req.body.usuarioId) : authenticatedUserId
-
     const result = await createNotificationService({
-      usuarioId: bodyUserId,
+      correo: req.body.correo ?? '',
       titulo: req.body.titulo ?? '',
       mensaje: req.body.mensaje ?? ''
     })
@@ -205,6 +203,32 @@ export const deleteNotificationController = async (
 
     const id = Number.parseInt(req.params.id, 10)
     const result = await deleteNotificationService(id, usuarioId)
+
+    return res.status(200).json(result)
+  } catch (error) {
+    const { statusCode, message } = buildErrorResponse(error)
+
+    return res.status(statusCode).json({
+      message
+    })
+  }
+}
+
+export const archiveNotificationController = async (
+  req: Request<NotificationParams>,
+  res: Response
+) => {
+  try {
+    const usuarioId = getUserIdFromRequest(req as AuthenticatedRequest)
+
+    if (!usuarioId) {
+      return res.status(401).json({
+        message: 'No autorizado'
+      })
+    }
+
+    const id = Number.parseInt(req.params.id, 10)
+    const result = await archiveNotificationService(id, usuarioId)
 
     return res.status(200).json(result)
   } catch (error) {
