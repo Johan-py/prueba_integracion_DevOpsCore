@@ -403,6 +403,7 @@ function BusquedaMapaContent() {
               <ListIcon size={16} className="text-stone-500" />
             </button>
           )}
+
           <div className="absolute inset-0">
             <MapView
               properties={properties}
@@ -424,10 +425,7 @@ export default function BusquedaMapaPage() {
   return (
     <Suspense
       fallback={
-        <div
-          className="flex items-center justify-center bg-white text-gray-500 italic"
-          style={{ height: '100dvh' }}
-        >
+        <div className="h-screen w-screen flex items-center justify-center bg-white text-gray-500 italic">
           Cargando buscador de PropBol...
         </div>
       }
