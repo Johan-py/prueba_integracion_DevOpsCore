@@ -195,5 +195,5 @@ export default function FilterBar({
       </div>
       
     </form>
-  );
+  )
 }

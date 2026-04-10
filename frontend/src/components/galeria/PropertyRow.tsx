@@ -43,5 +43,5 @@ export default function PropertyRow({
         <ContactButton type={contactType} variant="table" />
       </div>
     </div>
-  );
+  )
 }

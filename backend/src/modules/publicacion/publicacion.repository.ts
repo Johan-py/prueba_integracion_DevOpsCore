@@ -1,23 +1,21 @@
 // backend/src/modules/publicaciones/publicacion.repository.ts
 import { prisma } from '../../lib/prisma.config.js'
 
-const ESTADO_PUBLICACION_ELIMINADA = "ELIMINADA" as const;
-const ESTADO_INMUEBLE_INACTIVO = "INACTIVO" as const;
+const ESTADO_PUBLICACION_ELIMINADA = 'ELIMINADA' as const
+const ESTADO_INMUEBLE_INACTIVO = 'INACTIVO' as const
 
 /**
  * Buscar todas las publicaciones activas de un usuario
  * - No debe incluir publicaciones eliminadas
  * - Ordenadas por fecha de publicación descendente
  */
-export const buscarPublicacionesPorUsuarioRepository = async (
-  usuarioId: number,
-) => {
+export const buscarPublicacionesPorUsuarioRepository = async (usuarioId: number) => {
   return prisma.publicacion.findMany({
     where: {
       usuarioId,
       estado: {
-        not: ESTADO_PUBLICACION_ELIMINADA,
-      },
+        not: ESTADO_PUBLICACION_ELIMINADA
+      }
     },
     include: {
       multimedia: true,
@@ -30,17 +28,17 @@ export const buscarPublicacionesPorUsuarioRepository = async (
               latitud: true,
               longitud: true,
               inmuebleId: true,
-              ubicacionMaestraId: true,
-            },
-          },
-        },
-      },
+              ubicacionMaestraId: true
+            }
+          }
+        }
+      }
     },
     orderBy: {
-      fechaPublicacion: "desc",
-    },
-  });
-};
+      fechaPublicacion: 'desc'
+    }
+  })
+}
 
 /**
  * Buscar una publicación por ID
@@ -51,10 +49,10 @@ export const buscarPublicacionPorIdRepository = async (id: number) => {
     where: { id },
     include: {
       inmueble: true,
-      multimedia: true,
-    },
-  });
-};
+      multimedia: true
+    }
+  })
+}
 
 /**
  * Eliminar lógicamente una publicación
@@ -63,20 +61,20 @@ export const buscarPublicacionPorIdRepository = async (id: number) => {
  */
 export const eliminarLogicamentePublicacionRepository = async (
   publicacionId: number,
-  inmuebleId: number,
+  inmuebleId: number
 ) => {
   return prisma.$transaction([
     prisma.publicacion.update({
       where: { id: publicacionId },
       data: {
-        estado: ESTADO_PUBLICACION_ELIMINADA,
-      },
+        estado: ESTADO_PUBLICACION_ELIMINADA
+      }
     }),
     prisma.inmueble.update({
       where: { id: inmuebleId },
       data: {
-        estado: ESTADO_INMUEBLE_INACTIVO,
-      },
-    }),
-  ]);
-};
+        estado: ESTADO_INMUEBLE_INACTIVO
+      }
+    })
+  ])
+}

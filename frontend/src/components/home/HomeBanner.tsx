@@ -57,5 +57,5 @@ export const HomeBanner = ({ url, title, subtitle }: BannerProps) => {
       <div className="md:hidden absolute bottom-0 translate-y-1/2 w-full px-4 z-20">
       </div>
     </div>
-  );
-};
+  )
+}

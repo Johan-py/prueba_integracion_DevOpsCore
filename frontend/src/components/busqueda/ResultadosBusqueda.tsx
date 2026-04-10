@@ -133,5 +133,5 @@ export const ResultadosBusqueda = () => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}

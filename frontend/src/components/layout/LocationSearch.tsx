@@ -23,10 +23,48 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [history, setHistory] = useState<string[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({})
 
   const { updateFilters } = useSearchFilters();
   const { registrarConsulta } = usePopularidad();
 
+  // ── Dropdown position: fixed so overflow:auto parents can't clip it ────────
+  const recalcDropdown = () => {
+    if (!containerRef.current) return
+    const rect = containerRef.current.getBoundingClientRect()
+    setDropdownStyle({
+      position: 'fixed',
+      top: rect.bottom + 8,
+      left: rect.left,
+      width: rect.width,
+      zIndex: 9999
+    })
+  }
+
+  useEffect(() => {
+    if (!isOpen) return
+    let frame1 = 0
+    let frame2 = 0
+    frame1 = requestAnimationFrame(() => {
+    frame2 = requestAnimationFrame(recalcDropdown)
+    })
+    return () => {
+      if (frame1) cancelAnimationFrame(frame1)
+      if (frame2) cancelAnimationFrame(frame2)
+    }
+  }, [isOpen])
+
+  useEffect(() => {
+    if (!isOpen) return
+    window.addEventListener('resize', recalcDropdown)
+    window.addEventListener('scroll', recalcDropdown, true)
+    return () => {
+      window.removeEventListener('resize', recalcDropdown)
+      window.removeEventListener('scroll', recalcDropdown, true)
+    }
+  }, [isOpen])
+
+  // ── Selección de ubicación ─────────────────────────────────────────────────
   const handleSelectLocation = (loc: Location) => {
     const fullName = `${loc.nombre} - ${loc.departamento} - Bolivia`;
     updateFilters({
@@ -120,7 +158,12 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
             type="text"
             value={value}
             onChange={handleInputChange}
-            onFocus={() => setIsOpen(true)}
+            onFocus={() => {
+              setIsOpen(true)
+              requestAnimationFrame(() => {
+                  recalcDropdown()
+                })   
+          }}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 setIsOpen(false);
@@ -234,5 +277,5 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
         </div>
       )}
     </div>
-  );
+  )
 }

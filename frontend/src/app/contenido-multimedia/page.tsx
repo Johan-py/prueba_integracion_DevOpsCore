@@ -359,5 +359,5 @@ function ContenidoMultimediaPageContent() {
         />
       </div>
     </main>
-  );
+  )
 }

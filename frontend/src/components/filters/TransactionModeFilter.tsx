@@ -68,5 +68,5 @@ export default function TransactionModeFilter({
         </label>
       ))}
     </div>
-  );
+  )
 }
