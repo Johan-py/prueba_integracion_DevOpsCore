@@ -1,18 +1,9 @@
-<<<<<<< HEAD
-import express from 'express'
-import cors from 'cors'
-import helmet from 'helmet'
-import morgan from 'morgan'
-import 'dotenv/config'
-import publicacionesRouter from './modules/publicaciones/publicaciones.router.js'
-=======
 import path from "path";
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { env } from "./config/env.js";
 import type { Request, Response } from "express";
->>>>>>> c4f97a97c73c3ee3ee36481b8ce7d632fa372371
 
 // --------------------
 // CONTROLLERS
@@ -29,23 +20,6 @@ import {
 import { BannersController } from "./modules/banners/banners.controller.js";
 import { FiltersHomepageController } from "./modules/filtershomepage/filtershomepage.controller.js";
 
-<<<<<<< HEAD
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }))
-app.use(helmet())
-app.use(morgan('dev'))
-app.use(express.json())
-
-app.get('/api/health', (_, res) => {
-  res.json({ status: 'ok', message: 'PropBol API running' })
-})
-
-app.use('/api/publicaciones', publicacionesRouter)
-
-const PORT = process.env.PORT || 5000
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`)
-})
-=======
 // --------------------
 // AUTH
 // --------------------
@@ -224,4 +198,3 @@ app.listen(PORT, () => {
 });
 
 export default app;
->>>>>>> c4f97a97c73c3ee3ee36481b8ce7d632fa372371

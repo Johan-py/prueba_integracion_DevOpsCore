@@ -1,4 +1,4 @@
-import { prisma } from '../../lib/prisma.js'
+import { prisma } from '../../lib/prisma.config.js'
 
 export const getPublicacionesByUsuario = async (usuarioId: number) => {
   return prisma.publicacion.findMany({
