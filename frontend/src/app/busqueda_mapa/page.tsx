@@ -243,10 +243,8 @@ function BusquedaMapaContent() {
                 <div className="w-10 h-1.5 bg-stone-300 hover:bg-orange-400 rounded-full mb-3 transition-colors" onClick={() => setSheetState((s) => (s === 'full' ? 'peek' : 'full'))} />
                 <div className="flex items-center justify-between w-full px-4 pb-2">
                   <span className="text-sm font-semibold text-slate-700 flex items-center gap-1.5">
-                    <span className="text-orange-500">{properties.length}</span>
-                    <span className="text-gray-500 font-normal">propiedades</span>
+                    <span className="text-orange-500">{properties.length}</span><span className="text-gray-500 font-normal">propiedades</span>
                   </span>
-
                   <div className="flex items-center gap-2">
                     {/* Botón cerrar sheet → vuelve a hidden (mapa limpio) */}
                     <button
