@@ -39,8 +39,10 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Instalar pytest
-        run: pip install -r tests_api/requirements.txt
+      - name: Instalar dependencias Python
+        run: pip install -r backend/tests_api/requirements.txt
 
       - name: Ejecutar tests
-        run: pytest tests_api/ -v
+        env:
+          PYTHONPATH: ./backend
+        run: pytest backend/tests_api/ -v
