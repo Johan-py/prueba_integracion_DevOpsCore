@@ -1,23 +1,25 @@
 interface ConfirmDeleteModalProps {
-  abierto: boolean
-  onAceptar: () => void
-  onCancelar: () => void
-  loading?: boolean
+  abierto: boolean;
+  onAceptar: () => void;
+  onCancelar: () => void;
+  loading?: boolean;
 }
 
 export default function ConfirmDeleteModal({
   abierto,
   onAceptar,
   onCancelar,
-  loading = false
+  loading = false,
 }: ConfirmDeleteModalProps) {
-  if (!abierto) return null
+  if (!abierto) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="w-full max-w-sm overflow-hidden rounded-2xl bg-[#F9F6EE] shadow-xl mx-4">
         <div className="flex items-center justify-center bg-[#F9F6EE] px-6 py-4">
-          <h2 className="text-lg font-semibold text-gray-800 text-center">Confirmar eliminación</h2>
+          <h2 className="text-lg font-semibold text-gray-800 text-center">
+            Confirmar eliminación
+          </h2>
         </div>
 
         <hr className="h-[2px] bg-gray-800" />
@@ -27,7 +29,9 @@ export default function ConfirmDeleteModal({
             ¿Está seguro de eliminar esta publicación?
           </p>
 
-          <p className="mb-8 text-sm text-gray-500 ">Esta acción no se puede deshacer</p>
+          <p className="mb-8 text-sm text-gray-500 ">
+            Esta acción no se puede deshacer
+          </p>
 
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button
@@ -43,11 +47,11 @@ export default function ConfirmDeleteModal({
               disabled={loading}
               className="h-11 w-full rounded-lg bg-[#D97706] text-[14px] font-medium text-white transition hover:bg-[#bf6905]"
             >
-              {loading ? 'Eliminando...' : 'Aceptar'}
+              {loading ? "Eliminando..." : "Aceptar"}
             </button>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

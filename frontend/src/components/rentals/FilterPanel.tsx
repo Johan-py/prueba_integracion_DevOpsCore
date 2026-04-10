@@ -1,25 +1,30 @@
-'use client'
-import { useState, useEffect } from 'react'
-import { useFilterLogic } from '@/hooks/useFilterLogic'
+"use client";
+import { useState, useEffect } from "react";
+import { useFilterLogic } from "@/hooks/useFilterLogic";
 
 interface FilterItem {
-  name: string
-  count: number
+  name: string;
+  count: number;
 }
 
 const formatName = (text: string) => {
-  if (!text) return ''
-  return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
-}
+  if (!text) return "";
+  return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+};
 
 interface FilterSectionProps {
-  title: string
-  data: FilterItem[]
-  logic: ReturnType<typeof useFilterLogic>
-  itemLabel: string
+  title: string;
+  data: FilterItem[];
+  logic: ReturnType<typeof useFilterLogic>;
+  itemLabel: string;
 }
 
-const FilterSection = ({ title, data, logic, itemLabel }: FilterSectionProps) => {
+const FilterSection = ({
+  title,
+  data,
+  logic,
+  itemLabel,
+}: FilterSectionProps) => { 
   return (
     <section>
       {/* Título de sección: se cambió a text-sm (más pequeño que Filtros, más grande que el contenido) */}
@@ -27,7 +32,7 @@ const FilterSection = ({ title, data, logic, itemLabel }: FilterSectionProps) =>
         {title}
       </h3>
       <div
-        className={`flex flex-col gap-1.5 mt-1 ${logic.viewLevel > 2 ? 'max-h-60 overflow-y-auto pr-2' : ''}`}
+        className={`flex flex-col gap-1.5 mt-1 ${logic.viewLevel > 2 ? "max-h-60 overflow-y-auto pr-2" : ""}`}
       >
         {logic.visibleData.map((item: FilterItem) => (
           <div
@@ -49,70 +54,70 @@ const FilterSection = ({ title, data, logic, itemLabel }: FilterSectionProps) =>
         ))}
 
         {logic.viewLevel < 3 && data.length > 2 ? (
-          <button
-            onClick={logic.handleSeeMore}
+          <button onClick={logic.handleSeeMore}
             // Se ajustó a text-[10px] o text-xs para mantener la proporción
-            className="text-xs text-orange-400 hover:text-orange-600 underline mt-1 w-fit font-medium font-inter transition-all"
-          >
-            {logic.viewLevel === 1 ? 'Ver más >' : 'Mostrar todo >'}
+            className="text-xs text-orange-400 hover:text-orange-600 underline mt-1 w-fit font-medium font-inter transition-all">
+            {logic.viewLevel === 1 ? "Ver más >" : "Mostrar todo >"}
           </button>
         ) : (
           data.length > 2 && ( // Changed to text-xs to maintain proportion
-            <button
-              onClick={logic.handleSeeLess}
-              className="text-xs text-orange-400 hover:text-orange-600 underline mt-1 w-fit ml-auto font-medium font-inter transition-all"
-            >
-              {'<'} Ver menos
+            <button onClick={logic.handleSeeLess}
+              className="text-xs text-orange-400 hover:text-orange-600 underline mt-1 w-fit ml-auto font-medium font-inter transition-all">
+              {"<"} Ver menos
             </button>
           )
         )}
       </div>
     </section>
-  )
-}
+  );
+};
 
 export default function FilterPanel() {
-  const [rentalsData, setRentalsData] = useState<FilterItem[]>([])
-  const [salesData, setSalesData] = useState<FilterItem[]>([])
-  const [typesData, setTypesData] = useState<FilterItem[]>([])
-  const [loading, setLoading] = useState(true)
-  const [hasError, setHasError] = useState(false)
-  const [globalSort, setGlobalSort] = useState<'asc' | 'desc'>('asc')
-  const [sortType, setSortType] = useState<'name' | 'count'>('name')
-  const [mobileTab, setMobileTab] = useState<'alquiler' | 'venta' | 'tipo'>('alquiler')
+  const [rentalsData, setRentalsData] = useState<FilterItem[]>([]);
+  const [salesData, setSalesData] = useState<FilterItem[]>([]);
+  const [typesData, setTypesData] = useState<FilterItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+  const [globalSort, setGlobalSort] = useState<"asc" | "desc">("asc");
+  const [sortType, setSortType] = useState<"name" | "count">("name");
+  const [mobileTab, setMobileTab] = useState<"alquiler" | "venta" | "tipo">(
+    "alquiler",
+  );
 
-  const toggleGlobalSort = () => setGlobalSort((prev) => (prev === 'asc' ? 'desc' : 'asc'))
+  const toggleGlobalSort = () =>
+    setGlobalSort((prev) => (prev === "asc" ? "desc" : "asc"));
 
   const fetchFilters = async () => {
-    setLoading(true)
-    setHasError(false)
+    setLoading(true);
+    setHasError(false);
     try {
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
-      const response = await fetch(`${API_BASE_URL}/api/filters`)
-      const result = await response.json()
+      const API_BASE_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const response = await fetch(`${API_BASE_URL}/api/filters`);
+      const result = await response.json();
 
       if (result.success) {
-        setRentalsData(result.data.rentals)
-        setSalesData(result.data.sales)
-        setTypesData(result.data.categories)
+        setRentalsData(result.data.rentals);
+        setSalesData(result.data.sales);
+        setTypesData(result.data.categories);
       } else {
-        setHasError(true)
+        setHasError(true);
       }
     } catch (error) {
-      console.error('Error fetching filters:', error)
-      setHasError(true)
+      console.error("Error fetching filters:", error);
+      setHasError(true);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchFilters()
-  }, [])
+    fetchFilters();
+  }, []);
 
-  const rentalsLogic = useFilterLogic(rentalsData, globalSort, sortType)
-  const salesLogic = useFilterLogic(salesData, globalSort, sortType)
-  const typesLogic = useFilterLogic(typesData, globalSort, sortType)
+  const rentalsLogic = useFilterLogic(rentalsData, globalSort, sortType);
+  const salesLogic = useFilterLogic(salesData, globalSort, sortType);
+  const typesLogic = useFilterLogic(typesData, globalSort, sortType);
 
   if (loading) {
     return (
@@ -121,7 +126,7 @@ export default function FilterPanel() {
           Sincronizando filtros...
         </span>
       </div>
-    )
+    );
   }
 
   if (hasError) {
@@ -145,7 +150,9 @@ export default function FilterPanel() {
           </svg>
         </div>
         <div>
-          <h3 className="text-gray-900 font-bold font-inter text-base mb-1">Error de conexión</h3>
+          <h3 className="text-gray-900 font-bold font-inter text-base mb-1">
+            Error de conexión
+          </h3>
           <p className="text-gray-500 text-sm font-inter mb-4">
             No pudimos cargar los filtros en este momento.
           </p>
@@ -157,7 +164,7 @@ export default function FilterPanel() {
           </button>
         </div>
       </div>
-    )
+    );
   }
 
   const FilterHeader = () => (
@@ -183,27 +190,31 @@ export default function FilterPanel() {
       <div className="flex items-center gap-3">
         <button
           onClick={() => {
-            setSortType('name')
-            toggleGlobalSort()
+            setSortType("name");
+            toggleGlobalSort();
           }}
-          className={`text-xs font-medium transition-all font-inter outline-none whitespace-nowrap ${sortType === 'name' ? 'text-orange-500 hover:text-orange-600' : 'text-gray-400 hover:text-gray-500'}`}
+          className={`text-xs font-medium transition-all font-inter outline-none whitespace-nowrap ${sortType === "name" ? "text-orange-500 hover:text-orange-600" : "text-gray-400 hover:text-gray-500"}`}
         >
-          {sortType === 'name' && globalSort === 'desc' ? 'Ordenar A↓' : 'Ordenar A↑'}
+          {sortType === "name" && globalSort === "desc"
+            ? "Ordenar A↓"
+            : "Ordenar A↑"}
         </button>
 
         <button
           onClick={() => {
-            setSortType('count')
-            toggleGlobalSort()
+            setSortType("count");
+            toggleGlobalSort();
           }}
-          className={`text-xs font-medium transition-all font-inter outline-none flex items-center gap-0.5 whitespace-nowrap ${sortType === 'count' ? 'text-orange-500 hover:text-orange-600' : 'text-gray-400 hover:text-gray-500'}`}
+          className={`text-xs font-medium transition-all font-inter outline-none flex items-center gap-0.5 whitespace-nowrap ${sortType === "count" ? "text-orange-500 hover:text-orange-600" : "text-gray-400 hover:text-gray-500"}`}
         >
           Cantidad
-          <span>{sortType === 'count' && globalSort === 'desc' ? '↓' : '↑'}</span>
+          <span>
+            {sortType === "count" && globalSort === "desc" ? "↓" : "↑"}
+          </span>
         </button>
       </div>
     </div>
-  )
+  );
 
   return (
     <>
@@ -214,27 +225,27 @@ export default function FilterPanel() {
 
         <div className="flex gap-2 overflow-x-auto pb-4 px-2 scrollbar-hide">
           <button
-            onClick={() => setMobileTab('alquiler')}
-            className={`flex-shrink-0 px-6 py-2.5 rounded-2xl text-sm font-bold font-inter transition-all ${mobileTab === 'alquiler' ? 'bg-orange-500 text-white shadow-lg shadow-orange-200' : 'bg-gray-100 text-gray-500'}`}
+            onClick={() => setMobileTab("alquiler")}
+            className={`flex-shrink-0 px-6 py-2.5 rounded-2xl text-sm font-bold font-inter transition-all ${mobileTab === "alquiler" ? "bg-orange-500 text-white shadow-lg shadow-orange-200" : "bg-gray-100 text-gray-500"}`}
           >
             Alquileres
           </button>
           <button
-            onClick={() => setMobileTab('venta')}
-            className={`flex-shrink-0 px-6 py-2.5 rounded-2xl text-sm font-bold font-inter transition-all ${mobileTab === 'venta' ? 'bg-orange-500 text-white shadow-lg shadow-orange-200' : 'bg-gray-100 text-gray-500'}`}
+            onClick={() => setMobileTab("venta")}
+            className={`flex-shrink-0 px-6 py-2.5 rounded-2xl text-sm font-bold font-inter transition-all ${mobileTab === "venta" ? "bg-orange-500 text-white shadow-lg shadow-orange-200" : "bg-gray-100 text-gray-500"}`}
           >
             En Venta
           </button>
           <button
-            onClick={() => setMobileTab('tipo')}
-            className={`flex-shrink-0 px-6 py-2.5 rounded-2xl text-sm font-bold font-inter transition-all ${mobileTab === 'tipo' ? 'bg-orange-500 text-white shadow-lg shadow-orange-200' : 'bg-gray-100 text-gray-500'}`}
+            onClick={() => setMobileTab("tipo")}
+            className={`flex-shrink-0 px-6 py-2.5 rounded-2xl text-sm font-bold font-inter transition-all ${mobileTab === "tipo" ? "bg-orange-500 text-white shadow-lg shadow-orange-200" : "bg-gray-100 text-gray-500"}`}
           >
             Inmuebles
           </button>
         </div>
 
         <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm mx-2">
-          {mobileTab === 'alquiler' && (
+          {mobileTab === "alquiler" && (
             <FilterSection
               title="En Alquiler"
               data={rentalsData}
@@ -242,10 +253,15 @@ export default function FilterPanel() {
               itemLabel="casas"
             />
           )}
-          {mobileTab === 'venta' && (
-            <FilterSection title="En Venta" data={salesData} logic={salesLogic} itemLabel="casas" />
+          {mobileTab === "venta" && (
+            <FilterSection
+              title="En Venta"
+              data={salesData}
+              logic={salesLogic}
+              itemLabel="casas"
+            />
           )}
-          {mobileTab === 'tipo' && (
+          {mobileTab === "tipo" && (
             <FilterSection
               title="Por tipo de Inmueble"
               data={typesData}
@@ -266,7 +282,12 @@ export default function FilterPanel() {
             logic={rentalsLogic}
             itemLabel="casas"
           />
-          <FilterSection title="En venta" data={salesData} logic={salesLogic} itemLabel="casas" />
+          <FilterSection
+            title="En venta"
+            data={salesData}
+            logic={salesLogic}
+            itemLabel="casas"
+          />
           <FilterSection
             title="Por tipo de Inmueble"
             data={typesData}

@@ -1,32 +1,32 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect, useRef } from 'react'
-import Image from 'next/image'
-import { MapPin, Search, Loader2, X, History } from 'lucide-react'
-import { usePopularidad } from '@/hooks/usePopularidad'
-import { useSearchFilters } from '@/hooks/useSearchFilters'
+import React, { useState, useEffect, useRef } from "react";
+import Image from "next/image";
+import { MapPin, Search, Loader2, X, History } from "lucide-react";
+import { usePopularidad } from "@/hooks/usePopularidad";
+import { useSearchFilters } from "@/hooks/useSearchFilters";
 
 type Location = {
-  id: string | number
-  nombre: string
-  departamento: string
-}
+  id: string | number;
+  nombre: string;
+  departamento: string;
+};
 
 type LocationSearchProps = {
-  value: string
-  onChange: (value: string) => void
-}
+  value: string;
+  onChange: (value: string) => void;
+};
 
 export function LocationSearch({ value, onChange }: LocationSearchProps) {
-  const [suggestions, setSuggestions] = useState<Location[]>([])
-  const [isOpen, setIsOpen] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [history, setHistory] = useState<string[]>([])
-  const containerRef = useRef<HTMLDivElement>(null)
+  const [suggestions, setSuggestions] = useState<Location[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [history, setHistory] = useState<string[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({})
 
-  const { updateFilters } = useSearchFilters()
-  const { registrarConsulta } = usePopularidad()
+  const { updateFilters } = useSearchFilters();
+  const { registrarConsulta } = usePopularidad();
 
   // ── Dropdown position: fixed so overflow:auto parents can't clip it ────────
   const recalcDropdown = () => {
@@ -66,89 +66,94 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
 
   // ── Selección de ubicación ─────────────────────────────────────────────────
   const handleSelectLocation = (loc: Location) => {
-    const fullName = `${loc.nombre} - ${loc.departamento} - Bolivia`
-    updateFilters({ locationId: loc.id, query: fullName })
-    onChange(fullName)
-    saveToHistory(fullName)
-    setIsOpen(false)
-    registrarConsulta(loc.id, fullName)
-  }
+    const fullName = `${loc.nombre} - ${loc.departamento} - Bolivia`;
+    updateFilters({
+      locationId: loc.id,
+      query: fullName,
+    });
+    onChange(fullName);
+    saveToHistory(fullName);
+    setIsOpen(false);
+    registrarConsulta(loc.id, fullName);
 
-  // ── Historial ──────────────────────────────────────────────────────────────
+    // Auto-submit tras elegir sugerencia
+    setTimeout(() => {
+      containerRef.current?.closest("form")?.requestSubmit();
+    }, 100);
+  };
+
   useEffect(() => {
-    const savedHistory = localStorage.getItem('searchHistory')
-    if (savedHistory) setHistory(JSON.parse(savedHistory))
-  }, [])
+    const savedHistory = localStorage.getItem("searchHistory");
+    if (savedHistory) {
+      setHistory(JSON.parse(savedHistory));
+    }
+  }, []);
 
   const saveToHistory = (item: string) => {
-    const updated = [item, ...history.filter((i) => i !== item)].slice(0, 5)
-    setHistory(updated)
-    localStorage.setItem('searchHistory', JSON.stringify(updated))
-  }
+    const updatedHistory = [item, ...history.filter((i) => i !== item)].slice(0, 5);
+    setHistory(updatedHistory);
+    localStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
+  };
 
-  // ── Input sanitizado ───────────────────────────────────────────────────────
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const clean = e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s\-]/gi, '')
-    onChange(clean)
-  }
+    const rawValue = e.target.value;
+    const cleanValue = rawValue
+      .replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s\-]/gi, "")
+      .trimStart();
 
-  const isSelected = value.includes('Bolivia')
+    onChange(cleanValue);
+  };
 
-  // ── Click outside ──────────────────────────────────────────────────────────
+  const isSelected = value.includes("Bolivia");
+
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
+    const handleClickOutside = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setIsOpen(false)
+        setIsOpen(false);
       }
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [])
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-  // ── Fetch sugerencias ──────────────────────────────────────────────────────
   useEffect(() => {
     const fetchLocations = async () => {
       if (value.trim().length < 2 || isSelected) {
-        setSuggestions([])
-        return
+        setSuggestions([]);
+        return;
       }
-      setIsLoading(true)
+      setIsLoading(true);
       try {
-        const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
-        const res = await fetch(`${API_BASE}/api/locations/search?q=${encodeURIComponent(value)}`)
+        const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+        const res = await fetch(`${API_BASE}/api/locations/search?q=${encodeURIComponent(value)}`);
         if (res.ok) {
-          const data = await res.json()
-          setSuggestions(data)
-          setIsOpen(true)
+          const data = await res.json();
+          setSuggestions(data);
+          setIsOpen(true);
         }
-      } catch (err) {
-        console.error('Error buscando ubicaciones:', err)
+      } catch (error) {
+        console.error("Error buscando ubicaciones:", error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
-    const t = setTimeout(fetchLocations, 300)
-    return () => clearTimeout(t)
-  }, [value, isSelected])
+    };
+    const timer = setTimeout(fetchLocations, 300);
+    return () => clearTimeout(timer);
+  }, [value, isSelected]);
 
   return (
     <div className="w-full relative" ref={containerRef}>
-      <label className="block text-sm font-medium text-stone-700 mb-2 text-left md:text-center uppercase tracking-wide font-montserrat">
-        Ciudad / Zona
-      </label>
-
+      {/* ELIMINADO EL LABEL CIUDAD/ZONA */}
+      
       <div
-        className={`h-[46px] rounded-xl border transition-all flex items-center gap-3 px-4 bg-white shadow-sm ${
-          isOpen && suggestions.length > 0
-            ? 'border-amber-600 ring-2 ring-amber-100'
-            : 'border-stone-300'
-        }`}
+        className={`h-[46px] rounded-xl border transition-all flex items-center gap-3 px-4 bg-white shadow-sm ${isOpen && suggestions.length > 0
+          ? "border-amber-600 ring-2 ring-amber-100"
+          : "border-stone-300"
+          }`}
       >
-        <MapPin
-          className={`w-5 h-5 flex-shrink-0 ${value ? 'text-amber-600' : 'text-stone-400'}`}
-        />
+        <MapPin className={`w-5 h-5 flex-shrink-0 ${value ? "text-amber-600" : "text-stone-400"}`} />
 
-        <div className="relative flex-1 flex items-center h-full min-w-0">
+        <div className="relative flex-1 flex items-center w-full h-full min-w-0">
           <input
             type="text"
             value={value}
@@ -160,41 +165,49 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
                 })   
           }}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') setIsOpen(false)
+              if (e.key === "Enter") {
+                setIsOpen(false);
+              }
             }}
             placeholder="Cochabamba, La Paz..."
-            className="w-full bg-transparent outline-none text-sm text-stone-900 placeholder:text-stone-400 font-inter"
+            className="w-full bg-transparent outline-none text-sm text-stone-900 placeholder:text-stone-400 font-inter pr-[70px] md:truncate overflow-x-auto whitespace-nowrap"
           />
-          {isSelected && (
-            <Image
-              src="https://flagcdn.com/w20/bo.png"
-              alt="BO"
-              width={20}
-              height={14}
-              className="rounded-sm flex-shrink-0 ml-2"
-            />
-          )}
+         
+          <div className="absolute right-0 flex items-center gap-2 bg-white pl-2 h-full">
+            {isSelected && (
+              <Image
+                src="https://flagcdn.com/w20/bo.png"
+                alt="BO"
+                width={20}
+                height={14}
+                className="rounded-sm flex-shrink-0"
+              />
+            )}
+           
+            {isLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin text-amber-600" />
+            ) : (
+              value && (
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onChange("");
+                  }}
+                  type="button"
+                  className="p-1 hover:bg-stone-100 rounded-full transition-colors flex-shrink-0"
+                >
+                  <X className="w-4 h-4 text-stone-400 hover:text-red-500" />
+                </button>
+              )
+            )}
+          </div>
         </div>
-
-        {isLoading ? (
-          <Loader2 className="w-4 h-4 animate-spin text-amber-600 flex-shrink-0" />
-        ) : (
-          value && (
-            <button onClick={() => onChange('')} type="button" className="flex-shrink-0">
-              <X className="w-4 h-4 text-stone-400 hover:text-red-500" />
-            </button>
-          )
-        )}
       </div>
 
-      {/* PANEL DESPLEGABLE — position:fixed para no ser clipeado por overflow del padre */}
       {isOpen && (
-        <div
-          className="bg-white border border-stone-200 rounded-xl shadow-xl overflow-hidden"
-          style={dropdownStyle}
-        >
-          {/* CASO A: Historial (input vacío) */}
-          {value === '' && history.length > 0 && (
+        <div className="absolute z-[100] w-full mt-2 bg-white border border-stone-200 rounded-xl shadow-xl overflow-hidden">
+          {value === "" && history.length > 0 && (
             <div>
               <div className="px-4 py-2 bg-stone-50 border-b border-stone-100">
                 <span className="text-[10px] uppercase font-bold text-stone-400 tracking-wider">
@@ -206,9 +219,12 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
                   key={`hist-${idx}`}
                   type="button"
                   onClick={() => {
-                    onChange(item)
-                    setIsOpen(false)
-                    updateFilters({ query: item })
+                    onChange(item);
+                    setIsOpen(false);
+                    updateFilters({ query: item });
+                    setTimeout(() => {
+                        containerRef.current?.closest("form")?.requestSubmit();
+                    }, 100);
                   }}
                   className="w-full px-4 py-3 flex items-center gap-3 hover:bg-amber-50 transition-colors text-left border-b border-stone-50 last:border-0"
                 >
@@ -219,7 +235,6 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
             </div>
           )}
 
-          {/* CASO B: Sugerencias (escribiendo) */}
           {value.trim().length >= 2 && !isSelected && (
             <>
               {isLoading ? (
@@ -255,7 +270,6 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
               ) : (
                 <div className="px-4 py-8 text-center bg-stone-50/50">
                   <p className="text-sm text-stone-600 font-medium">No se encontraron resultados</p>
-                  <p className="text-xs text-stone-400 mt-1 italic">Pruebe con "Cala Cala"</p>
                 </div>
               )}
             </>

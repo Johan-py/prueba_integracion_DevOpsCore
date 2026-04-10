@@ -1,11 +1,11 @@
-import AboutUsImage from '@/components/about/AboutUsImage'
-import AboutUsSectionBlock from '@/components/about/AboutUsSectionBlock'
+import AboutUsImage from "@/components/about/AboutUsImage";
+import AboutUsSectionBlock from "@/components/about/AboutUsSectionBlock";
 import {
   aboutImages,
   introSections,
   peopleSection,
-  presenceSections
-} from '@/components/about/about.constants'
+  presenceSections,
+} from "@/components/about/about.constants";
 
 function AboutUsHeader() {
   return (
@@ -17,7 +17,7 @@ function AboutUsHeader() {
         QUIENES SOMOS
       </h1>
     </header>
-  )
+  );
 }
 
 function AboutUsIntroCard() {
@@ -34,7 +34,7 @@ function AboutUsIntroCard() {
         ))}
       </div>
     </article>
-  )
+  );
 }
 
 function AboutUsPeopleCard() {
@@ -42,17 +42,20 @@ function AboutUsPeopleCard() {
     <article className="rounded-[28px] bg-stone-100 p-4 sm:p-6">
       <div className="space-y-4">
         <h2 className="font-heading max-w-xs text-3xl font-bold leading-tight text-stone-900">
-          {peopleSection.title} <span className="text-amber-600">{peopleSection.accent}</span>
+          {peopleSection.title}{" "}
+          <span className="text-amber-600">{peopleSection.accent}</span>
         </h2>
         <AboutUsImage
           src={peopleSection.imageSrc}
           alt={peopleSection.imageAlt}
           className="aspect-[16/10] w-full rounded-[24px] shadow-sm"
         />
-        <p className="text-base leading-7 text-stone-600">{peopleSection.description}</p>
+        <p className="text-base leading-7 text-stone-600">
+          {peopleSection.description}
+        </p>
       </div>
     </article>
-  )
+  );
 }
 
 function AboutUsPresenceCard() {
@@ -71,7 +74,7 @@ function AboutUsPresenceCard() {
         />
       </div>
     </article>
-  )
+  );
 }
 
 export default function AboutUsContent() {
@@ -84,5 +87,5 @@ export default function AboutUsContent() {
         <AboutUsPresenceCard />
       </div>
     </section>
-  )
+  );
 }

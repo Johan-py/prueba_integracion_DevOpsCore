@@ -1,16 +1,20 @@
-'use client'
+"use client";
 
-import React from 'react'
-import { AlertTriangle, X } from 'lucide-react'
+import React from "react";
+import { AlertTriangle, X } from "lucide-react";
 
 interface CancelPaymentModalProps {
-  isOpen: boolean
-  onConfirm: () => void
-  onCancel: () => void
+  isOpen: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
 }
 
-export function CancelPaymentModal({ isOpen, onConfirm, onCancel }: CancelPaymentModalProps) {
-  if (!isOpen) return null
+export function CancelPaymentModal({
+  isOpen,
+  onConfirm,
+  onCancel,
+}: CancelPaymentModalProps) {
+  if (!isOpen) return null;
 
   return (
     // Overlay
@@ -38,15 +42,21 @@ export function CancelPaymentModal({ isOpen, onConfirm, onCancel }: CancelPaymen
         </div>
 
         {/* Título */}
-        <h2 className="text-xl font-bold text-stone-900 mb-2">¿Cancelar el pago?</h2>
+        <h2 className="text-xl font-bold text-stone-900 mb-2">
+          ¿Cancelar el pago?
+        </h2>
 
         {/* Descripción */}
         <p className="text-sm text-stone-500 mb-1 leading-relaxed">
-          Si salís ahora,{' '}
-          <span className="font-medium text-stone-700">se cancelará la transacción</span> y tendrás
-          que iniciar una nueva compra.
+          Si salís ahora,{" "}
+          <span className="font-medium text-stone-700">
+            se cancelará la transacción
+          </span>{" "}
+          y tendrás que iniciar una nueva compra.
         </p>
-        <p className="text-xs text-stone-400 mb-7">El código QR dejará de ser válido.</p>
+        <p className="text-xs text-stone-400 mb-7">
+          El código QR dejará de ser válido.
+        </p>
 
         {/* Acciones */}
         <div className="flex flex-col gap-3 w-full">
@@ -65,5 +75,5 @@ export function CancelPaymentModal({ isOpen, onConfirm, onCancel }: CancelPaymen
         </div>
       </div>
     </div>
-  )
+  );
 }

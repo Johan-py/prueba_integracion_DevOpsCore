@@ -1,41 +1,41 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function ConsumoPage() {
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
-  const [data, setData] = useState<any>(null)
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [data, setData] = useState<any>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/consumo/1')
+        const res = await fetch("http://localhost:5000/api/consumo/1");
 
         if (!res.ok) {
-          throw new Error('Error en la API')
+          throw new Error("Error en la API");
         }
 
-        const json = await res.json()
+        const json = await res.json();
 
-        setData(json)
+        setData(json);
       } catch (err) {
-        setError(true)
+        setError(true);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchData()
-  }, [])
+    fetchData();
+  }, []);
 
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="w-10 h-10 border-4 border-gray-300 border-t-orange-500 rounded-full animate-spin"></div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -53,24 +53,24 @@ export default function ConsumoPage() {
           Reintentar
         </button>
       </div>
-    )
+    );
   }
 
-  const porcentaje = (data.usadas / data.limite) * 100
-  const disponibles = data.limite - data.usadas
+  const porcentaje = (data.usadas / data.limite) * 100;
+  const disponibles = data.limite - data.usadas;
 
-  let colorBarra = 'bg-green-500'
-  let colorTexto = 'text-green-600'
-  let mensaje = 'Consumo normal'
+  let colorBarra = "bg-green-500";
+  let colorTexto = "text-green-600";
+  let mensaje = "Consumo normal";
 
   if (data.usadas >= 9) {
-    colorBarra = 'bg-red-500'
-    colorTexto = 'text-red-600'
-    mensaje = 'Límite alcanzado'
+    colorBarra = "bg-red-500";
+    colorTexto = "text-red-600";
+    mensaje = "Límite alcanzado";
   } else if (data.usadas >= 5) {
-    colorBarra = 'bg-yellow-400'
-    colorTexto = 'text-yellow-600'
-    mensaje = 'Casi sin cupo disponible'
+    colorBarra = "bg-yellow-400";
+    colorTexto = "text-yellow-600";
+    mensaje = "Casi sin cupo disponible";
   }
 
   return (
@@ -139,5 +139,5 @@ export default function ConsumoPage() {
         </div>
       )}
     </div>
-  )
+  );
 }
