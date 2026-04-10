@@ -8,19 +8,12 @@ import type {
   UnreadCountResponse,
 } from "@/types/notification";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000'
-const ITEMS_PER_LOAD = 20
-const NOTIFICATIONS_UPDATED_EVENT = 'notifications-updated'
-const AUTH_STATE_CHANGED_EVENT = 'auth-state-changed'
-const SKELETON_DELAY_MS = 300
-type RequestOptions = {
-  signal?: AbortSignal
-  skipAuthEvent?: boolean
-}
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
+const ITEMS_PER_LOAD = 20;
+const NOTIFICATIONS_UPDATED_EVENT = "notifications-updated";
 
-type RefreshOptions = {
-  silent?: boolean
-}
+const AUTH_STATE_CHANGED_EVENT = "auth-state-changed";
+const SKELETON_DELAY_MS = 300;
 
 const getStoredToken = () => {
   if (typeof window === "undefined") return null;
@@ -40,15 +33,13 @@ const buildNotificationsUrl = (
 ) => {
   const params = new URLSearchParams({
     limit: String(limit),
-    offset: String(offset)
-  })
-
-  if (filter !== 'todas') {
-    params.set('filter', filter)
+    offset: String(offset),
+  });
+  if (filter !== "todas") {
+    params.set("filter", filter);
   }
-
-  return `${API_URL}/notificaciones?${params.toString()}`
-}
+  return `${API_URL}/notificaciones?${params.toString()}`;
+};
 
 const requestJson = async <T>(url: string, init?: RequestInit): Promise<T> => {
   const controller = new AbortController();
@@ -97,43 +88,37 @@ const requestJson = async <T>(url: string, init?: RequestInit): Promise<T> => {
 };
 
 export function useNotifications() {
-  const [open, setOpen] = useState(false)
-  const [filter, setFilter] = useState<NotificationFilter>('todas')
-  const [notifications, setNotifications] = useState<NotificationItem[]>([])
-  const [total, setTotal] = useState(0)
-  const [unreadCount, setUnreadCount] = useState(0)
-  const [isLoggedIn, setIsLoggedIn] = useState(Boolean(getStoredToken()))
-  const [isLoading, setIsLoading] = useState(false)
-  const [showSkeleton, setShowSkeleton] = useState(false)
-  const [isLoadingMore, setIsLoadingMore] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [open, setOpen] = useState(false);
+  const [filter, setFilter] = useState<NotificationFilter>("todas");
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [total, setTotal] = useState(0);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const [isLoggedIn, setIsLoggedIn] = useState(Boolean(getStoredToken()));
+  const [isLoading, setIsLoading] = useState(false);
+  const [showSkeleton, setShowSkeleton] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [isOnline, setIsOnline] = useState(
     typeof window !== "undefined" ? window.navigator.onLine : true,
   );
 
-  const notificationRef = useRef<HTMLDivElement>(null)
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const savedScrollTopRef = useRef(0)
-  const instanceId = useRef(`notifications-${Math.random().toString(36).slice(2)}`)
-  const eventSourceRef = useRef<EventSource | null>(null)
+  const notificationRef = useRef<HTMLDivElement>(null);
+  const instanceId = useRef(
+    `notifications-${Math.random().toString(36).slice(2)}`,
+  );
 
   const clearNotificationsState = useCallback(() => {
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close()
-      eventSourceRef.current = null
-    }
-
-    setNotifications([])
-    setTotal(0)
-    setUnreadCount(0)
-    setError(null)
-    setOpen(false)
-    setIsLoading(false)
-    setShowSkeleton(false)
-    setIsLoadingMore(false)
-    setIsLoggedIn(false)
-    savedScrollTopRef.current = 0
-  }, [])
+    setNotifications([]);
+    setTotal(0);
+    setUnreadCount(0);
+    setError(null);
+    setOpen(false);
+    setIsLoading(false);
+    setShowSkeleton(false);
+    setIsLoadingMore(false);
+    setIsLoggedIn(false);
+  }, []);
 
   const emitNotificationsUpdated = useCallback(() => {
     if (typeof window === "undefined") return;
@@ -144,15 +129,10 @@ export function useNotifications() {
     );
   }, []);
 
-  const saveScrollPosition = useCallback((value: number) => {
-    savedScrollTopRef.current = value
-  }, [])
-
   const refreshNotifications = useCallback(
-    async (nextFilter: NotificationFilter, options: RefreshOptions = {}) => {
-      const silent = options.silent ?? false
+    async (nextFilter: NotificationFilter) => {
+      const token = getStoredToken();
 
-      const token = getStoredToken()
       if (!token) {
         clearNotificationsState();
         return;
@@ -162,16 +142,12 @@ export function useNotifications() {
         return;
       }
 
-      let skeletonTimer: number | null = null
+      setIsLoading(true);
+      setError(null);
 
-      if (!silent) {
-        setIsLoading(true)
-        setError(null)
-
-        skeletonTimer = window.setTimeout(() => {
-          setShowSkeleton(true)
-        }, SKELETON_DELAY_MS)
-      }
+      const skeletonTimer = window.setTimeout(() => {
+        setShowSkeleton(true);
+      }, SKELETON_DELAY_MS);
 
       try {
         const [notificationsResponse, unreadCountResponse] = await Promise.all([
@@ -183,11 +159,10 @@ export function useNotifications() {
           ),
         ]);
 
-        setNotifications(notificationsResponse.items)
-        setTotal(notificationsResponse.total)
-        setUnreadCount(unreadCountResponse.unreadCount)
-        setIsLoggedIn(true)
-        setError(null)
+        setNotifications(notificationsResponse.items);
+        setTotal(notificationsResponse.total);
+        setUnreadCount(unreadCountResponse.unreadCount);
+        setIsLoggedIn(true);
       } catch (err) {
         if (!window.navigator.onLine) {
           return;
@@ -211,14 +186,9 @@ export function useNotifications() {
           setError("No se pudieron cargar las notificaciones.");
         }
       } finally {
-        if (skeletonTimer !== null) {
-          window.clearTimeout(skeletonTimer)
-        }
-
-        if (!silent) {
-          setIsLoading(false)
-          setShowSkeleton(false)
-        }
+        window.clearTimeout(skeletonTimer);
+        setIsLoading(false);
+        setShowSkeleton(false);
       }
     },
     [clearNotificationsState],
@@ -248,10 +218,8 @@ export function useNotifications() {
         clearNotificationsState();
         return;
       }
-
-      if (!window.navigator.onLine) return
-
-      setError('No se pudieron cargar las notificaciones.')
+      if (!window.navigator.onLine) return;
+      setError("No se pudieron cargar las notificaciones.");
     } finally {
       setIsLoadingMore(false);
     }
@@ -270,33 +238,30 @@ export function useNotifications() {
 
   const markAsRead = useCallback(
     async (id: number) => {
-      await requestJson(`${API_URL}/notificaciones/${id}/read`, { method: 'PATCH' })
-      await refreshNotifications(filter)
-      emitNotificationsUpdated()
+      await requestJson(`${API_URL}/notificaciones/${id}/read`, {
+        method: "PATCH",
+      });
+      await refreshNotifications(filter);
+      emitNotificationsUpdated();
     },
     [emitNotificationsUpdated, filter, refreshNotifications],
   );
 
   const markAllAsRead = useCallback(async () => {
-    await requestJson(`${API_URL}/notificaciones/read-all`, { method: 'PATCH' })
-    await refreshNotifications(filter)
-    emitNotificationsUpdated()
-  }, [emitNotificationsUpdated, filter, refreshNotifications])
+    await requestJson(`${API_URL}/notificaciones/read-all`, {
+      method: "PATCH",
+    });
+    await refreshNotifications(filter);
+    emitNotificationsUpdated();
+  }, [emitNotificationsUpdated, filter, refreshNotifications]);
 
   const deleteNotification = useCallback(
     async (id: number) => {
-      await requestJson(`${API_URL}/notificaciones/${id}`, { method: 'DELETE' })
-      await refreshNotifications(filter)
-      emitNotificationsUpdated()
-    },
-    [emitNotificationsUpdated, filter, refreshNotifications]
-  )
-
-  const archiveNotification = useCallback(
-    async (id: number) => {
-      await requestJson(`${API_URL}/notificaciones/${id}/archivar`, { method: 'PATCH' })
-      await refreshNotifications(filter)
-      emitNotificationsUpdated()
+      await requestJson(`${API_URL}/notificaciones/${id}`, {
+        method: "DELETE",
+      });
+      await refreshNotifications(filter);
+      emitNotificationsUpdated();
     },
     [emitNotificationsUpdated, filter, refreshNotifications],
   );
@@ -305,19 +270,14 @@ export function useNotifications() {
 
   useEffect(() => {
     const handleOnline = () => {
-      setIsOnline(true)
-      void refreshNotifications(filter, { silent: true })
-    }
+      setIsOnline(true);
+      void refreshNotifications(filter);
+    };
 
     const handleOffline = () => {
-      setIsOnline(false)
-      setError(null)
-
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close()
-        eventSourceRef.current = null
-      }
-    }
+      setIsOnline(false);
+      setError(null);
+    };
 
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
@@ -334,13 +294,15 @@ export function useNotifications() {
 
   useEffect(() => {
     const handleNotificationsUpdated = (event: Event) => {
-      const customEvent = event as CustomEvent<{ source?: string }>
-      if (customEvent.detail?.source === instanceId.current) return
-      void refreshNotifications(filter, { silent: true })
-    }
+      const customEvent = event as CustomEvent<{ source?: string }>;
+      if (customEvent.detail?.source === instanceId.current) return;
+      void refreshNotifications(filter);
+    };
 
-    window.addEventListener(NOTIFICATIONS_UPDATED_EVENT, handleNotificationsUpdated)
-
+    window.addEventListener(
+      NOTIFICATIONS_UPDATED_EVENT,
+      handleNotificationsUpdated,
+    );
     return () => {
       window.removeEventListener(
         NOTIFICATIONS_UPDATED_EVENT,
@@ -355,9 +317,8 @@ export function useNotifications() {
         clearNotificationsState();
         return;
       }
-
-      void refreshNotifications(filter, { silent: true })
-    }
+      void refreshNotifications(filter);
+    };
 
     const handleStorage = (event: StorageEvent) => {
       if (
@@ -391,89 +352,25 @@ export function useNotifications() {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside)
-
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
-  useEffect(() => {
-    if (!open) return
-
-    const restoreScroll = () => {
-      if (scrollContainerRef.current) {
-        scrollContainerRef.current.scrollTop = savedScrollTopRef.current
-      }
-    }
-
-    restoreScroll()
-
-    const frame = window.requestAnimationFrame(restoreScroll)
-
-    return () => {
-      window.cancelAnimationFrame(frame)
-    }
-  }, [open, notifications.length])
+  const filteredNotifications = useMemo(() => notifications, [notifications]);
+  const visibleNotifications = useMemo(() => notifications, [notifications]);
 
   useEffect(() => {
-    savedScrollTopRef.current = 0
+    if (!isLoggedIn || !isOnline) return;
 
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTop = 0
-    }
-  }, [filter])
+    const interval = setInterval(() => {
+      if (!window.navigator.onLine) return;
+      void refreshNotifications(filter);
+    }, 15000);
 
-  useEffect(() => {
-    const token = getStoredToken()
-
-    if (!token || !isLoggedIn || !isOnline) {
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close()
-        eventSourceRef.current = null
-      }
-      return
-    }
-
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close()
-      eventSourceRef.current = null
-    }
-
-    const streamUrl = `${API_URL}/notificaciones/stream?token=${encodeURIComponent(token)}`
-    const eventSource = new EventSource(streamUrl)
-
-    eventSourceRef.current = eventSource
-
-    eventSource.addEventListener('connected', () => {})
-
-    eventSource.addEventListener('notifications-updated', () => {
-      void refreshNotifications(filter, { silent: true })
-    })
-
-    eventSource.addEventListener('ping', () => {})
-
-    eventSource.onerror = () => {
-      eventSource.close()
-      eventSourceRef.current = null
-
-      window.setTimeout(() => {
-        const latestToken = getStoredToken()
-        if (!latestToken || !window.navigator.onLine) return
-        void refreshNotifications(filter, { silent: true })
-      }, 2000)
-    }
-
-    return () => {
-      eventSource.close()
-      if (eventSourceRef.current === eventSource) {
-        eventSourceRef.current = null
-      }
-    }
-  }, [filter, isLoggedIn, isOnline, refreshNotifications])
-
-  const filteredNotifications = useMemo(() => notifications, [notifications])
-  const visibleNotifications = useMemo(() => notifications, [notifications])
+    return () => clearInterval(interval);
+  }, [isLoggedIn, isOnline, filter, refreshNotifications]);
 
   return {
     open,
@@ -488,14 +385,11 @@ export function useNotifications() {
     error,
     isOnline,
     notificationRef,
-    scrollContainerRef,
-    saveScrollPosition,
     toggleNotifications,
     setFilter,
     markAsRead,
     markAllAsRead,
     deleteNotification,
-    archiveNotification,
     loadMoreNotifications,
     hasMore,
     refreshNotifications,
