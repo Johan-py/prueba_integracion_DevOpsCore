@@ -3,17 +3,21 @@
   "version": "1.0.0",
   "private": true,
   "workspaces": [
-    "frontend",
-    "backend"
+    "backend",
+    "frontend"
   ],
   "scripts": {
     "install:all": "pnpm install",
+
     "dev:back": "pnpm --filter backend run dev",
     "dev:back:setup": "pnpm --filter backend run prisma:generate && pnpm --filter backend run dev",
+
     "dev:front": "pnpm --filter frontend run dev",
     "dev": "concurrently \"pnpm run dev:back:setup\" \"pnpm run dev:front\"",
+    
     "build:back": "pnpm --filter backend run build",
     "start:back": "pnpm --filter backend run start",
+
     "lab:chaos": "cd scripts && sh chaos_devs.sh",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

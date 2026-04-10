@@ -1,87 +1,87 @@
 type TermsSection = {
-  bullets?: string[]
-  paragraphs: string[]
-  title: string
-}
+  bullets?: string[];
+  paragraphs: string[];
+  title: string;
+};
 
 const termsSections: TermsSection[] = [
   {
-    title: '1. Introducción',
+    title: "1. Introducción",
     paragraphs: [
-      'Los presentes Términos y Condiciones regulan el acceso, navegación y uso del portal inmobiliario PropBol. Al ingresar a la plataforma, el usuario acepta de manera expresa estas disposiciones y se compromete a utilizar el sistema de forma responsable, lícita y acorde a su finalidad.',
-      'PropBol opera como una inmobiliaria boliviana orientada a conectar personas con oportunidades de compra, alquiler, anticrético y publicación de inmuebles, priorizando una experiencia clara, confiable y accesible desde cualquier dispositivo.'
-    ]
+      "Los presentes Términos y Condiciones regulan el acceso, navegación y uso del portal inmobiliario PropBol. Al ingresar a la plataforma, el usuario acepta de manera expresa estas disposiciones y se compromete a utilizar el sistema de forma responsable, lícita y acorde a su finalidad.",
+      "PropBol opera como una inmobiliaria boliviana orientada a conectar personas con oportunidades de compra, alquiler, anticrético y publicación de inmuebles, priorizando una experiencia clara, confiable y accesible desde cualquier dispositivo.",
+    ],
   },
   {
-    title: '2. Alcance del servicio',
+    title: "2. Alcance del servicio",
     paragraphs: [
-      'La plataforma pone a disposición información, funcionalidades y canales de contacto relacionados con propiedades e inmuebles disponibles en territorio boliviano.',
-      'El contenido publicado tiene carácter informativo y puede incluir descripciones, imágenes, precios referenciales y datos de contacto asociados a cada inmueble.'
+      "La plataforma pone a disposición información, funcionalidades y canales de contacto relacionados con propiedades e inmuebles disponibles en territorio boliviano.",
+      "El contenido publicado tiene carácter informativo y puede incluir descripciones, imágenes, precios referenciales y datos de contacto asociados a cada inmueble.",
     ],
     bullets: [
-      'Búsqueda y exploración de inmuebles por tipo de operación.',
-      'Consulta de información general de propiedades disponibles.',
-      'Acceso a secciones institucionales y canales oficiales de PropBol.',
-      'Opciones para publicar inmuebles según los flujos habilitados por el sistema.'
-    ]
+      "Búsqueda y exploración de inmuebles por tipo de operación.",
+      "Consulta de información general de propiedades disponibles.",
+      "Acceso a secciones institucionales y canales oficiales de PropBol.",
+      "Opciones para publicar inmuebles según los flujos habilitados por el sistema.",
+    ],
   },
   {
-    title: '3. Obligaciones del usuario',
+    title: "3. Obligaciones del usuario",
     paragraphs: [
-      'El usuario se compromete a brindar información veraz cuando interactúe con la plataforma y a utilizar el portal sin afectar su funcionamiento, seguridad o disponibilidad para otros usuarios.',
-      'Queda prohibido realizar actividades que impliquen suplantación de identidad, uso indebido de datos, publicación de contenido falso o cualquier acción contraria a la normativa vigente en Bolivia.'
-    ]
+      "El usuario se compromete a brindar información veraz cuando interactúe con la plataforma y a utilizar el portal sin afectar su funcionamiento, seguridad o disponibilidad para otros usuarios.",
+      "Queda prohibido realizar actividades que impliquen suplantación de identidad, uso indebido de datos, publicación de contenido falso o cualquier acción contraria a la normativa vigente en Bolivia.",
+    ],
   },
   {
-    title: '4. Propiedad intelectual',
+    title: "4. Propiedad intelectual",
     paragraphs: [
-      'La identidad visual provisional, los textos, estructuras, componentes y demás contenidos del portal forman parte de los activos de PropBol o de sus respectivos titulares, cuando corresponda.',
-      'No está permitido copiar, modificar, distribuir o reutilizar el contenido del portal con fines comerciales sin autorización previa y expresa.'
-    ]
+      "La identidad visual provisional, los textos, estructuras, componentes y demás contenidos del portal forman parte de los activos de PropBol o de sus respectivos titulares, cuando corresponda.",
+      "No está permitido copiar, modificar, distribuir o reutilizar el contenido del portal con fines comerciales sin autorización previa y expresa.",
+    ],
   },
   {
-    title: '5. Publicación y disponibilidad de información',
+    title: "5. Publicación y disponibilidad de información",
     paragraphs: [
-      'PropBol procura mantener la información del portal actualizada y presentada con claridad; sin embargo, la disponibilidad, vigencia y condiciones de los inmuebles pueden cambiar sin previo aviso.',
-      'La empresa podrá corregir, actualizar o retirar publicaciones cuando sea necesario para resguardar la calidad de la información o el correcto funcionamiento del sistema.'
-    ]
+      "PropBol procura mantener la información del portal actualizada y presentada con claridad; sin embargo, la disponibilidad, vigencia y condiciones de los inmuebles pueden cambiar sin previo aviso.",
+      "La empresa podrá corregir, actualizar o retirar publicaciones cuando sea necesario para resguardar la calidad de la información o el correcto funcionamiento del sistema.",
+    ],
   },
   {
-    title: '6. Limitación de responsabilidad',
+    title: "6. Limitación de responsabilidad",
     paragraphs: [
-      'PropBol realiza esfuerzos razonables para ofrecer una plataforma estable y útil, pero no garantiza que el servicio se encuentre libre de interrupciones, errores temporales o demoras ocasionadas por factores externos.',
-      'La utilización de la información disponible en el portal es responsabilidad del usuario, quien deberá complementar su decisión con la verificación correspondiente antes de concretar cualquier operación inmobiliaria.'
-    ]
+      "PropBol realiza esfuerzos razonables para ofrecer una plataforma estable y útil, pero no garantiza que el servicio se encuentre libre de interrupciones, errores temporales o demoras ocasionadas por factores externos.",
+      "La utilización de la información disponible en el portal es responsabilidad del usuario, quien deberá complementar su decisión con la verificación correspondiente antes de concretar cualquier operación inmobiliaria.",
+    ],
   },
   {
-    title: '7. Enlaces y canales oficiales',
+    title: "7. Enlaces y canales oficiales",
     paragraphs: [
-      'La plataforma puede incluir enlaces a redes sociales oficiales y otras secciones institucionales para ampliar la información sobre PropBol.',
-      'Cualquier interacción fuera del portal principal deberá realizarse a través de los canales oficiales publicados por la empresa.'
-    ]
+      "La plataforma puede incluir enlaces a redes sociales oficiales y otras secciones institucionales para ampliar la información sobre PropBol.",
+      "Cualquier interacción fuera del portal principal deberá realizarse a través de los canales oficiales publicados por la empresa.",
+    ],
   },
   {
-    title: '8. Modificaciones de los términos',
+    title: "8. Modificaciones de los términos",
     paragraphs: [
-      'PropBol se reserva el derecho de actualizar estos Términos y Condiciones cuando resulte necesario por cambios operativos, legales o de mejora del servicio.',
-      'Las modificaciones serán publicadas en esta misma vista para que los usuarios puedan revisarlas oportunamente antes de continuar utilizando la plataforma.'
-    ]
-  }
-]
+      "PropBol se reserva el derecho de actualizar estos Términos y Condiciones cuando resulte necesario por cambios operativos, legales o de mejora del servicio.",
+      "Las modificaciones serán publicadas en esta misma vista para que los usuarios puedan revisarlas oportunamente antes de continuar utilizando la plataforma.",
+    ],
+  },
+];
 
 export default function TermsAndConditionsPage() {
   return (
     <div
       className="min-h-screen py-10"
       style={{
-        width: '100vw',
-        marginLeft: 'calc(-50vw + 50%)',
+        width: "100vw",
+        marginLeft: "calc(-50vw + 50%)",
         backgroundImage:
           "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('/icons/fondoTerminos.jpg')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed'
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundAttachment: "fixed",
       }}
     >
       <section className="w-full min-h-screen flex justify-center py-2 sm:py-4">
@@ -96,10 +96,11 @@ export default function TermsAndConditionsPage() {
                   TÉRMINOS Y CONDICIONES
                 </h1>
                 <p className="max-w-3xl text-sm leading-7 text-stone-600 sm:text-base">
-                  Este documento establece las condiciones generales de uso del portal inmobiliario
-                  de PropBol. Su lectura permite comprender el alcance del servicio, las
-                  responsabilidades del usuario y los criterios bajo los cuales se presenta la
-                  información del sistema.
+                  Este documento establece las condiciones generales de uso del
+                  portal inmobiliario de PropBol. Su lectura permite comprender
+                  el alcance del servicio, las responsabilidades del usuario y
+                  los criterios bajo los cuales se presenta la información del
+                  sistema.
                 </p>
               </div>
             </header>
@@ -111,14 +112,20 @@ export default function TermsAndConditionsPage() {
                     {section.title}
                   </h2>
                   {section.paragraphs.map((paragraph) => (
-                    <p key={paragraph} className="text-sm leading-7 text-stone-600 sm:text-base">
+                    <p
+                      key={paragraph}
+                      className="text-sm leading-7 text-stone-600 sm:text-base"
+                    >
                       {paragraph}
                     </p>
                   ))}
                   {section.bullets ? (
                     <ul className="space-y-2 pl-5 text-sm leading-7 text-stone-600 sm:text-base">
                       {section.bullets.map((bullet) => (
-                        <li key={bullet} className="list-disc marker:text-amber-600">
+                        <li
+                          key={bullet}
+                          className="list-disc marker:text-amber-600"
+                        >
                           {bullet}
                         </li>
                       ))}
@@ -131,5 +138,5 @@ export default function TermsAndConditionsPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }
