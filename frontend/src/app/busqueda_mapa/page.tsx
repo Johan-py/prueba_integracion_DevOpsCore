@@ -252,43 +252,16 @@ function BusquedaMapaContent() {
                 </div>
               </div>
               <div className="flex flex-col flex-1 overflow-hidden">
-                {/* Card de propiedad seleccionada desde el mapa */}
                 {pinnedProperty && (
                   <div className="mx-4 mb-3 relative shrink-0">
-                    <button
-                      onClick={() => {
-                        setPinnedProperty(null)
-                        setSelectedPropertyId(null)
-                      }}
-                      className="absolute top-2 right-2 z-10 bg-white rounded-full p-1 shadow text-stone-400 hover:text-stone-600"
-                    >
-                      <X size={14} />
-                    </button>
+                    <button onClick={() => { setPinnedProperty(null); setSelectedPropertyId(null) }} className="absolute top-2 right-2 z-10 bg-white rounded-full p-1 shadow text-stone-400 hover:text-stone-600"><X size={14} /></button>
                     <div className="ring-2 ring-orange-400 rounded-xl overflow-hidden">
-                      <PropertyCard
-                        imagen=""
-                        estado={pinnedProperty.type}
-                        precio={
-                          pinnedProperty.currency === 'USD'
-                            ? `$${pinnedProperty.price.toLocaleString('es-BO')} USD`
-                            : `Bs ${pinnedProperty.price.toLocaleString('es-BO')}`
-                        }
-                        descripcion={pinnedProperty.title}
-                        camas={3}
-                        banos={2}
-                        metros={150}
-                      />
+                      <PropertyCard imagen="" estado={pinnedProperty.type} precio={pinnedProperty.currency === 'USD' ? `$${pinnedProperty.price.toLocaleString('es-BO')} USD` : `Bs ${pinnedProperty.price.toLocaleString('es-BO')}`} descripcion={pinnedProperty.title} camas={3} banos={2} metros={150} />
                     </div>
                   </div>
                 )}
-
-                {/* Ordenamiento */}
                 <div className="px-4 shrink-0 border-b border-stone-100 pb-2">
-                  <MenuOrdenamiento
-                    totalResultados={properties.length}
-                    ordenActual={ordenActual}
-                    onOrdenChange={cambiarOrden}
-                  />
+                  <MenuOrdenamiento totalResultados={properties.length} ordenActual={ordenActual} onOrdenChange={cambiarOrden} />
                 </div>
 
                 {/* Toggle grid/lista */}
