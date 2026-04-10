@@ -246,45 +246,11 @@ function BusquedaMapaContent() {
                     <span className="text-orange-500">{properties.length}</span><span className="text-gray-500 font-normal">propiedades</span>
                   </span>
                   <div className="flex items-center gap-2">
-                    {/* Botón cerrar sheet → vuelve a hidden (mapa limpio) */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setSheetState('hidden')
-                      }}
-                      className="flex items-center gap-1 text-xs text-stone-400 hover:text-stone-600 bg-stone-100 rounded-full px-2 py-1"
-                    >
-                      <X size={12} />
-                      <span>Ocultar</span>
-                    </button>
-
-                    {/* Toggle peek ↔ full */}
-                    {sheetState === 'peek' ? (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setSheetState('full')
-                        }}
-                        className="text-stone-400 hover:text-stone-600 p-1"
-                      >
-                        <ChevronUp size={18} />
-                      </button>
-                    ) : (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setSheetState('peek')
-                        }}
-                        className="text-stone-400 hover:text-stone-600 p-1"
-                      >
-                        <ChevronDown size={18} />
-                      </button>
-                    )}
+                    <button onClick={(e) => { e.stopPropagation(); setSheetState('hidden') }} className="flex items-center gap-1 text-xs text-stone-400 hover:text-stone-600 bg-stone-100 rounded-full px-2 py-1"><X size={12} /><span>Ocultar</span></button>
+                    {sheetState === 'peek' ? <button onClick={(e) => { e.stopPropagation(); setSheetState('full') }} className="text-stone-400 hover:text-stone-600 p-1"><ChevronUp size={18} /></button> : <button onClick={(e) => { e.stopPropagation(); setSheetState('peek') }} className="text-stone-400 hover:text-stone-600 p-1"><ChevronDown size={18} /></button>}
                   </div>
                 </div>
               </div>
-
-              {/* Contenido scrolleable */}
               <div className="flex flex-col flex-1 overflow-hidden">
                 {/* Card de propiedad seleccionada desde el mapa */}
                 {pinnedProperty && (
