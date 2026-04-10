@@ -726,5 +726,5 @@ export default function SignUpForm() {
         </div>
       </div>
     </div>
-  );
+  )
 }

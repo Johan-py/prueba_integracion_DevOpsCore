@@ -30,9 +30,7 @@ export function useProperties(): UsePropertiesResult {
         const queryString = searchParams.toString();
 
         //Llamamos al endpoint de inmuebles con los filtros dinámicos
-        const res = await fetch(
-          `${API_URL}/api/properties/inmuebles?${queryString}`,
-        );
+        const res = await fetch(`${API_URL}/api/properties/inmuebles?${queryString}`)
 
         if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
 

@@ -1,34 +1,34 @@
 export type GoogleTokenResponse = {
-  access_token?: string;
-  id_token?: string;
-  expires_in?: number;
-  scope?: string;
-  token_type?: string;
-  error?: string;
-  error_description?: string;
-};
+  access_token?: string
+  id_token?: string
+  expires_in?: number
+  scope?: string
+  token_type?: string
+  error?: string
+  error_description?: string
+}
 
 export type GoogleUserInfo = {
-  email?: string;
-  given_name?: string;
-  family_name?: string;
-  name?: string;
-  picture?: string;
-  email_verified?: boolean;
-};
+  email?: string
+  given_name?: string
+  family_name?: string
+  name?: string
+  picture?: string
+  email_verified?: boolean
+}
 
 export type GoogleAuthIntent = "signin" | "signup";
 
 export type GoogleLoginSuccess = {
-  message: string;
-  token: string;
+  message: string
+  token: string
   user: {
-    id: number;
-    correo: string;
-    nombre: string;
-    apellido: string;
-  };
-};
+    id: number
+    correo: string
+    nombre: string
+    apellido: string
+  }
+}
 
 export class GoogleAuthError extends Error {
   code:
@@ -45,9 +45,9 @@ export class GoogleAuthError extends Error {
       | "ACCOUNT_ALREADY_EXISTS",
     statusCode = 400,
   ) {
-    super(message);
-    this.name = "GoogleAuthError";
-    this.code = code;
-    this.statusCode = statusCode;
+    super(message)
+    this.name = 'GoogleAuthError'
+    this.code = code
+    this.statusCode = statusCode
   }
 }

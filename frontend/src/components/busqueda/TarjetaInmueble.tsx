@@ -1,12 +1,15 @@
+"use client";
 import { Inmueble } from "../../types/inmueble";
 import { BedDouble, Bath, Maximize, MapPin, Star } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
 
 interface TarjetaInmuebleProps {
   inmueble: Inmueble;
 }
 
 export const TarjetaInmueble = ({ inmueble }: TarjetaInmuebleProps) => {
+  const [isHovered, setIsHovered] = useState(false);
   const formatoMoneda = new Intl.NumberFormat("es-BO", {
     style: "currency",
     currency: "USD",
@@ -19,7 +22,11 @@ export const TarjetaInmueble = ({ inmueble }: TarjetaInmuebleProps) => {
       : "";
 
   return (
-    <div className="group flex flex-col w-full bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300">
+    <div 
+      className="group flex flex-col w-full bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300 cursor-pointer"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <div className="relative aspect-[4/3] w-full bg-gray-200 overflow-hidden">
         <Image
           src={`https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=600&h=400&ixlib=rb-4.0.3`}
@@ -41,7 +48,11 @@ export const TarjetaInmueble = ({ inmueble }: TarjetaInmuebleProps) => {
           <h3 className="font-semibold text-lg text-gray-900 leading-tight line-clamp-1">
             {inmueble.titulo}
           </h3>
-          <span className="text-xs font-bold text-gray-900 whitespace-nowrap ml-2">
+          <span 
+            className={`whitespace-nowrap ml-2 font-bold transition-all duration-300 ${
+              isHovered ? "text-base text-[#ea580c]" : "text-xs text-gray-900"
+            }`}
+          >
             {formatoMoneda.format(Number(inmueble.precio))}
           </span>
         </div>

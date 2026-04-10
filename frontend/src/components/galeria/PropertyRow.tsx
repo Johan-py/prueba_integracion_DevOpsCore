@@ -1,5 +1,7 @@
+"use client";
 import ContactButton from "./ContactButton"; // <-- Importas tu componente
 import Image from "next/image";
+import { useState } from "react";
 
 export default function PropertyRow({
   title,
@@ -14,8 +16,13 @@ export default function PropertyRow({
   contactType: string;
   image: string;
 }) {
+  const [isHovered, setIsHovered] = useState(false);
   return (
-    <div className="grid grid-cols-[40px_70px_minmax(0,1fr)_50px] gap-2 px-3 py-2 items-center">
+    <div 
+      className="grid grid-cols-[40px_70px_minmax(0,1fr)_50px] gap-2 px-3 py-2 items-center cursor-pointer transition-colors hover:bg-stone-50 rounded-lg"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       {/* FOTO */}
       <div className="w-[40px] h-[40px] rounded-md overflow-hidden bg-gray-200">
         <Image
@@ -28,7 +35,13 @@ export default function PropertyRow({
       </div>
 
       {/* PRECIO */}
-      <span className="text-[11px] font-semibold text-gray-700">{price}</span>
+      <span 
+        className={`font-semibold transition-all duration-300 ${
+          isHovered ? "text-sm text-[#ea580c]" : "text-[11px] text-gray-700"
+        }`}
+      >
+        {price}
+      </span>
 
       {/* DETALLE */}
       <div className="flex flex-col overflow-hidden min-w-0">
@@ -43,5 +56,5 @@ export default function PropertyRow({
         <ContactButton type={contactType} variant="table" />
       </div>
     </div>
-  );
+  )
 }

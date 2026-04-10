@@ -1,7 +1,9 @@
 // frontend/src/components/layout/PropertyCard.tsx
+"use client";
 import Image from "next/image";
 import { BedDouble, Bath, Square, ImageOff } from "lucide-react"; // Quité MessageSquareText porque ya viene en tu botón
 import ContactButton from "../galeria/ContactButton"; // <-- Tu botón modular importado
+import { useState } from "react";
 
 type PropsTarjeta = {
   imagen?: string;
@@ -25,8 +27,13 @@ export default function PropertyCard({
   banos,
   metros,
 }: PropsTarjeta) {
+  const [isHovered, setIsHovered] = useState(false);
   return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300 border border-gray-100 group">
+    <div 
+      className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300 border border-gray-100 group"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       {/* 2. Implementación de Imagen o Cuadro Gris (Misión Día 3) */}
       <div
         className={`relative aspect-[16/10] overflow-hidden ${!imagen ? COLOR_GRIS_PLACEHOLDER : ""} flex items-center justify-center`}
@@ -54,12 +61,16 @@ export default function PropertyCard({
         </span>
       </div>
 
-      <div className="p-4 flex flex-col gap-3">
-        <h2 className="text-xl md:text-2xl font-extrabold text-gray-950 tracking-tight">
+      <div className="p-3 flex flex-col gap-2">
+        <h2
+        className={`font-extrabold text-gray-950 tracking-tight transition-all duration-300 ${
+          isHovered ? "text-2xl md:text-3xl" : "text-xl md:text-2xl"
+        }`}
+      >
           {precio}
         </h2>
 
-        <p className="text-sm text-gray-800 line-clamp-2 font-medium leading-relaxed min-h-[40px]">
+        <p className="text-sm text-gray-900 line-clamp-2 font-medium leading-snug">
           {descripcion}
         </p>
 
@@ -81,5 +92,5 @@ export default function PropertyCard({
         </div>
       </div>
     </div>
-  );
+  )
 }

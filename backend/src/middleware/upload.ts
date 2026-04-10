@@ -8,48 +8,42 @@ const storage = multer.diskStorage({
   destination: (
     _req: Request,
     _file: Express.Multer.File,
-    cb: (error: Error | null, destination: string) => void,
+    cb: (error: Error | null, destination: string) => void
   ) => {
-    const uploadDir = path.join(process.cwd(), "uploads", "avatars");
+    const uploadDir = path.join(process.cwd(), 'uploads', 'avatars')
     // Crear directorio si no existe
     if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
+      fs.mkdirSync(uploadDir, { recursive: true })
     }
-    cb(null, uploadDir);
+    cb(null, uploadDir)
   },
   filename: (
     _req: Request,
     file: Express.Multer.File,
-    cb: (error: Error | null, filename: string) => void,
+    cb: (error: Error | null, filename: string) => void
   ) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const extension = path.extname(file.originalname);
-    cb(null, `avatar-${uniqueSuffix}${extension}`);
-  },
-});
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9)
+    const extension = path.extname(file.originalname)
+    cb(null, `avatar-${uniqueSuffix}${extension}`)
+  }
+})
 
 // Filtrar tipos de archivo
-const fileFilter = (
-  _req: Request,
-  file: Express.Multer.File,
-  cb: multer.FileFilterCallback,
-) => {
-  const allowedTypes = /jpeg|jpg|png|gif|webp/;
-  const extname = allowedTypes.test(
-    path.extname(file.originalname).toLowerCase(),
-  );
-  const mimetype = allowedTypes.test(file.mimetype);
+const fileFilter = (_req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+  const allowedTypes = /jpeg|jpg|png|gif|webp/
+  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase())
+  const mimetype = allowedTypes.test(file.mimetype)
 
   if (mimetype && extname) {
-    cb(null, true);
+    cb(null, true)
   } else {
     // CORREGIDO: Pasar null como primer argumento y false como segundo
-    cb(null, false);
+    cb(null, false)
   }
-};
+}
 
 export const upload = multer({
   storage: storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB límite
-  fileFilter: fileFilter,
-});
+  fileFilter: fileFilter
+})

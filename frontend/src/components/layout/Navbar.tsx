@@ -100,20 +100,20 @@ export default function Navbar() {
   };
 
   const fetchCurrentUser = async (token: string) => {
-    const response = await fetch(`${API_URL}/api/auth/me`, {
+    const response = await fetch(`${API_URL}/api/perfil/usuario`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
 
-    const data = (await response.json()) as MeResponse;
+    const data = await response.json();
 
-    if (!response.ok || !data.user) {
+    if (!response.ok || !data.perfil) {
       throw new Error(data.message || "Sesión inválida o expirada");
     }
 
-    return data.user;
+    return data.perfil;
   };
 
   const restoreSession = async () => {
@@ -276,7 +276,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="sticky top-0 z-40 w-full border-b border-stone-200 bg-[#F9F6EE] shadow-sm">
+      <nav className="sticky top-0 z-50 w-full border-b border-stone-200 bg-[#F9F6EE] shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-10">
@@ -580,5 +580,5 @@ export default function Navbar() {
         </div>
       )}
     </>
-  );
+  )
 }

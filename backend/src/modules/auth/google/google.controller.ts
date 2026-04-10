@@ -13,7 +13,7 @@ const resolveIntent = (value: unknown): GoogleAuthIntent => {
 
 const buildGoogleAuthUrl = (intent: GoogleAuthIntent) => {
   return (
-    "https://accounts.google.com/o/oauth2/v2/auth?" +
+    'https://accounts.google.com/o/oauth2/v2/auth?' +
     new URLSearchParams({
       client_id: env.GOOGLE_CLIENT_ID,
       redirect_uri: env.GOOGLE_CALLBACK_URL,
@@ -24,38 +24,38 @@ const buildGoogleAuthUrl = (intent: GoogleAuthIntent) => {
       include_granted_scopes: "true",
       state: intent,
     }).toString()
-  );
-};
+  )
+}
 
 const escapeHtml = (value: string) => {
   return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-};
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
 
 const sendPopupResponse = (
   res: Response,
   intent: GoogleAuthIntent,
   payload:
     | {
-        type: "propbol:google-login-success";
-        message: string;
-        token: string;
+        type: 'propbol:google-login-success'
+        message: string
+        token: string
         user: {
-          id: number;
-          correo: string;
-          nombre: string;
-          apellido: string;
-        };
+          id: number
+          correo: string
+          nombre: string
+          apellido: string
+        }
       }
     | {
-        type: "propbol:google-login-error";
-        code: string;
-        message: string;
-      },
+        type: 'propbol:google-login-error'
+        code: string
+        message: string
+      }
 ) => {
   const serializedPayload = JSON.stringify(payload).replace(/</g, "\\u003c");
   const targetOrigin = JSON.stringify(env.FRONTEND_URL);
@@ -65,7 +65,7 @@ const sendPopupResponse = (
       ? "Autenticación con Google completada. Puedes cerrar esta ventana."
       : payload.message;
 
-  return res.status(200).type("html").send(`<!DOCTYPE html>
+  return res.status(200).type('html').send(`<!DOCTYPE html>
     <html lang="es">
     <head>
         <meta charset="UTF-8" />
@@ -86,8 +86,8 @@ const sendPopupResponse = (
         })();
         </script>
     </body>
-    </html>`);
-};
+    </html>`)
+}
 
 export const StratGoogleLoginController = (req: Request, res: Response) => {
   const intent = resolveIntent(req.query.intent);
@@ -122,15 +122,15 @@ export const googleCallbackController = async (req: Request, res: Response) => {
       type: "propbol:google-login-success",
       message: result.message,
       token: result.token,
-      user: result.user,
-    });
+      user: result.user
+    })
   } catch (error) {
     if (error instanceof GoogleAuthError) {
       return sendPopupResponse(res, intent, {
         type: "propbol:google-login-error",
         code: error.code,
-        message: error.message,
-      });
+        message: error.message
+      })
     }
 
     return sendPopupResponse(res, intent, {
@@ -139,4 +139,4 @@ export const googleCallbackController = async (req: Request, res: Response) => {
       message: "No se pudo completar la autenticación con Google.",
     });
   }
-};
+}

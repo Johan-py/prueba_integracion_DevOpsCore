@@ -7,9 +7,9 @@ export function verificarToken(req: Request, res: Response, next: NextFunction) 
 
   if (!token) {
     return res.status(401).json({
-      error: "No autorizado",
-      message: "Debes iniciar sesión para ver los planes",
-    });
+      error: 'No autorizado',
+      message: 'Debes iniciar sesión para ver los planes'
+    })
   }
 
   try {
@@ -25,14 +25,14 @@ export function verificarToken(req: Request, res: Response, next: NextFunction) 
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
       return res.status(403).json({
-        error: "Token expirado",
-        message: "Tu sesión expiró, inicia sesión nuevamente",
-      });
+        error: 'Token expirado',
+        message: 'Tu sesión expiró, inicia sesión nuevamente'
+      })
     }
 
     return res.status(403).json({
-      error: "Token inválido",
-      message: "No pudimos validar tu sesión",
-    });
+      error: 'Token inválido',
+      message: 'No pudimos validar tu sesión'
+    })
   }
 }

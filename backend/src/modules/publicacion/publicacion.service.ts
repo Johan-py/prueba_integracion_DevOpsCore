@@ -2,8 +2,8 @@
 import {
   buscarPublicacionesPorUsuarioRepository,
   buscarPublicacionPorIdRepository,
-  eliminarLogicamentePublicacionRepository,
-} from "./publicacion.repository.js";
+  eliminarLogicamentePublicacionRepository
+} from './publicacion.repository.js'
 
 /**
  * HU1 - Listar publicaciones propias
@@ -12,30 +12,26 @@ import {
  */
 export const listarMisPublicacionesService = async (usuarioId: number) => {
   if (Number.isNaN(usuarioId) || usuarioId <= 0) {
-    throw new Error("USUARIO_INVALIDO");
+    throw new Error('USUARIO_INVALIDO')
   }
 
-  const publicaciones =
-    await buscarPublicacionesPorUsuarioRepository(usuarioId);
+  const publicaciones = await buscarPublicacionesPorUsuarioRepository(usuarioId)
 
-  type PublicacionesPorUsuario = Awaited<
-    ReturnType<typeof buscarPublicacionesPorUsuarioRepository>
-  >;
+  type PublicacionesPorUsuario = Awaited<ReturnType<typeof buscarPublicacionesPorUsuarioRepository>>
 
   return publicaciones.map((publicacion: PublicacionesPorUsuario[number]) => ({
     id: publicacion.id,
     titulo: publicacion.titulo,
     precio: Number(publicacion.inmueble.precio),
-    ubicacion:
-      publicacion.inmueble.ubicacion?.direccion || "Ubicación no disponible",
+    ubicacion: publicacion.inmueble.ubicacion?.direccion || 'Ubicación no disponible',
     nroBanos: publicacion.inmueble.nroBanos,
     nroCuartos: publicacion.inmueble.nroCuartos,
     superficieM2: publicacion.inmueble.superficieM2
       ? Number(publicacion.inmueble.superficieM2)
       : null,
-    imagenUrl: publicacion.multimedia?.[0]?.url ?? null,
-  }));
-};
+    imagenUrl: publicacion.multimedia?.[0]?.url ?? null
+  }))
+}
 
 /**
  * HU1 - Eliminar publicación propia
@@ -44,37 +40,34 @@ export const listarMisPublicacionesService = async (usuarioId: number) => {
  */
 export const eliminarPublicacionService = async (
   publicacionId: number,
-  usuarioSolicitanteId: number,
+  usuarioSolicitanteId: number
 ) => {
   if (Number.isNaN(publicacionId) || publicacionId <= 0) {
-    throw new Error("ID_INVALIDO");
+    throw new Error('ID_INVALIDO')
   }
 
   if (Number.isNaN(usuarioSolicitanteId) || usuarioSolicitanteId <= 0) {
-    throw new Error("USUARIO_INVALIDO");
+    throw new Error('USUARIO_INVALIDO')
   }
 
-  const publicacion = await buscarPublicacionPorIdRepository(publicacionId);
+  const publicacion = await buscarPublicacionPorIdRepository(publicacionId)
 
   if (!publicacion) {
-    throw new Error("PUBLICACION_NO_EXISTE");
+    throw new Error('PUBLICACION_NO_EXISTE')
   }
 
   if (publicacion.usuarioId !== usuarioSolicitanteId) {
-    throw new Error("NO_AUTORIZADO");
+    throw new Error('NO_AUTORIZADO')
   }
 
-  if (publicacion.estado === "ELIMINADA") {
-    throw new Error("PUBLICACION_YA_ELIMINADA");
+  if (publicacion.estado === 'ELIMINADA') {
+    throw new Error('PUBLICACION_YA_ELIMINADA')
   }
 
-  await eliminarLogicamentePublicacionRepository(
-    publicacion.id,
-    publicacion.inmuebleId,
-  );
+  await eliminarLogicamentePublicacionRepository(publicacion.id, publicacion.inmuebleId)
 
   return {
     id: publicacion.id,
-    estado: "ELIMINADA",
-  };
-};
+    estado: 'ELIMINADA'
+  }
+}

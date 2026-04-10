@@ -65,5 +65,5 @@ export default function Logo({
         Prop<span className="text-amber-600">Bol</span>
       </span>
     </Link>
-  );
+  )
 }
