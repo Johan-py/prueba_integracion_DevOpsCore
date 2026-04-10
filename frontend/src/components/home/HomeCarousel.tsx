@@ -16,11 +16,15 @@ export const HomeCarousel = ({ banners }: { banners: BannerData[] }) => {
   const touchStartX = useRef<number | null>(null)
 
   const nextSlide = () => {
-    setCurrentIndex((prev) => (prev === banners.length - 1 ? 0 : prev + 1))
+    setCurrentIndex((prev) =>
+      prev === banners.length - 1 ? 0 : prev + 1
+    )
   }
 
   const prevSlide = () => {
-    setCurrentIndex((prev) => (prev === 0 ? banners.length - 1 : prev - 1))
+    setCurrentIndex((prev) =>
+      prev === 0 ? banners.length - 1 : prev - 1
+    )
   }
 
   // auto-slide cada 5 segundos
@@ -49,8 +53,14 @@ export const HomeCarousel = ({ banners }: { banners: BannerData[] }) => {
     touchStartX.current = null
   }
 
+  if (!banners || banners.length === 0) return null
+
   return (
-    <div className="relative w-full" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+    <div
+      className="relative w-full"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       <HomeBanner
         url={banners[currentIndex].urlImagen}
         title={banners[currentIndex].titulo || 'Encuentra tu lugar ideal'}
@@ -60,7 +70,7 @@ export const HomeCarousel = ({ banners }: { banners: BannerData[] }) => {
       {/* Flechas */}
       <button
         onClick={prevSlide}
-        className="hidden md:flex absolute left-6 top-1/2 -translate-y-1/2 z-50
+        className="hidden md:flex absolute left-6 top-1/2 -translate-y-1/2 z-10
         text-white/80 hover:text-white
         transition-all duration-200
         hover:scale-110 active:scale-95"
@@ -70,7 +80,7 @@ export const HomeCarousel = ({ banners }: { banners: BannerData[] }) => {
 
       <button
         onClick={nextSlide}
-        className="hidden md:flex absolute right-6 top-1/2 -translate-y-1/2 z-50
+        className="hidden md:flex absolute right-6 top-1/2 -translate-y-1/2 z-10
         text-white/80 hover:text-white
         transition-all duration-200
         hover:scale-110 active:scale-95"
@@ -78,13 +88,15 @@ export const HomeCarousel = ({ banners }: { banners: BannerData[] }) => {
         <ChevronRight className="w-10 h-10 drop-shadow-lg" />
       </button>
 
-      {/*  INDICADORES */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 flex gap-2">
+      {/* Indicadores */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2">
         {banners.map((_, index) => (
           <div
             key={index}
             className={`h-2 rounded-full transition-all ${
-              currentIndex === index ? 'bg-white w-4' : 'bg-white/50 w-2'
+              currentIndex === index
+                ? 'bg-white w-4'
+                : 'bg-white/50 w-2'
             }`}
           />
         ))}
