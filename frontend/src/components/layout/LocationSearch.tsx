@@ -43,7 +43,15 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
 
   useEffect(() => {
     if (!isOpen) return
-    recalcDropdown()
+    let frame1 = 0
+    let frame2 = 0
+    frame1 = requestAnimationFrame(() => {
+    frame2 = requestAnimationFrame(recalcDropdown)
+    })
+    return () => {
+      if (frame1) cancelAnimationFrame(frame1)
+      if (frame2) cancelAnimationFrame(frame2)
+    }
   }, [isOpen])
 
   useEffect(() => {
@@ -145,7 +153,12 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
             type="text"
             value={value}
             onChange={handleInputChange}
-            onFocus={() => setIsOpen(true)}
+            onFocus={() => {
+              setIsOpen(true)
+              requestAnimationFrame(() => {
+                  recalcDropdown()
+                })   
+          }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') setIsOpen(false)
             }}
