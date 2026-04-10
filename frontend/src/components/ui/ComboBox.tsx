@@ -22,10 +22,18 @@ export function ComboBox({
   options = [],
   icon: Icon,
   onChange,
+  value,
 }: ComboBoxProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState<ComboBoxOption | null>(null);
   const comboBoxRef = useRef<HTMLDivElement>(null);
+
+  // ✅ SINCRONIZA VALUE EXTERNO (IMPORTANTE)
+  useEffect(() => {
+    if (value) {
+      setSelected({ label: value });
+    }
+  }, [value]);
 
   const handleOptionClick = (option: string | ComboBoxOption) => {
     const optionObj = typeof option === "string" ? { label: option } : option;
@@ -53,14 +61,18 @@ export function ComboBox({
   }, []);
 
   return (
-    <div className="flex flex-col gap-2 w-full font-inter" ref={comboBoxRef}>
+    <div
+      className="flex flex-col gap-2 w-full font-inter relative z-[9999]"
+      ref={comboBoxRef}
+    >
       <label className="text-sm font-medium text-stone-900">{label}</label>
 
       <div className="relative group">
         {DisplayIcon && (
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none z-10">
             <DisplayIcon
-              className={`w-5 h-5 transition-colors ${isOpen ? "text-amber-600" : "text-stone-400"}`}
+              className={`w-5 h-5 transition-colors ${isOpen ? "text-amber-600" : "text-stone-400"
+                }`}
             />
           </div>
         )}
@@ -68,20 +80,23 @@ export function ComboBox({
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className={`w-full flex items-center justify-between bg-white border text-stone-600 py-2.5 pr-3 rounded-xl transition-all shadow-sm focus:outline-none focus:border-amber-600 focus:ring-1 focus:ring-amber-600 hover:border-stone-300 ${
-            DisplayIcon ? "pl-10" : "pl-4"
-          } ${isOpen ? "border-amber-600 ring-1 ring-amber-600" : "border-stone-200"}`}
+          className={`w-full flex items-center justify-between bg-white border text-stone-600 py-2.5 pr-3 rounded-xl transition-all shadow-sm focus:outline-none focus:border-amber-600 focus:ring-1 focus:ring-amber-600 hover:border-stone-300 ${DisplayIcon ? "pl-10" : "pl-4"
+            } ${isOpen
+              ? "border-amber-600 ring-1 ring-amber-600"
+              : "border-stone-200"
+            }`}
         >
           <span className={selected ? "text-stone-900" : "text-stone-500"}>
             {selected?.label || placeholder}
           </span>
           <ChevronDown
-            className={`w-4 h-4 text-stone-400 transition-transform ${isOpen ? "rotate-180" : ""}`}
+            className={`w-4 h-4 text-stone-400 transition-transform ${isOpen ? "rotate-180" : ""
+              }`}
           />
         </button>
 
         {isOpen && (
-          <ul className="absolute z-20 w-full mt-1 bg-white border border-stone-200 rounded-xl shadow-lg overflow-hidden max-h-60 overflow-y-auto">
+          <ul className="absolute mt-1 w-full bg-white border border-stone-200 rounded-xl shadow-xl z-[99999] max-h-60 overflow-y-auto">
             {options.map((option) => {
               const labelText =
                 typeof option === "string" ? option : option.label;
@@ -94,7 +109,9 @@ export function ComboBox({
                   onClick={() => handleOptionClick(option)}
                   className="px-4 py-2.5 text-stone-600 hover:bg-amber-50 hover:text-amber-700 cursor-pointer flex items-center gap-2 transition-colors"
                 >
-                  {OptionIcon && <OptionIcon className="w-4 h-4 opacity-70" />}
+                  {OptionIcon && (
+                    <OptionIcon className="w-4 h-4 opacity-70" />
+                  )}
                   {labelText}
                 </li>
               );

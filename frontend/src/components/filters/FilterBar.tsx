@@ -96,7 +96,6 @@ export default function FilterBar({
   const handleSearch = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
-    // ✅ FIX FINAL
     const tipoMap: Record<string, string> = {
       Casa: "CASA",
       Departamento: "DEPARTAMENTO",
@@ -130,9 +129,7 @@ export default function FilterBar({
       if (merged.locationId != null && merged.locationId !== "") {
         params.set("locationId", String(merged.locationId));
       }
-    } catch {
-      // ignore
-    }
+    } catch { }
 
     modosSeleccionados.forEach((modo) =>
       params.append("modoInmueble", modo)
@@ -144,8 +141,7 @@ export default function FilterBar({
       params.set("query", ubicacionTexto.trim());
 
     const queryString = params.toString();
-    const targetUrl = `/busqueda_mapa${queryString ? `?${queryString}` : ""
-      }`;
+    const targetUrl = `/busqueda_mapa${queryString ? `?${queryString}` : ""}`;
 
     router.push(targetUrl);
 
@@ -154,7 +150,7 @@ export default function FilterBar({
 
   const containerStyles =
     variant === "map"
-      ? "bg-[#faf9f6] border-b border-stone-200 py-5 px-6 w-full flex flex-col gap-5 shadow-sm sticky top-0 z-50 overflow-visible"
+      ? "bg-[#faf9f6] border-b border-stone-200 py-5 px-6 w-full flex flex-col gap-5 shadow-sm sticky top-0 z-50"
       : "bg-white shadow-lg rounded-[30px] p-6 flex flex-col gap-6 w-full max-w-[921px]";
 
   return (
@@ -166,12 +162,12 @@ export default function FilterBar({
 
       <div
         className={`flex items-center gap-3 w-full ${variant === "map"
-            ? "flex-nowrap overflow-x-auto"
-            : "flex-col md:flex-row flex-wrap"
+          ? "flex-wrap"   // 🔥 FIX CLAVE
+          : "flex-col md:flex-row flex-wrap"
           }`}
       >
-        {/* ✅ ComboBox corregido */}
-        <div className="w-full md:w-64">
+        {/* ComboBox */}
+        <div className="w-full md:w-64 relative z-[9999]">
           <ComboBox
             label={variant === "map" ? "" : "Tipo"}
             placeholder="Cualquier tipo"
@@ -183,12 +179,13 @@ export default function FilterBar({
               "Cuarto",
               "Espacios Cementerio",
             ]}
-            onChange={(val: string) => setTipoInmueble(val)}
             value={tipoInmueble}
+            onChange={(val: string) => setTipoInmueble(val)}
           />
         </div>
 
-        <div className="w-full flex-1">
+        {/* Ubicación */}
+        <div className="w-full flex-1 relative z-[50]">
           <LocationSearch
             value={ubicacionTexto}
             onChange={(val: LocationValue) => {
@@ -201,8 +198,9 @@ export default function FilterBar({
           />
         </div>
 
+        {/* Filtros */}
         {variant === "map" && (
-          <div className="flex items-center gap-3 overflow-x-auto">
+          <div className="flex items-center gap-3 flex-wrap">
             <MockFilterBtn icon={DollarSign} text="Precio" />
             <MockFilterBtn icon={Users} text="Capacidad" />
             <MockFilterBtn icon={Maximize} text="Metros" />
@@ -214,9 +212,10 @@ export default function FilterBar({
           </div>
         )}
 
+        {/* Botón */}
         <button
           type="submit"
-          className="h-[46px] px-8 bg-[#d97706] hover:bg-[#b95e00] text-white rounded-xl font-bold flex items-center gap-2"
+          className="h-[46px] px-8 bg-[#d97706] hover:bg-[#b95e00] text-white rounded-xl font-bold flex items-center justify-center gap-2"
         >
           <SearchIcon size={18} />
           {variant === "home" && "BUSCAR"}

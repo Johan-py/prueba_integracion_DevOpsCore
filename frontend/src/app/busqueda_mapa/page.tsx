@@ -49,20 +49,20 @@ function BusquedaMapaContent() {
 
   // Hover con debounce de 200 ms → vuela el mapa al marcador
   useEffect(() => {
-  if (!hoveredId) {
-    if (!isHoveringList) {
-      setSelectedPropertyId(null);
+    if (!hoveredId) {
+      if (!isHoveringList) {
+        setSelectedPropertyId(null);
+      }
+      return;
     }
-    return;
-  }
-  
-  const timeout = setTimeout(() => {
-    if (isHoveringList) {
-      setSelectedPropertyId(hoveredId);
-    }
-  }, 200);
-  
-  return () => clearTimeout(timeout);
+
+    const timeout = setTimeout(() => {
+      if (isHoveringList) {
+        setSelectedPropertyId(hoveredId);
+      }
+    }, 200);
+
+    return () => clearTimeout(timeout);
   }, [hoveredId, isHoveringList]);
 
   return (
@@ -77,9 +77,8 @@ function BusquedaMapaContent() {
       <main className="flex flex-1 overflow-hidden relative">
         {/* Panel lateral colapsable */}
         <aside
-          className={`bg-white border-r border-stone-200 flex flex-col z-10 transition-all duration-300 ${
-            isSidebarOpen ? "w-full md:w-[450px]" : "w-0"
-          }`}
+          className={`bg-white border-r border-stone-200 flex flex-col z-10 transition-all duration-300 ${isSidebarOpen ? "w-full md:w-[450px]" : "w-0"
+            }`}
         >
           {isSidebarOpen && (
             <div className="flex flex-col h-full">
@@ -88,25 +87,25 @@ function BusquedaMapaContent() {
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex flex-col">
                     <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-1">
-                      <Filter className="w-4 h-4 text-orange-500" />
-                      <h1 className="text-base font-semibold text-stone-900 uppercase tracking-wide">Filtros </h1>
+                      <div className="flex items-center gap-1">
+                        <Filter className="w-4 h-4 text-orange-500" />
+                        <h1 className="text-base font-semibold text-stone-900 uppercase tracking-wide">Filtros </h1>
                       </div>
                       <div className="flex items-center gap-2 mb-2">
-                       <h1 className="text-xl font-semibold text-slate-800">
+                        <h1 className="text-xl font-semibold text-slate-800">
                           Resultados de búsqueda
-                          </h1>
-                         </div>
-                    <h2 className="text-sm font-bold text-slate-900">
-                      <span className="text-orange-500">
-                        {properties.length}
-                      </span>
-                      <span className="ml-2 text-gray-600 font-normal text-sm">
-                        {properties.length === 1
-                          ? "propiedad encontrada"
-                          : "propiedades encontradas"}
-                      </span>
-                    </h2>
+                        </h1>
+                      </div>
+                      <h2 className="text-sm font-bold text-slate-900">
+                        <span className="text-orange-500">
+                          {properties.length}
+                        </span>
+                        <span className="ml-2 text-gray-600 font-normal text-sm">
+                          {properties.length === 1
+                            ? "propiedad encontrada"
+                            : "propiedades encontradas"}
+                        </span>
+                      </h2>
                     </div>
                   </div>
                   <button
@@ -146,12 +145,12 @@ function BusquedaMapaContent() {
 
               {/* Lista de propiedades con hover → fly-to en mapa */}
               <div className="flex-1 overflow-y-auto p-4 bg-stone-50 no-scrollbar"
-                  onMouseEnter={() => setIsHoveringList(true)}
-                  onMouseLeave={() => {
-                   setIsHoveringList(false);
-                   setSelectedPropertyId(null);
-                   setHoveredId(null);
-                 }} 
+                onMouseEnter={() => setIsHoveringList(true)}
+                onMouseLeave={() => {
+                  setIsHoveringList(false);
+                  setSelectedPropertyId(null);
+                  setHoveredId(null);
+                }}
               >
                 {isLoading ? (
                   <div className="flex flex-col justify-center items-center h-full text-stone-400 text-sm gap-2 animate-pulse">
@@ -162,11 +161,10 @@ function BusquedaMapaContent() {
                   <EmptyState />
                 ) : (
                   <div
-                    className={`gap-4 flex flex-col h-fit w-full ${
-                      viewMode === "list"
+                    className={`gap-4 flex flex-col h-fit w-full ${viewMode === "list"
                         ? "divide-y divide-gray-100 bg-white border border-gray-100 rounded-xl shadow-sm"
                         : ""
-                         }`  }
+                      }`}
                   >
                     {properties.map((property: any) => (
                       <div
@@ -175,16 +173,15 @@ function BusquedaMapaContent() {
                         onMouseEnter={() => setHoveredId(property.id)}
                         onMouseLeave={() => setHoveredId(null)}
                         onClick={() => setSelectedPropertyId(property.id)}
-                        className={`cursor-pointer transition-all duration-200 rounded-xl ${
-                          selectedPropertyId === property.id
+                        className={`cursor-pointer transition-all duration-200 rounded-xl ${selectedPropertyId === property.id
                             ? "ring-2 ring-orange-400 ring-offset-1"
                             : ""
-                        }`}
+                          }`}
                       >
                         {viewMode === "grid" ? (
                           <PropertyCard
                             imagen={property.imagen || "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=800&q=80"
-                              ||"https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"||"https://images.unsplash.com/photo-1512917774085-9988501fc184?auto=format&fit=crop&w=800&q=80"}
+                              || "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80" || "https://images.unsplash.com/photo-1512917774085-9988501fc184?auto=format&fit=crop&w=800&q=80"}
                             estado={property.type}
                             precio={
                               property.currency === "USD"
