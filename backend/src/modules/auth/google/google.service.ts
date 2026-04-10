@@ -1,8 +1,15 @@
-import { env } from '../../../config/env.js'
-import { generateToken, type JwtPayload } from '../../../utils/jwt.js'
-import { createGoogleSession, findUserByGoogleEmail } from './google.repository.js'
+import crypto from "node:crypto";
+
+import { env } from "../../../config/env.js";
+import { generateToken, type JwtPayload } from "../../../utils/jwt.js";
+import {
+  createGoogleSession,
+  createGoogleUser,
+  findUserByGoogleEmail,
+} from "./google.repository.js";
 import {
   GoogleAuthError,
+  type GoogleAuthIntent,
   type GoogleLoginSuccess,
   type GoogleTokenResponse,
   type GoogleUserInfo
@@ -60,7 +67,48 @@ const getGoogleUserInfo = async (accessToken: string) => {
   return data
 }
 
-export const loginWithGoogleCodeService = async (code: string): Promise<GoogleLoginSuccess> => {
+const splitGoogleName = (googleUser: GoogleUserInfo) => {
+  const givenName = googleUser.given_name?.trim() ?? "";
+  const familyName = googleUser.family_name?.trim() ?? "";
+  const fullName = googleUser.name?.trim() ?? "";
+
+  if (givenName || familyName) {
+    return {
+      nombre: givenName || "Usuario",
+      apellido: familyName || "Google",
+    };
+  }
+
+  const parts = fullName.split(/\s+/).filter(Boolean);
+
+  if (parts.length === 0) {
+    return {
+      nombre: "Usuario",
+      apellido: "Google",
+    };
+  }
+
+  if (parts.length === 1) {
+    return {
+      nombre: parts[0],
+      apellido: "Google",
+    };
+  }
+
+  return {
+    nombre: parts[0],
+    apellido: parts.slice(1).join(" "),
+  };
+};
+
+const createRandomGooglePassword = () => {
+  return `google_${crypto.randomUUID()}_${Date.now()}`;
+};
+
+export const loginWithGoogleCodeService = async (
+  code: string,
+  intent: GoogleAuthIntent = "signin",
+): Promise<GoogleLoginSuccess> => {
   if (!code?.trim()) {
     throw new GoogleAuthError('Google no devolvió un código válido.', 'GOOGLE_AUTH_FAILED', 400)
   }
@@ -77,38 +125,65 @@ export const loginWithGoogleCodeService = async (code: string): Promise<GoogleLo
     )
   }
 
-  const existingUser = await findUserByGoogleEmail(correo)
+  let user = await findUserByGoogleEmail(correo);
 
-  if (!existingUser) {
+  if (!user && intent === "signin") {
     throw new GoogleAuthError(
-      "Este usuario no esta registrado. Puedes crear un cuenta para continuar.",
+      "Esta cuenta de Google no está registrada. Regístrate primero.",
       "ACCOUNT_NOT_REGISTERED",
       404,
     );
   }
 
-  const jwtPayload: JwtPayload = {
-    id: existingUser.id,
-    correo: existingUser.correo
+  if (user && intent === "signup") {
+    throw new GoogleAuthError(
+      "Este correo ya está registrado. Inicia sesión en su lugar.",
+      "ACCOUNT_ALREADY_EXISTS",
+      409,
+    );
   }
+
+  if (!user && intent === "signup") {
+    const { nombre, apellido } = splitGoogleName(googleUser);
+
+    user = await createGoogleUser({
+      nombre,
+      apellido,
+      correo,
+      password: createRandomGooglePassword(),
+    });
+  }
+
+  if (!user) {
+    throw new GoogleAuthError(
+      "No se pudo completar la autenticación con Google.",
+      "GOOGLE_AUTH_FAILED",
+      400,
+    );
+  }
+
+  const jwtPayload: JwtPayload = {
+    id: user.id,
+    correo: user.correo,
+  };
 
   const token = generateToken(jwtPayload)
   const fechaExpiracion = new Date(Date.now() + SESSION_DURATION_MS)
 
   await createGoogleSession({
     token,
-    usuarioId: existingUser.id,
-    fechaExpiracion
-  })
+    usuarioId: user.id,
+    fechaExpiracion,
+  });
 
   return {
-    message: 'Inicio de sesión con Google exitoso',
+    message: "¡Registro exitoso! Bienvenido a PropBol.",
     token,
     user: {
-      id: existingUser.id,
-      correo: existingUser.correo,
-      nombre: existingUser.nombre,
-      apellido: existingUser.apellido
-    }
-  }
-}
+      id: user.id,
+      correo: user.correo,
+      nombre: user.nombre,
+      apellido: user.apellido,
+    },
+  };
+};

@@ -17,6 +17,8 @@ export type GoogleUserInfo = {
   email_verified?: boolean
 }
 
+export type GoogleAuthIntent = "signin" | "signup";
+
 export type GoogleLoginSuccess = {
   message: string
   token: string
@@ -29,13 +31,19 @@ export type GoogleLoginSuccess = {
 }
 
 export class GoogleAuthError extends Error {
-  code: 'GOOGLE_AUTH_FAILED' | 'ACCOUNT_NOT_REGISTERED'
-  statusCode: number
+  code:
+    | "GOOGLE_AUTH_FAILED"
+    | "ACCOUNT_NOT_REGISTERED"
+    | "ACCOUNT_ALREADY_EXISTS";
+  statusCode: number;
 
   constructor(
     message: string,
-    code: 'GOOGLE_AUTH_FAILED' | 'ACCOUNT_NOT_REGISTERED',
-    statusCode = 400
+    code:
+      | "GOOGLE_AUTH_FAILED"
+      | "ACCOUNT_NOT_REGISTERED"
+      | "ACCOUNT_ALREADY_EXISTS",
+    statusCode = 400,
   ) {
     super(message)
     this.name = 'GoogleAuthError'
