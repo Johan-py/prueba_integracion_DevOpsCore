@@ -1,4 +1,5 @@
 import { HomeBanner } from "@/components/home/HomeBanner";
+import { HomeCarousel } from "@/components/home/HomeCarousel";
 import ExploreSection from "@/components/layout/ExploreSection";
 import FilterPanel from "@/components/rentals/FilterPanel";
 interface BannerData {
@@ -32,20 +33,16 @@ const fetchBanners = async (): Promise<BannerData[]> => {
 export default async function Home() {
   const banners = await fetchBanners();
   const mainBanner = banners[0]; // Tomamos el primero de la base de datos
-
+// No toquen esto :v
   return (
-    <main className="flex min-h-screen flex-col items-center bg-gray-50">
-      {/* Banner */}
-      {mainBanner && (
-        <HomeBanner
-          url={mainBanner.urlImagen}
-          title={mainBanner.titulo || "Encuentra tu lugar ideal en Bolivia"}
-          subtitle={
-            mainBanner.subtitulo ||
-            "Compra, vende o alquila propiedades de forma rápida y segura"
-          }
-        />
-      )}
+  <main className="flex min-h-screen flex-col items-center bg-gray-50">
+    {banners.length > 0 ? (
+      <HomeCarousel banners={banners} />
+    ) : (
+      <div className="w-full h-[300px] flex items-center justify-center bg-gray-200">
+        <p className="text-gray-600">No hay banners disponibles</p>
+      </div>
+    )}
 
       {/* CONTENEDOR PRINCIPAL */}
       <div className="w-full px-2 md:px-6 py-12">
