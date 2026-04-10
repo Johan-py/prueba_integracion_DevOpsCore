@@ -1,9 +1,17 @@
 import type { Request, Response } from "express";
 import { env } from "../../../config/env.js";
 import { loginWithGoogleCodeService } from "./google.service.js";
-import { GoogleAuthError } from "./google.types.js";
+import { GoogleAuthError, type GoogleAuthIntent } from "./google.types.js";
 
-const buildGoogleAuthUrl = () => {
+const isValidIntent = (value: string): value is GoogleAuthIntent => {
+  return value === "signin" || value === "signup";
+};
+
+const resolveIntent = (value: unknown): GoogleAuthIntent => {
+  return typeof value === "string" && isValidIntent(value) ? value : "signin";
+};
+
+const buildGoogleAuthUrl = (intent: GoogleAuthIntent) => {
   return (
     "https://accounts.google.com/o/oauth2/v2/auth?" +
     new URLSearchParams({
@@ -14,6 +22,7 @@ const buildGoogleAuthUrl = () => {
       access_type: "offline",
       prompt: "consent select_account",
       include_granted_scopes: "true",
+      state: intent,
     }).toString()
   );
 };
@@ -51,7 +60,7 @@ const sendPopupResponse = (
   const targetOrigin = JSON.stringify(env.FRONTEND_URL);
   const fallbackMessage =
     payload.type === "propbol:google-login-success"
-      ? "Inicio de sesión completado. Puedes cerrar esta ventana."
+      ? "Autenticación con Google completada. Puedes cerrar esta ventana."
       : payload.message;
 
   return res.status(200).type("html").send(`<!DOCTYPE html>
@@ -78,13 +87,15 @@ const sendPopupResponse = (
     </html>`);
 };
 
-export const StratGoogleLoginController = (_req: Request, res: Response) => {
-  return res.redirect(buildGoogleAuthUrl());
+export const StratGoogleLoginController = (req: Request, res: Response) => {
+  const intent = resolveIntent(req.query.intent);
+  return res.redirect(buildGoogleAuthUrl(intent));
 };
 
 export const googleCallbackController = async (req: Request, res: Response) => {
   const code = typeof req.query.code === "string" ? req.query.code : "";
   const error = typeof req.query.error === "string" ? req.query.error : "";
+  const intent = resolveIntent(req.query.state);
 
   if (error) {
     return sendPopupResponse(res, {
@@ -103,7 +114,7 @@ export const googleCallbackController = async (req: Request, res: Response) => {
   }
 
   try {
-    const result = await loginWithGoogleCodeService(code);
+    const result = await loginWithGoogleCodeService(code, intent);
 
     return sendPopupResponse(res, {
       type: "propbol:google-login-success",
@@ -123,7 +134,7 @@ export const googleCallbackController = async (req: Request, res: Response) => {
     return sendPopupResponse(res, {
       type: "propbol:google-login-error",
       code: "GOOGLE_AUTH_FAILED",
-      message: "No se pudo completar el inicio de sesión con Google.",
+      message: "No se pudo completar la autenticación con Google.",
     });
   }
 };
