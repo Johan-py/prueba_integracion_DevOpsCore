@@ -23,60 +23,11 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [history, setHistory] = useState<string[]>([])
   const containerRef = useRef<HTMLDivElement>(null)
-<<<<<<< HEAD
-=======
   const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({})
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
 
   const { updateFilters } = useSearchFilters()
   const { registrarConsulta } = usePopularidad()
 
-<<<<<<< HEAD
-  // FUNCIÓN MODULAR DE SELECCIÓN
-  const handleSelectLocation = (loc: Location) => {
-    const fullName = `${loc.nombre} - ${loc.departamento} - Bolivia`
-
-    // 1. "Avisamos" al sistema
-    updateFilters({
-      locationId: loc.id,
-      query: fullName
-    })
-
-    // 2. Lógica interna del componente
-    onChange(fullName)
-    saveToHistory(fullName)
-    setIsOpen(false)
-    registrarConsulta(loc.id, fullName)
-  }
-
-  // Cargar historial al montar el componente
-  useEffect(() => {
-    const savedHistory = localStorage.getItem('searchHistory')
-    if (savedHistory) {
-      setHistory(JSON.parse(savedHistory))
-    }
-  }, [])
-
-  // Guardar en historial cuando se selecciona una ubicación
-  const saveToHistory = (item: string) => {
-    const updatedHistory = [item, ...history.filter((i) => i !== item)].slice(0, 5)
-    setHistory(updatedHistory)
-    localStorage.setItem('searchHistory', JSON.stringify(updatedHistory))
-  }
-
-  // --- LÓGICA DE LIMPIEZA (HU 2) --- --BitPro
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawValue = e.target.value
-
-    // Filtro: Solo letras (incluye tildes y ñ), números, espacios y guiones.
-    // Todo lo demás (emojis, @, #, $, etc.) se elimina al instante.
-    const cleanValue = rawValue.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s\-]/gi, '')
-
-    onChange(cleanValue)
-  }
-
-  const isSelected = value.includes('Bolivia')
-=======
   // ── Dropdown position: fixed so overflow:auto parents can't clip it ────────
   const recalcDropdown = () => {
     if (!containerRef.current) return
@@ -114,22 +65,11 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
     setIsOpen(false)
     registrarConsulta(loc.id, fullName)
   }
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
 
   // ── Historial ──────────────────────────────────────────────────────────────
   useEffect(() => {
-<<<<<<< HEAD
-    const handleClickOutside = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setIsOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-=======
     const savedHistory = localStorage.getItem('searchHistory')
     if (savedHistory) setHistory(JSON.parse(savedHistory))
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
   }, [])
 
   const saveToHistory = (item: string) => {
@@ -167,36 +107,20 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
       setIsLoading(true)
       try {
         const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
-<<<<<<< HEAD
-
         const res = await fetch(`${API_BASE}/api/locations/search?q=${encodeURIComponent(value)}`)
-
-=======
-        const res = await fetch(`${API_BASE}/api/locations/search?q=${encodeURIComponent(value)}`)
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
         if (res.ok) {
           const data = await res.json()
           setSuggestions(data)
           setIsOpen(true)
         }
-<<<<<<< HEAD
-      } catch (error) {
-        console.error('Error buscando ubicaciones:', error)
-=======
       } catch (err) {
         console.error('Error buscando ubicaciones:', err)
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
       } finally {
         setIsLoading(false)
       }
     }
-<<<<<<< HEAD
-    const timer = setTimeout(fetchLocations, 300)
-    return () => clearTimeout(timer)
-=======
     const t = setTimeout(fetchLocations, 300)
     return () => clearTimeout(t)
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
   }, [value, isSelected])
 
   return (
@@ -243,11 +167,7 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
           <Loader2 className="w-4 h-4 animate-spin text-amber-600 flex-shrink-0" />
         ) : (
           value && (
-<<<<<<< HEAD
-            <button onClick={() => onChange('')} type="button">
-=======
             <button onClick={() => onChange('')} type="button" className="flex-shrink-0">
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
               <X className="w-4 h-4 text-stone-400 hover:text-red-500" />
             </button>
           )
@@ -275,11 +195,7 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
                   onClick={() => {
                     onChange(item)
                     setIsOpen(false)
-<<<<<<< HEAD
-                    updateFilters({ query: item }) // Avisamos al sistema global
-=======
                     updateFilters({ query: item })
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
                   }}
                   className="w-full px-4 py-3 flex items-center gap-3 hover:bg-amber-50 transition-colors text-left border-b border-stone-50 last:border-0"
                 >

@@ -28,11 +28,7 @@ export default function ExploreSection() {
     { label: 'Espacios Cementerio', icon: Flower2 }
   ]
 
-<<<<<<< HEAD
-  const { updateFilters } = useSearchFilters() // 🚀 1. Inicializamos el hook
-=======
   const { updateFilters } = useSearchFilters()
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
 
   const handleSearch = () => {
     const hasOperationFilter = selectedOption.length > 0
@@ -61,10 +57,6 @@ export default function ExploreSection() {
       query: location.trim()
     })
 
-<<<<<<< HEAD
-    // 3. NAVEGACIÓN INTACTA (Para no romper el mapa)
-=======
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
     const params = new URLSearchParams()
     selectedOption.forEach((modo) => params.append('modoInmueble', modo.toUpperCase()))
     if (tipoFinal) params.set('tipoInmueble', tipoFinal)
@@ -78,62 +70,6 @@ export default function ExploreSection() {
   return (
     <section className="bg-white py-10 md:py-16">
       <div className="max-w-5xl mx-auto px-4">
-<<<<<<< HEAD
-        <div className="rounded-2xl bg-white p-6 shadow-xl border border-stone-100 flex flex-col gap-6">
-          <div className="flex flex-wrap items-center gap-x-8 gap-y-2">
-            {searchOptions.map((option) => {
-              const isSelected = selectedOption.includes(option.id)
-              return (
-                <button
-                  key={option.id}
-                  onClick={() =>
-                    setSelectedOption((prev) =>
-                      prev.includes(option.id)
-                        ? prev.filter((item) => item !== option.id)
-                        : [...prev, option.id]
-                    )
-                  }
-                  className="flex items-center gap-2.5 transition-colors duration-200 group focus:outline-none"
-                >
-                  <div
-                    className={`w-7 h-7 rounded-md border shadow-sm flex items-center justify-center transition-all ${
-                      isSelected ? 'bg-amber-500 border-amber-500' : 'bg-white border-stone-300'
-                    }`}
-                  >
-                    {isSelected && <span className="text-white text-sm font-bold">✓</span>}
-                  </div>
-                  <span
-                    className={`font-semibold font-montserrat text-lg transition-colors ${
-                      isSelected ? 'text-amber-700' : 'text-stone-900 group-hover:text-amber-600'
-                    }`}
-                  >
-                    {option.name}
-                  </span>
-                </button>
-              )
-            })}
-          </div>
-
-          <div className="flex flex-col md:flex-row items-end justify-between gap-4 w-full">
-            <div className="w-full md:w-1/3">
-              <ComboBox
-                label="Tipo de Inmueble"
-                placeholder="Cualquier tipo"
-                options={propertyTypes}
-                icon={Home}
-                onChange={(val) => setPropertyType(val)}
-              />
-            </div>
-            <div className="w-full">
-              <LocationSearch
-                value={location}
-                onChange={(value) => {
-                  setLocation(value)
-                  if (errorMessage) setErrorMessage('')
-                }}
-              />
-            </div>
-=======
         {/* MOBILE con un Selector combobox */}
         <div className="md:hidden">
           <div className="rounded-2xl bg-white p-4 shadow-xl border border-stone-100 flex flex-col gap-4">
@@ -164,7 +100,6 @@ export default function ExploreSection() {
               }}
             />
 
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
             <button
               onClick={handleSearch}
               className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2"
@@ -246,10 +181,6 @@ export default function ExploreSection() {
 
             {errorMessage && <p className="text-sm text-red-500 font-medium">{errorMessage}</p>}
           </div>
-<<<<<<< HEAD
-          {errorMessage && <p className="text-sm text-red-500 font-medium">{errorMessage}</p>}
-=======
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
         </div>
       </div>
     </section>

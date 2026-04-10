@@ -169,6 +169,38 @@ export const getMeController = async (req: Request, res: Response) => {
   }
 };
 
+export const getMeController = async (req: Request, res: Response) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({
+      message: "Token no proporcionado",
+    });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({
+      message: "Token no proporcionado",
+    });
+  }
+
+  try {
+    const result = await getMeService(token);
+
+    return res.status(200).json({
+      message: "Sesión válida",
+      ...result,
+    });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Sesión inválida o expirada";
+
+    return res.status(401).json({ message });
+  }
+};
+
 export const logoutController = async (req: Request, res: Response) => {
   const authHeader = req.headers.authorization
 

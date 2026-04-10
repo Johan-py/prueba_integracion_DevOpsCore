@@ -1,14 +1,7 @@
-<<<<<<< HEAD
-// frontend/src/components/layout/PropertyCard.tsx
-import Image from 'next/image'
-import { BedDouble, Bath, Square, ImageOff } from 'lucide-react' // Quité MessageSquareText porque ya viene en tu botón
-import ContactButton from '../galeria/ContactButton' // <-- Tu botón modular importado
-=======
 import Image from 'next/image'
 import { BedDouble, Bath, Square, ImageOff, MapPin } from 'lucide-react'
 import ContactButton from '../galeria/ContactButton'
 import { useState } from 'react'
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
 
 type PropsTarjeta = {
   imagen?: string
@@ -49,13 +42,9 @@ export default function PropertyCard({
 
       {/* Imagen */}
       <div
-<<<<<<< HEAD
-        className={`relative aspect-[16/10] overflow-hidden ${!imagen ? COLOR_GRIS_PLACEHOLDER : ''} flex items-center justify-center`}
-=======
         className={`relative aspect-[16/10] overflow-hidden ${
           !imagen ? COLOR_GRIS_PLACEHOLDER : ''
         } flex items-center justify-center`}
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
       >
         {imagen ? (
           <Image

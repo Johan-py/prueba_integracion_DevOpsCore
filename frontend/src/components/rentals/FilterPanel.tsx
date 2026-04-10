@@ -19,11 +19,7 @@ interface FilterSectionProps {
   itemLabel: string
 }
 
-<<<<<<< HEAD
-const FilterSection: React.FC<FilterSectionProps> = ({ title, data, logic, itemLabel }) => {
-=======
 const FilterSection = ({ title, data, logic, itemLabel }: FilterSectionProps) => {
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
   return (
     <section>
       {/* Título de sección: se cambió a text-sm (más pequeño que Filtros, más grande que el contenido) */}
@@ -91,14 +87,8 @@ export default function FilterPanel() {
     setLoading(true)
     setHasError(false)
     try {
-<<<<<<< HEAD
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/'
-
-      const response = await fetch(`${API_BASE_URL}api/filters`)
-=======
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
       const response = await fetch(`${API_BASE_URL}/api/filters`)
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
       const result = await response.json()
 
       if (result.success) {
@@ -196,11 +186,7 @@ export default function FilterPanel() {
             setSortType('name')
             toggleGlobalSort()
           }}
-<<<<<<< HEAD
-          className={`text-sm font-medium transition-all font-inter outline-none ${sortType === 'name' ? 'text-orange-500 hover:text-orange-600' : 'text-gray-400 hover:text-gray-500'}`}
-=======
           className={`text-xs font-medium transition-all font-inter outline-none whitespace-nowrap ${sortType === 'name' ? 'text-orange-500 hover:text-orange-600' : 'text-gray-400 hover:text-gray-500'}`}
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
         >
           {sortType === 'name' && globalSort === 'desc' ? 'Ordenar A↓' : 'Ordenar A↑'}
         </button>
@@ -210,15 +196,9 @@ export default function FilterPanel() {
             setSortType('count')
             toggleGlobalSort()
           }}
-<<<<<<< HEAD
-          className={`text-sm font-medium transition-all font-inter outline-none flex items-center gap-0.5 ${sortType === 'count' ? 'text-orange-500 hover:text-orange-600' : 'text-gray-400 hover:text-gray-500'}`}
-        >
-          Cant.
-=======
           className={`text-xs font-medium transition-all font-inter outline-none flex items-center gap-0.5 whitespace-nowrap ${sortType === 'count' ? 'text-orange-500 hover:text-orange-600' : 'text-gray-400 hover:text-gray-500'}`}
         >
           Cantidad
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
           <span>{sortType === 'count' && globalSort === 'desc' ? '↓' : '↑'}</span>
         </button>
       </div>

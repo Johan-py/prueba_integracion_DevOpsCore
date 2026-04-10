@@ -1,10 +1,6 @@
 'use client'
 
-<<<<<<< HEAD
-import { useCallback, useEffect, useMemo, useState } from 'react'
-=======
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
 import { Eye, EyeOff, Mail, User, Phone, Lock, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -126,17 +122,11 @@ export default function SignUpForm() {
   const [touched, setTouched] = useState<Record<string, boolean>>({})
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-<<<<<<< HEAD
-  const [serverError, setServerError] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-=======
   const passwordContainerRef = useRef<HTMLDivElement>(null)
   const confirmPasswordContainerRef = useRef<HTMLDivElement>(null)
   const [serverError, setServerError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [googleButtonResetKey, setGoogleButtonResetKey] = useState(0)
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
   const onlyLettersRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/
   const onlyNumbersRegex = /^[0-9]*$/
 
@@ -342,10 +332,6 @@ export default function SignUpForm() {
     setShowConfirmPassword(false)
     setServerError('')
     setIsSubmitting(false)
-<<<<<<< HEAD
-    router.push('/')
-  }
-=======
     setGoogleButtonResetKey((prev) => prev + 1)
   }
 
@@ -360,7 +346,6 @@ export default function SignUpForm() {
       serverError !== ''
     )
   }, [formData, serverError])
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
 
   const isFormValid = useMemo(() => {
     const requiredFieldsCompleted =
@@ -634,10 +619,6 @@ export default function SignUpForm() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={handleChange('password')}
-<<<<<<< HEAD
-                  onBlur={handleBlur('password')}
-=======
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
                   placeholder="Ingresa tu contraseña"
                   maxLength={255}
                   className={`${getInputClasses(
@@ -664,9 +645,6 @@ export default function SignUpForm() {
 
             <div>
               <FieldLabel htmlFor="confirmPassword">Confirmar contraseña</FieldLabel>
-<<<<<<< HEAD
-              <div className="relative">
-=======
               <div
                 className="relative"
                 ref={confirmPasswordContainerRef}
@@ -677,7 +655,6 @@ export default function SignUpForm() {
                   }
                 }}
               >
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
                 <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#78716c]" />
                 <input
                   id="confirmPassword"
@@ -685,10 +662,6 @@ export default function SignUpForm() {
                   type={showConfirmPassword ? 'text' : 'password'}
                   value={formData.confirmPassword}
                   onChange={handleChange('confirmPassword')}
-<<<<<<< HEAD
-                  onBlur={handleBlur('confirmPassword')}
-=======
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
                   placeholder="Ingresa tu contraseña"
                   maxLength={255}
                   className={`${getInputClasses(

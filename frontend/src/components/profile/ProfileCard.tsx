@@ -1,11 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
-<<<<<<< HEAD
-import { Plus, Trash2, Pencil, Camera, Loader2 } from 'lucide-react'
-=======
 import { Plus, Trash2, Pencil, Camera, Loader2, User } from 'lucide-react'
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
 import SecurityModal from './SecurityModal'
 import OtpModal from './OtpModal'
 
@@ -56,11 +52,8 @@ export default function ProfileCard() {
   const [genero, setGenero] = useState('')
   const [direccion, setDireccion] = useState('')
   const [avatar, setAvatar] = useState<string | null>(null)
-<<<<<<< HEAD
-=======
   const [tempAvatar, setTempAvatar] = useState<File | null>(null)
   const [previewAvatar, setPreviewAvatar] = useState<string | null>(null)
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
   const [errorNombre, setErrorNombre] = useState('')
 
   const [originalNombre] = useState('')
@@ -151,14 +144,7 @@ export default function ProfileCard() {
     try {
       const response = await fetch(`${API_URL}/api/perfil/usuario/nombre`, {
         method: 'PUT',
-<<<<<<< HEAD
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${getToken()}`
-        },
-=======
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
         body: JSON.stringify({ nombre })
       })
       const data = await response.json()
@@ -182,14 +168,7 @@ export default function ProfileCard() {
     try {
       const response = await fetch(`${API_URL}/api/perfil/usuario/pais`, {
         method: 'PUT',
-<<<<<<< HEAD
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${getToken()}`
-        },
-=======
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
         body: JSON.stringify({ pais })
       })
       const data = await response.json()
@@ -211,14 +190,7 @@ export default function ProfileCard() {
     try {
       const response = await fetch(`${API_URL}/api/perfil/usuario/genero`, {
         method: 'PUT',
-<<<<<<< HEAD
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${getToken()}`
-        },
-=======
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
         body: JSON.stringify({ genero })
       })
       const data = await response.json()
@@ -240,14 +212,7 @@ export default function ProfileCard() {
     try {
       const response = await fetch(`${API_URL}/api/perfil/usuario/direccion`, {
         method: 'PUT',
-<<<<<<< HEAD
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${getToken()}`
-        },
-=======
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
         body: JSON.stringify({ direccion })
       })
       const data = await response.json()
@@ -265,8 +230,6 @@ export default function ProfileCard() {
   }
 
   const guardarTelefonos = async () => {
-<<<<<<< HEAD
-=======
     const numerosLimpios = telefonos.map((t) => t.numero.trim()).filter((num) => num !== '')
     // 2. VALIDACIÓN DE DUPLICADOS:
     const tieneDuplicados = new Set(numerosLimpios).size !== numerosLimpios.length
@@ -276,7 +239,6 @@ export default function ProfileCard() {
       return // Detenemos la ejecución si hay repetidos
     }
 
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
     setIsLoading(true)
     try {
       const token = getToken()
@@ -545,11 +507,7 @@ export default function ProfileCard() {
     genero !== originalGenero ||
     direccion !== originalDireccion ||
     tempEmail !== originalEmail
-<<<<<<< HEAD
-
-=======
   tempAvatar !== null
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
   if (isLoading && !perfilData) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -567,11 +525,7 @@ export default function ProfileCard() {
           <div className="w-28 h-28 rounded-full bg-white border border-gray-300 flex items-center justify-center shadow-sm overflow-hidden">
             {previewAvatar || (avatar && avatar.trim() !== '') ? (
               <img
-<<<<<<< HEAD
-                src={avatar.startsWith('http') ? avatar : `${API_URL}${avatar}`}
-=======
                 src={previewAvatar || (avatar?.startsWith('http') ? avatar : `${API_URL}${avatar}`)}
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
                 alt="Foto de perfil"
                 className="w-full h-full object-cover"
               />
@@ -601,9 +555,6 @@ export default function ProfileCard() {
             type="file"
             accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
             hidden
-<<<<<<< HEAD
-            onChange={(e) => e.target.files?.[0] && subirFoto(e.target.files[0])}
-=======
             onChange={(e) => {
               const file = e.target.files?.[0]
               if (file) {
@@ -612,7 +563,6 @@ export default function ProfileCard() {
                 setPreviewAvatar(preview)
               }
             }}
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
           />
         </div>
 
@@ -723,15 +673,7 @@ export default function ProfileCard() {
                         setTelefonos(
                           telefonos.map((t) =>
                             t.id === tel.id
-<<<<<<< HEAD
-                              ? {
-                                  ...t,
-                                  pais: seleccion.nombre,
-                                  codigo: seleccion.codigo
-                                }
-=======
                               ? { ...t, pais: seleccion.nombre, codigo: seleccion.codigo }
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
                               : t
                           )
                         )

@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-=======
 import type { MouseEventHandler } from 'react'
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
 import Link from 'next/link'
 
 type LogoProps = {

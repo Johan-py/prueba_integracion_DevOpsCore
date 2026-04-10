@@ -1,11 +1,7 @@
 'use client'
 
 import { Suspense, useRef, useState } from 'react'
-<<<<<<< HEAD
-import { useSearchParams } from 'next/navigation'
-=======
 import { useRouter, useSearchParams } from 'next/navigation'
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
 import FotosSection from '@/components/contenido-multimedia/FotosSection'
 import VideosSection from '@/components/contenido-multimedia/VideosSection'
 import PublicarSection from '@/components/contenido-multimedia/PublicarSection'
@@ -38,10 +34,7 @@ export default function ContenidoMultimediaPage() {
 }
 
 function ContenidoMultimediaPageContent() {
-<<<<<<< HEAD
-=======
   const router = useRouter()
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
   const searchParams = useSearchParams()
   const publicacionId = Number(searchParams.get('publicacionId'))
 
@@ -267,11 +260,8 @@ function ContenidoMultimediaPageContent() {
       return
     }
 
-<<<<<<< HEAD
-=======
     // Aquí luego irá tu llamada real al backend
     // Si todo sale bien, abrimos el modal de éxito
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
     setShowSuccessModal(true)
   }
 
@@ -339,9 +329,6 @@ function ContenidoMultimediaPageContent() {
           canPublish={hasMultimedia}
         />
 
-<<<<<<< HEAD
-        <SuccessModal open={showSuccessModal} onClose={() => setShowSuccessModal(false)} />
-=======
         <SuccessModal
           open={showSuccessModal}
           onClose={() => {
@@ -349,7 +336,6 @@ function ContenidoMultimediaPageContent() {
             router.push('/')
           }}
         />
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
 
         <PlanModal
           open={showPlanModal}

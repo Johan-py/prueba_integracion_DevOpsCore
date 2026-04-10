@@ -60,7 +60,7 @@ jobs:
 
       - name: Crear tablas en DB de test
         working-directory: backend
-        run: npx prisma db push --accept-data-loss --skip-generate
+        run: npx prisma db push --accept-data-loss
 
       - name: Instalar wait-on
         run: npm install -g wait-on

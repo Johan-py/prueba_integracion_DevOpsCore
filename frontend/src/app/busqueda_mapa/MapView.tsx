@@ -26,56 +26,33 @@ const PIN_FILL: Record<PropertyMapPin['type'], string> = {
   casa: '#3b82f6',
   departamento: '#8b5cf6',
   terreno: '#f59e0b',
-<<<<<<< HEAD
-  local: '#10b981'
-=======
   oficina: '#10b981'
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
 }
 
 const PIN_HALO: Record<PropertyMapPin['type'], string> = {
   casa: 'rgba(59,  130, 246, 0.25)',
   departamento: 'rgba(139, 92,  246, 0.25)',
   terreno: 'rgba(245, 158, 11,  0.25)',
-<<<<<<< HEAD
-  local: 'rgba(16,  185, 129, 0.25)'
-}
-
-// Color sólido para el texto del precio en el popup
-=======
   oficina: 'rgba(16,  185, 129, 0.25)'
 }
 
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
 const PIN_LABEL: Record<PropertyMapPin['type'], string> = {
   casa: '#2563eb',
   departamento: '#7c3aed',
   terreno: '#d97706',
-<<<<<<< HEAD
-  local: '#059669'
-=======
   oficina: '#059669'
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
 }
 
 const SELECTED_ICONS: Record<PropertyMapPin['type'], string> = {
   casa: '/house.svg',
   departamento: '/department.svg',
   terreno: '/land.svg',
-<<<<<<< HEAD
-  local: '/local.svg'
-=======
   oficina: '/local.svg'
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
 }
 
 function createPinIcon(type: PropertyMapPin['type']): L.DivIcon {
   const fill = PIN_FILL[type] ?? '#6b7280'
   const halo = PIN_HALO[type] ?? 'rgba(107,114,128,0.25)'
-<<<<<<< HEAD
-
-=======
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
   const outer = 28
   const inner = 20
   const half = outer / 2
@@ -95,10 +72,6 @@ function createPinIcon(type: PropertyMapPin['type']): L.DivIcon {
 
 function createSelectedIcon(type: PropertyMapPin['type']): L.DivIcon {
   const iconPath = SELECTED_ICONS[type]
-<<<<<<< HEAD
-
-=======
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
   return L.divIcon({
     className: '',
     html: `
@@ -117,8 +90,6 @@ function formatPrice(price: number, currency: 'USD' | 'BOB'): string {
   return currency === 'USD'
     ? `$${price.toLocaleString('es-BO')} USD`
     : `Bs ${price.toLocaleString('es-BO')}`
-<<<<<<< HEAD
-=======
 }
 
 // ─── Fix gray area ────────────────────────────────────────────────────────────
@@ -133,7 +104,6 @@ function MapResizer() {
     return () => window.removeEventListener('resize', handler)
   }, [map])
   return null
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
 }
 
 interface MapViewProps {
@@ -161,10 +131,6 @@ export default function MapView({
     setIsMounted(true)
   }, [])
 
-<<<<<<< HEAD
-  // Evita hydration mismatch: renderiza skeleton hasta que el cliente monte
-=======
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
   if (!isMounted) return <div className="w-full h-full bg-gray-100 animate-pulse" />
 
   const selectedProperty = properties.find((p) => p.id === selectedId)
@@ -190,9 +156,6 @@ export default function MapView({
         zoomControl={false}
         touchZoom={true}
         dragging={true}
-<<<<<<< HEAD
-        style={{ height: '100%', width: '100%' }}
-=======
         tapTolerance={15}
         wheelDebounceTime={150}
         wheelPxPerZoomLevel={120}
@@ -201,7 +164,6 @@ export default function MapView({
         bounceAtZoomLimits={false}
         inertia={true}
         inertiaDeceleration={3000}
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
         className="z-0"
       >
         <TileLayer
@@ -246,22 +208,12 @@ export default function MapView({
         >
           {properties.map((property) => {
             const isSelected = property.id === selectedId
-<<<<<<< HEAD
-
-=======
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
             return (
               <Marker
                 key={property.id}
                 position={[property.lat, property.lng]}
                 icon={isSelected ? createSelectedIcon(property.type) : createPinIcon(property.type)}
-<<<<<<< HEAD
-                eventHandlers={{
-                  click: () => onSelect?.(property.id)
-                }}
-=======
                 eventHandlers={{ click: () => onSelect?.(property.id) }}
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
               >
                 <Popup>
                   <div className="text-sm min-w-[160px]">
@@ -283,25 +235,6 @@ export default function MapView({
 
 function FlyToSelected({ lat, lng }: { lat: number; lng: number }) {
   const map = useMap()
-<<<<<<< HEAD
-
-  useEffect(() => {
-    if (!lat || !lng) return
-
-    const targetZoom = 18
-
-    map.flyTo([lat, lng], targetZoom, {
-      duration: 1.2
-    })
-
-    const timeout = setTimeout(() => {
-      map.setView([lat, lng], targetZoom)
-    }, 1200)
-
-    return () => clearTimeout(timeout)
-  }, [lat, lng, map])
-
-=======
   useEffect(() => {
     if (!lat || !lng) return
     const targetZoom = 18
@@ -309,6 +242,5 @@ function FlyToSelected({ lat, lng }: { lat: number; lng: number }) {
     const timeout = setTimeout(() => map.setView([lat, lng], targetZoom), 1200)
     return () => clearTimeout(timeout)
   }, [lat, lng, map])
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
   return null
 }

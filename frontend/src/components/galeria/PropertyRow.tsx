@@ -1,12 +1,7 @@
-<<<<<<< HEAD
-import ContactButton from './ContactButton' // <-- Importas tu componente
-import Image from 'next/image'
-=======
 import ContactButton from './ContactButton'
 import Image from 'next/image'
 import { useState } from 'react'
 import { MapPin } from 'lucide-react'
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
 
 export default function PropertyRow({
   title,

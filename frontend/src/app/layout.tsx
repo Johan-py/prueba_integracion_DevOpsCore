@@ -3,10 +3,6 @@ import './globals.css'
 import AppShell from '@/components/layout/AppShell'
 
 export const metadata: Metadata = {
-<<<<<<< HEAD
-  title: 'PropBol',
-  description: 'Descripción de mi aplicación'
-=======
   title: {
     default: 'PropBol',
     template: '%s | PropBol'
@@ -40,7 +36,6 @@ export const metadata: Metadata = {
       'Portal inmobiliario boliviano para comprar, alquilar, publicar y descubrir propiedades.',
     title: 'PropBol'
   }
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

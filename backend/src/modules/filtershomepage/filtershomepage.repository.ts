@@ -40,6 +40,20 @@ export class FiltersHomepageRepository {
       count: ids.size,
     }));
 
+      const normalizedDept = rawDept.trim().toUpperCase();
+
+      if (!deptCounts.has(normalizedDept)) {
+        deptCounts.set(normalizedDept, new Set());
+      }
+      
+      deptCounts.get(normalizedDept)!.add(u.inmuebleId);
+    }
+
+    const counts = Array.from(deptCounts.entries()).map(([dept, ids]) => ({
+      departamento: dept, 
+      count: ids.size,
+    }));
+
     return counts.sort((a, b) => b.count - a.count)
   }
 

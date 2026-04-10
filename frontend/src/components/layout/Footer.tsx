@@ -1,29 +1,14 @@
 'use client'
 
-<<<<<<< HEAD
-import Image from 'next/image'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-=======
 import { Facebook, Instagram } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import Logo, { LogoMark } from '../navbar/Logo'
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
 
 type FooterAction = {
   href?: string
   isExternal?: boolean
   label: string
-<<<<<<< HEAD
-}
-
-const exploreActions: FooterAction[] = [
-  { label: 'Comprar Propiedad' }, // TODO: users -> '/propiedades/en-venta' | visitors -> '/auth/login'
-  { label: 'Alquilar Inmueble' }, // TODO: users -> '/propiedades/alquiler' | visitors -> '/auth/login'
-  { label: 'Anticrético' }, // TODO: users -> '/propiedades/anticretico' | visitors -> '/auth/login'
-  { label: 'Publica tu inmueble' } // TODO: users -> '/publicar' | visitors -> '/auth/login'
-=======
   requiresAuth?: boolean
 }
 
@@ -44,7 +29,6 @@ const exploreActions: FooterAction[] = [
     requiresAuth: true
   },
   { label: 'Publica tu inmueble', href: '/registro-inmueble', requiresAuth: true }
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
 ]
 
 const companyActions: FooterAction[] = [
@@ -101,18 +85,9 @@ function FooterBrand() {
             scrollToHomeTop()
           }
         }}
-<<<<<<< HEAD
-        className="inline-flex items-center gap-3 transition-colors hover:text-amber-600"
-      >
-        <Image src="/icons/temp-icon.svg" alt="Logo temporal de PropBol" width={44} height={44} />
-        <span className="text-2xl font-bold text-stone-900">PropBol</span>
-      </Link>
-      <p className="mt-4 max-w-xs text-sm leading-8 text-stone-600">
-=======
         textClassName="text-[2rem] sm:text-[2.15rem]"
       />
       <p className="mt-4 max-w-xs text-sm leading-7 text-stone-600">
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
         Revolucionando el mercado inmobiliario con tecnología de punta y diseño centrado en el
         usuario.
       </p>
@@ -121,8 +96,6 @@ function FooterBrand() {
 }
 
 function FooterSection({ actions, title }: { actions: FooterAction[]; title: string }) {
-<<<<<<< HEAD
-=======
   const router = useRouter()
 
   const handleProtectedNavigation = (action: FooterAction) => {
@@ -141,7 +114,6 @@ function FooterSection({ actions, title }: { actions: FooterAction[]; title: str
     router.push(action.href)
   }
 
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
   return (
     <section className="border-t border-amber-600 pt-4">
       <h2 className="text-xl font-bold text-stone-900">{title}</h2>
@@ -190,13 +162,6 @@ function FooterSection({ actions, title }: { actions: FooterAction[]; title: str
 function FooterBottomBar() {
   return (
     <div className="border-t border-stone-200">
-<<<<<<< HEAD
-      <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-5 text-sm text-stone-600 sm:flex-row sm:flex-wrap sm:items-center sm:px-8 lg:px-10">
-        <span className="h-4 w-4 rounded-md border border-stone-400" aria-hidden="true" />
-        <span>2026 PropBol Inmobiliaria.</span>
-        <span className="hidden h-1 w-1 rounded-full bg-stone-300 sm:block" aria-hidden="true" />
-        <span>Todos los derechos reservados</span>
-=======
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-5 text-sm text-stone-600 sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:px-10">
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
           <LogoMark className="rounded-md shadow-none" size={16} />
@@ -223,7 +188,6 @@ function FooterBottomBar() {
             )
           })}
         </div>
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
       </div>
     </div>
   )

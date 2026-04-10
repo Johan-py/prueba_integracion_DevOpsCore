@@ -8,10 +8,6 @@ interface BannerProps {
 
 export const HomeBanner = ({ url, title, subtitle }: BannerProps) => {
   return (
-<<<<<<< HEAD
-    <div className="relative w-full h-[60vh] min-h-[300px] bg-slate-100 flex items-center justify-center">
-      <Image src={url} alt="Portada principal" fill className="object-cover" priority />
-=======
     <div
       className="relative w-full 
       h-[20vh] sm:h-[25vh] md:h-[60vh] 
@@ -25,7 +21,6 @@ export const HomeBanner = ({ url, title, subtitle }: BannerProps) => {
         className="object-cover object-top md:object-center pointer-events-none"
         priority
       />
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
 
       <div className="absolute inset-0 bg-black/45 pointer-events-none" />
 

@@ -18,12 +18,6 @@ export type User = {
   avatar?: string | null
 }
 
-<<<<<<< HEAD
-const USER_STORAGE_KEY = 'propbol_user'
-const SESSION_EXPIRES_KEY = 'propbol_session_expires'
-const SESSION_DURATION_MS = 60 * 60 * 1000
-
-=======
 type MeResponse = {
   message?: string
   user?: {
@@ -39,7 +33,6 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000'
 const USER_STORAGE_KEY = 'propbol_user'
 const SESSION_EXPIRES_KEY = 'propbol_session_expires'
 
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
 const filters: NotificationFilter[] = ['todas', 'leida', 'no leida']
 
 export default function Navbar() {
@@ -98,16 +91,6 @@ export default function Navbar() {
     return Date.now() > Number(expiresAt)
   }
 
-<<<<<<< HEAD
-  const restoreSession = () => {
-    const savedUser = localStorage.getItem(USER_STORAGE_KEY)
-    const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY)
-    const token = localStorage.getItem('token')
-
-    const updatedName = localStorage.getItem('nombre')
-    const updatedEmail = localStorage.getItem('correo')
-    const updatedAvatar = localStorage.getItem('avatar')
-=======
   const fetchCurrentUser = async (token: string) => {
     const response = await fetch(`${API_URL}/api/perfil/usuario`, {
       method: 'GET',
@@ -129,7 +112,6 @@ export default function Navbar() {
     const savedUser = localStorage.getItem(USER_STORAGE_KEY)
     const expiresAt = localStorage.getItem(SESSION_EXPIRES_KEY)
     const token = localStorage.getItem('token')
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
 
     if (!savedUser || !expiresAt || !token) {
       clearSession(false)
@@ -139,17 +121,6 @@ export default function Navbar() {
     if (Date.now() > Number(expiresAt)) {
       clearSession(false)
       return
-<<<<<<< HEAD
-    }
-
-    try {
-      const parsedUser = JSON.parse(savedUser)
-      const finalUser: User = {
-        name: updatedName || parsedUser.name,
-        email: updatedEmail || parsedUser.email,
-        avatar: updatedAvatar || parsedUser.avatar || null
-      }
-=======
     }
 
     if (!navigator.onLine) {
@@ -183,7 +154,6 @@ export default function Navbar() {
       localStorage.setItem('correo', finalUser.email)
       localStorage.setItem('avatar', finalUser.avatar ?? '')
 
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
       setUser(finalUser)
       setIsLoggedIn(true)
     } catch {
@@ -192,15 +162,6 @@ export default function Navbar() {
   }
 
   useEffect(() => {
-<<<<<<< HEAD
-    restoreSession()
-
-    const handleSessionChange = () => restoreSession()
-
-    window.addEventListener('storage', handleSessionChange)
-    window.addEventListener('propbol:login', handleSessionChange)
-    window.addEventListener('propbol:session-changed', handleSessionChange)
-=======
     void restoreSession()
 
     const handleSessionChange = () => {
@@ -215,16 +176,12 @@ export default function Navbar() {
     window.addEventListener('propbol:login', handleSessionChange)
     window.addEventListener('propbol:session-changed', handleSessionChange)
     window.addEventListener('online', handleOnline)
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
 
     return () => {
       window.removeEventListener('storage', handleSessionChange)
       window.removeEventListener('propbol:login', handleSessionChange)
       window.removeEventListener('propbol:session-changed', handleSessionChange)
-<<<<<<< HEAD
-=======
       window.removeEventListener('online', handleOnline)
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
     }
   }, [])
 
@@ -252,10 +209,7 @@ export default function Navbar() {
         router.push('/')
       }
     }, 10000)
-<<<<<<< HEAD
-=======
 
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
     return () => clearInterval(interval)
   }, [user, router])
 
@@ -288,21 +242,6 @@ export default function Navbar() {
 
   const handleConfirmLogout = async () => {
     if (isLoggingOut) return
-<<<<<<< HEAD
-    setIsLoggingOut(true)
-    const token = localStorage.getItem('token')
-    if (token) {
-      try {
-        await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/auth/logout`,
-          {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        )
-      } catch {}
-    }
-=======
 
     setIsLoggingOut(true)
     const token = localStorage.getItem('token')
@@ -316,7 +255,6 @@ export default function Navbar() {
       } catch {}
     }
 
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
     clearSession()
     setIsLoggingOut(false)
     router.push('/')
@@ -432,10 +370,7 @@ export default function Navbar() {
                             const target = e.currentTarget
                             const reachedBottom =
                               target.scrollTop + target.clientHeight >= target.scrollHeight - 10
-<<<<<<< HEAD
-=======
 
->>>>>>> d035455e2b35f2177fdcfa0b99607734c0e9413e
                             if (reachedBottom && hasMore && !isLoadingMore) {
                               void loadMoreNotifications()
                             }
