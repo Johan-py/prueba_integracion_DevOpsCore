@@ -1,6 +1,6 @@
 import { prisma } from '../../lib/prisma.config.js'
 
-type SupportedNotificationFilter = 'todas' | 'leida' | 'no leida' | 'archivada'
+type SupportedNotificationFilter = 'todas' | 'leida' | 'no leida'
 
 type FindNotificationsParams = {
   usuarioId: number
@@ -41,11 +41,6 @@ type CreateNotificationParams = {
   mensaje: string
 }
 
-type ArchiveNotificationParams = {
-  id: number
-  usuarioId: number
-}
-
 const buildWhereClause = ({
   usuarioId,
   filter
@@ -53,23 +48,13 @@ const buildWhereClause = ({
   usuarioId: number
   filter: SupportedNotificationFilter
 }) => {
-  if (filter === 'archivada') {
-    return {
-      usuarioId,
-      eliminada: false,
-      archivada: true
-    }
-  }
-
   const where: {
     usuarioId: number
     eliminada: boolean
-    archivada: boolean
     leida?: boolean
   } = {
     usuarioId,
-    eliminada: false,
-    archivada: false
+    eliminada: false
   }
 
   if (filter === 'leida') {
@@ -113,7 +98,6 @@ export const countUnreadNotificationsRepository = async (usuarioId: number) => {
     where: {
       usuarioId,
       eliminada: false,
-      archivada: false,
       leida: false
     }
   })
@@ -144,7 +128,6 @@ export const createNotificationRepository = async ({
       mensaje,
       leida: false,
       eliminada: false,
-      archivada: false,
       fechaCreacion: new Date(),
       fechaLectura: null
     }
@@ -178,7 +161,6 @@ export const markAllNotificationsAsReadRepository = async ({
     where: {
       usuarioId,
       eliminada: false,
-      archivada: false,
       leida: false
     },
     data: {
@@ -200,22 +182,6 @@ export const softDeleteNotificationRepository = async ({
     },
     data: {
       eliminada: true
-    }
-  })
-}
-
-export const archiveNotificationRepository = async ({
-  id,
-  usuarioId
-}: ArchiveNotificationParams) => {
-  return prisma.notificacion.updateMany({
-    where: {
-      id,
-      usuarioId,
-      eliminada: false
-    },
-    data: {
-      archivada: true
     }
   })
 }

@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  Archive,
   Bell,
   CheckCheck,
   Loader2,
@@ -42,13 +41,12 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
 const USER_STORAGE_KEY = "propbol_user";
 const SESSION_EXPIRES_KEY = "propbol_session_expires";
 
-const filters: NotificationFilter[] = ["todas", "leida", "no leida", "archivada"];
+const filters: NotificationFilter[] = ["todas", "leida", "no leida"];
 
 export default function Navbar() {
   const router = useRouter();
   const panelRef = useRef<HTMLDivElement | null>(null);
   const notificationPanelRef = useRef<HTMLDivElement | null>(null);
- const [, setTick] = useState(0)
 
   const [user, setUser] = useState<User | null>(null);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -65,14 +63,11 @@ export default function Navbar() {
     isLoadingMore,
     error,
     isOnline,
-    scrollContainerRef,
-    saveScrollPosition,
     toggleNotifications,
     setFilter,
     markAsRead,
     markAllAsRead,
     deleteNotification,
-    archiveNotification,
     loadMoreNotifications,
     hasMore,
     refreshNotifications,
@@ -173,34 +168,6 @@ export default function Navbar() {
       clearSession(false);
     }
   };
-
- const formatRelativeTime = (fecha: string | null): string => {
-  if (!fecha) return "";
-  const diff = Date.now() - new Date(fecha).getTime();
-  const mins = Math.floor(diff / 60000);
-
-  if (mins < 1) return "hace un momento";
-  if (mins < 60) return `hace ${mins} min`;
-
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `hace ${hours} h`;
-
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `hace ${days} d`;
-
-  return new Date(fecha).toLocaleDateString("es-BO", {
-    day: "numeric",
-    month: "short",
-  });
-};
-
-useEffect(() => {
-  const interval = setInterval(() => {
-    setTick((t) => t + 1);
-  }, 60000);
-
-  return () => clearInterval(interval);
-}, []);
 
   useEffect(() => {
     void restoreSession();
@@ -403,28 +370,22 @@ useEffect(() => {
                                   : "bg-stone-100 text-stone-700 hover:bg-stone-200"
                               }`}
                             >
-                              {item === 'todas'
-                                ? 'Todas'
-                                : item === 'leida'
-                                  ? 'Leídas'
-                                  : item === 'no leida'
-                                    ? 'No leídas'
-                                    : 'Archivadas'}
+                              {item === "todas"
+                                ? "Todas"
+                                : item === "leida"
+                                  ? "Leídas"
+                                  : "No leídas"}
                             </button>
                           ))}
                         </div>
 
                         <div
-                          ref={scrollContainerRef}
                           role="list"
                           aria-label="Lista de notificaciones"
                           aria-live="polite"
                           className="max-h-[60vh] overflow-y-auto sm:max-h-80"
                           onScroll={(e) => {
-                            const target = e.currentTarget
-
-                            saveScrollPosition(target.scrollTop)
-
+                            const target = e.currentTarget;
                             const reachedBottom =
                               target.scrollTop + target.clientHeight >=
                               target.scrollHeight - 10;
@@ -465,48 +426,37 @@ useEffect(() => {
                                 <div
                                   key={notification.id}
                                   role="listitem"
-                                  onClick={() => {
-                                    if (notification.status === 'no leida' && isOnline) {
-                                      void markAsRead(notification.id)
-                                    }
-                                  }}
                                   className={`border-b border-stone-100 px-4 py-3 transition hover:bg-stone-50 ${
-                                    notification.status === 'no leida' ? 'cursor-pointer bg-amber-50' : 'bg-white'
+                                    notification.status === "no leida"
+                                      ? "bg-amber-50"
+                                      : "bg-white"
                                   }`}
                                 >
                                   <div className="flex items-start justify-between gap-3">
                                     <div className="min-w-0 flex-1">
-                                      <div className="flex items-center gap-2">
-                                        {notification.status === 'no leida' && (
-                                          <span className="h-2 w-2 shrink-0 rounded-full bg-amber-500" />
-                                        )}
-                                        <p className="truncate text-sm font-semibold text-stone-900">
-                                          {notification.title?.trim() || '(Sin título)'}
-                                        </p>
-                                      </div>
+                                      <p className="truncate text-sm font-semibold text-stone-900">
+                                        {notification.title?.trim() ||
+                                          "(Sin título)"}
+                                      </p>
                                       <p className="mt-1 line-clamp-2 text-sm text-stone-600">
                                         {notification.description?.trim() ||
                                           "(Sin descripción disponible)"}
                                       </p>
-                                      <div className="mt-2 flex items-center gap-2">
-                                        <span className="text-[10px] uppercase text-stone-400">
-                                          {notification.status}
-                                        </span>
-                                        <span className="text-[10px] text-stone-400">
-                                          · {formatRelativeTime(notification.fechaCreacion)}
-                                        </span>
-                                      </div>
+                                      <span className="mt-2 inline-block text-[10px] uppercase text-stone-400">
+                                        {notification.status}
+                                      </span>
                                     </div>
-                                    <div className="flex shrink-0 items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                                      {!notification.archivada && (
+                                    <div className="flex shrink-0 items-center gap-2">
+                                      {notification.status === "no leida" && (
                                         <button
                                           type="button"
-                                          onClick={() => void archiveNotification(notification.id)}
-                                          
-                                          aria-label="Archivar notificación"
-                                          className="text-stone-400 transition hover:text-amber-600 disabled:cursor-not-allowed disabled:opacity-40"
+                                          onClick={() =>
+                                            void markAsRead(notification.id)
+                                          }
+                                          disabled={!isOnline}
+                                          className="text-xs text-amber-600 transition hover:text-amber-700 disabled:cursor-not-allowed disabled:opacity-40"
                                         >
-                                          <Archive className="h-4 w-4" /> 
+                                          Leer
                                         </button>
                                       )}
                                       <button
