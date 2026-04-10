@@ -187,81 +187,29 @@ function BusquedaMapaContent() {
   )
 
   // ────────────────────────────────────────────────────────────────────────────
-  // RENDER LANDSCAPE MÓVIL
-  // Pantalla ancha pero baja. Layout: mapa | lista (side by side, 50/50)
-  // sin FilterBar encima para no desperdiciar altura
+  // RENDER LANDSCAPE MÓVIL (Develop)
   // ────────────────────────────────────────────────────────────────────────────
   if (isMounted && (isMobile || isLandscape)) {
     if (isLandscape) {
       return (
         <div className="flex flex-col bg-white overflow-hidden" style={{ height: '100dvh' }}>
-          {/* FilterBar compacto arriba */}
           <div className="shrink-0" style={{ zIndex: 1002, position: 'relative' }}>
             <FilterBar variant="map" onSearch={(f) => console.log('🔍 Filtros:', f)} />
           </div>
-          {/* Mapa + lista lado a lado */}
           <div className="flex flex-1 overflow-hidden">
-            {/* Mapa */}
             <div className="flex-1 relative">
               <div className="absolute inset-0">
-                <MapView
-                  properties={properties}
-                  selectedId={selectedPropertyId}
-                  onSelect={(id) => {
-                    setSelectedPropertyId(id)
-                    setPinnedProperty(properties.find((p: any) => p.id === id) ?? null)
-                  }}
-                  isLoading={isLoading}
-                  error={error}
-                />
+                <MapView properties={properties} selectedId={selectedPropertyId} onSelect={(id) => { setSelectedPropertyId(id); setPinnedProperty(properties.find((p: any) => p.id === id) ?? null) }} isLoading={isLoading} error={error} />
               </div>
             </div>
-            {/* Lista — ancho fijo 280px */}
             <div className="w-[280px] flex flex-col bg-white border-l border-stone-200 overflow-hidden shrink-0">
               <div className="px-3 py-2 border-b border-stone-100 flex items-center justify-between shrink-0">
                 <span className="text-sm font-semibold text-slate-700">
-                  <span className="text-orange-500">{properties.length}</span>
-                  <span className="ml-1 text-gray-500 font-normal text-xs">props.</span>
+                  <span className="text-orange-500">{properties.length}</span><span className="ml-1 text-gray-500 font-normal text-xs">props.</span>
                 </span>
-                <div className="flex bg-stone-100 p-0.5 rounded border border-stone-200">
-                  <button
-                    onClick={() => setViewMode('grid')}
-                    className={`p-1 rounded ${viewMode === 'grid' ? 'bg-white text-[#ea580c] shadow-sm' : 'text-stone-400'}`}
-                  >
-                    <LayoutGrid size={13} />
-                  </button>
-                  <button
-                    onClick={() => setViewMode('list')}
-                    className={`p-1 rounded ${viewMode === 'list' ? 'bg-white text-[#ea580c] shadow-sm' : 'text-stone-400'}`}
-                  >
-                    <ListIcon size={13} />
-                  </button>
-                </div>
+                {MenuToggleComponent}
               </div>
-              <div className="flex-1 overflow-y-auto p-2 bg-stone-50 no-scrollbar">
-                {properties.map((property: any) => (
-                  <div
-                    key={property.id}
-                    onClick={() => {
-                      setSelectedPropertyId(property.id)
-                      setPinnedProperty(property)
-                    }}
-                    className={`cursor-pointer mb-2 rounded-xl transition-all ${selectedPropertyId === property.id ? 'ring-2 ring-orange-400 ring-offset-1' : ''}`}
-                  >
-                    <PropertyRow
-                      title={property.title}
-                      price={
-                        property.currency === 'USD'
-                          ? `$${property.price.toLocaleString('es-BO')} USD`
-                          : `Bs ${property.price.toLocaleString('es-BO')}`
-                      }
-                      size="150 m²"
-                      contactType="whatsapp"
-                      image=""
-                    />
-                  </div>
-                ))}
-              </div>
+              <PropertyListMobile onClickItem={(p) => setPinnedProperty(p)} />
             </div>
           </div>
         </div>
