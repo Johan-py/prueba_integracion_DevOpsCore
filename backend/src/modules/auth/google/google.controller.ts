@@ -38,6 +38,7 @@ const escapeHtml = (value: string) => {
 
 const sendPopupResponse = (
   res: Response,
+  intent: GoogleAuthIntent,
   payload:
     | {
         type: "propbol:google-login-success";
@@ -58,6 +59,7 @@ const sendPopupResponse = (
 ) => {
   const serializedPayload = JSON.stringify(payload).replace(/</g, "\\u003c");
   const targetOrigin = JSON.stringify(env.FRONTEND_URL);
+  const title = intent === "signup" ? "Registro con Google" : "Inicio de sesión con Google";
   const fallbackMessage =
     payload.type === "propbol:google-login-success"
       ? "Autenticación con Google completada. Puedes cerrar esta ventana."
@@ -67,7 +69,7 @@ const sendPopupResponse = (
     <html lang="es">
     <head>
         <meta charset="UTF-8" />
-        <title>Autenticación con Google</title>
+        <title>${title}</title>
     </head>
     <body>
         <p>${escapeHtml(fallbackMessage)}</p>
@@ -98,7 +100,7 @@ export const googleCallbackController = async (req: Request, res: Response) => {
   const intent = resolveIntent(req.query.state);
 
   if (error) {
-    return sendPopupResponse(res, {
+    return sendPopupResponse(res, intent, {
       type: "propbol:google-login-error",
       code: "GOOGLE_AUTH_FAILED",
       message: "La autenticación con Google fue cancelada o falló.",
@@ -106,7 +108,7 @@ export const googleCallbackController = async (req: Request, res: Response) => {
   }
 
   if (!code) {
-    return sendPopupResponse(res, {
+    return sendPopupResponse(res, intent, {
       type: "propbol:google-login-error",
       code: "GOOGLE_AUTH_FAILED",
       message: "Google no devolvió un código válido.",
@@ -116,7 +118,7 @@ export const googleCallbackController = async (req: Request, res: Response) => {
   try {
     const result = await loginWithGoogleCodeService(code, intent);
 
-    return sendPopupResponse(res, {
+    return sendPopupResponse(res, intent, {
       type: "propbol:google-login-success",
       message: result.message,
       token: result.token,
@@ -124,14 +126,14 @@ export const googleCallbackController = async (req: Request, res: Response) => {
     });
   } catch (error) {
     if (error instanceof GoogleAuthError) {
-      return sendPopupResponse(res, {
+      return sendPopupResponse(res, intent, {
         type: "propbol:google-login-error",
         code: error.code,
         message: error.message,
       });
     }
 
-    return sendPopupResponse(res, {
+    return sendPopupResponse(res, intent, {
       type: "propbol:google-login-error",
       code: "GOOGLE_AUTH_FAILED",
       message: "No se pudo completar la autenticación con Google.",

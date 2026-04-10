@@ -192,7 +192,7 @@ export default function GoogleRegisterButton({
         className="flex w-full items-center justify-center gap-3 rounded-md border border-[#d6d3d1] bg-white px-4 py-3 text-sm font-medium text-[#44403c] transition hover:bg-[#fafaf9] disabled:cursor-not-allowed disabled:opacity-60"
       >
         <GoogleLogo />
-        <span>Iniciar sesión con Google</span>
+        <span>Registrarse con Google</span>
       </button>
 
       {localError ? (

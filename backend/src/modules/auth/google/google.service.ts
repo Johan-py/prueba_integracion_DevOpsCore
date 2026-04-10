@@ -139,6 +139,14 @@ export const loginWithGoogleCodeService = async (
     );
   }
 
+  if (user && intent === "signup") {
+    throw new GoogleAuthError(
+      "Este correo ya está registrado. Inicia sesión en su lugar.",
+      "ACCOUNT_ALREADY_EXISTS",
+      409,
+    );
+  }
+
   if (!user && intent === "signup") {
     const { nombre, apellido } = splitGoogleName(googleUser);
 
@@ -173,10 +181,7 @@ export const loginWithGoogleCodeService = async (
   });
 
   return {
-    message:
-      intent === "signup"
-        ? "Registro e inicio de sesión con Google exitoso"
-        : "Inicio de sesión con Google exitoso",
+    message: "¡Registro exitoso! Bienvenido a PropBol.",
     token,
     user: {
       id: user.id,

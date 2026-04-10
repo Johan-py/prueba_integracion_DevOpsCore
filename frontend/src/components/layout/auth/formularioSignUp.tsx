@@ -678,10 +678,16 @@ export default function SignUpForm() {
             <div className="pt-1">
               <GoogleRegisterButton
                 disabled={isSubmitting}
-                onError={(message) => setServerError(message)}
                 onSuccess={async (payload) => {
                   saveSession(payload);
+                  sessionStorage.setItem(
+                    "register_success_message",
+                    payload.message || "¡Registro exitoso! Bienvenido a PropBol.",
+                  );
                   router.push("/");
+                  setTimeout(() => {
+                    window.dispatchEvent(new Event("propbol:register-success"));
+                  }, 100);
                 }}
               />
             </div>
