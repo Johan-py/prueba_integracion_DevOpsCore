@@ -309,7 +309,7 @@ useEffect(() => {
 
   return (
     <>
-      <nav className="sticky top-0 z-50 w-full border-b border-stone-200 bg-[#F9F6EE] shadow-sm">
+      <nav className="sticky top-0 z-[9999] w-full border-b border-stone-200 bg-[#F9F6EE] shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-10">
@@ -583,7 +583,7 @@ useEffect(() => {
 
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/40 md:hidden"
+          className="fixed inset-0 z-[9999] bg-black/40 md:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
           aria-modal="true"
           role="dialog"
