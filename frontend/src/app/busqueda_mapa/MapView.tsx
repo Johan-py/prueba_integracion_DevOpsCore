@@ -267,6 +267,7 @@ export default function MapView({
           showCoverageOnHover={false}
           zoomToBoundsOnClick={true}
           spiderfyOnMaxZoom={true}
+          spiderfyDistanceMultiplier={2}
           removeOutsideVisibleBounds={false}
           clusterPane="markerPane"
         >
