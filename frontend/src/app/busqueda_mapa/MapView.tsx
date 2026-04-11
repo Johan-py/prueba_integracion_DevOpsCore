@@ -264,6 +264,8 @@ export default function MapView({
           animate={true}
           animateAddingMarkers={true}
           chunkedLoading={true}
+          tap={true}
+          tapTolerance={15}
           showCoverageOnHover={false}
           zoomToBoundsOnClick={true}
           spiderfyOnMaxZoom={true}
