@@ -309,17 +309,10 @@ useEffect(() => {
 
   return (
     <>
-<<<<<<< HEAD
+return (
+    <>
       <nav className="sticky top-0 z-[9999] w-full border-b border-stone-200 bg-[#F9F6EE] shadow-sm">
-=======
-<<<<<<< HEAD
-      <nav className="sticky top-0 z-40 w-full border-b border-stone-200 bg-[#F9F6EE] shadow-sm">
->>>>>>> 22b4cb8 (fix: cambios en la barra superior)
         <div className="container mx-auto px-4 py-4">
-=======
-      <nav className="sticky top-0 z-[60] w-full border-b border-stone-200 bg-[#F9F6EE] shadow-sm">
-        <div className="container mx-auto px-4 py-2">
->>>>>>> 251d4bb (fix: cambios en la barra superior)
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-10">
               <Logo />
