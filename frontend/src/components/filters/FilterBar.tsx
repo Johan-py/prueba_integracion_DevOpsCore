@@ -18,11 +18,6 @@ interface FilterBarProps {
   variant?: "home" | "map";
 }
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 22b4cb8 (fix: cambios en la barra superior)
 type LocationValue =
   | string
   | {
@@ -36,11 +31,7 @@ type LocationValue =
 const MockFilterBtn = ({ icon: Icon, text, hasChevron = true }: { icon?: any, text: string, hasChevron?: boolean }) => (
   <button
     type="button"
-<<<<<<< HEAD
-    className="h-[46px] flex items-center justify-between bg-white border border-stone-200 text-stone-600 px-4 rounded-xl shadow-sm hover:border-stone-300 transition-all font-inter text-sm whitespace-nowrap gap-3 shrink-0 focus:outline-none cursor-default"
-=======
-    className="h-[36px] flex items-center justify-between bg-white border border-stone-200 text-stone-600 px-3 rounded-xl shadow-sm hover:border-stone-300 transition-all font-inter text-sm whitespace-nowrap gap-2 shrink-0 focus:outline-none cursor-default"
->>>>>>> 22b4cb8 (fix: cambios en la barra superior)
+className="h-[36px] flex items-center justify-between bg-white border border-stone-200 text-stone-600 px-3 rounded-xl shadow-sm hover:border-stone-300 transition-all font-inter text-sm whitespace-nowrap gap-2 shrink-0 focus:outline-none cursor-default"
     onClick={(e) => e.preventDefault()}
   >
     <div className="flex items-center gap-2">
@@ -51,10 +42,6 @@ const MockFilterBtn = ({ icon: Icon, text, hasChevron = true }: { icon?: any, te
   </button>
 );
 
-<<<<<<< HEAD
-=======
->>>>>>> 251d4bb (fix: cambios en la barra superior)
->>>>>>> 22b4cb8 (fix: cambios en la barra superior)
 export default function FilterBar({
   onSearch,
   variant = "home",
@@ -133,18 +120,8 @@ export default function FilterBar({
   // 🚀 FIX Z-INDEX MASIVO: Agregamos z-[99999] y !overflow-visible para aplastar al mapa
   const containerStyles =
     variant === "map"
-<<<<<<< HEAD
-      ? "bg-[#faf9f6] border-b border-stone-200 py-5 px-6 w-full flex flex-col gap-5 shadow-sm sticky top-0 z-50 !overflow-visible"
+? "bg-[#faf9f6] border-b border-stone-200 py-2 px-6 w-full flex flex-col gap-2 shadow-sm sticky top-0 z-50 !overflow-visible"
       : "bg-white shadow-lg rounded-[30px] p-6 flex flex-col gap-6 w-full max-w-[921px] relative z-[99999] !overflow-visible";
-=======
-<<<<<<< HEAD
-      ? "bg-white border-b border-stone-200 p-3 flex flex-row items-center gap-4 w-full shadow-sm"
-      : "bg-white shadow-lg rounded-[30px] p-6 flex flex-col gap-6 w-[921px]";
-=======
-      ? "bg-[#faf9f6] border-b border-stone-200 py-2 px-6 w-full flex flex-col gap-2 shadow-sm sticky top-0 z-50 !overflow-visible"
-      : "bg-white shadow-lg rounded-[30px] p-6 flex flex-col gap-6 w-full max-w-[921px] relative z-[99999] !overflow-visible";
->>>>>>> 251d4bb (fix: cambios en la barra superior)
->>>>>>> 22b4cb8 (fix: cambios en la barra superior)
 
   return (
     <form className={containerStyles} onSubmit={handleSearch}>
@@ -192,21 +169,6 @@ export default function FilterBar({
           />
         </div>
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-        <button
-          type="button"
-          onClick={(e) => {
-            e.preventDefault();
-            handleSearch();
-          }}
-          className={`${variant === "map" ? "h-[40px] px-6" : "h-[46px] px-10"} bg-[#d97706] hover:bg-[#b95e00] text-white rounded-xl font-bold flex items-center gap-2 transition-all active:scale-95`}
-        >
-          <SearchIcon size={18} /> {variant === "map" ? "" : "BUSCAR"}
-        </button>
-=======
->>>>>>> 22b4cb8 (fix: cambios en la barra superior)
         {/* 🚀 FIX AISLAMIENTO DE SCROLL: 
             Solo estos botones tienen overflow-x-auto. Así los menús de la izquierda no se cortan. */}
         {variant === "map" && (
@@ -223,21 +185,13 @@ export default function FilterBar({
           <button
             type="submit"
             className={`${
-<<<<<<< HEAD
-              variant === "map" ? "h-[46px] px-8 shadow-md" : "w-full md:w-auto h-[46px] px-10"
-=======
               variant === "map" ? "h-[36px] px-6 shadow-md" : "w-full md:w-auto h-[46px] px-10"
->>>>>>> 22b4cb8 (fix: cambios en la barra superior)
             } bg-[#d97706] hover:bg-[#b95e00] text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95`}
           >
             <SearchIcon size={18} />
             {variant === "home" && "BUSCAR"}
           </button>
         </div>
-<<<<<<< HEAD
-=======
->>>>>>> 251d4bb (fix: cambios en la barra superior)
->>>>>>> 22b4cb8 (fix: cambios en la barra superior)
       </div>
       
     </form>
