@@ -262,11 +262,16 @@ export default function MapView({
           maxClusterRadius={CLUSTER_CONFIG.maxClusterRadius}
           disableClusteringAtZoom={CLUSTER_CONFIG.disableClusteringAtZoom}
           animate={true}
+          preferCanvas={true}
           animateAddingMarkers={true}
           chunkedLoading={true}
+          tap={true}
+          tapTolerance={15}
           showCoverageOnHover={false}
           zoomToBoundsOnClick={true}
-          removeOutsideVisibleBounds={true}
+          spiderfyOnMaxZoom={true}
+          spiderfyDistanceMultiplier={2}
+          removeOutsideVisibleBounds={false}
           clusterPane="markerPane"
         >
           {properties.map((property) => {
