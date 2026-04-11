@@ -94,7 +94,7 @@ export default function Home() {
     }
   };
 
-  const handleDelete = async (id: number | string) => {
+  const handleDelete = async (id: any) => {
     const confirmDelete = window.confirm("¿Estás seguro de eliminar esta publicación?");
     if (!confirmDelete) return;
 
