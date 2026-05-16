@@ -245,7 +245,7 @@ app.use("/api/blogs", blogsRoutes);
 app.use("/api/testimonios", testimoniosRoutes);
 app.use("/api/telemetria", telemetriaRouter);
 app.use("/api/comparaciones", comparacionRoutes);
-app.use("/api/sesiones", sesionRoutes);
+app.use("/api/sesion", sesionRoutes);
 app.use('/api/ml', mlRoutes)
 app.use("/api/transacciones", transaccionesRoutes);
 app.use("/api/suscripciones", suscripcionesRoutes);
