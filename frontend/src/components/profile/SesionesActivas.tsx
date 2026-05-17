@@ -168,7 +168,7 @@ export default function ActiveSessions() {
       }
 
       // Mantener solo la sesión actual
-      setSesiones(prev => prev.filter(s => s.esActual))
+      setSesiones(prev => prev.filter(s => s.esActual && s.estado))
       setSeleccionadas([])
 
     } catch (err: any) {
@@ -196,10 +196,10 @@ export default function ActiveSessions() {
     }
   }
 
-  const todasSeleccionadas = sesiones.filter(s => !s.esActual).length > 0 &&
-    seleccionadas.length === sesiones.filter(s => !s.esActual).length
+  const todasSeleccionadas = sesiones.filter(s => s.estado && !s.esActual).length > 0 &&
+    seleccionadas.length === sesiones.filter(s => s.estado && !s.esActual).length
 
-  const sesionesActivasCount = sesiones.filter(s => !s.esActual).length
+  const sesionesActivasCount = sesiones.filter(s => s.estado).length
 
   return (
     <div className="min-h-screen bg-[#EAEAEA] p-4">
@@ -244,7 +244,9 @@ export default function ActiveSessions() {
 
             {/* FILAS */}
             <div className="space-y-3">
-              {sesiones.map((sesion) => (
+              {sesiones 
+                    .filter((sesion) => sesion.estado)
+                    .map((sesion) => (
                 <div
                   key={sesion.id}
                   className={`max-w-5xl mx-auto grid grid-cols-4 items-center rounded-lg py-5 px-6 text-center text-lg transition-colors
