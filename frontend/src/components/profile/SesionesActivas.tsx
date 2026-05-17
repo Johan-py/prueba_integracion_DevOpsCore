@@ -102,6 +102,16 @@ export default function ActiveSessions() {
   // ── DELETE: Cerrar sesiones seleccionadas ─────────────
   const cerrarSesiones = async () => {
     if (seleccionadas.length === 0) return
+       const confirmar = window.confirm(
+                `¿Estás seguro de cerrar ${
+             seleccionadas.length > 1
+                  ? 'las sesiones seleccionadas'
+                  : 'la sesión seleccionada'
+              }?`
+        )
+
+  if (!confirmar) return
+
     setIsLoading(true)
     setError(null)
 
@@ -144,6 +154,11 @@ export default function ActiveSessions() {
 
   // ── DELETE: Cerrar todas excepto actual ───────────────
   const cerrarTodas = async () => {
+    const confirmar = window.confirm(
+         '¿Estás seguro de cerrar todas las sesiones activas?'
+     )
+     
+  if (!confirmar) return
     setIsLoading(true)
     setError(null)
 
@@ -255,7 +270,7 @@ export default function ActiveSessions() {
                       : 'bg-[#E7DFD7]'
                     }`}
                 >
-                  <p className="font-medium">#{sesion.id}</p>
+                  <p className="font-medium">{sesion.id}</p>
                   <p>{formatearFecha(sesion.fechaInicio)}</p>
                   <p>
                     {sesion.esActual ? (
