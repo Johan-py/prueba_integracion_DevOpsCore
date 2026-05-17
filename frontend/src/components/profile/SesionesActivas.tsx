@@ -254,10 +254,10 @@ export default function ActiveSessions() {
             <p className="text-gray-600 text-lg">No hay sesiones activas</p>
           </div>
         ) : (
-          <div className="bg-[#F4F4F4] rounded-2xl p-8">
+          <div className="bg-[#F4F4F4] rounded-2xl p-8 overflow-x-auto">
 
             {/* HEADER TABLA */}
-            <div className="max-w-5xl mx-auto grid grid-cols-4 bg-[#E8962F] text-white font-bold rounded-lg py-4 px-6 mb-4 text-center text-lg">
+            <div className="max-w-5xl min-w-[700px] mx-auto grid grid-cols-4 bg-[#E8962F] text-white font-bold rounded-lg py-4 px-6 mb-4 text-center text-lg">
               <p>ID</p>
               <p>Última actividad</p>
               <p>Estado</p>
@@ -271,7 +271,7 @@ export default function ActiveSessions() {
                     .map((sesion) => (
                 <div
                   key={sesion.id}
-                  className={`max-w-5xl mx-auto grid grid-cols-4 items-center rounded-lg py-5 px-6 text-center text-lg transition-colors
+                  className={`max-w-5xl min-w-[700px] mx-auto grid grid-cols-4 items-center rounded-lg py-5 px-6 text-center text-lg transition-colors
                     ${seleccionadas.includes(sesion.id)
                       ? 'bg-amber-100'
                       : 'bg-[#E7DFD7]'
