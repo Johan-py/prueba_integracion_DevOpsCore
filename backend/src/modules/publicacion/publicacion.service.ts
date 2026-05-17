@@ -491,6 +491,11 @@ export const obtenerDetallePublicacionService = async (
       publicacion.multimedia.find(
         (item) => normalizarTipoMultimedia(item.tipo) === TIPO_MULTIMEDIA_VIDEO,
       )?.url ?? null,
+    videoUrls: publicacion.multimedia
+      .filter(
+        (item) => normalizarTipoMultimedia(item.tipo) === TIPO_MULTIMEDIA_VIDEO,
+      )
+      .map((item) => item.url),
     detalles: {
       habitaciones: publicacion.inmueble.nroCuartos ?? null,
       banos: publicacion.inmueble.nroBanos ?? null,
@@ -568,10 +573,15 @@ export const obtenerDetallePublicacionPorInmuebleService = async (
         pesoMb: item.pesoMb ? Number(item.pesoMb) : null,
       })),
     videoUrl:
-      publicacion.multimedia.find(
+     publicacion.multimedia.find(
+      (item) => normalizarTipoMultimedia(item.tipo) === TIPO_MULTIMEDIA_VIDEO,
+     )?.url ?? null,
+     videoUrls: publicacion.multimedia
+       .filter(
         (item) => normalizarTipoMultimedia(item.tipo) === TIPO_MULTIMEDIA_VIDEO,
-      )?.url ?? null,
-    detalles: {
+      )
+       .map((item) => item.url),
+      detalles: {
       habitaciones: publicacion.inmueble.nroCuartos ?? null,
       banos: publicacion.inmueble.nroBanos ?? null,
       superficieUtil: publicacion.inmueble.superficieM2

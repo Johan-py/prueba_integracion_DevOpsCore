@@ -218,7 +218,7 @@ export default function TourGuiado() {
 
 useEffect(() => {
   const check = () =>
-    setIsDark(document.documentElement.classList.contains("propbol-theme-dark"));
+    setIsDark(document.documentElement.classList.contains("dark")); // Detecta el modo oscuro actual al montar el componente y cada vez que cambie la clase "dark" en el <html>
   check();
   const observer = new MutationObserver(check);
   observer.observe(document.documentElement, {

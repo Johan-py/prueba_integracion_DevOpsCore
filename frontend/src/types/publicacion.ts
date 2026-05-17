@@ -9,7 +9,8 @@ export interface MisPublicacionesItem {
   imagenUrl: string | null;
   tipoOperacion?: string;
   activa?: boolean;
-   promoted?: boolean;  
+  promoted?: boolean;
+
   // Estadísticas de la publicación
   totalVisualizaciones?: number;
   totalCompartidos?: number;
@@ -65,6 +66,7 @@ export interface PublicacionDetalle {
   ubicacionTexto: string;
   imagenes: PublicacionImagen[];
   videoUrl?: string | null;
+  videoUrls?: string[];
 }
 
 export interface EditarPublicacionPayload {
@@ -74,6 +76,7 @@ export interface EditarPublicacionPayload {
   tipoAccion: "VENTA" | "ALQUILER" | "ANTICRETO";
   ubicacion: string;
 }
+
 // ==================== NUEVOS TIPOS HU-11 ====================
 // PUBLICIDAD DE PROPIEDADES
 
