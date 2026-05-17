@@ -1,18 +1,20 @@
 'use client'
 import React, { useState } from 'react'
 
-// Ya no necesitamos la prop 'resultados' si solo son botones
 const HeaderPanel = () => {
   const [activeView, setActiveView] = useState<'grid' | 'list'>('grid')
 
   return (
-    <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg shadow-sm shrink-0">
+    // Se agregó dark:bg-gray-800 para el fondo del contenedor en modo oscuro
+    <div className="flex space-x-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg shadow-sm shrink-0">
       <button
         onClick={() => setActiveView('grid')}
         className={`p-1.5 rounded-md transition-all ${
           activeView === 'grid'
-            ? 'bg-white shadow-sm border border-gray-200'
-            : 'hover:bg-gray-200 text-gray-400'
+            // Se agregaron colores oscuros para el estado activo
+            ? 'bg-white dark:bg-gray-700 shadow-sm border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white'
+            // Se agregaron colores oscuros para el hover y texto inactivo
+            : 'hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-400 dark:text-gray-400'
         }`}
         title="Vista Grilla"
       >
@@ -38,8 +40,10 @@ const HeaderPanel = () => {
         onClick={() => setActiveView('list')}
         className={`p-1.5 rounded-md transition-all ${
           activeView === 'list'
-            ? 'bg-white shadow-sm border border-gray-200'
-            : 'hover:bg-gray-200 text-gray-400'
+             // Se agregaron colores oscuros para el estado activo
+            ? 'bg-white dark:bg-gray-700 shadow-sm border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white'
+             // Se agregaron colores oscuros para el hover y texto inactivo
+            : 'hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-400 dark:text-gray-400'
         }`}
         title="Vista Lista"
       >
