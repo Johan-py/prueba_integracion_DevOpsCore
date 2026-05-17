@@ -70,7 +70,7 @@ export default function ResumenCompra() {
       <div className="flex justify-between items-center mb-8 border-b pb-4">
         <div className="flex-1 text-center">
           <div className="text-sm text-gray-500 mb-1">Resumen</div>
-          <div className="w-8 h-8 mx-auto rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-semibold">
+          <div className="w-8 h-8 mx-auto rounded-full bg-orange-600 text-white flex items-center justify-center text-sm font-semibold">
             1
           </div>
         </div>
@@ -242,7 +242,9 @@ export default function ResumenCompra() {
           </Link>
         </div>
       </div>
-      
+      {/* ================ FIN PARTE INTERMEDIA ================ */}
+
+      {/* ================ PARTE INFERIOR ================ */}
       <div></div>
       {/* ================ FIN PARTE INFERIOR ================ */}
     </div>
