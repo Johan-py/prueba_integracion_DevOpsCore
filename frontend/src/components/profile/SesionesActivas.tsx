@@ -77,7 +77,14 @@ export default function ActiveSessions() {
   }
 
   useEffect(() => {
+     cargarSesiones()
+
+  const interval = setInterval(() => {
     cargarSesiones()
+  }, 10000) // cada 10 segundos
+
+  return () => clearInterval(interval)
+
   }, [])
 
   // ── Seleccionar / deseleccionar ───────────────────────
@@ -157,7 +164,7 @@ export default function ActiveSessions() {
     const confirmar = window.confirm(
          '¿Estás seguro de cerrar todas las sesiones activas?'
      )
-     
+
   if (!confirmar) return
     setIsLoading(true)
     setError(null)
