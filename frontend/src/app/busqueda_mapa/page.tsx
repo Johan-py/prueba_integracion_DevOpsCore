@@ -183,15 +183,9 @@ function BusquedaMapaContent() {
 
   const toggleOferta = () => {
     const newState = !isOfertaOpen
-
-    if (newState) {
-      setIsPriceFilterOpen(false)
-      setActiveSidebarView('results')
-      setIsSidebarOpen(true)
-    }
-
     setIsOfertaOpen(newState)
 
+    // Actualizar URL
     const params = new URLSearchParams(searchParams.toString())
     if (newState) {
       params.set('soloOfertas', 'true')
@@ -202,26 +196,12 @@ function BusquedaMapaContent() {
   }
 
   const toggleCapacidad = () => {
-    if (isOfertaOpen) {
-      setIsOfertaOpen(false)
-      const params = new URLSearchParams(searchParams.toString())
-      params.delete('soloOfertas')
-      router.push(`/busqueda_mapa${params.toString() ? `?${params.toString()}` : ''}`)
-    }
-
     setIsPriceFilterOpen(false)
     setIsSidebarOpen(true)
     setActiveSidebarView((prev) => (prev === 'capacidad' ? 'results' : 'capacidad'))
   }
 
   const openEtiquetas = () => {
-    if (isOfertaOpen) {
-      setIsOfertaOpen(false)
-      const params = new URLSearchParams(searchParams.toString())
-      params.delete('soloOfertas')
-      router.push(`/busqueda_mapa${params.toString() ? `?${params.toString()}` : ''}`)
-    }
-
     setIsPriceFilterOpen(false)
     setIsSidebarOpen(true)
     setActiveSidebarView((prev) => (prev === 'etiquetas' ? 'results' : 'etiquetas'))
@@ -875,15 +855,17 @@ function BusquedaMapaContent() {
     <div className="flex bg-stone-100 p-1 rounded-md border border-stone-200 shadow-inner scale-90">
       <button
         onClick={() => setViewMode('grid')}
-        className={`p-1 rounded transition-colors ${viewMode === 'grid' ? 'bg-white text-[#ea580c] shadow-sm' : 'text-stone-400'
-          }`}
+        className={`p-1 rounded transition-colors ${
+          viewMode === 'grid' ? 'bg-white text-[#ea580c] shadow-sm' : 'text-stone-400'
+        }`}
       >
         <LayoutGrid size={16} />
       </button>
       <button
         onClick={() => setViewMode('list')}
-        className={`p-1 rounded transition-colors ${viewMode === 'list' ? 'bg-white text-[#ea580c] shadow-sm' : 'text-stone-400'
-          }`}
+        className={`p-1 rounded transition-colors ${
+          viewMode === 'list' ? 'bg-white text-[#ea580c] shadow-sm' : 'text-stone-400'
+        }`}
       >
         <ListIcon size={16} />
       </button>
@@ -925,10 +907,11 @@ function BusquedaMapaContent() {
         />
       ) : (
         <div
-          className={`gap-3 flex flex-col ${viewMode === 'list'
-            ? 'divide-y divide-gray-100 bg-white border border-gray-100 rounded-xl shadow-sm'
-            : ''
-            }`}
+          className={`gap-3 flex flex-col ${
+            viewMode === 'list'
+              ? 'divide-y divide-gray-100 bg-white border border-gray-100 rounded-xl shadow-sm'
+              : ''
+          }`}
         >
           {(isClusterView ? clusterProperties : paginatedProperties).map((property: any) => {
             const isSelected = isCompareMode && selectedIds.includes(property.id);
@@ -1205,8 +1188,8 @@ function BusquedaMapaContent() {
 
           {/* ── BOTONES FLOTANTES DE ZONAS (portrait móvil) ──
               z-[35] para quedar siempre sobre el bottom sheet (z-[30])
-              Alineados a la derecha en la parte superior del mapa para no solapar el zoom */}
-          <div className="absolute top-3 right-4 z-[35] flex flex-col items-end gap-2 pointer-events-none">
+              Centrados horizontalmente en la parte superior del mapa */}
+          <div className="absolute top-3 left-0 right-0 z-[35] flex flex-col items-center gap-2 pointer-events-none">
             {/* Estado normal: Mis zonas + Dibujar zona */}
             {!isDrawingMode && !editingZoneId && (
               <div className="flex flex-row gap-2 pointer-events-auto">
@@ -1564,32 +1547,18 @@ function BusquedaMapaContent() {
   // RENDER DESKTOP
   // ────────────────────────────────────────────────────────────────────────────
   return (
-    <div className="relative z-10 flex flex-col bg-white dark:bg-stone-950 w-full h-[calc(100dvh-54px)] overflow-hidden">
+    <div className="relative z-10 flex flex-col bg-white w-full h-[calc(100dvh-54px)] overflow-hidden">
       <FilterBar
         variant="map"
         onSearch={(nuevosFiltros) => {
           console.log('🔍 Buscando con filtros:', nuevosFiltros)
         }}
         onOpenPriceFilter={() => {
-          if (isOfertaOpen) {
-            setIsOfertaOpen(false)
-            const params = new URLSearchParams(searchParams.toString())
-            params.delete('soloOfertas')
-            router.push(`/busqueda_mapa${params.toString() ? `?${params.toString()}` : ''}`)
-          }
-
           setIsPriceFilterOpen((prev) => !prev)
           setIsSidebarOpen(true)
           setActiveSidebarView('results')
         }}
         onOpenSuperficieFilter={() => {
-          if (isOfertaOpen) {
-            setIsOfertaOpen(false)
-            const params = new URLSearchParams(searchParams.toString())
-            params.delete('soloOfertas')
-            router.push(`/busqueda_mapa${params.toString() ? `?${params.toString()}` : ''}`)
-          }
-
           setIsPriceFilterOpen(false)
           setIsSidebarOpen(true)
           setActiveSidebarView((prev) => (prev === 'superficie' ? 'results' : 'superficie'))
@@ -1605,10 +1574,10 @@ function BusquedaMapaContent() {
         onOpenEtiquetasFilter={openEtiquetas}
       />
 
-      <main className="flex flex-col md:flex-row w-full flex-1 min-h-0 relative overflow-hidden border-b border-stone-200 dark:border-stone-700">
+      <main className="flex flex-col md:flex-row w-full flex-1 min-h-0 relative overflow-hidden border-b border-stone-200">
         {/* Panel lateral colapsable */}
         <aside
-          className={`bg-white dark:bg-stone-900 border-r border-stone-200 dark:border-stone-800 flex flex-col z-10 transition-[width] duration-200 min-h-0 overflow-hidden ${
+          className={`bg-white border-r border-stone-200 flex flex-col z-10 transition-[width] duration-200 min-h-0 overflow-hidden ${
             isSidebarOpen ? 'w-full md:h-full h-[65dvh]' : 'w-0'
           }`}
           style={
@@ -1684,9 +1653,9 @@ function BusquedaMapaContent() {
             </div>
           ) : isSidebarOpen && activeSidebarView === 'results' ? (
             // 🚀 CONTENEDOR PADRE SIN SCROLL
-            <div className="flex flex-col h-full min-h-0 relative bg-stone-50 dark:bg-stone-950">
+            <div className="flex flex-col h-full min-h-0 relative bg-stone-50">
               {/* 🚀 CABECERA (Fuera del scroll = Cero rebotes) */}
-              <div className="bg-white dark:bg-stone-900 shrink-0 border-b border-stone-200 dark:border-stone-800 shadow-sm">
+              <div className="bg-white shrink-0 border-b border-stone-200 shadow-sm">
                 {/* BLOQUE 1: DESAPARECE CON EL SCROLL (Solo el título "Filtros") — sin animar altura para evitar saltos en el listado */}
                 <div
                   className={`px-4 overflow-hidden ${isScrolled ? 'max-h-0 opacity-0' : 'max-h-[60px] opacity-100 pt-4'}`}
@@ -1694,7 +1663,7 @@ function BusquedaMapaContent() {
                   <div className="flex justify-between items-center mb-2">
                     <div className="flex items-center gap-1">
                       <Filter className="w-4 h-4 text-orange-500" />
-                      <h1 className="text-base font-semibold text-slate-800 dark:text-stone-200 uppercase tracking-wide">
+                      <h1 className="text-base font-semibold text-slate-800 uppercase tracking-wide">
                         Filtros
                       </h1>
                     </div>
@@ -1710,13 +1679,14 @@ function BusquedaMapaContent() {
                 {/* BLOQUE 2: títulos + orden+vista: grid evita hueco enorme al ensanchar el panel */}
                 <div className={`px-4 pb-3 flex flex-col ${isScrolled ? 'pt-3 gap-2' : 'gap-3'}`}>
                   <div
-                    className={`grid items-start gap-x-4 gap-y-3 ${resultsHeaderSideBySide ? 'grid-cols-[minmax(0,1fr)_auto]' : 'grid-cols-1'
-                      }`}
+                    className={`grid items-start gap-x-4 gap-y-3 ${
+                      resultsHeaderSideBySide ? 'grid-cols-[minmax(0,1fr)_auto]' : 'grid-cols-1'
+                    }`}
                   >
                     <div className="flex min-w-0 justify-between gap-2">
                       <div className="flex min-w-0 flex-col">
                         <h1
-                          className={`font-semibold text-slate-900 dark:text-stone-100 break-words line-clamp-2 ${isScrolled ? 'text-base' : 'text-xl'}`}
+                          className={`font-semibold text-slate-900 break-words line-clamp-2 ${isScrolled ? 'text-base' : 'text-xl'}`}
                         >
                           {isClusterView
                             ? `${clusterProperties.length} propiedades en este clúster`
@@ -1750,7 +1720,7 @@ function BusquedaMapaContent() {
                             : '🌍 Todo Bolivia · buscar en zona específica'} 
                         </button> */}
                         <h2
-                          className={`font-bold text-slate-900 dark:text-stone-100 flex flex-wrap items-center gap-x-2 gap-y-1 ${isScrolled ? 'text-xs mt-0.5' : 'text-sm mt-1'}`}
+                          className={`font-bold text-slate-900 flex flex-wrap items-center gap-x-2 gap-y-1 ${isScrolled ? 'text-xs mt-0.5' : 'text-sm mt-1'}`}
                         >
                           <div>
                             <span className="text-orange-500">
@@ -1758,7 +1728,7 @@ function BusquedaMapaContent() {
                                 ? clusterProperties.length
                                 : displayedProperties.length}
                             </span>
-                            <span className="ml-1 text-gray-600 dark:text-stone-400 font-normal">
+                            <span className="ml-1 text-gray-600 font-normal">
                               {(isClusterView
                                 ? clusterProperties.length
                                 : displayedProperties.length) === 1
@@ -1782,7 +1752,7 @@ function BusquedaMapaContent() {
                           )}
                         </h2>
                         {isRecomendadosActive && !isClusterView && (
-                          <p className={`text-gray-500 dark:text-stone-400 ${isScrolled ? 'text-[11px]' : 'text-xs'}`}>
+                          <p className={`text-gray-500 ${isScrolled ? 'text-[11px]' : 'text-xs'}`}>
                             Mostrando resultados personalizados según tu actividad reciente
                           </p>
                         )}
@@ -1799,14 +1769,16 @@ function BusquedaMapaContent() {
                     </div>
 
                     <div
-                      className={`flex w-full flex-col gap-2 ${resultsHeaderSideBySide ? 'w-auto max-w-full shrink-0 items-end' : ''
-                        }`}
+                      className={`flex w-full flex-col gap-2 ${
+                        resultsHeaderSideBySide ? 'w-auto max-w-full shrink-0 items-end' : ''
+                      }`}
                     >
                       <div
-                        className={`flex w-full flex-wrap items-end gap-x-2 gap-y-2 ${resultsHeaderSideBySide
-                          ? 'w-auto max-w-[22rem] justify-end'
-                          : 'justify-start'
-                          }`}
+                        className={`flex w-full flex-wrap items-end gap-x-2 gap-y-2 ${
+                          resultsHeaderSideBySide
+                            ? 'w-auto max-w-[22rem] justify-end'
+                            : 'justify-start'
+                        }`}
                       >
                         <MenuOrdenamiento
                           totalResultados={displayedProperties.length}
@@ -1815,14 +1787,14 @@ function BusquedaMapaContent() {
                           isCompact={isScrolled}
                           embeddedInPanel
                         />
-                        <div className="flex shrink-0 bg-stone-100 dark:bg-stone-800 p-1 rounded-md border border-stone-200 dark:border-stone-700 shadow-inner scale-90 origin-right">
+                        <div className="flex shrink-0 bg-stone-100 p-1 rounded-md border border-stone-200 shadow-inner scale-90 origin-right">
                           <button
                             type="button"
                             onClick={() => setViewMode('grid')}
                             className={`p-1 rounded transition-colors ${
                               viewMode === 'grid'
-                                ? 'bg-white dark:bg-stone-700 text-[#ea580c] shadow-sm'
-                                : 'text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300'
+                                ? 'bg-white text-[#ea580c] shadow-sm'
+                                : 'text-stone-400'
                             }`}
                           >
                             <LayoutGrid size={16} />
@@ -1832,8 +1804,8 @@ function BusquedaMapaContent() {
                             onClick={() => setViewMode('list')}
                             className={`p-1 rounded transition-colors ${
                               viewMode === 'list'
-                                ? 'bg-white dark:bg-stone-700 text-[#ea580c] shadow-sm'
-                                : 'text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300'
+                                ? 'bg-white text-[#ea580c] shadow-sm'
+                                : 'text-stone-400'
                             }`}
                           >
                             <ListIcon size={16} />
@@ -1891,9 +1863,9 @@ function BusquedaMapaContent() {
                         : 'grid items-stretch gap-4 [grid-template-columns:repeat(auto-fill,minmax(var(--card-min-width),1fr))]'
                     } ${
                       viewMode === 'list'
-                        ? 'divide-y divide-gray-100 dark:divide-stone-800 bg-white dark:bg-stone-900 border border-gray-100 dark:border-stone-800 rounded-xl shadow-sm'
+                        ? 'divide-y divide-gray-100 bg-white border border-gray-100 rounded-xl shadow-sm'
                         : ''
-                      }`}
+                    }`}
                     style={
                       viewMode === 'grid'
                         ? { ['--card-min-width' as string]: `${desktopGridMinWidth}px` }
@@ -1922,10 +1894,10 @@ function BusquedaMapaContent() {
                   className={`cursor-pointer transition-all duration-200 rounded-[16px] relative focus:outline-none focus:ring-0 focus:ring-offset-0 ${
                     viewMode === 'grid'
                       ? 'h-full w-full justify-self-center'
-                      : 'w-full py-1 hover:bg-stone-100 dark:hover:bg-stone-800'
+                      : 'w-full py-1 hover:bg-stone-100 dark:hover:bg-slate-800'
                   } ${
                     isSelected
-                      ? '!outline !outline-4 !outline-[rgb(234,88,12)] scale-[0.98] shadow-lg dark:!bg-stone-800/80 z-10'
+                      ? '!outline !outline-4 !outline-[rgb(234,88,12)] scale-[0.98] shadow-lg dark:!bg-slate-800/80 z-10'
                       : ''
                   }`}
                 >
@@ -1959,12 +1931,11 @@ function BusquedaMapaContent() {
                               }}
                               precio={property.precio ? Number(property.precio) : undefined}
                               precio_anterior={
-                              property.precio_anterior
-                               ? Number(property.precio_anterior)
-                              : undefined
+                                property.precio_anterior
+                                  ? Number(property.precio_anterior)
+                                  : undefined
                               }
-                             esRecomendadoIA={isRecomendadosActive}
-                              />
+                            />
                           ) : (
                             <PropertyRow
                               title={property.title}
@@ -2250,7 +2221,7 @@ function BusquedaMapaContent() {
         />
       </main>
       {/* MONTAJE DEL MODAL COMPARATIVO */}
-      <CompareFooter
+      <CompareFooter 
         onOpenModal={() => {
           // Abrimos el modal instantáneamente para el usuario
           setIsModalOpen(true);
@@ -2271,12 +2242,12 @@ function BusquedaMapaContent() {
               })
             }).catch(err => console.error("Error al guardar historial de comparación:", err));
           }
-        }}
+        }} 
       />
-
-      <ComparatorModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+      
+      <ComparatorModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
       />
     </div>
   )
