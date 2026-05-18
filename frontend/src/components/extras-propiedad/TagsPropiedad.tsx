@@ -8,7 +8,7 @@ type Tag = {
 };
 
 type Props = {
-  publicacionId: number;
+  publicacionId?: number;
   tagsIniciales?: string[];
   catalogoTags?: Tag[];
   onGuardar?: (tags: string[]) => void;
@@ -34,11 +34,11 @@ export default function TagsPropiedad({
   const [mensajeExito, setMensajeExito] = useState("");
   const [sugerenciasFiltradas, setSugerenciasFiltradas] = useState<Tag[]>([]);
 
-    useEffect(() => {
+  useEffect(() => {
     if (tagsIniciales.length > 0) {
-        setTags(tagsIniciales);
+      setTags(tagsIniciales);
     }
-    }, []);
+  }, [tagsIniciales]);
 
   useEffect(() => {
     const busqueda = nuevoTag.trim().toLowerCase();
@@ -58,32 +58,57 @@ export default function TagsPropiedad({
 
     if (!valor) return;
 
+    // Validación de longitud
     if (valor.length < MIN_CARACTERES || valor.length > MAX_CARACTERES) {
       setError(`El tag debe tener entre ${MIN_CARACTERES} y ${MAX_CARACTERES} caracteres`);
       return;
     }
 
-    if (!/^[a-záéíóúüñA-ZÁÉÍÓÚÜÑ0-9\s\-]+$/.test(valor)) {
+    // 🔧 BUG-F02: Caracteres permitidos (ahora incluye / y espacio)
+    const caracteresPermitidos = /^[a-záéíóúüñA-ZÁÉÍÓÚÜÑ0-9\s\/\-]+$/;
+    if (!caracteresPermitidos.test(valor)) {
       setError("El tag contiene caracteres no permitidos");
       return;
     }
 
+    // 🔧 BUG-F03: Validación semántica (evita solo números o solo símbolos)
+    const soloNumeros = /^\d+$/.test(valor);
+    const soloSimbolos = /^[\-\/\s]+$/.test(valor);
+
+    if (soloNumeros) {
+      setError("El tag no puede contener solo números. Ejemplo válido: '2 habitaciones'");
+      return;
+    }
+
+    if (soloSimbolos) {
+      setError("El tag no puede contener solo símbolos. Usa palabras descriptivas");
+      return;
+    }
+
+    // Al menos una letra
+    const tieneLetra = /[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ]/.test(valor);
+    if (!tieneLetra) {
+      setError("El tag debe contener al menos una letra");
+      return;
+    }
+
+    // Validación de duplicado
     if (tags.some((t) => t.toLowerCase() === valor.toLowerCase())) {
       setError("Este tag ya fue agregado");
       return;
     }
 
+    // Validación de límite
     if (tags.length >= MAX_TAGS) {
       setError(`No puedes agregar más de ${MAX_TAGS} tags`);
       return;
     }
 
-    const nuevos =  [...new Set([...tags, valor])];
+    const nuevos = [...new Set([...tags, valor])];
     setTags(nuevos);
     setNuevoTag("");
     setError("");
     setMensajeExito("¡Excelente! El tag fue agregado.");
-    //onGuardar?.(nuevos);
 
     setTimeout(() => setMensajeExito(""), 2000);
   };
@@ -93,153 +118,158 @@ export default function TagsPropiedad({
     setTags(actualizados);
     setError("");
     setMensajeExito("");
-    //onGuardar?.(actualizados);
   };
 
-    return (
-    <div className="mt-4 rounded-2xl border border-neutral-300 bg-[#f5ede2] p-6">
-        {/* TITULO */}
-        <h3 className="mb-4 text-xl font-bold text-neutral-900">
-        Tags o Etiquetas
-        </h3>
+  const handleGuardar = () => {
+    onGuardar?.(tags);
+    setMensajeExito("✓ Tags guardados correctamente");
+    setTimeout(() => setMensajeExito(""), 2000);
+  };
 
-        <p className="mb-4 text-sm text-neutral-600">
+  return (
+    <div className="mt-4 rounded-2xl border border-neutral-300 bg-[#f5ede2] p-6">
+      {/* TITULO */}
+      <h3 className="mb-4 text-xl font-bold text-neutral-900">
+        Tags o Etiquetas
+      </h3>
+
+      <p className="mb-4 text-sm text-neutral-600">
         Agrega palabras clave para que los clientes encuentren tu inmueble
         más fácilmente. Presiona Enter o haz clic en "+ Agregar".
-        </p>
+      </p>
 
-        {/* INPUT */}
-        <label className="mb-2 block text-sm font-semibold text-neutral-800">
+      {/* INPUT */}
+      <label className="mb-2 block text-sm font-semibold text-neutral-800">
         Nuevo tag:
-        </label>
+      </label>
 
-        <div className="relative mb-3 flex flex-col gap-3 md:flex-row">
+      <div className="relative mb-3 flex flex-col gap-3 md:flex-row">
         <div className="relative w-full">
-            <input
+          <input
             type="text"
             value={nuevoTag}
             maxLength={MAX_CARACTERES}
             onChange={(e) => {
-                setNuevoTag(e.target.value);
-                if (error) setError("");
+              setNuevoTag(e.target.value);
+              if (error) setError("");
             }}
             onKeyDown={(e) => {
-                if (e.key === "Enter") {
+              if (e.key === "Enter") {
                 e.preventDefault();
                 agregarTag(nuevoTag);
-                }
+              }
             }}
             placeholder="Ej: piscina, garaje, terraza"
             className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 outline-none focus:border-orange-400"
-            />
+          />
 
-            <p className="mt-1 text-xs text-neutral-500">
+          <p className="mt-1 text-xs text-neutral-500">
             {nuevoTag.length}/{MAX_CARACTERES} caracteres
-            </p>
+          </p>
 
-            {/* SUGERENCIAS DINÁMICAS */}
-            {sugerenciasFiltradas.length > 0 && (
+          {/* SUGERENCIAS DINÁMICAS */}
+          {sugerenciasFiltradas.length > 0 && (
             <div className="absolute left-0 right-0 top-[52px] z-20 max-h-56 overflow-y-auto rounded-xl border border-neutral-200 bg-white shadow-lg">
-                {sugerenciasFiltradas.map((t) => (
+              {sugerenciasFiltradas.map((t) => (
                 <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => agregarTag(t.nombre)}
-                    className="block w-full px-4 py-3 text-left text-sm text-neutral-800 hover:bg-orange-50"
+                  key={t.id}
+                  type="button"
+                  onClick={() => agregarTag(t.nombre)}
+                  className="block w-full px-4 py-3 text-left text-sm text-neutral-800 hover:bg-orange-50"
                 >
-                    <span className="font-semibold">{t.nombre}</span>
+                  <span className="font-semibold">{t.nombre}</span>
                 </button>
-                ))}
+              ))}
             </div>
-            )}
+          )}
 
-            {sugerenciasFiltradas.length === 0 && nuevoTag.trim().length >= 2 && (
+          {sugerenciasFiltradas.length === 0 && nuevoTag.trim().length >= 2 && (
             <p className="mt-1 text-xs text-neutral-500">Sin sugerencias</p>
-            )}
+          )}
         </div>
 
         <button
-            type="button"
-            onClick={() => agregarTag(nuevoTag)}
-            disabled={tags.length >= MAX_TAGS}
-            className="rounded-xl bg-orange-500 px-5 py-3 font-semibold text-white hover:bg-orange-600 disabled:opacity-50"
+          type="button"
+          onClick={() => agregarTag(nuevoTag)}
+          disabled={tags.length >= MAX_TAGS}
+          className="rounded-xl bg-orange-500 px-5 py-3 font-semibold text-white hover:bg-orange-600 disabled:opacity-50"
         >
-            + Agregar
+          + Agregar
         </button>
-        </div>
+      </div>
 
-        {/* ERROR */}
-        {error && (
+      {/* ERROR */}
+      {error && (
         <p className="mb-4 text-sm font-medium text-red-600">{error}</p>
-        )}
+      )}
 
-        {/* ÉXITO */}
-        {mensajeExito && (
+      {/* ÉXITO */}
+      {mensajeExito && (
         <p className="mb-4 text-sm font-medium text-green-600">{mensajeExito}</p>
-        )}
+      )}
 
-        {/* SUGERENCIAS PREDEFINIDAS */}
-        <div className="mb-4">
+      {/* SUGERENCIAS PREDEFINIDAS */}
+      <div className="mb-4">
         <p className="mb-2 text-xs font-semibold text-neutral-800">Sugerencias:</p>
         <div className="flex flex-wrap gap-2">
-            {SUGERENCIAS_DEFAULT.filter(
+          {SUGERENCIAS_DEFAULT.filter(
             (s) => !tags.some((t) => t.toLowerCase() === s.toLowerCase())
-            ).map((item) => (
+          ).map((item) => (
             <button
-                key={item}
-                type="button"
-                onClick={() => agregarTag(item)}
-                className="rounded-full border border-neutral-300 bg-white px-3 py-1 text-sm text-neutral-700 hover:border-orange-400 hover:text-orange-500"
+              key={item}
+              type="button"
+              onClick={() => agregarTag(item)}
+              className="rounded-full border border-neutral-300 bg-white px-3 py-1 text-sm text-neutral-700 hover:border-orange-400 hover:text-orange-500"
             >
-                {item}
+              {item}
             </button>
-            ))}
+          ))}
         </div>
-        </div>
+      </div>
 
-        {/* TAGS AÑADIDOS */}
-        <h4 className="mb-3 text-base font-semibold text-neutral-900">
+      {/* TAGS AÑADIDOS */}
+      <h4 className="mb-3 text-base font-semibold text-neutral-900">
         Tags añadidos ({tags.length}/{MAX_TAGS}):
-        </h4>
+      </h4>
 
-        <div className="mb-6 flex flex-wrap gap-3">
+      <div className="mb-6 flex flex-wrap gap-3">
         {tags.length === 0 ? (
-            <p className="text-sm text-neutral-600">Aún no se añadieron tags.</p>
+          <p className="text-sm text-neutral-600">Aún no se añadieron tags.</p>
         ) : (
-            tags.map((tag, index) => (
+          tags.map((tag, index) => (
             <div
-                key={`${tag}-${index}`}
-                className="flex items-center gap-2 rounded-full bg-black px-4 py-2 text-sm text-white"
+              key={`${tag}-${index}`}
+              className="flex items-center gap-2 rounded-full bg-black px-4 py-2 text-sm text-white"
             >
-                <span>{tag}</span>
-                <button
+              <span>{tag}</span>
+              <button
                 type="button"
                 onClick={() => eliminarTag(index)}
                 className="text-orange-400"
                 title="Eliminar"
-                >
+              >
                 ✖
-                </button>
+              </button>
             </div>
-            ))
+          ))
         )}
-        </div>
+      </div>
 
-        <p className="mb-4 text-xs text-neutral-500">
+      <p className="mb-4 text-xs text-neutral-500">
         Puedes agregar hasta {MAX_TAGS} tags. Cada tag debe tener entre {MIN_CARACTERES} y {MAX_CARACTERES} caracteres.
-        </p>
+      </p>
 
-        {/* BOTÓN GUARDAR */}
-        <div className="flex justify-center border-t border-neutral-400 pt-6">
+      {/* BOTÓN GUARDAR */}
+      <div className="flex justify-center border-t border-neutral-400 pt-6">
         <button
-            type="button"
-            disabled={tags.length === 0}
-            onClick={() => onGuardar?.(tags)}
-            className="rounded-full bg-orange-500 px-8 py-2 font-semibold text-white hover:bg-orange-600 disabled:opacity-50"
+          type="button"
+          disabled={tags.length === 0}
+          onClick={handleGuardar}
+          className="rounded-full bg-orange-500 px-8 py-2 font-semibold text-white hover:bg-orange-600 disabled:opacity-50"
         >
-            Guardar tags
+          Guardar tags
         </button>
-        </div>
+      </div>
     </div>
-    );
+  );
 }
