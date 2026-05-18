@@ -601,6 +601,12 @@ export const obtenerDetallePublicacionPorInmuebleService = async (
         : null,
       direccion: publicacion.inmueble.ubicacion?.direccion || null,
     },
+    puntosDeInteres: publicacion.inmueble.puntosDeInteres?.map((poi) => ({
+      id: poi.id,
+      nombre: poi.nombre,
+      latitud: Number(poi.latitud),
+      longitud: Number(poi.longitud),
+    })) ?? [],
     contacto: {
       nombre: `${publicacion.usuario.nombre} ${publicacion.usuario.apellido}`,
       correo: publicacion.usuario.correo ?? null,
