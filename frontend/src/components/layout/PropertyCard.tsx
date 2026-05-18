@@ -30,9 +30,6 @@ type PropsTarjeta = {
 // 1. Definimos una constante para el color gris de fondo cuando no hay imagen
 const COLOR_GRIS_PLACEHOLDER = 'bg-gray-200'
 
-/**
- * Formatea metros cuadrados de forma segura
- */
 function formatMetros(value: number): string {
   if (!Number.isFinite(value)) return '—'
   const rounded = Math.round(value * 100) / 100
@@ -64,10 +61,7 @@ export default function PropertyCard({
   // Obtenemos el estado isCompareMode
   const { isCompareMode } = useCompareStore()
 
- /**
-   * Cálculo de oferta (HU6)
-   * Determina si el precio actual es menor al anterior
-   */
+  // Calcular oferta HU6
   const precioNum = Number(precio)
   const precioAnteriorNum = Number(precio_anterior)
   const esOferta = !isNaN(precioAnteriorNum) && precioAnteriorNum > 0 && !isNaN(precioNum) && precioNum > 0 && precioNum < precioAnteriorNum
