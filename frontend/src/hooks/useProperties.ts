@@ -356,6 +356,8 @@ export function useProperties(): UsePropertiesResult {
     }
 
     async function fetchProperties() {
+       setIsLoading(true)   // ← AGREGAR
+       setProperties([]) 
       setError(null)
 
       // ✅ Modo recomendados (persistente por URL)
