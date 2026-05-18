@@ -1667,12 +1667,6 @@ function BusquedaMapaContent() {
                         Filtros
                       </h1>
                     </div>
-                    <button
-                      onClick={() => setIsSidebarOpen(false)}
-                      className="p-1 hover:bg-stone-100 rounded-full transition-colors text-stone-400 shrink-0"
-                    >
-                      <ChevronLeft size={20} />
-                    </button>
                   </div>
                 </div>
 
@@ -1757,15 +1751,6 @@ function BusquedaMapaContent() {
                           </p>
                         )}
                       </div>
-                      {isScrolled && (
-                        <button
-                          type="button"
-                          onClick={() => setIsSidebarOpen(false)}
-                          className="p-1 hover:bg-stone-100 rounded-full transition-colors text-stone-400 shrink-0 self-start"
-                        >
-                          <ChevronLeft size={20} />
-                        </button>
-                      )}
                     </div>
 
                     <div
@@ -1986,7 +1971,7 @@ function BusquedaMapaContent() {
         {/* Divider resizable (solo desktop con sidebar abierto, en vista de resultados y si Precio está cerrado) */}
         {isSidebarOpen && activeSidebarView === 'results' && !isPriceFilterOpen && (
           <div
-            className="hidden md:block w-1 bg-stone-200 hover:bg-orange-300 active:bg-orange-400 cursor-col-resize relative z-20"
+            className="hidden md:flex w-1 bg-stone-200 hover:bg-orange-300 active:bg-orange-400 cursor-col-resize relative z-20 items-center justify-center"
             onMouseDown={(e) => {
               e.preventDefault()
               isResizingRef.current = true
@@ -2013,7 +1998,21 @@ function BusquedaMapaContent() {
               window.addEventListener('mouseup', onUp)
             }}
             title="Arrastra para ajustar el layout"
-          />
+          >
+          {isSidebarOpen && activeSidebarView === 'results' && !isPriceFilterOpen && (
+            <button
+              onClick={() => setIsSidebarOpen(false)}
+              className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-full
+                        z-30 w-5 h-10 bg-white border border-stone-200 border-l-0 rounded-r-full
+                        shadow-md items-center justify-center
+                        hover:bg-orange-50 hover:border-orange-300 hover:text-orange-500
+                        transition-colors text-stone-400 cursor-pointer"
+              title="Ocultar resultados"
+            >
+              <ChevronLeft size={14} />
+            </button>
+          )}
+          </div>
         )}
 
         {/* Área del mapa */}
