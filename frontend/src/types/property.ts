@@ -29,6 +29,9 @@ export interface PropertyMapPin {
   superficieM2?: number | null
   score?: number
   razones?: string[]
+   precio?: number           
+  precio_anterior?: number | null  
+  popularidad?: number      
 }
 
 // Respuesta esperada del endpoint real futuro:

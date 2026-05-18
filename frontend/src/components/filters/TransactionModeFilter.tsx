@@ -23,7 +23,7 @@ export default function TransactionModeFilter({
           <label
             key={modo.id}
             // Añadimos textos adaptables al modo oscuro
-            className="group flex items-center gap-2 text-sm text-stone-900 dark:text-slate-200 font-medium cursor-pointer"
+            className="group flex items-center gap-2 text-sm text-stone-900 dark:text-stone-200 font-medium cursor-pointer"
           >
             <div className="relative inline-flex shadow-sm">
               <input
@@ -42,7 +42,7 @@ export default function TransactionModeFilter({
                   w-[28px] h-[18px] rounded cursor-pointer appearance-none transition-colors border 
                   group-hover:border-[#d97706] dark:group-hover:border-[#E87C1E]
                   bg-white border-gray-400 
-                  dark:bg-transparent dark:border-slate-600 
+                  dark:bg-transparent dark:border-stone-600 
                   checked:!bg-[#d97706] checked:!border-[#d97706] 
                   dark:checked:!bg-transparent dark:checked:!border-[#E87C1E]
                 `}

@@ -30,6 +30,16 @@
     /* #ffffff - Blanco para superficies */
   }
 
+  html.dark {
+    --background: 20 6% 10%;  /* stone-900 oscuro */
+    --foreground: 30 6% 94%;  /* stone-100 claro */
+    --muted: 30 5% 65%;       /* stone-600 claro */
+    --border: 20 5% 25%;      /* stone-800 oscuro */
+    --card: 20 6% 15%;        /* stone-900 oscuro */
+    
+    --primary: 30 100% 50%;   /* Ámbar para acentos, se mantiene igual */ 
+  }
+
   body {
     font-family: 'Montserrat', sans-serif;
     background-color: hsl(var(--background));

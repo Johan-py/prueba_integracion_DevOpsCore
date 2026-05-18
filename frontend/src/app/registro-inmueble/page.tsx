@@ -619,11 +619,12 @@ const [poiSeleccionado, setPoiSeleccionado] = useState<number | null>(null)
       }
 
       const publicacionId = result?.property?.publicacion?.id
+      const inmuebleId = result?.property?.inmueble?.id
       for (const poi of pois) {
   if (!poi.nombre.trim()) continue
 
   const responsePoi = await fetch(
-    `${API_URL}/api/pois/inmueble/${publicacionId}`,
+    `${API_URL}/api/pois/inmueble/${inmuebleId}`,
     {
       method: 'POST',
       headers: {
@@ -944,8 +945,8 @@ const [poiSeleccionado, setPoiSeleccionado] = useState<number | null>(null)
               </div>
 
               <div className="mt-6">
-                <div className="flex items-center gap-3 mb-4 gap-4">
-                  <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3 mb-4">
+                  <div className="flex flex-wrap items-center gap-3">
                     <button
                       type="button"
                       onClick={() => {
@@ -953,7 +954,7 @@ const [poiSeleccionado, setPoiSeleccionado] = useState<number | null>(null)
                         setModoDifuminadoActivo(false)
                         setVertices([]) // Lógica de develop: borra el polígono anterior
                       }}
-                      className={`px-4 py-2 rounded-full text-xs transition ${
+                      className={`px-4 py-2 rounded-full text-sm transition ${
                         modoPinActivo ? 'bg-orange-500 text-white' : 'bg-gray-200'
                       }`}
                     >
@@ -994,17 +995,25 @@ if (referenciasEnEsePunto.length >= 4) {
   return
 }
 
-setPois([
-  ...pois,
-  {
-    id: Date.now(),
-    nombre: '',
-    lat: pinCoords.lat,
-    lng: pinCoords.lng
-  }
-])
+const despl = [
+                          [0.001, 0],      // Norte
+                          [0, 0.001],      // Este
+                          [-0.001, 0],     // Sur
+                          [0, -0.001]      // Oeste
+                        ];
+                        const d = despl[pois.length % 4];
+
+                        setPois([
+                          ...pois,
+                          {
+                            id: Date.now(),
+                            nombre: '',
+                            lat: pinCoords.lat + d[0],
+                            lng: pinCoords.lng + d[1]
+                          }
+                        ])
       }}
-      className={`px-4 py-2 rounded-full text-xs ${
+      className={`px-4 py-2 rounded-full text-sm ${
         pinCoords
           ? 'bg-orange-500 text-white'
           : 'bg-gray-200 text-gray-400 cursor-not-allowed'
@@ -1030,7 +1039,7 @@ if (poiSeleccionado !== null) {
   setPois(pois.slice(0, -1))
 }
 }}
-      className={`px-4 py-2 rounded-full text-xs ${
+      className={`px-4 py-2 rounded-full text-sm ${
         pois.length > 0
           ? 'bg-red-500 text-white'
           : 'bg-gray-200 text-gray-400 cursor-not-allowed'
@@ -1059,7 +1068,7 @@ if (poiSeleccionado !== null) {
         direccion: ''
       }))
     }}
-    className={`px-4 py-2 rounded-full text-xs transition ${
+    className={`px-4 py-2 rounded-full text-sm transition ${
       !pinCoords && vertices.length === 0
         ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
         : 'bg-orange-500 text-white hover:bg-orange-600'
@@ -1099,18 +1108,18 @@ if (poiSeleccionado !== null) {
               </div>
 
               <div className="mt-12 space-y-6">
-                <div className="flex justify-center md:justify-end gap-6">
+                <div className="flex flex-col sm:flex-row justify-center md:justify-end gap-4 sm:gap-6">
                   <button
                     type="button"
                     onClick={() => router.back()}
-                    className="px-12 py-3 rounded-full border border-gray-400 bg-[#D9D9D9]"
+                    className="w-full sm:w-auto px-12 py-3 rounded-full border border-gray-400 bg-[#D9D9D9]"
                   >
                     Cancelar
                   </button>
 
                   <button
                     onClick={guardarPropiedad}
-                    className="px-12 py-3 rounded-full border-2 border-orange-400 bg-[#D9D9D9] hover:bg-orange-100 transition"
+                    className="w-full sm:w-auto px-12 py-3 rounded-full border-2 border-orange-400 bg-[#D9D9D9] hover:bg-orange-100 transition"
                   >
                     Continuar
                   </button>

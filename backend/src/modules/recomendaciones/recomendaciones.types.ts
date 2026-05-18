@@ -10,6 +10,7 @@ export interface InmuebleConScore {
   } | null
   score: number
   razones: string[] // Para debugging
+  modeloUsado?: 'ML' | 'REGLAS'
 }
 
 export interface HistorialVista {

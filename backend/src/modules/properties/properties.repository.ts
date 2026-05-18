@@ -293,24 +293,24 @@ export const propertiesRepository = {
         ...filtros.labels.map((labelId) => ({
           publicaciones: {
             some: {
-              estado: "ACTIVA" as const,
-              publicacion_parametro: {
+              estado: 'ACTIVA' as const,
+              publicacion_tag: {
                 some: {
-                  parametro_id: labelId,
-                },
-              },
-            },
-          },
-        })),
-      ];
+                  tag_id: labelId
+                }
+              }
+            }
+          }
+        }))
+      ]
     }
 
     // HU6 - Filtro solo ofertas
     if (filtros.soloOfertas === true) {
       where.precio = {
         ...((where.precio as object) ?? {}),
-        lt: prisma.inmueble.fields.precio_anterior,
-      };
+        lt: prisma.inmueble.fields.precio_anterior
+      }
     }
 
     // ── ORDER BY ───────────────────────────────────────────────────────────

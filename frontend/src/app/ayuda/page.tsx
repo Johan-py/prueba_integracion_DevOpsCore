@@ -116,14 +116,14 @@ export default function AyudaPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Hero */}
-      <section className="bg-white border-b border-gray-200 py-14 px-4 text-center">
+      <section className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 py-14 px-4 text-center">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#E68B25]/10 mb-4">
           <HelpCircle className="w-8 h-8 text-[#E68B25]" />
         </div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Centro de Ayuda</h1>
-        <p className="text-gray-500 max-w-md mx-auto mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-stone-100 mb-2">Centro de Ayuda</h1>
+        <p className="text-gray-500 dark:text-stone-400 max-w-md mx-auto mb-8">
           Conoce todas las funciones de PropBol con nuestro tour guiado interactivo.
         </p>
         <button
@@ -136,7 +136,7 @@ export default function AyudaPage() {
 
       {/* Pasos del tour */}
       <section className="max-w-5xl mx-auto px-4 py-12">
-        <h2 className="text-xl font-semibold text-gray-700 mb-6">
+        <h2 className="text-xl font-semibold text-gray-700 dark:text-stone-300 mb-6">
           ¿Qué encontrarás en el tour?
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -145,16 +145,16 @@ export default function AyudaPage() {
             return (
               <div
                 key={index}
-                className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex gap-4 items-start hover:shadow-md transition-shadow"
+                className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm p-5 flex gap-4 items-start hover:shadow-md transition-shadow"
               >
                 <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-[#E68B25]/10 flex items-center justify-center">
                   <Icon className="w-5 h-5 text-[#E68B25]" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-800 mb-1">
+                  <p className="text-sm font-semibold text-gray-800 dark:text-stone-200 mb-1">
                     {paso.title}
                   </p>
-                  <p className="text-xs text-gray-500 leading-relaxed">
+                  <p className="text-xs text-gray-500 dark:text-stone-400 leading-relaxed">
                     {paso.description}
                   </p>
                 </div>
