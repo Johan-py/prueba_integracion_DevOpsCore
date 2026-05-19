@@ -158,7 +158,7 @@ export default function TestimoniosSection() {
               <button
                 onClick={handlePrev}
                 disabled={testimonios.length <= visibleCount}
-                className="shrink-0 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full border border-stone-200 text-stone-400 hover:text-amber-600 hover:border-amber-400 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                className="shrink-0 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full border border-stone-200 dark:border-stone-600 text-stone-400 dark:text-stone-400 bg-white dark:bg-stone-800 hover:text-amber-600 hover:border-amber-400 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
@@ -179,7 +179,7 @@ export default function TestimoniosSection() {
               <button
                 onClick={handleNext}
                 disabled={testimonios.length <= visibleCount}
-                className="shrink-0 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full border border-stone-200 text-stone-400 hover:text-amber-600 hover:border-amber-400 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                className="shrink-0 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full border border-stone-200 dark:border-stone-600 text-stone-400 dark:text-stone-400 bg-white dark:bg-stone-800 hover:text-amber-600 hover:border-amber-400 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
