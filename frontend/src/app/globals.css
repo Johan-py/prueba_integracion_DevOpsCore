@@ -793,6 +793,37 @@ html.propbol-theme-dark body :where([class*="text-amber-600"], [class*="text-amb
 html.propbol-theme-dark body :where([class*="text-red-600"], [class*="text-[#D94848]"]) {
   color: #fca5a5 !important;
 }
+/* === FIX BLOG FORM DARK MODE === */
+/* Fondos con opacidad Tailwind (bg-[#FAFAFA]/50) que el selector global excluye */
+html.dark body [class*="bg-[#FAFAFA]"] {
+  background: var(--pb-surface) !important;
+  color: var(--pb-text) !important;
+}
+
+/* TipTap prose editor en dark mode */
+html.dark .prose {
+  color: var(--pb-text) !important;
+}
+html.dark .prose h1,
+html.dark .prose h2,
+html.dark .prose h3 {
+  color: var(--pb-text) !important;
+}
+html.dark .prose p,
+html.dark .prose li {
+  color: var(--pb-muted) !important;
+}
+html.dark .prose blockquote {
+  border-left-color: var(--pb-accent) !important;
+  color: var(--pb-muted) !important;
+}
+html.dark .prose a {
+  color: var(--pb-accent) !important;
+}
+html.dark .prose p.is-editor-empty:first-child::before {
+  color: #666666 !important;
+}
+
 /* === FIX MAPAS MODO OSCURO (RESTAURADO) === */
 html.dark .leaflet-popup-content-wrapper,
 html.propbol-theme-dark .leaflet-popup-content-wrapper {
