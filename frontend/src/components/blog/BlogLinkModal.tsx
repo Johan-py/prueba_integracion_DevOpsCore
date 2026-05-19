@@ -49,7 +49,7 @@ export default function BlogLinkModal({
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300">
       <div
-        className="w-full max-w-[440px] bg-white rounded-[40px] shadow-2xl ring-1 ring-black/5 overflow-hidden animate-in zoom-in-95 duration-300"
+        className="w-full max-w-[440px] bg-white dark:bg-[#111] rounded-[40px] shadow-2xl ring-1 ring-black/5 dark:ring-white/10 overflow-hidden animate-in zoom-in-95 duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header with Progress */}
@@ -59,7 +59,7 @@ export default function BlogLinkModal({
               <div className="h-10 w-10 rounded-2xl bg-amber-50 flex items-center justify-center rotate-3">
                 <LinkIcon className="h-5 w-5 text-[#B45309]" />
               </div>
-              <h3 className="text-xl font-black text-[#1C1917] tracking-tight">Nuevo Enlace</h3>
+              <h3 className="text-xl font-black text-[#1C1917] dark:text-white tracking-tight">Nuevo Enlace</h3>
             </div>
             <button
               onClick={onClose}
@@ -91,17 +91,17 @@ export default function BlogLinkModal({
                   <Type className="h-4 w-4" />
                   <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Paso 1: Identificación</span>
                 </div>
-                <h4 className="text-2xl font-bold text-[#1C1917] leading-tight">¿Qué texto verán tus lectores?</h4>
+                <h4 className="text-2xl font-bold text-[#1C1917] dark:text-white leading-tight">¿Qué texto verán tus lectores?</h4>
                 <div className="space-y-3">
                   <input
                     type="text"
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     placeholder="Ej: Ver catálogo completo"
-                    className="w-full rounded-2xl bg-[#F5F5F4] px-6 py-5 text-base font-semibold text-[#1C1917] outline-none transition focus:bg-white focus:ring-4 focus:ring-[#F59E0B]/10 border-2 border-transparent focus:border-[#F59E0B]/20"
+                    className="w-full rounded-2xl bg-[#F5F5F4] dark:bg-[#222] px-6 py-5 text-base font-semibold text-[#1C1917] dark:text-white outline-none transition focus:bg-white dark:focus:bg-[#1a1a1a] focus:ring-4 focus:ring-[#F59E0B]/10 border-2 border-transparent focus:border-[#F59E0B]/20"
                     autoFocus
                   />
-                  <p className="text-xs text-[#78716C] leading-relaxed px-1">
+                  <p className="text-xs text-[#78716C] dark:text-[#999] leading-relaxed px-1">
                     Este es el texto amigable que aparecerá resaltado en tu blog.
                   </p>
                 </div>
@@ -116,17 +116,17 @@ export default function BlogLinkModal({
                   <Globe className="h-4 w-4" />
                   <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Paso 2: Dirección</span>
                 </div>
-                <h4 className="text-2xl font-bold text-[#1C1917] leading-tight">¿A dónde los enviamos?</h4>
+                <h4 className="text-2xl font-bold text-[#1C1917] dark:text-white leading-tight">¿A dónde los enviamos?</h4>
                 <div className="space-y-3">
                   <input
                     type="url"
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
                     placeholder="https://tu-sitio.com/pagina"
-                    className="w-full rounded-2xl bg-[#F5F5F4] px-6 py-5 text-base font-semibold text-[#1C1917] outline-none transition focus:bg-white focus:ring-4 focus:ring-[#F59E0B]/10 border-2 border-transparent focus:border-[#F59E0B]/20"
+                    className="w-full rounded-2xl bg-[#F5F5F4] dark:bg-[#222] px-6 py-5 text-base font-semibold text-[#1C1917] dark:text-white outline-none transition focus:bg-white dark:focus:bg-[#1a1a1a] focus:ring-4 focus:ring-[#F59E0B]/10 border-2 border-transparent focus:border-[#F59E0B]/20"
                     required={step === 2}
                   />
-                  <p className="text-xs text-[#78716C] leading-relaxed px-1">
+                  <p className="text-xs text-[#78716C] dark:text-[#999] leading-relaxed px-1">
                     Pega la dirección web completa (URL) del destino.
                   </p>
                 </div>
@@ -141,7 +141,7 @@ export default function BlogLinkModal({
                   <CheckCircle2 className="h-4 w-4" />
                   <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Paso 3: Confirmación</span>
                 </div>
-                <h4 className="text-2xl font-bold text-[#1C1917] leading-tight">¡Todo listo para brillar!</h4>
+                <h4 className="text-2xl font-bold text-[#1C1917] dark:text-white leading-tight">¡Todo listo para brillar!</h4>
                 <div className="rounded-3xl bg-emerald-50 p-6 border border-emerald-100 space-y-4">
                   <div className="space-y-1">
                     <span className="text-[9px] font-bold uppercase text-emerald-600/60 tracking-wider">Vista previa final</span>
@@ -164,7 +164,7 @@ export default function BlogLinkModal({
               <button
                 type="button"
                 onClick={handleBack}
-                className="flex items-center justify-center h-16 w-16 rounded-2xl bg-[#F5F5F4] text-[#1C1917] transition hover:bg-[#E7E5E4]"
+                className="flex items-center justify-center h-16 w-16 rounded-2xl bg-[#F5F5F4] dark:bg-[#222] text-[#1C1917] dark:text-white transition hover:bg-[#E7E5E4] dark:hover:bg-[#333]"
               >
                 <ChevronLeft className="h-6 w-6" />
               </button>

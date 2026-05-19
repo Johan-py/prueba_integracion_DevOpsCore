@@ -144,6 +144,9 @@ export const blogsService = {
     if (estado === "RECHAZADO" && !razon_rechazo) {
       throw new Error("RAZON_RECHAZO_REQUIRED");
     }
+    if (razon_rechazo && razon_rechazo.length > 500) {
+      throw new Error("RAZON_RECHAZO_TOO_LONG");
+    }
 
     const updatedBlog = await blogsRepository.changeEstado(
       id,
@@ -194,14 +197,18 @@ export const blogsService = {
   },
 
   async eliminar(id: number, usuario_id: number) {
-    const blogeliminado = await blogsRepository.findById(id);
-    if (!blogeliminado) throw new Error("BLOG_NOT_FOUND");
-    if (blogeliminado.usuario_id !== usuario_id) throw new Error("FORBIDDEN");
-
+    const blog = await blogsRepository.findById(id);
+    if (!blog) {
+      throw new Error("BLOG_NOT_FOUND");
+    }
+    if (blog.usuario_id !== usuario_id) {
+      throw new Error("FORBIDDEN");
+    }
+    const blogEliminado = await blogsRepository.delete(id);
     const io = getIO();
     io.emit("blog:eliminado_global", { id });
     io.emit(`blog:${id}:notificacion_eliminado`);
-    return blogeliminado;
+    return blogEliminado;
   },
 
   async listarAdmin(params: {
