@@ -10,7 +10,7 @@ interface AdvancedFiltersModalProps {
   onApply: (amenities: number[], labels: number[]) => void
 }
 
-// Datos basados en tu Mockup e IDs de base de datos (puedes ajustarlos luego)
+// Datos basados en tu Mockup e IDs de base de datos
 const AMENITIES_DATA = [
   { id: 1, name: 'Piscina' },
   { id: 2, name: 'Terraza' },
@@ -20,7 +20,7 @@ const AMENITIES_DATA = [
   { id: 6, name: 'Ascensor' },
   { id: 7, name: 'Aire' },
   { id: 8, name: 'Amueblado' },
-  { id: 9, name: 'Parrillero' }, 
+  { id: 9, name: 'Parrillero' },
   { id: 10, name: 'Seguridad' },
 ]
 
@@ -32,7 +32,6 @@ const LABELS_DATA = [
 ]
 
 export default function AdvancedFiltersModal({ isOpen, onClose, onApply }: AdvancedFiltersModalProps) {
-  // Estados para selección múltiple
   const [mounted, setMounted] = useState(false)
   const [selectedAmenities, setSelectedAmenities] = useState<number[]>([])
   const [selectedLabels, setSelectedLabels] = useState<number[]>([])
@@ -54,16 +53,14 @@ export default function AdvancedFiltersModal({ isOpen, onClose, onApply }: Advan
 
   if (!isOpen || !mounted) return null
 
-  // Lógica de Toggle para Amenidades
   const toggleAmenity = (id: number) => {
-    setSelectedAmenities(prev => 
+    setSelectedAmenities(prev =>
       prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]
     )
   }
 
-  // Lógica de Toggle para Etiquetas
   const toggleLabel = (id: number) => {
-    setSelectedLabels(prev => 
+    setSelectedLabels(prev =>
       prev.includes(id) ? prev.filter(l => l !== id) : [...prev, id]
     )
   }
@@ -80,23 +77,23 @@ export default function AdvancedFiltersModal({ isOpen, onClose, onApply }: Advan
 
   return createPortal(
     <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4">
-      {/* Backdrop (Fondo oscuro difuminado) */}
-      <div 
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" 
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
       {/* Ventana del Modal */}
-      <div className="relative w-full max-w-xl bg-white rounded-[32px] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+      <div className="relative w-full max-w-xl bg-white dark:bg-slate-900 rounded-[32px] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200 border border-transparent dark:border-slate-800">
         
         {/* Header */}
-        <div className="flex items-center justify-between px-8 py-6 border-b border-gray-100">
-          <div className="flex-1" /> {/* Spacer */}
-          <h2 className="text-2xl font-bold text-gray-800 text-center">Filtros avanzados</h2>
+        <div className="flex items-center justify-between px-8 py-6 border-b border-gray-100 dark:border-slate-800">
+          <div className="flex-1" />
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-slate-100 text-center">Filtros avanzados</h2>
           <div className="flex-1 flex justify-end">
-            <button 
+            <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400"
+              className="p-2 hover:bg-gray-100 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-full transition-colors text-gray-400 dark:text-slate-400"
             >
               <X size={24} />
             </button>
@@ -108,7 +105,7 @@ export default function AdvancedFiltersModal({ isOpen, onClose, onApply }: Advan
           
           {/* SECCIÓN AMENIDADES */}
           <section>
-            <h3 className="text-lg font-semibold text-gray-700 mb-4">Amenidades</h3>
+            <h3 className="text-lg font-semibold text-gray-700 dark:text-slate-200 mb-4">Amenidades</h3>
             <div className="flex flex-wrap gap-3">
               {AMENITIES_DATA.slice(0, showAllAmenities ? undefined : 8).map((amenity) => {
                 const isActive = selectedAmenities.includes(amenity.id)
@@ -116,13 +113,15 @@ export default function AdvancedFiltersModal({ isOpen, onClose, onApply }: Advan
                   <button
                     key={amenity.id}
                     onClick={() => toggleAmenity(amenity.id)}
+                    /* AQUI ESTÁ LA MAGIA: Solo coloreamos el texto y el borde en estado activo */
                     className={`
-                      flex items-center gap-2 px-5 py-2.5 rounded-xl border text-sm font-medium transition-all
-                      ${isActive 
-                        ? 'bg-[#d97706] border-[#d97706] text-white shadow-md' 
-                        : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-[#d97706]'}
+                      flex items-center gap-2 px-5 py-2.5 rounded-full border text-sm font-medium transition-all
+                      ${isActive
+                        ? '!bg-transparent dark:!bg-slate-800 !border-[rgb(217,119,6)] !text-[rgb(217,119,6)] dark:!border-[rgb(232,124,30)] dark:!text-[rgb(232,124,30)]'
+                        : 'bg-gray-50 dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300 hover:border-[rgb(217,119,6)] dark:hover:border-[rgb(232,124,30)]'}
                     `}
                   >
+                    {/* Al heredar el color del texto, el icono también se pinta de naranja automáticamente */}
                     {isActive && <Check size={16} strokeWidth={3} />}
                     {amenity.name}
                   </button>
@@ -130,9 +129,9 @@ export default function AdvancedFiltersModal({ isOpen, onClose, onApply }: Advan
               })}
               
               {!showAllAmenities && (
-                <button 
+                <button
                   onClick={() => setShowAllAmenities(true)}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-[#d97706] text-sm font-bold hover:bg-gray-100"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-[rgb(217,119,6)] dark:text-[rgb(232,124,30)] text-sm font-bold hover:bg-gray-100 dark:hover:bg-slate-700"
                 >
                   <Plus size={16} /> Más
                 </button>
@@ -142,7 +141,7 @@ export default function AdvancedFiltersModal({ isOpen, onClose, onApply }: Advan
 
           {/* SECCIÓN ETIQUETAS */}
           <section>
-            <h3 className="text-lg font-semibold text-gray-700 mb-4">Etiquetas</h3>
+            <h3 className="text-lg font-semibold text-gray-700 dark:text-slate-200 mb-4">Etiquetas</h3>
             <div className="flex flex-wrap gap-3">
               {LABELS_DATA.map((label) => {
                 const isActive = selectedLabels.includes(label.id)
@@ -150,11 +149,12 @@ export default function AdvancedFiltersModal({ isOpen, onClose, onApply }: Advan
                   <button
                     key={label.id}
                     onClick={() => toggleLabel(label.id)}
+                    /* Aplicamos el mismo estilo outline para las etiquetas */
                     className={`
                       px-6 py-2.5 rounded-full border text-sm font-medium transition-all
-                      ${isActive 
-                        ? 'bg-[#d97706] border-[#d97706] text-white shadow-md' 
-                        : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-[#d97706]'}
+                      ${isActive
+                        ? '!bg-transparent dark:!bg-slate-800 !border-[rgb(217,119,6)] !text-[rgb(217,119,6)] dark:!border-[rgb(232,124,30)] dark:!text-[rgb(232,124,30)]'
+                        : 'bg-gray-50 dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300 hover:border-[rgb(217,119,6)] dark:hover:border-[rgb(232,124,30)]'}
                     `}
                   >
                     {label.name}
@@ -167,16 +167,16 @@ export default function AdvancedFiltersModal({ isOpen, onClose, onApply }: Advan
         </div>
 
         {/* Footer (Botones de acción) */}
-        <div className="p-8 pt-4 flex gap-4">
+        <div className="p-8 pt-4 flex items-center gap-4">
           <button
             onClick={handleClear}
-            className="flex-1 py-4 text-gray-500 font-semibold hover:text-gray-700 transition-colors"
+            className="flex-1 py-4 text-stone-500 dark:text-slate-400 font-semibold hover:text-[rgb(217,119,6)] dark:hover:text-[rgb(232,124,30)] transition-colors underline"
           >
             Limpiar
           </button>
           <button
             onClick={handleApply}
-            className="flex-[2] bg-[#d97706] hover:bg-[#b95e00] text-white py-4 rounded-2xl font-bold shadow-lg shadow-orange-200 transition-all active:scale-95"
+            className="flex-[2] !bg-[rgb(217,119,6)] hover:!bg-[rgb(185,94,0)] !text-white py-4 rounded-[16px] font-bold shadow-lg shadow-orange-200/50 dark:shadow-none transition-all active:scale-95 border-none dark:!bg-[rgb(232,124,30)] dark:hover:!bg-[rgb(217,119,6)]"
           >
             Aplicar
           </button>

@@ -62,43 +62,35 @@ export default async function BlogDetailPage({ params }: { params: { id: string 
     .slice(0, 4)
 
   return (
-    <article className="min-h-screen bg-[linear-gradient(180deg,#fbf6ef_0%,#f8f3eb_38%,#ffffff_100%)] pb-20">
+    <article className="min-h-screen bg-[linear-gradient(180deg,#fbf6ef_0%,#f8f3eb_38%,#ffffff_100%)] dark:bg-none dark:bg-black pb-20 transition-colors duration-300">
       <header className="mx-auto max-w-5xl px-4 pt-10 sm:px-6 lg:px-8 lg:pt-14">
         <div className="max-w-4xl">
           <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#a56400]">
             Blog PropBol
           </p>
 
-          <h1 className="font-heading mt-4 text-4xl font-black leading-tight text-stone-900 sm:text-5xl lg:text-6xl">
+          <h1 className="font-heading mt-4 text-4xl font-black leading-tight text-stone-900 dark:text-white sm:text-5xl lg:text-6xl transition-colors duration-300">
             {title}
           </h1>
 
-          <div className="mt-8 flex items-center justify-between gap-4 border-b border-stone-200 pb-8">
+          <div className="mt-8 flex items-center justify-between gap-4 border-b border-stone-200 dark:border-stone-800 pb-8 transition-colors duration-300">
             <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-stone-900 text-sm font-bold text-white">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#d68b1a] to-[#a56400] text-lg font-black text-white shadow-lg shadow-[#a56400]/30 border border-white/20">
                 {authorName.charAt(0).toUpperCase()}
               </div>
 
               <div className="flex min-w-0 flex-col">
-                <span className="text-sm font-bold text-stone-900">{authorName}</span>
+                <span className="text-sm font-bold text-stone-900 dark:text-white transition-colors duration-300">{authorName}</span>
                 <span className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">
                   {publishedLabel}
                 </span>
               </div>
             </div>
-
-            <button className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-stone-100 transition-colors text-stone-400 hover:text-stone-900 transition-all duration-300" title="Más opciones">
-              <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="1"></circle>
-                <circle cx="12" cy="5" r="1"></circle>
-                <circle cx="12" cy="19" r="1"></circle>
-              </svg>
-            </button>
           </div>
 
         </div>
 
-        <div className="mt-10 overflow-hidden rounded-[32px] bg-stone-100 shadow-[0_24px_80px_-32px_rgba(41,37,36,0.35)]">
+        <div className="mt-10 overflow-hidden rounded-[32px] bg-stone-100 dark:bg-stone-900 shadow-[0_24px_80px_-32px_rgba(41,37,36,0.35)] dark:shadow-none transition-colors duration-300">
           <Image
             src={imageUrl}
             alt={title}
@@ -113,13 +105,13 @@ export default async function BlogDetailPage({ params }: { params: { id: string 
       <main className="mx-auto mt-12 max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="blog-grid-container grid gap-12 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start xl:grid-cols-[minmax(0,1fr)_360px]">
           <div className="space-y-12">
-            <div className="rounded-[36px] bg-white/90 p-6 shadow-[0_24px_80px_-50px_rgba(41,37,36,0.45)] sm:p-8 lg:p-10">
+            <div className="rounded-[36px] bg-white/90 dark:bg-[#111111] dark:border dark:border-stone-800 p-6 shadow-[0_24px_80px_-50px_rgba(41,37,36,0.45)] dark:shadow-none sm:p-8 lg:p-10 transition-colors duration-300">
               <MarkdownRenderer content={articleContent} />
             </div>
 
             <div className="no-capture">
-              <BlogSharePlaceholder 
-                title={title} 
+              <BlogSharePlaceholder
+                title={title}
                 author={authorName}
                 category={publicBlog?.category || 'General'}
                 imageUrl={imageUrl}

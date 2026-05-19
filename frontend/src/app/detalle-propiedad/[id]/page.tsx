@@ -106,15 +106,31 @@ export default function DetallePropiedadPage() {
   return (
     <main className="min-h-screen bg-[#ede7dc]">
       <div className="mx-auto w-full max-w-[1120px] px-4 py-8">
-        <div className="mb-4 flex justify-end">
+        <div className="mb-4 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => window.close()}
+            className="rounded-full px-3 py-2 text-sm font-semibold text-[#d67a00] transition hover:bg-[#f3ece2]"
+          >
+            ← Volver
+          </button>
+
           <button
             type="button"
             onClick={toggleFavorite}
             disabled={isLoadingStatus || isSubmitting}
-            className={`flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold transition ${isFavorite ? 'bg-[#fff0f6] text-[#E68B25]' : 'text-[#d67a00] hover:bg-[#f3ece2]'
-              } ${isLoadingStatus || isSubmitting ? 'cursor-not-allowed opacity-70' : ''}`}
+            className={`flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold transition ${
+              isFavorite
+                ? 'bg-[#fff0f6] text-[#E68B25]'
+                : 'text-[#d67a00] hover:bg-[#f3ece2]'
+            } ${isLoadingStatus || isSubmitting ? 'cursor-not-allowed opacity-70' : ''}`}
           >
-            <Heart className={`h-4 w-4 ${isFavorite ? 'fill-[#E68B25] text-[#E68B25]' : ''}`} />
+            <Heart
+              className={`h-4 w-4 ${
+                isFavorite ? 'fill-[#E68B25] text-[#E68B25]' : ''
+              }`}
+            />
+
             {isLoadingStatus || isSubmitting
               ? 'Procesando...'
               : isFavorite
@@ -128,7 +144,7 @@ export default function DetallePropiedadPage() {
         <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_300px] lg:items-start">
           <div className="space-y-5">
             <div className="flex items-start justify-between gap-4">
-              <ResumenPropiedad detalle={detalle} />
+              <ResumenPropiedad detalle={detalle} esOferta={esOferta} porcentajeDescuento={porcentajeDescuento} formatPrice={formatPrice}/>
 
               <div className="mt-16 shrink-0">
                 <CompartirPublicacion publicacionId={id} titulo={detalle.titulo} />
@@ -137,7 +153,8 @@ export default function DetallePropiedadPage() {
 
             <DescripcionPropiedad descripcion={detalle.descripcion} />
             <DetallesPropiedad detalle={detalle} />
-            <UbicacionPropiedad mapa={detalle.mapa} />
+            <UbicacionPropiedad mapa={detalle.mapa} puntosDeInteres={detalle.puntosDeInteres} 
+/>
           </div>
 
           <div className="lg:sticky lg:top-16 lg:self-start">

@@ -150,13 +150,13 @@ export default function BlogSharePlaceholder({
   }, [])
 
   return (
-    <div className="mt-8 w-full rounded-2xl bg-white p-6 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-stone-100 min-h-[120px] transition-all duration-300">
+    <div className="mt-8 w-full rounded-2xl bg-white dark:bg-[#111111] p-6 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none border border-stone-100 dark:border-stone-800 min-h-[120px] transition-all duration-300">
       <div className="flex flex-col gap-6">
         <h3 className="text-xs font-bold uppercase tracking-[0.24em] text-[#a56400]">
           Compartir
         </h3>
-        <div className="flex flex-wrap items-center justify-between w-full gap-y-6">
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between w-full gap-5">
+          <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto w-full lg:w-auto pr-2 lg:pr-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             <button onClick={shareToGmail} className="flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-stone-100 hover:bg-stone-200 transition-colors duration-200 group shrink-0" title="Compartir por Gmail">
               <img
                 src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg"
@@ -178,11 +178,11 @@ export default function BlogSharePlaceholder({
                 className="w-6 h-6 sm:w-7 sm:h-7 opacity-90 group-hover:opacity-100 transition-opacity"
               />
             </button>
-            <button onClick={shareToX} className="flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-stone-100 hover:bg-stone-200 transition-colors duration-200 group shrink-0" title="Compartir en X (Twitter)">
+            <button onClick={shareToX} className="flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 transition-colors duration-200 group shrink-0" title="Compartir en X (Twitter)">
               <img
                 src="https://upload.wikimedia.org/wikipedia/commons/c/ce/X_logo_2023.svg"
                 alt="X"
-                className="w-5 h-5 sm:w-6 sm:h-6 opacity-90 group-hover:opacity-100 transition-opacity"
+                className="w-5 h-5 sm:w-6 sm:h-6 opacity-90 group-hover:opacity-100 transition-opacity dark:invert"
               />
             </button>
             <button onClick={shareToLinkedIn} className="flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-stone-100 hover:bg-stone-200 transition-colors duration-200 group shrink-0" title="Compartir en LinkedIn">
@@ -200,7 +200,7 @@ export default function BlogSharePlaceholder({
               className="flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-stone-100 hover:bg-stone-200 transition-colors duration-200 group shrink-0"
               title="Copiar enlace"
             >
-              <svg viewBox="0 0 24 24" className="w-5 h-5 opacity-90 group-hover:opacity-100 transition-opacity text-[#433527]" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <svg viewBox="0 0 24 24" className="w-5 h-5 opacity-90 group-hover:opacity-100 transition-opacity text-[#433527] dark:text-stone-300" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <rect width="14" height="14" x="8" y="8" rx="2.5" ry="2.5"></rect>
                 <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
               </svg>
@@ -210,7 +210,7 @@ export default function BlogSharePlaceholder({
               className="flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-stone-100 hover:bg-stone-200 transition-colors duration-200 group shrink-0"
               title="Más opciones de compartido"
             >
-              <svg viewBox="0 0 24 24" className="w-5 h-5 opacity-90 group-hover:opacity-100 transition-opacity text-[#433527]" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg viewBox="0 0 24 24" className="w-5 h-5 opacity-90 group-hover:opacity-100 transition-opacity text-[#433527] dark:text-stone-300" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="1.5"></circle>
                 <circle cx="19" cy="12" r="1.5"></circle>
                 <circle cx="5" cy="12" r="1.5"></circle>
@@ -219,13 +219,13 @@ export default function BlogSharePlaceholder({
           </div>
 
           {/* MENÚ DE DESCARGA */}
-          <div className="relative shrink-0" ref={menuRef}>
+          <div className="relative w-full lg:w-auto lg:shrink-0" ref={menuRef}>
             <button
               onClick={() => setIsDownloadOpen(!isDownloadOpen)}
               disabled={isGenerating}
-              className={`flex items-center justify-between gap-3 h-11 px-4 sm:h-12 sm:px-5 rounded-xl border transition-all duration-300 group whitespace-nowrap shrink-0 ${isDownloadOpen
+              className={`flex items-center justify-between gap-3 h-11 px-4 sm:h-12 sm:px-5 w-full lg:w-auto rounded-xl border transition-all duration-300 group whitespace-nowrap ${isDownloadOpen
                 ? 'bg-stone-900 border-stone-900 text-white shadow-lg shadow-stone-200'
-                : 'border-stone-200 hover:border-stone-400 hover:bg-stone-50 text-[#433527]'
+                : 'border-stone-200 dark:border-stone-700 hover:border-stone-400 dark:hover:border-stone-500 hover:bg-stone-50 dark:hover:bg-stone-800 text-[#433527] dark:text-stone-300'
                 } ${isGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
 
@@ -233,7 +233,7 @@ export default function BlogSharePlaceholder({
                 {isGenerating ? (
                   <div className="w-4 h-4 border-2 border-stone-300 border-t-stone-100 rounded-full animate-spin" />
                 ) : (
-                  <svg viewBox="0 0 24 24" className={`w-[18px] h-[18px] ${isDownloadOpen ? 'text-stone-100' : 'text-[#433527]'}`} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg viewBox="0 0 24 24" className={`w-[18px] h-[18px] ${isDownloadOpen ? 'text-stone-100' : 'text-[#433527] dark:text-stone-300'}`} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                     <polyline points="7 10 12 15 17 10"></polyline>
                     <line x1="12" y1="15" x2="12" y2="3"></line>
@@ -250,9 +250,9 @@ export default function BlogSharePlaceholder({
 
             {/* DROPDOWN */}
             {isDownloadOpen && (
-              <div className="absolute right-0 top-full mt-2.5 w-full bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.12)] border border-stone-100 p-2 z-50 animate-in fade-in zoom-in slide-in-from-top-2 duration-300 origin-top">
+              <div className="absolute right-0 top-full mt-2.5 w-full bg-white dark:bg-[#111111] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.12)] dark:shadow-none border border-stone-100 dark:border-stone-800 p-2 z-50 animate-in fade-in zoom-in slide-in-from-top-2 duration-300 origin-top">
                 <button
-                  className="flex items-center w-full gap-3 px-3 py-3 rounded-xl hover:bg-stone-50 text-stone-700 transition-colors group"
+                  className="flex items-center w-full gap-3 px-3 py-3 rounded-xl hover:bg-stone-50 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-300 transition-colors group"
                   onClick={handleDownloadPDF}
                 >
                   <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-red-50 group-hover:bg-red-100 transition-colors shrink-0">
@@ -266,7 +266,7 @@ export default function BlogSharePlaceholder({
                 </button>
 
                 <button
-                  className="flex items-center w-full gap-3 px-3 py-3 rounded-xl hover:bg-stone-50 text-stone-700 transition-colors group"
+                  className="flex items-center w-full gap-3 px-3 py-3 rounded-xl hover:bg-stone-50 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-300 transition-colors group"
                   onClick={async () => {
                     setIsDownloadOpen(false);
                     setIsGenerating(true);

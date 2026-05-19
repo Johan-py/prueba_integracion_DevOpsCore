@@ -262,8 +262,9 @@ function labelIcon(nombre: string, isSelected: boolean, zoom: number, tipoZona: 
     : '0 1px 3px rgba(255,255,255,0.95), 0 -1px 3px rgba(255,255,255,0.95), 1px 0 3px rgba(255,255,255,0.95), -1px 0 3px rgba(255,255,255,0.95)'
 
   return L.divIcon({
-    className: '',
+    className: 'pb-map-label-container',
     html: `<div
+      class="pb-map-label"
       aria-hidden="true"
       style="
         background: transparent;
@@ -409,6 +410,26 @@ function ZonaInteractiva({
   
   recalcularCentroOptimo()
 }, [zoom, zona.coordenadas])
+
+  useEffect(() => {
+    const layer = polygonRef.current
+    if (!layer) return
+
+    layer.setStyle({
+      color: selected ? colorConfig.borderActive : colorConfig.borderInactive,
+      weight: selected ? 2 : 1.8,
+      dashArray: selected ? '6,6' : undefined,
+      fillColor: selected ? colorConfig.fillActive : colorConfig.fillInactive,
+      fillOpacity: selected ? colorConfig.fillOpacityActive : colorConfig.fillOpacityInactive,
+      lineJoin: 'round',
+      lineCap: 'round'
+    })
+
+    const element = layer.getElement() as SVGPathElement | null
+    if (element) {
+      element.setAttribute('aria-pressed', String(selected))
+    }
+  }, [selected, colorConfig.borderActive, colorConfig.borderInactive, colorConfig.fillActive, colorConfig.fillInactive, colorConfig.fillOpacityActive, colorConfig.fillOpacityInactive])
 
 
 

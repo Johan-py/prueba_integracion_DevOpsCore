@@ -1,30 +1,30 @@
-import { prisma } from '../../lib/prisma.client.js'
+import { prisma } from "../../lib/prisma.client.js";
 
 export const testimoniosRepository = {
   async findAll(params: { ciudad?: string; usuarioId?: number }) {
-    const { ciudad, usuarioId } = params
+    const { ciudad, usuarioId } = params;
 
     const where = {
       visible: true,
       eliminado: false,
-      ...(ciudad && ciudad !== 'Todos' ? { ciudad } : {})
-    }
+      ...(ciudad && ciudad !== "Todos" ? { ciudad } : {}),
+    };
 
     const testimonios = await prisma.testimonio.findMany({
       where,
-      orderBy: { fecha_creacion: 'desc' },
+      orderBy: { fecha_creacion: "desc" },
       include: {
         usuario: {
           select: {
             id: true,
             nombre: true,
             apellido: true,
-            avatar: true
-          }
+            avatar: true,
+          },
         },
-        likes: true
-      }
-    })
+        testimonio_like: true,
+      },
+    });
 
     return testimonios.map((t) => ({
       id: t.id,
@@ -40,36 +40,43 @@ export const testimoniosRepository = {
         apellido: t.usuario.apellido,
         avatar: t.usuario.avatar,
         iniciales:
-          `${t.usuario.nombre[0] ?? ''}${t.usuario.apellido[0] ?? ''}`.toUpperCase()
+          `${t.usuario.nombre[0] ?? ""}${t.usuario.apellido[0] ?? ""}`.toUpperCase(),
       },
-      totalLikes: t.likes.length,
+      totalLikes: t.testimonio_like.length,
       meGusta: usuarioId
-        ? t.likes.some((l) => l.usuarioId === usuarioId)
-        : false
-    }))
+        ? t.testimonio_like.some((l) => l.usuario_id === usuarioId)
+        : false,
+    }));
   },
 
   async findById(id: number) {
-    return prisma.testimonio.findUnique({ where: { id } })
+    return prisma.testimonio.findUnique({ where: { id } });
   },
 
   async findLike(testimonioId: number, usuarioId: number) {
-    return prisma.testimonioLike.findUnique({
-      where: { testimonioId_usuarioId: { testimonioId, usuarioId } }
-    })
+    return prisma.testimonio_like.findUnique({
+      where: {
+        testimonio_id_usuario_id: {
+          testimonio_id: testimonioId,
+          usuario_id: usuarioId,
+        },
+      },
+    });
   },
 
   async createLike(testimonioId: number, usuarioId: number) {
-    return prisma.testimonioLike.create({
-      data: { testimonioId, usuarioId }
-    })
+    return prisma.testimonio_like.create({
+      data: { testimonio_id: testimonioId, usuario_id: usuarioId },
+    });
   },
 
   async deleteLike(id: number) {
-    return prisma.testimonioLike.delete({ where: { id } })
+    return prisma.testimonio_like.delete({ where: { id } });
   },
 
   async countLikes(testimonioId: number) {
-    return prisma.testimonioLike.count({ where: { testimonioId } })
-  }
-}
+    return prisma.testimonio_like.count({
+      where: { testimonio_id: testimonioId },
+    });
+  },
+};

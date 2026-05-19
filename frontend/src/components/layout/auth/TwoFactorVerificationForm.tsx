@@ -89,6 +89,13 @@ const getPending2FA = (): Pending2FAData | null => {
 const clearPending2FA = () => {
   localStorage.removeItem(PENDING_2FA_KEY);
 };
+const maskEmail = (email: string): string => {
+  const [local, domain] = email.split("@");
+  if (!domain) return email;
+  const visible = local.slice(0, 2);
+  const masked = "*".repeat(Math.max(local.length - 2, 3));
+  return `${visible}${masked}@${domain}`;
+};
 
 export default function TwoFactorVerificationForm() {
   const router = useRouter();
@@ -273,7 +280,7 @@ export default function TwoFactorVerificationForm() {
       {pending2FA?.email && (
         <p className="mt-2 text-sm text-gray-500">
           Código enviado a:{" "}
-          <span className="font-medium">{pending2FA.email}</span>
+          <span className="font-medium">{maskEmail(pending2FA.email)}</span>
         </p>
       )}
 
@@ -288,6 +295,7 @@ export default function TwoFactorVerificationForm() {
           value={code}
           onChange={(e) => handleCodeChange(e.target.value)}
           onPaste={handleCodePaste}
+          onKeyDown={(e) => e.key === "Enter" && handleVerifyCode()} 
           placeholder="123456"
           className={`w-full rounded-md border px-3 py-2 text-sm outline-none ${
             error

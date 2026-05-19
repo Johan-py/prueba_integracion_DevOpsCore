@@ -9,6 +9,7 @@ import {
   misBlogs,
   actualizarBlog,
   eliminarBlog,
+  resubmitBlog,
   cambiarEstadoBlog,
   listarBlogsAdmin,
   listarCategorias,
@@ -50,6 +51,7 @@ router.get("/mis-blogs", requireAuth, misBlogs);
 router.get("/:id", obtenerBlog);
 router.patch("/:id", requireAuth, actualizarBlog);
 router.delete("/:id", requireAuth, eliminarBlog);
+router.patch("/:id/resubmit", requireAuth, resubmitBlog);
 router.patch("/:id/estado", requireAuth, cambiarEstadoBlog);
 
 // Rutas de Comentarios

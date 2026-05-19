@@ -10,8 +10,8 @@ interface Props {
     pesoMb: number | null
   }>
   titulo: string
-  esOferta?: boolean           
-  porcentajeDescuento?: number 
+  esOferta?: boolean
+  porcentajeDescuento?: number
 }
 
 const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '')
@@ -32,7 +32,7 @@ function resolverUrlMultimedia(url: string) {
   return `${API_URL}/${url}`
 }
 
-export default function GaleriaPropiedad({ imagenes, titulo }: Props) {
+export default function GaleriaPropiedad({ imagenes, titulo, esOferta, porcentajeDescuento }: Props) {
   const imagenesValidas = useMemo(
     () =>
       imagenes
@@ -57,12 +57,18 @@ export default function GaleriaPropiedad({ imagenes, titulo }: Props) {
 
   return (
     <section className="grid gap-3 lg:grid-cols-[1.65fr_1fr]">
-      <div className="overflow-hidden rounded-2xl">
+      <div className="relative overflow-hidden rounded-2xl">
         <img
           src={imagenPrincipal}
           alt={titulo}
           className="h-[260px] w-full object-cover sm:h-[320px] lg:h-[390px]"
         />
+        {/* Badge de oferta */}
+        {esOferta && (
+          <div className="absolute top-0 right-0 z-10 bg-orange-500 text-white text-sm font-bold px-4 py-1.5 rounded-bl-lg shadow-md">
+            {porcentajeDescuento}% OFF
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-3">

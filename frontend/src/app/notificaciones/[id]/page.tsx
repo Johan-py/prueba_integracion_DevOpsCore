@@ -131,6 +131,22 @@ export default function NotificationDetailPage() {
                   {notification.status === 'no leida' ? 'No leída' : 'Leída'}
                 </span>
 
+                {notification.tipo === 'BLOG_APROBADO' && (
+                  <span className="rounded-full bg-green-100 px-2.5 py-1 font-semibold text-green-700">
+                    Aprobado
+                  </span>
+                )}
+                {notification.tipo === 'BLOG_RECHAZADO' && (
+                  <span className="rounded-full bg-red-100 px-2.5 py-1 font-semibold text-red-600">
+                    Rechazado
+                  </span>
+                )}
+                {notification.tipo === 'BLOG_PENDIENTE' && (
+                  <span className="rounded-full bg-amber-100 px-2.5 py-1 font-semibold text-amber-700">
+                    Pendiente
+                  </span>
+                )}
+
                 {notification.fechaCreacion && (
                   <span>{formatRelativeTime(notification.fechaCreacion)}</span>
                 )}
@@ -139,16 +155,40 @@ export default function NotificationDetailPage() {
           </div>
         </div>
 
-        <div className="px-6 py-6">
+        <div className="px-6 py-6 space-y-4">
           <div className="rounded-xl border border-stone-200 bg-stone-50 p-5">
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-stone-500">
               Mensaje
             </h2>
 
-            <p className="whitespace-pre-line text-base leading-7 text-stone-700">
+            <p className={`whitespace-pre-line text-base leading-7 ${notification.tipo === 'BLOG_RECHAZADO' ? 'text-red-600' : 'text-stone-700'}`}>
               {notification.description?.trim() || '(Sin descripción disponible)'}
             </p>
           </div>
+
+          {notification.tipo === 'BLOG_APROBADO' && notification.blogId && (
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => router.push(`/blog/${notification.blogId}`)}
+                className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700"
+              >
+                Ver blog publicado
+              </button>
+            </div>
+          )}
+
+          {notification.tipo === 'BLOG_RECHAZADO' && notification.blogId && (
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => router.push(`/blog/${notification.blogId}/edit`)}
+                className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-amber-700"
+              >
+                Editar y reenviar blog
+              </button>
+            </div>
+          )}
         </div>
       </article>
     </section>

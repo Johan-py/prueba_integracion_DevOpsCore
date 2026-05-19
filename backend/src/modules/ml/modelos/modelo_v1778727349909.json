@@ -1,0 +1,27 @@
+{
+  "version": "v1778727349909",
+  "algoritmo": "regresion_logistica",
+  "pesos": [
+    0.24948242996322467,
+    0.54345159649079,
+    0.23977213540651945,
+    0.4451967810817609,
+    0.3917298239719212,
+    0.4387093235554394,
+    1.1861531339826943
+  ],
+  "bias": 1.1861531339826943,
+  "features": [
+    "categoria",
+    "tipoAccion",
+    "precio",
+    "superficieM2",
+    "cuartos",
+    "banos",
+    "precioReducido"
+  ],
+  "precision": 1,
+  "recall": 1,
+  "datos_usados": 8,
+  "entrenado_en": "2026-05-14T02:55:49.910Z"
+}

@@ -3,7 +3,7 @@ export interface DetallePropiedad {
   inmuebleId: number
   titulo: string
   precio: number
-  precio_anterior?: number;
+  precio_anterior?: number
   tipoInmueble: string | null
   tipoOperacion: string
   ubicacionTexto: string
@@ -25,9 +25,17 @@ export interface DetallePropiedad {
     longitud: number | null
     direccion: string | null
   }
+  puntosDeInteres?: PuntoInteres[]
   contacto: {
     nombre: string
     correo: string | null
     telefono: string | null
   }
+}
+
+export interface PuntoInteres {
+  id: number
+  nombre: string
+  latitud: number
+  longitud: number
 }

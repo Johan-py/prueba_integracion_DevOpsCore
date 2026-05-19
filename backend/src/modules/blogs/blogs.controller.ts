@@ -183,6 +183,32 @@ export const actualizarBlog = async (req: AuthRequest, res: Response) => {
   }
 };
 
+/** PATCH /api/blogs/:id/resubmit — Autor del blog */
+export const resubmitBlog = async (req: AuthRequest, res: Response) => {
+  try {
+    if (!req.user)
+      return res.status(401).json({ message: "NOT_AUTHENTICATED" });
+
+    const id = Number(req.params.id);
+    const blog = await blogsService.resubmit(id, req.user.id);
+    return res.json(blog);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.message === "BLOG_NOT_FOUND")
+        return res.status(404).json({ message: "Blog no encontrado" });
+      if (error.message === "FORBIDDEN")
+        return res
+          .status(403)
+          .json({ message: "No tienes permiso para reenviar este blog" });
+      if (error.message === "BLOG_NOT_REJECTED")
+        return res.status(409).json({
+          message: "Solo puedes reenviar blogs en estado RECHAZADO",
+        });
+    }
+    return handleError(res, error);
+  }
+};
+
 /** PATCH /api/blogs/:id/estado — Solo Admin */
 export const cambiarEstadoBlog = async (req: AuthRequest, res: Response) => {
   try {
@@ -212,6 +238,10 @@ export const cambiarEstadoBlog = async (req: AuthRequest, res: Response) => {
         return res
           .status(400)
           .json({ message: "Debes proporcionar una razón de rechazo" });
+      if (error.message === "RAZON_RECHAZO_TOO_LONG")
+        return res
+          .status(400)
+          .json({ message: "El comentario de rechazo no puede superar los 500 caracteres" });
     }
     return handleError(res, error);
   }
@@ -303,7 +333,7 @@ export const listarComentarios = async (req: Request, res: Response) => {
       blog_id,
       usuario_id,
       page ? Number(page) : 1,
-      limit ? Number(limit) : 10
+      limit ? Number(limit) : 10,
     );
 
     return res.json(comentarios);

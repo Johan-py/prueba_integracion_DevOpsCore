@@ -439,8 +439,8 @@ export default function FilterBar({ onSearch, variant = 'home', onOpenPriceFilte
   // FIX Z-INDEX MASIVO: Agregamos z-[99999] y !overflow-visible para aplastar al mapa
   const containerStyles =
     variant === 'map'
-      ? 'bg-[#faf9f6] border-b border-stone-200 py-2 px-4 w-full flex flex-col gap-2 shadow-sm sticky top-0 z-[9999] !overflow-visible'
-      : 'bg-white shadow-lg rounded-[30px] p-6 flex flex-col gap-6 w-full max-w-[921px] relative z-[999999] !overflow-visible'
+      ? 'bg-[#faf9f6] dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 py-2 px-4 w-full flex flex-col gap-2 shadow-sm sticky top-0 z-[9999] !overflow-visible transition-colors dark:shadow-stone-900/20'
+      : 'bg-white dark:bg-stone-900 shadow-lg rounded-[30px] p-6 flex flex-col gap-6 w-full max-w-[921px] relative z-[999999] !overflow-visible transition-colors'
   return (
     <form className={containerStyles} onSubmit={handleSearch}>
 
@@ -457,7 +457,7 @@ export default function FilterBar({ onSearch, variant = 'home', onOpenPriceFilte
               <ComboBox label="" placeholder="Cualquier tipo" icon={Home} options={propertyTypes} onChange={(val) => setTipoInmueble(val)} value={tipoInmueble} />
             </div>
 
-            <div className="shrink-0 flex items-center h-[42px] bg-white border border-stone-200 rounded-xl px-2 shadow-sm relative z-[90]">
+            <div className="shrink-0 flex items-center h-[42px] bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl px-2 shadow-sm relative z-[90]">
               <TransactionModeFilter modoSeleccionado={modosSeleccionados} onModoChange={setModosSeleccionados} />
             </div>
 
@@ -474,36 +474,36 @@ export default function FilterBar({ onSearch, variant = 'home', onOpenPriceFilte
 
           {/* FILA 2: Filtros Rápidos (Píldoras) */}
           <div className="flex flex-wrap items-center gap-3 relative z-[80] justify-center md:justify-start">
-            <button type="button" onClick={(e) => { e.preventDefault(); window.dispatchEvent(new CustomEvent('abrirPanelUbicacion')); }} className={`h-[38px] flex items-center gap-2 px-4 rounded-full border text-sm font-medium shadow-sm transition-all focus:outline-none shrink-0 ${isZonaFilterActive ? 'bg-[#d97706] text-white border-[#d97706]' : 'bg-white text-stone-600 border-stone-200 hover:border-[#d97706]'}`}>
-              <MapPin className={`w-4 h-4 ${isZonaFilterActive ? 'text-white' : 'text-stone-500'}`} />
+            <button type="button" onClick={(e) => { e.preventDefault(); window.dispatchEvent(new CustomEvent('abrirPanelUbicacion')); }} className={`h-[38px] flex items-center gap-2 px-4 rounded-full border text-sm font-medium shadow-sm transition-all focus:outline-none shrink-0 ${isZonaFilterActive ? 'bg-[#d97706] text-white border-[#d97706] dark:bg-[#E87C1E] dark:border-[#E87C1E]' : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-[#d97706] dark:hover:border-[#E87C1E] dark:hover:bg-stone-700'}`}>
+              <MapPin className={`w-4 h-4 ${isZonaFilterActive ? 'text-white' : 'text-stone-500 dark:text-stone-400'}`} />
               <span>Zona</span>
             </button>
 
-            <button type="button" onClick={(e) => { e.preventDefault(); onOpenPriceFilter?.() }} className={`h-[38px] flex items-center gap-2 px-4 rounded-full border text-sm font-medium shadow-sm transition-all focus:outline-none shrink-0 ${isPriceFilterActive ? 'bg-[#d97706] text-white border-[#d97706]' : 'bg-white text-stone-600 border-stone-200 hover:border-[#d97706]'}`}>
-              <DollarSign className={`w-4 h-4 ${isPriceFilterActive ? 'text-white' : 'text-stone-500'}`} />
+            <button type="button" onClick={(e) => { e.preventDefault(); onOpenPriceFilter?.() }} className={`h-[38px] flex items-center gap-2 px-4 rounded-full border text-sm font-medium shadow-sm transition-all focus:outline-none shrink-0 ${isPriceFilterActive ? 'bg-[#d97706] text-white border-[#d97706] dark:bg-[#E87C1E] dark:border-[#E87C1E]' : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-[#d97706] dark:hover:border-[#E87C1E] dark:hover:bg-stone-700'}`}>
+              <DollarSign className={`w-4 h-4 ${isPriceFilterActive ? 'text-white' : 'text-stone-500 dark:text-stone-400'}`} />
               <span>Precio</span>
-              <ChevronDown className={`w-4 h-4 ${isPriceFilterActive ? 'text-white' : 'text-stone-400'}`} />
+              <ChevronDown className={`w-4 h-4 ${isPriceFilterActive ? 'text-white' : 'text-stone-400 dark:text-stone-400'}`} />
             </button>
 
             <div className="shrink-0">
               <CapacidadButton variant={variant} isActive={isCapacidadActive} onClick={onToggleCapacidad} />
             </div>
 
-            <button type="button" onClick={() => onOpenSuperficieFilter?.()} className={`h-[38px] flex items-center gap-2 px-4 rounded-full border text-sm font-medium shadow-sm transition-all focus:outline-none shrink-0 ${isSuperficieFilterActive ? 'bg-[#d97706] text-white border-[#d97706]' : 'bg-white text-stone-600 border-stone-200 hover:border-[#d97706]'}`}>
-              <Maximize className={`w-4 h-4 ${isSuperficieFilterActive ? 'text-white' : 'text-stone-500'}`} />
+            <button type="button" onClick={() => onOpenSuperficieFilter?.()} className={`h-[38px] flex items-center gap-2 px-4 rounded-full border text-sm font-medium shadow-sm transition-all focus:outline-none shrink-0 ${isSuperficieFilterActive ? 'bg-[#d97706] text-white border-[#d97706] dark:bg-[#E87C1E] dark:border-[#E87C1E]' : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-[#d97706] dark:hover:border-[#E87C1E] dark:hover:bg-stone-700'}`}>
+              <Maximize className={`w-4 h-4 ${isSuperficieFilterActive ? 'text-white' : 'text-stone-500 dark:text-stone-400'}`} />
               <span>Metros</span>
-              <ChevronDown className={`w-4 h-4 ${isSuperficieFilterActive ? 'text-white' : 'text-stone-400'}`} />
+              <ChevronDown className={`w-4 h-4 ${isSuperficieFilterActive ? 'text-white' : 'text-stone-400 dark:text-stone-400'}`} />
             </button>
 
-            <button type="button" onClick={() => onOpenEtiquetasFilter?.()} className={`h-[38px] flex items-center gap-2 px-4 rounded-full border text-sm font-medium shadow-sm transition-all focus:outline-none shrink-0 ${isEtiquetasFilterActive ? 'bg-[#d97706] text-white border-[#d97706]' : 'bg-white text-stone-600 border-stone-200 hover:border-[#d97706]'}`}>
-              <Tag className={`w-4 h-4 ${isEtiquetasFilterActive ? 'text-white' : 'text-stone-500'}`} />
+            <button type="button" onClick={() => onOpenEtiquetasFilter?.()} className={`h-[38px] flex items-center gap-2 px-4 rounded-full border text-sm font-medium shadow-sm transition-all focus:outline-none shrink-0 ${isEtiquetasFilterActive ? 'bg-[#d97706] text-white border-[#d97706] dark:bg-[#E87C1E] dark:border-[#E87C1E]' : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-[#d97706] dark:hover:border-[#E87C1E] dark:hover:bg-stone-700'}`}>
+              <Tag className={`w-4 h-4 ${isEtiquetasFilterActive ? 'text-white' : 'text-stone-500 dark:text-stone-400'}`} />
               <span>Etiquetas</span>
-              <ChevronDown className={`w-4 h-4 ${isEtiquetasFilterActive ? 'text-white' : 'text-stone-400'}`} />
+              <ChevronDown className={`w-4 h-4 ${isEtiquetasFilterActive ? 'text-white' : 'text-stone-400 dark:text-stone-400'}`} />
             </button>
 
             {/* Modal de Filtros Avanzados */}
-            <button type="button" onClick={() => setIsAdvancedFiltersOpen(true)} className="h-[38px] flex items-center gap-2 px-4 rounded-full bg-white border border-stone-200 text-stone-600 text-sm font-medium hover:border-[#d97706] shadow-sm transition-all focus:outline-none shrink-0">
-              <SlidersHorizontal className="w-4 h-4 text-stone-500" />
+            <button type="button" onClick={() => setIsAdvancedFiltersOpen(true)} className="h-[38px] flex items-center gap-2 px-4 rounded-full bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 text-sm font-medium hover:border-[#d97706] dark:hover:border-[#E87C1E] dark:hover:bg-stone-700 shadow-sm transition-all focus:outline-none shrink-0">
+              <SlidersHorizontal className="w-4 h-4 text-stone-500 dark:text-stone-400" />
               <span>Más Filtros</span>
             </button>
 
@@ -592,8 +592,8 @@ export default function FilterBar({ onSearch, variant = 'home', onOpenPriceFilte
 
 
               className={`h-[38px] flex items-center gap-2 px-4 rounded-full border text-sm font-medium shadow-sm transition-all focus:outline-none shrink-0 ${searchParams?.get('orden') === 'recomendados'
-                  ? 'bg-[#d97706] text-white border-[#d97706]'
-                  : 'bg-white text-stone-600 border-stone-200 hover:border-[#d97706]'
+                  ? 'bg-[#d97706] text-white border-[#d97706] dark:bg-[#E87C1E] dark:border-[#E87C1E]'
+                  : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-[#d97706] dark:hover:border-[#E87C1E] dark:hover:bg-stone-700'
                 }`}
             >
               <Award className={`w-4 h-4 ${searchParams?.get('orden') === 'recomendados' ? 'text-white' : 'text-stone-500'}`} />
@@ -607,8 +607,8 @@ export default function FilterBar({ onSearch, variant = 'home', onOpenPriceFilte
                 toggleCompareMode();
               }}
               className={`h-[38px] flex items-center gap-2 px-4 rounded-full border text-sm font-medium shadow-sm transition-all focus:outline-none shrink-0 ${isCompareMode
-                ? 'bg-[#d97706] text-white border-[#d97706]'
-                : 'bg-white text-stone-600 border-stone-200 hover:border-[#d97706]'
+                ? 'bg-[#d97706] text-white border-[#d97706] dark:bg-[#E87C1E] dark:border-[#E87C1E]'
+                : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-[#d97706] dark:hover:border-[#E87C1E] dark:hover:bg-stone-700'
                 }`}
             >
               <BarChart2 className={`w-4 h-4 ${isCompareMode ? 'text-white' : 'text-stone-500'}`} />
@@ -618,11 +618,11 @@ export default function FilterBar({ onSearch, variant = 'home', onOpenPriceFilte
 
           {/* FILA 3: ETIQUETAS DE FILTROS ACTIVOS (Chips Removibles) */}
           {activeFilters.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2 bg-white/60 backdrop-blur-sm border border-stone-200 rounded-xl p-2.5 w-full shadow-inner min-h-[48px]">
+            <div className="flex flex-wrap items-center gap-2 bg-white/60 dark:bg-stone-950/60 backdrop-blur-sm border border-stone-200 dark:border-stone-700 rounded-xl p-2.5 w-full shadow-inner min-h-[48px]">
               <span className="text-[11px] text-stone-500 font-bold uppercase tracking-wider ml-2 mr-1">Activos:</span>
 
               {activeFilters.map(filter => (
-                <div key={filter.id} className="group flex items-center gap-1.5 bg-[#fdf3e7] border border-orange-200 text-orange-800 px-3 py-1.5 rounded-lg text-xs font-semibold shadow-sm transition-all hover:bg-orange-100 animate-in fade-in zoom-in duration-200">
+                <div key={filter.id} className="group flex items-center gap-1.5 bg-[#fdf3e7] dark:bg-orange-500/20 border border-orange-200 dark:border-orange-500/30 text-orange-800 dark:text-orange-300 px-3 py-1.5 rounded-lg text-xs font-semibold shadow-sm transition-all hover:bg-orange-100 dark:hover:bg-orange-500/40 animate-in fade-in zoom-in duration-200">
                   <span className="max-w-[160px] truncate">{filter.label}</span>
                   <button
                     type="button"

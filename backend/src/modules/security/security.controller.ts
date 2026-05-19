@@ -7,6 +7,8 @@ import {
   verifyDeactivateAccountCodeService,
   activate2FAService,
   get2FAStatusService,
+  sendActivate2FACodeService,
+  verifyActivate2FACodeService,
 } from "./security.service.js";
 
 type AuthenticatedRequest = Request & {
@@ -158,5 +160,56 @@ export async function get2FAStatusController(
       return res.status(error.statusCode).json({ message: error.message });
     }
     return res.status(500).json({ message: "Error interno del servidor." });
+  }
+}
+
+export async function sendActivate2FACodeController(
+  req: AuthenticatedRequest,
+  res: Response,
+) {
+  try {
+    const userId = Number(req.user?.id);
+
+    const result = await sendActivate2FACodeService(userId);
+
+    return res.status(200).json(result);
+  } catch (error) {
+    if (error instanceof SecurityError) {
+      return res.status(error.statusCode).json({
+        message: error.message,
+      });
+    }
+
+    return res.status(500).json({
+      message: "Error interno del servidor.",
+    });
+  }
+}
+
+export async function verifyActivate2FACodeController(
+  req: AuthenticatedRequest,
+  res: Response,
+) {
+  try {
+    const userId = Number(req.user?.id);
+    const { codigo, verificationToken } = req.body ?? {};
+
+    const result = await verifyActivate2FACodeService({
+      userId,
+      codigo,
+      verificationToken,
+    });
+
+    return res.status(200).json(result);
+  } catch (error) {
+    if (error instanceof SecurityError) {
+      return res.status(error.statusCode).json({
+        message: error.message,
+      });
+    }
+
+    return res.status(500).json({
+      message: "Error interno del servidor.",
+    });
   }
 }
