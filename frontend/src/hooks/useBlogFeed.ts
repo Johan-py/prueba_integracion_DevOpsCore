@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { getPublishedBlogs, getBlogCategories } from "@/services/blogs.service";
 import { BlogCategory, PublicBlogCard } from "@/types/publicBlog";
+import { socket } from "@/lib/socket";
 
 const INITIAL_VISIBLE_CARDS = 3;
 
@@ -46,6 +47,43 @@ export const useBlogFeed = () => {
       }
     };
     fetchData();
+  }, []);
+
+  +useEffect(() => {
+    const handleNewPublishedBlog = (blog: any) => {
+      const mappedBlog: PublicBlogCard = {
+        id: String(blog.id),
+        title: blog.titulo,
+        excerpt: blog.resumen || blog.contenido,
+        imageUrl: blog.imagen,
+        category: blog.categoria?.nombre || "General",
+        categoryLabel: blog.categoria?.nombre || "General",
+
+        authorName:
+          `${blog.usuario?.nombre || ""} ${blog.usuario?.apellido || ""}`.trim(),
+
+        publishedAt:
+          blog.fecha_publicacion ||
+          blog.fecha_creacion ||
+          new Date().toISOString(),
+
+        isFeatured: blog.destacado ?? false,
+      };
+
+      setBlogs((prev) => {
+        const exists = prev.some((b) => b.id === mappedBlog.id);
+
+        if (exists) return prev;
+
+        return orderBlogs([mappedBlog, ...prev]);
+      });
+    };
+
+    socket.on("blog:publicado_global", handleNewPublishedBlog);
+
+    return () => {
+      socket.off("blog:publicado_global", handleNewPublishedBlog);
+    };
   }, []);
 
   // RESTAURAR CATEGORÍA
