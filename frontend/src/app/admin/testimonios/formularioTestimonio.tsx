@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Send } from 'lucide-react'
 
 type TestimonioFormData = {
   nombreUsuario: string
@@ -10,14 +11,14 @@ type TestimonioFormData = {
   categoria: string
   texto: string
   activo: boolean
-  calificacion: number
 }
 
 type FormularioTestimoniosProps = {
   onCreate?: (testimonio: TestimonioFormData & { id: number; likes: number }) => void
+  onCancel?: () => void
 }
 
-export default function FormularioTestimonios({ onCreate }: FormularioTestimoniosProps) {
+export default function FormularioTestimonios({ onCreate, onCancel }: FormularioTestimoniosProps) {
   const [nombreUsuario, setNombreUsuario] = useState('')
   const [apellidoUsuario, setApellidoUsuario] = useState('')
   const [departamento, setDepartamento] = useState('')
@@ -25,7 +26,6 @@ export default function FormularioTestimonios({ onCreate }: FormularioTestimonio
   const [categoria, setCategoria] = useState('')
   const [texto, setTexto] = useState('')
   const [activo, setActivo] = useState(true)
-  const [calificacion, setCalificacion] = useState(5)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [successMessage, setSuccessMessage] = useState('')
   const [serverError, setServerError] = useState('')
@@ -39,7 +39,6 @@ export default function FormularioTestimonios({ onCreate }: FormularioTestimonio
     setCategoria('')
     setTexto('')
     setActivo(true)
-    setCalificacion(5)
     setErrors({})
     setServerError('')
   }
@@ -94,8 +93,7 @@ export default function FormularioTestimonios({ onCreate }: FormularioTestimonio
           categoria: categoria.trim(),
           visible: activo,
           nombreAutor: nombreUsuario.trim(),
-          apellidoAutor: apellidoUsuario.trim(),
-          calificacion: calificacion
+          apellidoAutor: apellidoUsuario.trim()
         }),
       })
 
@@ -226,54 +224,51 @@ export default function FormularioTestimonios({ onCreate }: FormularioTestimonio
           )}
         </label>
 
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div className="flex flex-col justify-center">
-            <span className="text-sm font-semibold text-stone-700 mb-2">Calificación</span>
-            <div className="flex gap-1">
-              {[1, 2, 3, 4, 5].map((num) => (
-                <button
-                  key={num}
-                  type="button"
-                  onClick={() => setCalificacion(num)}
-                  className={`h-9 w-9 rounded-lg border text-sm font-bold transition-all ${
-                    calificacion >= num
-                      ? 'border-amber-500 bg-amber-500 text-white shadow-md'
-                      : 'border-stone-200 bg-stone-50 text-stone-400'
-                  }`}
-                >
-                  {num}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 bg-stone-50 p-3 rounded-xl border border-stone-100 mt-2 sm:mt-0 sm:col-span-2">
-            <input
-              type="checkbox"
-              id="new-activo"
-              checked={activo}
-              onChange={(event) => setActivo(event.target.checked)}
-              className="h-5 w-5 rounded border-amber-300 text-amber-600 focus:ring-amber-500"
-            />
-            <label htmlFor="new-activo" className="text-sm font-semibold text-stone-700 cursor-pointer">
-              Visible
-            </label>
+        <div className="flex items-center justify-between border-t border-stone-100 pt-6 mt-4">
+          <span className="text-sm font-semibold text-stone-700">Estado de publicación</span>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              role="switch"
+              aria-checked={activo}
+              onClick={() => setActivo(!activo)}
+              className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
+                activo ? 'bg-amber-500' : 'bg-stone-200'
+              }`}
+            >
+              <span
+                className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                  activo ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+            <span className={`text-sm font-medium ${activo ? 'text-stone-500' : 'text-stone-400'}`}>
+              {activo ? 'Publicado' : 'Borrador'}
+            </span>
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex justify-end gap-3 pt-4">
+          <button
+            type="button"
+            onClick={onCancel ? onCancel : resetForm}
+            className="rounded-xl border border-stone-200 px-6 py-2.5 text-sm font-bold text-stone-500 transition hover:bg-stone-50 hover:text-stone-700"
+          >
+            Cancelar
+          </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="inline-flex w-full items-center justify-center rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-amber-200 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+            className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-6 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isSubmitting ? 'Guardando...' : 'Guardar testimonio'}
+            <Send className="h-4 w-4" />
+            {isSubmitting ? 'Guardando...' : 'Publicar'}
           </button>
-
-          {successMessage && (
-            <p className="text-sm font-medium text-emerald-700">{successMessage}</p>
-          )}
         </div>
+
+        {successMessage && (
+          <p className="text-sm font-medium text-emerald-700 mt-2 text-right">{successMessage}</p>
+        )}
         {serverError && (
           <p className="text-sm font-medium text-red-600">{serverError}</p>
         )}
