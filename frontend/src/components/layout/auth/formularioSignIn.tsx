@@ -402,7 +402,9 @@ export default function LoginForm() {
     setShowMagicLinkForm(false);
   };
 
-  const handleMagicLinkSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleMagicLinkSubmit = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
     event.preventDefault();
 
     if (isLoadingMagicLink) {
@@ -1009,7 +1011,8 @@ export default function LoginForm() {
       }
 
       setSuccessMessage(
-        data.message || "Cuenta activada correctamente. Ahora puedes iniciar sesión.",
+        data.message ||
+          "Cuenta activada correctamente. Ahora puedes iniciar sesión.",
       );
       setErrorMessage("");
       setPassword("");
@@ -1089,11 +1092,14 @@ export default function LoginForm() {
     setIsActivating(true);
 
     try {
-      const response = await fetch(`${API_URL}/api/auth/request-activation-code`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ correo: activationEmail }),
-      });
+      const response = await fetch(
+        `${API_URL}/api/auth/request-activation-code`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ correo: activationEmail }),
+        },
+      );
 
       const data = await response.json();
 
@@ -1168,16 +1174,26 @@ export default function LoginForm() {
         return;
       }
 
-      setSuccessMessage(data.message || "Cuenta activada correctamente. Ahora puedes iniciar sesión.");
+      setSuccessMessage(
+        data.message ||
+          "Cuenta activada correctamente. Ahora puedes iniciar sesión.",
+      );
       setErrorMessage("");
       setPassword("");
       closeActivationModal();
       router.push("/sign-in");
     } catch (error) {
-      if (!navigator.onLine || (error instanceof Error && error.name === "AbortError" && !navigator.onLine)) {
+      if (
+        !navigator.onLine ||
+        (error instanceof Error &&
+          error.name === "AbortError" &&
+          !navigator.onLine)
+      ) {
         setActivationError(ACTIVATION_CONNECTION_ERROR_MESSAGE);
       } else if (error instanceof Error && error.name === "AbortError") {
-        setActivationError("La solicitud tardó demasiado. Por favor intenta nuevamente.");
+        setActivationError(
+          "La solicitud tardó demasiado. Por favor intenta nuevamente.",
+        );
       } else {
         setActivationError(ACTIVATION_CONNECTION_ERROR_MESSAGE);
       }
@@ -1187,7 +1203,6 @@ export default function LoginForm() {
     }
   };
 
->>>>>>> c8c3114b (contrasSinInter)
   const maskEmail = (email: string) => {
     const [name, domain] = email.split("@");
 
