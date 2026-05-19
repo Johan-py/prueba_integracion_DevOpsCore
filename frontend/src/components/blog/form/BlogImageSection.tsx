@@ -65,7 +65,7 @@ export default function BlogImageSection({
 
   return (
     <div className="space-y-2">
-      <label className={`relative flex min-h-[300px] cursor-pointer flex-col items-center justify-center rounded-[32px] border-2 border-dashed border-[#E7E5E4] dark:border-[#333] bg-[#FAFAFA] dark:bg-[#111] px-10 py-12 text-center transition hover:border-[#F59E0B] hover:bg-white dark:hover:bg-[#1a1a1a] group ${isCompressing ? "opacity-50 pointer-events-none" : ""}`}>
+      <label className={`relative flex min-h-[180px] sm:min-h-[300px] cursor-pointer flex-col items-center justify-center rounded-[32px] border-2 border-dashed border-[#E7E5E4] dark:border-[#333] bg-[#FAFAFA] dark:bg-[#111] px-6 py-8 sm:px-10 sm:py-12 text-center transition hover:border-[#F59E0B] hover:bg-white dark:hover:bg-[#1a1a1a] group ${isCompressing ? "opacity-50 pointer-events-none" : ""}`}>
         <input
           type="file"
           accept="image/png,image/jpeg,image/webp"

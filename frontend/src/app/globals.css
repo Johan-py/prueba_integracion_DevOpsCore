@@ -599,7 +599,9 @@ html.dark body :where([class*="shadow"],
 }
 
 /* Botones principales naranjas */
-html.dark body :where([class*="bg-orange-500"],
+html.dark body :where([class*="bg-amber-500"],
+  [class*="bg-amber-600"],
+  [class*="bg-orange-500"],
   [class*="bg-orange-600"],
   [class*="bg-[#E68B25]"],
   [class*="bg-[#e68b25]"],
