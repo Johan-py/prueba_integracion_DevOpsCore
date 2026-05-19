@@ -94,9 +94,9 @@ export default function BlogCreateForm({
 
   return (
     <div className="mx-auto max-w-6xl">
-      <div className="grid gap-12 lg:grid-cols-[1fr_320px]">
+      <div className="grid gap-6 lg:gap-12 lg:grid-cols-[1fr_320px]">
         {/* Main Content Area */}
-        <div className="space-y-8">
+        <div className="space-y-8 min-w-0 overflow-hidden">
           <BlogFormHeader mode={mode} />
 
           {statusLabel === "PENDIENTE" && (
@@ -108,10 +108,10 @@ export default function BlogCreateForm({
           )}
 
           {statusLabel === "RECHAZADO" && rejectionReason && (
-            <div className="rounded-[24px] bg-[#FDECEC] border border-[#F3BABA] p-6 shadow-sm">
-              <h3 className="text-sm font-bold text-[#D94848] uppercase tracking-wider mb-2">Motivo de rechazo</h3>
-              <p className="text-[#D94848] leading-relaxed break-words">{rejectionReason}</p>
-              <p className="text-xs text-[#D94848]/80 mt-3 italic">Corrige los puntos mencionados y vuelve a enviarlo para revisión.</p>
+            <div className="rounded-2xl bg-red-50 border border-red-200 p-4 sm:p-6 shadow-sm">
+              <h3 className="text-sm font-bold text-red-700 uppercase tracking-wider mb-2">Motivo de rechazo</h3>
+              <p className="text-red-700 leading-relaxed break-all">{rejectionReason}</p>
+              <p className="text-xs text-red-600 mt-3 italic opacity-80">Corrige los puntos mencionados y vuelve a enviarlo para revisión.</p>
             </div>
           )}
 
