@@ -248,7 +248,7 @@ function TarjetaTestimonio({
               </p>
             )}
             {testimonio.categoria && (
-              <span className="inline-block mt-1 text-[9px] md:text-[10px] font-semibold tracking-wide text-amber-700 bg-amber-50 border border-amber-200 rounded-full shadow-sm px-2.5 py-0.5 uppercase max-w-full truncate">
+              <span className="inline-block mt-1 text-[9px] md:text-[10px] font-semibold tracking-wide text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-full shadow-sm px-2.5 py-0.5 uppercase max-w-full truncate">
               </span>
             )}
           </div>
