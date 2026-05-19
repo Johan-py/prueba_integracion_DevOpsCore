@@ -65,7 +65,7 @@ export default function BlogImageSection({
 
   return (
     <div className="space-y-2">
-      <label className={`relative flex min-h-[300px] cursor-pointer flex-col items-center justify-center rounded-[32px] border-2 border-dashed border-[#E7E5E4] bg-[#FAFAFA] px-10 py-12 text-center transition hover:border-[#F59E0B] hover:bg-white group ${isCompressing ? "opacity-50 pointer-events-none" : ""}`}>
+      <label className={`relative flex min-h-[300px] cursor-pointer flex-col items-center justify-center rounded-[32px] border-2 border-dashed border-[#E7E5E4] dark:border-[#333] bg-[#FAFAFA] dark:bg-[#111] px-10 py-12 text-center transition hover:border-[#F59E0B] hover:bg-white dark:hover:bg-[#1a1a1a] group ${isCompressing ? "opacity-50 pointer-events-none" : ""}`}>
         <input
           type="file"
           accept="image/png,image/jpeg,image/webp"
@@ -101,13 +101,13 @@ export default function BlogImageSection({
           </div>
         ) : (
           <>
-            <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-black/5">
-              <Camera className="h-6 w-6 text-[#A8A29E]" />
+            <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-white dark:bg-[#222] shadow-sm ring-1 ring-black/5 dark:ring-white/10">
+              <Camera className="h-6 w-6 text-[#A8A29E] dark:text-[#999]" />
             </div>
-            <p className="text-base font-semibold text-[#1C1917]">
+            <p className="text-base font-semibold text-[#1C1917] dark:text-white">
               Arrastra y suelta la imagen destacada
             </p>
-            <p className="mt-1 text-xs font-medium text-[#78716C]">
+            <p className="mt-1 text-xs font-medium text-[#78716C] dark:text-[#999]">
               Recomendado: 1920×820px (Se comprimirá automáticamente a WebP)
             </p>
           </>

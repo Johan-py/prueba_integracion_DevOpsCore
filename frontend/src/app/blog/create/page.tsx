@@ -29,7 +29,7 @@ export default function CreatePostPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA]/50 py-12 sm:py-20">
+    <div className="min-h-screen bg-[#FAFAFA]/50 dark:bg-black py-12 sm:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <BlogCreateForm />
       </div>
