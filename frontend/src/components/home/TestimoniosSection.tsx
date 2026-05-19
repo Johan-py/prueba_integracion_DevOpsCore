@@ -121,7 +121,7 @@ export default function TestimoniosSection() {
             Historias reales de{' '}
             <span className="text-amber-600">Bolivia</span>
           </h2>
-          <p className="text-[10px] sm:text-xs tracking-widest text-stone-400 uppercase font-medium">
+          <p className="text-[10px] sm:text-xs tracking-widest text-stone-400 dark:text-stone-500 uppercase font-medium">
             Lo que dicen nuestros usuarios
           </p>
         </div>
