@@ -52,6 +52,17 @@ export default function AdminTestimoniosPage() {
     process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000'
 
   useEffect(() => {
+    if (showForm || showEditModal || showDeleteConfirm) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [showForm, showEditModal, showDeleteConfirm])
+
+  useEffect(() => {
     const fetchTestimonios = async () => {
       try {
         setIsLoading(true)
@@ -324,7 +335,7 @@ export default function AdminTestimoniosPage() {
         </div>
 
         {showForm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-6 sm:px-6 overflow-hidden">
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 px-4 py-6 sm:px-6 overflow-hidden">
             <div className="w-full max-w-3xl rounded-2xl bg-gradient-to-br from-white via-amber-50 to-orange-50 p-4 shadow-2xl ring-1 ring-amber-100 sm:p-6 max-h-[80vh] overflow-hidden">
               <div className="flex justify-end px-2 py-1">
                 <button
@@ -351,7 +362,7 @@ export default function AdminTestimoniosPage() {
 
         {/* MODAL EDITAR */}
         {showEditModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 py-4 sm:px-6 overflow-hidden backdrop-blur-sm">
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 px-4 py-4 sm:px-6 overflow-hidden backdrop-blur-sm">
             <div className="w-full max-w-2xl rounded-3xl bg-white p-0 shadow-2xl ring-1 ring-amber-100 flex flex-col max-h-[90vh] overflow-hidden">
               <div className="flex justify-between items-center px-6 py-4 border-b border-stone-100 bg-stone-50/50">
                 <div>
@@ -367,30 +378,32 @@ export default function AdminTestimoniosPage() {
               </div>
 
               <div className="flex-1 overflow-y-auto p-6 space-y-5 custom-scrollbar">
-                <div>
-                  <label className="block text-sm font-semibold text-stone-700 mb-2">
-                    Persona (Nombre)
-                  </label>
-                  <input
-                    type="text"
-                    value={editUserName}
-                    onChange={(e) => setEditUserName(e.target.value)}
-                    className="w-full rounded-xl border border-amber-200 bg-amber-50/30 px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-300"
-                    placeholder="Nombre que aparecerá en el testimonio..."
-                  />
-                </div>
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-semibold text-stone-700 mb-2">
+                      Persona (Nombre)
+                    </label>
+                    <input
+                      type="text"
+                      value={editUserName}
+                      onChange={(e) => setEditUserName(e.target.value)}
+                      className="w-full rounded-xl border border-amber-200 bg-amber-50/30 px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-300"
+                      placeholder="Nombre que aparecerá en el testimonio..."
+                    />
+                  </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-stone-700 mb-2">
-                    Apellido
-                  </label>
-                  <input
-                    type="text"
-                    value={editUserLastName}
-                    onChange={(e) => setEditUserLastName(e.target.value)}
-                    className="w-full rounded-xl border border-amber-200 bg-amber-50/30 px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-300"
-                    placeholder="Apellido..."
-                  />
+                  <div>
+                    <label className="block text-sm font-semibold text-stone-700 mb-2">
+                      Apellido
+                    </label>
+                    <input
+                      type="text"
+                      value={editUserLastName}
+                      onChange={(e) => setEditUserLastName(e.target.value)}
+                      className="w-full rounded-xl border border-amber-200 bg-amber-50/30 px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-300"
+                      placeholder="Apellido..."
+                    />
+                  </div>
                 </div>
 
                 <div className="grid gap-5 sm:grid-cols-2">
@@ -417,7 +430,9 @@ export default function AdminTestimoniosPage() {
                       <option value="Pando">Pando</option>
                     </select>
                   </div>
+                </div>
 
+                <div className="grid gap-5 sm:grid-cols-2">
                   <div>
                     <label className="block text-sm font-semibold text-stone-700 mb-2">
                       Zona / Barrio
@@ -431,20 +446,20 @@ export default function AdminTestimoniosPage() {
                       className="w-full rounded-xl border border-amber-200 bg-amber-50/30 px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-300"
                     />
                   </div>
-                </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-stone-700 mb-2">
-                    Categoría
-                  </label>
-                  <input
-                    type="text"
-                    value={editingData.categoria || ''}
-                    onChange={(e) =>
-                      setEditingData({ ...editingData, categoria: e.target.value })
-                    }
-                    className="w-full rounded-xl border border-amber-200 bg-amber-50/30 px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-300"
-                  />
+                  <div>
+                    <label className="block text-sm font-semibold text-stone-700 mb-2">
+                      Categoría
+                    </label>
+                    <input
+                      type="text"
+                      value={editingData.categoria || ''}
+                      onChange={(e) =>
+                        setEditingData({ ...editingData, categoria: e.target.value })
+                      }
+                      className="w-full rounded-xl border border-amber-200 bg-amber-50/30 px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-300"
+                    />
+                  </div>
                 </div>
 
                 <div>
@@ -512,7 +527,7 @@ export default function AdminTestimoniosPage() {
 
         {/* MODAL ELIMINAR */}
         {showDeleteConfirm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-6 sm:px-6">
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 px-4 py-6 sm:px-6">
             <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-stone-200">
               <h3 className="text-lg font-bold text-stone-900 mb-2">¿Eliminar testimonio?</h3>
               <p className="text-sm text-stone-600 mb-6">
