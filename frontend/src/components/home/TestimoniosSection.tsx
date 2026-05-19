@@ -229,7 +229,7 @@ function TarjetaTestimonio({
         "{testimonio.comentario}"
       </p>
        
-       <hr className="border-t border-stone-100 dark:border-stone-600 mb-4" />
+       <hr className="border-t border-stone-300 dark:border-stone-500 mb-4" />
       <div className="flex items-center justify-between gap-3">
         {/* FIX commit3: min-w-0 para que truncate funcione en nombres largos */}
         <div className="flex items-center gap-2 md:gap-3 min-w-0">
