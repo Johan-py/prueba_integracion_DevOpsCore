@@ -260,8 +260,8 @@ function TarjetaTestimonio({
           title={!isLoggedIn ? 'Inicia sesión para dar like' : ''}
           className={`flex items-center gap-1 md:gap-1.5 px-2.5 md:px-3 py-1.5 rounded-full border text-xs md:text-sm font-medium transition-all shrink-0 ${
             testimonio.meGusta
-              ? 'bg-amber-50 border-amber-400 text-amber-600'
-              : 'border-stone-200 text-stone-400 hover:border-amber-400 hover:text-amber-600'
+           ? 'bg-amber-50 dark:bg-amber-900/30 border-amber-400 text-amber-600 dark:text-amber-400'
+           : 'border-stone-200 dark:border-stone-600 text-stone-400 dark:text-stone-500 hover:border-amber-400 hover:text-amber-600'
           } ${!isLoggedIn ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}`}
         >
           <ThumbsUp className={`w-3.5 h-3.5 md:w-4 md:h-4 ${testimonio.meGusta ? 'fill-amber-500 text-amber-500' : ''}`} />
