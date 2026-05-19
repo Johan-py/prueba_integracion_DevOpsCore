@@ -222,13 +222,13 @@ function TarjetaTestimonio({
   onLike: (t: Testimonio) => void
 }) {
   return (
-    // FIX commit3: min-w-0 + overflow-hidden evitan que texto largo rompa el layout
     <div className="rounded-2xl border border-stone-100 shadow-md p-5 md:p-6 bg-white flex flex-col justify-between min-h-[200px] min-w-0 overflow-hidden">
       {/* FIX commit3: break-words para testimonios con palabras muy largas */}
       <p className="text-stone-600 italic text-center text-sm leading-relaxed mb-5 break-words">
         "{testimonio.comentario}"
       </p>
-
+       
+       <hr className="border-t border-stone-100 mb-4" />
       <div className="flex items-center justify-between gap-3">
         {/* FIX commit3: min-w-0 para que truncate funcione en nombres largos */}
         <div className="flex items-center gap-2 md:gap-3 min-w-0">
