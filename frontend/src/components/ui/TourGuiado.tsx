@@ -1,204 +1,22 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { TOUR_STEPS, FOOTER_STEP_INDEX } from "./tour.constants";
+import {
+  isLoggedIn,
+  isMobileMenuInDOM,
+  waitForMenuClose,
+  waitForMenuOpen,
+  getTourTheme,
+} from "./tour.utils";
 
-const TOUR_STEPS = [
-  {
-    id: "tour-banner",
-    title: "¡Bienvenido a PropBol!",
-    description: "Aquí encontrarás las propiedades destacadas del momento.",
-    required: false,
-  },
-  {
-    id: "tour-logo",
-    title: "Logo - Inicio",
-    description: "Haz clic en el logo para volver a la página principal.",
-    required: true,
-  },
-  {
-    id: "tour-propiedades",
-    mobileId: "tour-propiedades-mobile",
-    requiresMobileMenu: true,
-    title: "Propiedades",
-    description: "Explora casas, departamentos, terrenos y más.",
-    required: true,
-  },
-  {
-    id: "tour-blogs",
-    mobileId: "tour-blogs-mobile",
-    requiresMobileMenu: true,
-    title: "Blogs",
-    description: "Lee artículos y consejos sobre el mercado inmobiliario.",
-    required: true,
-  },
-  {
-    id: "tour-planes",
-    mobileId: "tour-planes-mobile",
-    requiresMobileMenu: true,
-    title: "Planes de membresía",
-    description: "Conoce nuestros planes y beneficios para publicar tu inmueble.",
-    required: true,
-  },
-  {
-    id: "tour-ayuda",
-    mobileId: "tour-ayuda-mobile",
-    requiresMobileMenu: true,
-    title: "Ayuda",
-    description: "Vuelve a ver este tour cuando quieras desde aquí.",
-    required: true,
-  },
-  {
-    id: "tour-buscador",
-    mobileId: "tour-buscador-mobile",
-    // Sin requiresMobileMenu: el elemento existe en el DOM con otro id,
-    // pero NO está dentro del menú hamburguesa
-    title: "Buscador de propiedades",
-    description:
-      "Filtra por tipo de operación (Venta, Alquiler o Anticrético), elige el tipo de inmueble y escribe una ubicación para encontrar la propiedad ideal.",
-    required: true,
-  },
-  {
-    id: "tour-filtros-visuales",
-    title: "Explora por ciudad y tipo",
-    description:
-      "Aquí puedes ver propiedades en alquiler o venta agrupadas por departamento, y también explorar por tipo de inmueble: casas, departamentos, oficinas y terrenos.",
-    required: true,
-  },
-  {
-    id: "tour-publicar-home",
-    mobileId: "tour-publicar-home-mobile",
-    requiresMobileMenu: true,
-    title: "Publica tu inmueble",
-    description:
-      "¿Tienes una propiedad para vender o alquilar? Haz clic aquí para registrar tu inmueble y llegar a miles de compradores e inquilinos.",
-    required: true,
-  },
-  {
-    id: "tour-notificaciones",
-    title: "Notificaciones",
-    description: "Aquí aparecerán tus alertas y novedades importantes.",
-    required: true,
-  },
-  {
-    id: "tour-user",
-    title: "Tu cuenta",
-    description: "Accede a tu perfil, publicaciones y configuración.",
-    required: true,
-  },
-  {
-    id: "tour-footer-logo",
-    title: "PropBol",
-    description: "Nuestra misión: revolucionar el mercado inmobiliario en Bolivia.",
-    required: true,
-  },
-  {
-    id: "tour-footer-explorar",
-    title: "Explorar propiedades",
-    description: "Encuentra inmuebles en venta, alquiler o anticrético.",
-    required: true,
-  },
-  {
-    id: "tour-footer-conocenos",
-    title: "Conócenos",
-    description: "Accede a información sobre nosotros, términos y políticas de privacidad.",
-    required: true,
-  },
-  {
-    id: "tour-footer-redes",
-    title: "Redes Sociales",
-    description: "Síguenos en Facebook e Instagram para estar al tanto de las novedades.",
-    required: true,
-  },
-];
-
-type TourStep = (typeof TOUR_STEPS)[number] & {
+type TourStep = {
+  id: string;
+  title: string;
+  description: string;
+  required: boolean;
   mobileId?: string;
   requiresMobileMenu?: boolean;
-};
-
-const FOOTER_STEP_INDEX = 11;
-// Fallback máximo de espera si el MutationObserver no detecta el cierre
-const MENU_CLOSE_TIMEOUT_MS = 600;
-
-const isLoggedIn = () => {
-  if (typeof window === "undefined") return false;
-  return !!localStorage.getItem("token");
-};
-
-// FIX: detecta si el overlay del menú hamburguesa está en el DOM.
-// El menú se renderiza como `fixed inset-0 z-[9999] bg-black/40 md:hidden`
-// cuando isMobileMenuOpen === true en Navbar.tsx.
-// Buscamos el elemento por su combinación de clases más característica.
-const isMobileMenuInDOM = (): boolean => {
-  return !!document.querySelector(".fixed.inset-0.bg-black\\/40");
-};
-
-// FIX: espera a que el overlay del menú desaparezca del DOM usando MutationObserver.
-// Llama a `onClosed` cuando el menú ya no está presente, o tras el timeout de seguridad.
-const waitForMenuClose = (onClosed: () => void): (() => void) => {
-  // Si el menú ya no está en el DOM, ejecutar inmediatamente
-  if (!isMobileMenuInDOM()) {
-    onClosed();
-    return () => { };
-  }
-
-  let done = false;
-  const resolve = () => {
-    if (done) return;
-    done = true;
-    observer.disconnect();
-    clearTimeout(fallback);
-    // Un requestAnimationFrame extra para que el browser pinte el frame
-    // sin el overlay antes de medir getBoundingClientRect
-    requestAnimationFrame(() => requestAnimationFrame(onClosed));
-  };
-
-  const observer = new MutationObserver(() => {
-    if (!isMobileMenuInDOM()) resolve();
-  });
-
-  observer.observe(document.body, { childList: true, subtree: true });
-
-  // Fallback: si por alguna razón el observer no detecta el cambio
-  const fallback = setTimeout(resolve, MENU_CLOSE_TIMEOUT_MS);
-
-  // Retorna función de cleanup
-  return () => {
-    done = true;
-    observer.disconnect();
-    clearTimeout(fallback);
-  };
-};
-
-// FIX: espera a que el overlay del menú aparezca en el DOM.
-const waitForMenuOpen = (onOpened: () => void): (() => void) => {
-  if (isMobileMenuInDOM()) {
-    onOpened();
-    return () => { };
-  }
-
-  let done = false;
-  const resolve = () => {
-    if (done) return;
-    done = true;
-    observer.disconnect();
-    clearTimeout(fallback);
-    requestAnimationFrame(() => requestAnimationFrame(onOpened));
-  };
-
-  const observer = new MutationObserver(() => {
-    if (isMobileMenuInDOM()) resolve();
-  });
-
-  observer.observe(document.body, { childList: true, subtree: true });
-
-  const fallback = setTimeout(resolve, MENU_CLOSE_TIMEOUT_MS);
-
-  return () => {
-    done = true;
-    observer.disconnect();
-    clearTimeout(fallback);
-  };
 };
 
 export default function TourGuiado() {
@@ -208,54 +26,46 @@ export default function TourGuiado() {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const retryRef = useRef<NodeJS.Timeout | null>(null);
   const cleanupMenuWaitRef = useRef<(() => void) | null>(null);
-  // Cancela RAFs pendientes de pasos anteriores en navegación rápida
   const rafRef = useRef<number | null>(null);
-  // IntersectionObserver activo — se cancela al cambiar de paso
   const ioRef = useRef<IntersectionObserver | null>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [tooltipH, setTooltipH] = useState(0);
   const [isDark, setIsDark] = useState(false);
 
-useEffect(() => {
-  const check = () =>
-    setIsDark(document.documentElement.classList.contains("dark")); // Detecta el modo oscuro actual al montar el componente y cada vez que cambie la clase "dark" en el <html>
-  check();
-  const observer = new MutationObserver(check);
-  observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ["class"],
-  });
-  return () => observer.disconnect();
-}, []);
+  useEffect(() => {
+    const check = () =>
+      setIsDark(document.documentElement.classList.contains("dark"));
+    check();
+    const observer = new MutationObserver(check);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
+  }, []);
 
-  // Ref para trackear el step desde el que venimos REALMENTE
-  // (funciona igual en navegación hacia adelante y hacia atrás)
   const prevStepRef = useRef<number>(-1);
 
   const checkAndShowTour = useCallback(() => {
     if (!isLoggedIn()) return;
 
-    // Intentar leer controlador desde localStorage para evitar HTTP
     try {
       const raw = localStorage.getItem("propbol_user");
       if (raw) {
         const sessionUser = JSON.parse(raw) as { controlador?: boolean | null };
-        if (sessionUser.controlador === true) return; // tour completado — no mostrar
+        if (sessionUser.controlador === true) return;
         if (sessionUser.controlador === false) {
-          // tour pendiente — mostrar sin HTTP
           prevStepRef.current = -1;
           setCurrentStep(0);
           setHighlight(null);
           setShowTour(true);
           return;
         }
-        // controlador ausente (sesión antigua sin el campo) → caer al fetch
       }
     } catch {
       // propbol_user malformado → caer al fetch
     }
 
-    // Fallback: controlador no conocido en localStorage → preguntar al backend
     const token = localStorage.getItem("token");
     const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
     fetch(`${apiUrl}/api/auth/me`, {
@@ -265,7 +75,6 @@ useEffect(() => {
       .then((data) => {
         const controlador = data?.user?.controlador;
 
-        // Cachear el valor en localStorage para que futuras recargas no caigan aquí
         try {
           const raw = localStorage.getItem("propbol_user");
           if (raw && typeof controlador === "boolean") {
@@ -275,10 +84,8 @@ useEffect(() => {
               JSON.stringify({ ...sessionUser, controlador })
             );
           }
-        } catch { /* ignorar */ }
+        } catch {}
 
-        // Solo mostrar si el backend confirma explícitamente false o null
-        // (undefined = error de red / respuesta inválida → no mostrar)
         if (controlador === false || controlador === null) {
           prevStepRef.current = -1;
           setCurrentStep(0);
@@ -286,7 +93,7 @@ useEffect(() => {
           setShowTour(true);
         }
       })
-      .catch(() => { });
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -309,17 +116,16 @@ useEffect(() => {
   }, []);
 
   useEffect(() => {
-  if (showTour) {
-    document.body.style.overflow = "hidden";
-    window.scrollTo({ top: 0, behavior: "auto" });
-  } else {
-    document.body.style.overflow = "";
-  }
-
-  return () => {
-    document.body.style.overflow = "";
-  };
-}, [showTour]);
+    if (showTour) {
+      document.body.style.overflow = "hidden";
+      window.scrollTo({ top: 0, behavior: "auto" });
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [showTour]);
 
   useEffect(() => {
     if (!showTour) return;
@@ -350,7 +156,6 @@ useEffect(() => {
       window.removeEventListener("propbol:iniciar-tour", handleIniciarTour);
   }, []);
 
-  // Solo recalcula posición por resize/scroll, sin measure() inicial
   useEffect(() => {
     if (!showTour) return;
 
@@ -392,14 +197,9 @@ useEffect(() => {
     };
   }, [currentStep, showTour]);
 
-  // applyHighlight recibe stepIndex explícitamente para evitar closure stale.
-  // Usa IntersectionObserver para medir el elemento solo cuando ya es visible
-  // en el viewport — sin importar cuánto tarde el scroll en llegar. Esto
-  // elimina el retraso perceptible al navegar entre pasos muy alejados.
   const applyHighlight = (el: HTMLElement, stepIndex: number) => {
     const isFooter = stepIndex >= FOOTER_STEP_INDEX;
 
-    // Cancelar cualquier medición pendiente del paso anterior
     if (timeoutRef.current) { clearTimeout(timeoutRef.current); timeoutRef.current = null; }
     if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
     if (ioRef.current) { ioRef.current.disconnect(); ioRef.current = null; }
@@ -418,8 +218,6 @@ useEffect(() => {
       el.scrollIntoView({ behavior: "auto", block: "center" });
     }
 
-    // Si el elemento ya es visible, medimos en el siguiente frame directamente.
-    // Si aún no lo es (scroll en curso), el IO dispara en cuanto entra al viewport.
     const rect = el.getBoundingClientRect();
     const vh = window.visualViewport?.height ?? window.innerHeight;
     const alreadyVisible =
@@ -440,7 +238,6 @@ useEffect(() => {
       );
       ioRef.current.observe(el);
 
-      // Fallback: si el IO no dispara en 600 ms (elemento off-screen o muy pequeño)
       timeoutRef.current = setTimeout(() => {
         ioRef.current?.disconnect();
         ioRef.current = null;
@@ -462,12 +259,10 @@ useEffect(() => {
     const prevStep = prevIndex >= 0 ? (TOUR_STEPS[prevIndex] as TourStep) : null;
     const prevNeededMobileMenu = isMobileNav && !!prevStep?.requiresMobileMenu;
 
-    // Actualizar ref con el step actual antes de cualquier async
     prevStepRef.current = currentStep;
 
     const id = isMobileNav && step.mobileId ? step.mobileId : step.id;
 
-    // Limpiar cualquier espera de menú anterior
     if (cleanupMenuWaitRef.current) {
       cleanupMenuWaitRef.current();
       cleanupMenuWaitRef.current = null;
@@ -500,30 +295,18 @@ useEffect(() => {
     };
 
     if (menuIsClosing) {
-      // FIX: despachar cierre y esperar a que el overlay desaparezca del DOM
-      // antes de medir. Evita que getBoundingClientRect devuelva coordenadas
-      // incorrectas mientras el overlay z-[9999] sigue pintado encima.
       setHighlight(null);
       window.dispatchEvent(new Event("propbol:cerrar-menu-movil"));
       cleanupMenuWaitRef.current = waitForMenuClose(tryFind);
     } else if (menuIsOpening) {
-      // FIX: despachar apertura y esperar a que el overlay esté en el DOM
-      // antes de buscar los elementos que viven dentro del menú.
       setHighlight(null);
       window.dispatchEvent(new Event("propbol:abrir-menu-movil"));
       cleanupMenuWaitRef.current = waitForMenuOpen(tryFind);
     } else {
-      // Sin cambio de estado del menú detectado por las flags anteriores.
       if (needsMobileMenu) {
-        // El menú ya debería estar abierto, pero nos aseguramos.
         window.dispatchEvent(new Event("propbol:abrir-menu-movil"));
         tryFind();
       } else if (isMobileNav) {
-        // FIX: aunque menuIsClosing sea false (p.ej. cuando se navega hacia
-        // atrás desde un step sin menú, o en el primer render), si el menú
-        // sigue en el DOM hay que cerrarlo y esperar antes de medir.
-        // Esto corrige el bug donde "tour-notificaciones" aparecía con el
-        // menú hamburguesa aún visible después de "tour-publicar-home".
         window.dispatchEvent(new Event("propbol:cerrar-menu-movil"));
         if (isMobileMenuInDOM()) {
           setHighlight(null);
@@ -552,8 +335,6 @@ useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    // Marcar controlador: true en localStorage de forma inmediata para que
-    // checkAndShowTour no vuelva a mostrar el tour en la próxima visita
     try {
       const raw = localStorage.getItem("propbol_user");
       if (raw) {
@@ -563,15 +344,13 @@ useEffect(() => {
           JSON.stringify({ ...sessionUser, controlador: true })
         );
       }
-    } catch {
-      // ignorar — el backend es la fuente de verdad
-    }
+    } catch {}
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
     fetch(`${apiUrl}/api/auth/tour`, {
       method: "PATCH",
       headers: { Authorization: `Bearer ${token}` },
-    }).catch(() => { });
+    }).catch(() => {});
   };
 
   const handleNext = () => {
@@ -589,16 +368,10 @@ useEffect(() => {
     completeTour();
     setShowTour(false);
   };
-  const theme = {
-  bg:           isDark ? "#111111" : "#ffffff",
-  text:         isDark ? "#ffffff" : "#111827",
-  textMuted:    isDark ? "#d1d5db" : "#374151",
-  textSubtle:   isDark ? "#6b7280" : "#9ca3af",
-  stepInactive: isDark ? "#374151" : "#e5e7eb",
-};
+
+  const theme = getTourTheme(isDark);
 
   if (!showTour) return null;
-  
 
   const PADDING = 8;
   const hasValid = highlight !== null;
@@ -735,7 +508,7 @@ useEffect(() => {
               fontSize: fontMeta,
               color: theme.textSubtle,
               marginBottom: 14,
-            fontStyle: "italic",
+              fontStyle: "italic",
             }}
           >
             Esta sección no está visible en tu dispositivo actual.
@@ -770,18 +543,18 @@ useEffect(() => {
                 onClick={() => setCurrentStep((prev) => prev - 1)}
                 className="propbol-tour-btn-prev"
                 style={{
-                 background: "none",
-                 color: "#E68B25",
-                 border: "1px solid #E68B25",
-                 borderRadius: 8,
-                 padding: isMobile ? "8px 12px" : "10px 18px",
-                 fontSize: fontBtn,
-                 fontWeight: 600,
-                 cursor: "pointer",
-                 minHeight: 44,
-                 backgroundColor: isDark ? "transparent" : "transparent",
-                 WebkitTextFillColor: "#E68B25",
-            }}
+                  background: "none",
+                  color: "#E68B25",
+                  border: "1px solid #E68B25",
+                  borderRadius: 8,
+                  padding: isMobile ? "8px 12px" : "10px 18px",
+                  fontSize: fontBtn,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  minHeight: 44,
+                  backgroundColor: isDark ? "transparent" : "transparent",
+                  WebkitTextFillColor: "#E68B25",
+                }}
               >
                 ← Anterior
               </button>
