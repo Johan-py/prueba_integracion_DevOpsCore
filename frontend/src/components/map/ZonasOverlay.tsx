@@ -411,6 +411,26 @@ function ZonaInteractiva({
   recalcularCentroOptimo()
 }, [zoom, zona.coordenadas])
 
+  useEffect(() => {
+    const layer = polygonRef.current
+    if (!layer) return
+
+    layer.setStyle({
+      color: selected ? colorConfig.borderActive : colorConfig.borderInactive,
+      weight: selected ? 2 : 1.8,
+      dashArray: selected ? '6,6' : undefined,
+      fillColor: selected ? colorConfig.fillActive : colorConfig.fillInactive,
+      fillOpacity: selected ? colorConfig.fillOpacityActive : colorConfig.fillOpacityInactive,
+      lineJoin: 'round',
+      lineCap: 'round'
+    })
+
+    const element = layer.getElement() as SVGPathElement | null
+    if (element) {
+      element.setAttribute('aria-pressed', String(selected))
+    }
+  }, [selected, colorConfig.borderActive, colorConfig.borderInactive, colorConfig.fillActive, colorConfig.fillInactive, colorConfig.fillOpacityActive, colorConfig.fillOpacityInactive])
+
 
 
   return (

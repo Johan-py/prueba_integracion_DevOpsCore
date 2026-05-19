@@ -405,6 +405,8 @@ interface MapViewProps {
   selectedZoneId?: number | null
   onZoneSelect?: (id: number | null) => void
   onZoneCycle?: (direction: 1 | -1) => void
+  selectedDrawnPolygonIndex?: number | null
+  onDrawnPolygonSelect?: (index: number | null) => void
   center?: [number, number]
   zoom?: number
   selectedId?: string | null
@@ -474,7 +476,9 @@ export default function MapView({
   selectedZoneId = null,
   onClusterDissolve,
   onZoneSelect,
-  onZoneCycle
+  onZoneCycle,
+  selectedDrawnPolygonIndex = null,
+  onDrawnPolygonSelect
 }: MapViewProps) {
   const [isMounted, setIsMounted] = useState(false)
   const [hoveredPinId, setHoveredPinId] = useState<string | null>(null)
@@ -635,8 +639,17 @@ export default function MapView({
             pathOptions={{
               color: '#16a34a',
               fillColor: '#22c55e',
-              fillOpacity: 0.2,
-              weight: 2
+              fillOpacity: selectedDrawnPolygonIndex === i ? 0.14 : 0.2,
+              weight: selectedDrawnPolygonIndex === i ? 2.5 : 2,
+              dashArray: selectedDrawnPolygonIndex === i ? '6,6' : undefined
+            }}
+            bubblingMouseEvents={false}
+            eventHandlers={{
+              click: (e) => {
+                L.DomEvent.stopPropagation(e)
+                onZoneSelect?.(null)
+                onDrawnPolygonSelect?.(selectedDrawnPolygonIndex === i ? null : i)
+              }
             }}
           />
         ))}
