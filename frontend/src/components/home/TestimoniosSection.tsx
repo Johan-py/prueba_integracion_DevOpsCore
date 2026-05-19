@@ -134,8 +134,8 @@ export default function TestimoniosSection() {
               onClick={() => handleCiudad(ciudad)}
               className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium border transition-all duration-200 whitespace-nowrap ${
                 ciudadActiva === ciudad
-                  ? 'bg-amber-600 text-white border-amber-600'
-                  : 'bg-white text-stone-600 border-stone-300 hover:border-amber-400 hover:text-amber-600'
+                ? 'bg-amber-600 text-white border-amber-600'
+                : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-300 dark:border-stone-600 hover:border-amber-400 hover:text-amber-600'
               }`}
             >
               {ciudad}
