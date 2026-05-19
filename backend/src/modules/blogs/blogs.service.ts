@@ -144,6 +144,9 @@ export const blogsService = {
     if (estado === "RECHAZADO" && !razon_rechazo) {
       throw new Error("RAZON_RECHAZO_REQUIRED");
     }
+    if (razon_rechazo && razon_rechazo.length > 500) {
+      throw new Error("RAZON_RECHAZO_TOO_LONG");
+    }
 
     const updatedBlog = await blogsRepository.changeEstado(
       id,

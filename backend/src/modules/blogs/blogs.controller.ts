@@ -238,6 +238,10 @@ export const cambiarEstadoBlog = async (req: AuthRequest, res: Response) => {
         return res
           .status(400)
           .json({ message: "Debes proporcionar una razón de rechazo" });
+      if (error.message === "RAZON_RECHAZO_TOO_LONG")
+        return res
+          .status(400)
+          .json({ message: "El comentario de rechazo no puede superar los 500 caracteres" });
     }
     return handleError(res, error);
   }

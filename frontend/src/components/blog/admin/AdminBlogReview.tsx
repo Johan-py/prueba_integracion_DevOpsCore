@@ -227,9 +227,13 @@ export default function AdminBlogReview({ blogId }: { blogId: string }) {
                       setFormError("");
                     }}
                     rows={5}
+                    maxLength={500}
                     placeholder="Ejemplo: falta citar fuentes, mejorar estructura o corregir tono editorial."
                     className="w-full rounded-2xl border border-stone-300 px-5 py-4 text-sm text-stone-700 outline-none transition focus:border-amber-600"
                   />
+                  <p className={`mt-1 text-right text-xs ${rejectionComment.length >= 450 ? "text-red-500" : "text-stone-400"}`}>
+                    {rejectionComment.length}/500 caracteres
+                  </p>
                 </label>
 
                 {formError && (
