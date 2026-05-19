@@ -224,7 +224,8 @@ function TarjetaTestimonio({
   return (
     <div className="rounded-2xl border border-stone-100 dark:border-stone-700 shadow-md p-5 md:p-6 bg-white dark:bg-stone-800 flex flex-col justify-between min-h-[200px] min-w-0 overflow-hidden">
       {/* FIX commit3: break-words para testimonios con palabras muy largas */}
-      <p className="text-stone-600 italic text-center text-sm leading-relaxed mb-5 break-words">
+      <p className="text-stone-600 dark:text-stone-300 italic text-center text-sm leading-relaxed mb-4 break-words">
+
         "{testimonio.comentario}"
       </p>
        
