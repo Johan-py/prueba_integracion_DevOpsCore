@@ -194,8 +194,8 @@ export default function TestimoniosSection() {
                     onClick={() => setCurrentIndex(i)}
                     className={`rounded-full transition-all duration-200 ${
                       i === currentIndex
-                        ? 'w-6 h-2.5 bg-amber-600'
-                        : 'w-2.5 h-2.5 bg-stone-300 hover:bg-stone-400'
+                      ? 'w-6 h-2.5 bg-amber-600'
+                      : 'w-2.5 h-2.5 bg-stone-300 dark:bg-stone-600 hover:bg-stone-400 dark:hover:bg-stone-500'
                     }`}
                   />
                 ))}
