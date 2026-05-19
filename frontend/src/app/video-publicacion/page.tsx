@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { X, Play } from 'lucide-react';
+import { X } from 'lucide-react';
 
 type TutorialContent = {
   titulo: string;
@@ -14,6 +14,9 @@ type TutorialContent = {
 };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+const VIDEO_ID = 'qMyFQH5q9IM';
+const VIDEO_EMBED_URL = `https://www.youtube.com/embed/${VIDEO_ID}?autoplay=1&mute=1&controls=1&rel=0`;
 
 export default function VideoPublicacionPage() {
   const router = useRouter();
@@ -55,7 +58,10 @@ export default function VideoPublicacionPage() {
           return;
         }
 
-        setContenido(contenidoResult.data);
+        setContenido({
+          ...contenidoResult.data,
+          videoUrl: VIDEO_EMBED_URL,
+        });
       } catch (error) {
         console.error('Error al cargar tutorial:', error);
         router.replace('/registro-inmueble');
@@ -99,7 +105,7 @@ export default function VideoPublicacionPage() {
   return (
     <main className="min-h-screen bg-gray-100">
       <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 px-4">
-        <section className="relative w-full max-w-[620px] rounded-2xl bg-white px-7 py-8 shadow-2xl">
+        <section className="relative w-full max-w-[700px] rounded-2xl bg-white px-7 py-8 shadow-2xl">
           <button
             type="button"
             onClick={() => router.replace('/registro-inmueble')}
@@ -114,7 +120,7 @@ export default function VideoPublicacionPage() {
               {contenido.titulo}
             </h1>
 
-            <p className="mt-2 text-sm leading-6 text-gray-500">
+            <p className="mx-auto mt-2 max-w-[560px] text-sm leading-6 text-gray-500">
               {contenido.mensaje}
             </p>
 
@@ -123,36 +129,14 @@ export default function VideoPublicacionPage() {
             </p>
           </div>
 
-          <div className="mt-4 overflow-hidden rounded-xl bg-[#FFF1E6]">
-            <a
-              href={contenido.videoUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex h-[240px] w-full items-center justify-between px-8"
-            >
-              <div>
-                <h2 className="text-2xl font-bold leading-tight text-gray-900">
-                  ¿Cómo publicar
-                  <br />
-                  <span className="text-orange-500">tu propiedad?</span>
-                </h2>
-              </div>
-
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-orange-500 text-white shadow-md">
-                <Play size={34} fill="white" />
-              </div>
-
-              <div className="hidden sm:block">
-                <img
-                  src={
-                    contenido.thumbnailUrl ||
-                    '/images/video-publicacion/casa-publicacion.png'
-                  }
-                  alt="Tutorial de publicación"
-                  className="h-[185px] w-auto object-contain"
-                />
-              </div>
-            </a>
+          <div className="mt-4 overflow-hidden rounded-xl bg-black">
+            <iframe
+              className="h-[315px] w-full"
+              src={contenido.videoUrl}
+              title="Video tutorial de publicación de inmueble"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            />
           </div>
 
           <label className="mt-5 flex cursor-pointer items-center gap-3 text-sm text-gray-600">
