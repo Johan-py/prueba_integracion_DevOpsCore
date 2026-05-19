@@ -1,7 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { TOUR_STEPS, FOOTER_STEP_INDEX, MENU_CLOSE_TIMEOUT_MS } from "./tour.constants";
+import { TOUR_STEPS, FOOTER_STEP_INDEX } from "./tour.constants";
+import {
+  isLoggedIn,
+  isMobileMenuInDOM,
+  waitForMenuClose,
+  waitForMenuOpen,
+  getTourTheme,
+} from "./tour.utils";
 
 type TourStep = {
   id: string;
@@ -10,82 +17,6 @@ type TourStep = {
   required: boolean;
   mobileId?: string;
   requiresMobileMenu?: boolean;
-};
-
-const isLoggedIn = () => {
-  if (typeof window === "undefined") return false;
-  return !!localStorage.getItem("token");
-};
-
-// FIX: detecta si el overlay del menú hamburguesa está en el DOM.
-// El menú se renderiza como `fixed inset-0 z-[9999] bg-black/40 md:hidden`
-// cuando isMobileMenuOpen === true en Navbar.tsx.
-// Buscamos el elemento por su combinación de clases más característica.
-const isMobileMenuInDOM = (): boolean => {
-  return !!document.querySelector(".fixed.inset-0.bg-black\\/40");
-};
-
-// FIX: espera a que el overlay del menú desaparezca del DOM usando MutationObserver.
-// Llama a `onClosed` cuando el menú ya no está presente, o tras el timeout de seguridad.
-const waitForMenuClose = (onClosed: () => void): (() => void) => {
-  if (!isMobileMenuInDOM()) {
-    onClosed();
-    return () => {};
-  }
-
-  let done = false;
-  const resolve = () => {
-    if (done) return;
-    done = true;
-    observer.disconnect();
-    clearTimeout(fallback);
-    requestAnimationFrame(() => requestAnimationFrame(onClosed));
-  };
-
-  const observer = new MutationObserver(() => {
-    if (!isMobileMenuInDOM()) resolve();
-  });
-
-  observer.observe(document.body, { childList: true, subtree: true });
-
-  const fallback = setTimeout(resolve, MENU_CLOSE_TIMEOUT_MS);
-
-  return () => {
-    done = true;
-    observer.disconnect();
-    clearTimeout(fallback);
-  };
-};
-
-// FIX: espera a que el overlay del menú aparezca en el DOM.
-const waitForMenuOpen = (onOpened: () => void): (() => void) => {
-  if (isMobileMenuInDOM()) {
-    onOpened();
-    return () => {};
-  }
-
-  let done = false;
-  const resolve = () => {
-    if (done) return;
-    done = true;
-    observer.disconnect();
-    clearTimeout(fallback);
-    requestAnimationFrame(() => requestAnimationFrame(onOpened));
-  };
-
-  const observer = new MutationObserver(() => {
-    if (isMobileMenuInDOM()) resolve();
-  });
-
-  observer.observe(document.body, { childList: true, subtree: true });
-
-  const fallback = setTimeout(resolve, MENU_CLOSE_TIMEOUT_MS);
-
-  return () => {
-    done = true;
-    observer.disconnect();
-    clearTimeout(fallback);
-  };
 };
 
 export default function TourGuiado() {
@@ -438,13 +369,7 @@ export default function TourGuiado() {
     setShowTour(false);
   };
 
-  const theme = {
-    bg:           isDark ? "#111111" : "#ffffff",
-    text:         isDark ? "#ffffff" : "#111827",
-    textMuted:    isDark ? "#d1d5db" : "#374151",
-    textSubtle:   isDark ? "#6b7280" : "#9ca3af",
-    stepInactive: isDark ? "#374151" : "#e5e7eb",
-  };
+  const theme = getTourTheme(isDark);
 
   if (!showTour) return null;
 
