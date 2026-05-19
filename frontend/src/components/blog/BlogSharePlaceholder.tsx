@@ -20,10 +20,19 @@ export default function BlogSharePlaceholder({
 }: BlogShareProps) {
   const [isDownloadOpen, setIsDownloadOpen] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [showToast, setShowToast] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
   const getUrl = () => typeof window !== 'undefined' ? window.location.href : '';
   const getTitle = () => title || (typeof document !== 'undefined' ? document.title : 'Blog PropBol');
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(getUrl());
+    setShowToast(true);
+    setTimeout(() => {
+      setShowToast(false);
+    }, 3000);
+  };
 
   const handleDownloadPDF = async () => {
     setIsGenerating(true);
@@ -133,8 +142,7 @@ export default function BlogSharePlaceholder({
       }
     } else {
       // Fallback: copiar al portapapeles
-      navigator.clipboard.writeText(getUrl());
-      alert('¡Enlace copiado al portapapeles!');
+      handleCopyLink();
     }
   };
 
@@ -193,10 +201,7 @@ export default function BlogSharePlaceholder({
               />
             </button>
             <button
-              onClick={() => {
-                navigator.clipboard.writeText(getUrl());
-                alert('¡Enlace copiado al portapapeles!');
-              }}
+              onClick={handleCopyLink}
               className="flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-stone-100 hover:bg-stone-200 transition-colors duration-200 group shrink-0"
               title="Copiar enlace"
             >
@@ -334,6 +339,18 @@ export default function BlogSharePlaceholder({
           </div>
         </div>
       </div>
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="fixed bottom-6 right-6 sm:bottom-10 sm:right-10 bg-white dark:bg-[#111111] text-stone-800 dark:text-white border border-stone-200 dark:border-stone-800 px-4 py-3 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-none z-[100] flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className="flex items-center justify-center w-6 h-6 rounded-full bg-green-50 dark:bg-green-500/20 text-green-600 dark:text-green-500 shrink-0">
+            <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <span className="text-sm font-semibold tracking-wide">¡Enlace copiado al portapapeles!</span>
+        </div>
+      )}
     </div>
   )
 }
