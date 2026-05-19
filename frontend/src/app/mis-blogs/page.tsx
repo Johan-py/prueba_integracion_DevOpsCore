@@ -229,7 +229,7 @@ export default function MisBlogsPage() {
                   {blog.estado === "RECHAZADO" && blog.blog_rechazo && blog.blog_rechazo.length > 0 && (
                     <div className="mb-4 p-3 bg-[#FDECEC] border border-[#F3BABA] rounded-lg">
                       <p className="text-xs font-bold text-[#D94848] uppercase tracking-wider mb-1">Motivo de rechazo:</p>
-                      <p className="text-sm text-[#D94848] break-words">{blog.blog_rechazo[0].comentario}</p>
+                      <p className="text-sm text-[#D94848] line-clamp-3 break-words">{blog.blog_rechazo[0].comentario}</p>
                     </div>
                   )}
 

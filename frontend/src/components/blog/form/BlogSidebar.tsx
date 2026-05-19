@@ -19,7 +19,7 @@ export default function BlogSidebar({
 
   return (
     <aside className="space-y-6 lg:pt-24">
-      <div className="rounded-[32px] bg-white dark:bg-[#111] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 dark:ring-white/10 space-y-5">
+      <div className="rounded-[32px] bg-white dark:bg-[#111] p-4 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 dark:ring-white/10 space-y-5">
         <h2 className="text-xl font-bold text-[#1C1917] dark:text-white">Publicación</h2>
         <div className="space-y-3">
           {isPendiente ? (
@@ -60,7 +60,7 @@ export default function BlogSidebar({
         </div>
       </div>
 
-      <div className="rounded-[32px] bg-[#F5F5F4]/60 dark:bg-[#111] p-8 space-y-6">
+      <div className="hidden lg:block rounded-[32px] bg-[#F5F5F4]/60 dark:bg-[#111] p-6 space-y-6">
         <div className="flex items-center gap-3">
           <BookOpen className="h-5 w-5 text-[#B45309]" />
           <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#78716C] dark:text-[#999]">Guías de un buen post</h3>
