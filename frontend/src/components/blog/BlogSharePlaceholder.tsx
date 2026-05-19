@@ -150,13 +150,13 @@ export default function BlogSharePlaceholder({
   }, [])
 
   return (
-    <div className="mt-8 w-full rounded-2xl bg-white dark:bg-[#111111] p-6 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none border border-stone-100 dark:border-stone-800 min-h-[120px] transition-all duration-300">
-      <div className="flex flex-col gap-6">
+    <div className="mt-8 w-full min-w-0 rounded-2xl bg-white dark:bg-[#111111] p-6 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none border border-stone-100 dark:border-stone-800 min-h-[120px] transition-all duration-300">
+      <div className="flex flex-col gap-6 min-w-0 w-full">
         <h3 className="text-xs font-bold uppercase tracking-[0.24em] text-[#a56400]">
           Compartir
         </h3>
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between w-full gap-5">
-          <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto w-full lg:w-auto pr-2 lg:pr-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between w-full min-w-0 gap-5">
+          <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto w-full lg:flex-1 min-w-0 pr-2 lg:pr-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             <button onClick={shareToGmail} className="flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-stone-100 hover:bg-stone-200 transition-colors duration-200 group shrink-0" title="Compartir por Gmail">
               <img
                 src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg"
@@ -250,7 +250,7 @@ export default function BlogSharePlaceholder({
 
             {/* DROPDOWN */}
             {isDownloadOpen && (
-              <div className="absolute right-0 top-full mt-2.5 w-full bg-white dark:bg-[#111111] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.12)] dark:shadow-none border border-stone-100 dark:border-stone-800 p-2 z-50 animate-in fade-in zoom-in slide-in-from-top-2 duration-300 origin-top">
+              <div className="absolute right-0 top-full mt-2.5 min-w-[210px] bg-white dark:bg-[#111111] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.12)] dark:shadow-none border border-stone-100 dark:border-stone-800 p-2 z-50 animate-in fade-in zoom-in slide-in-from-top-2 duration-300 origin-top">
                 <button
                   className="flex items-center w-full gap-3 px-3 py-3 rounded-xl hover:bg-stone-50 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-300 transition-colors group"
                   onClick={handleDownloadPDF}
