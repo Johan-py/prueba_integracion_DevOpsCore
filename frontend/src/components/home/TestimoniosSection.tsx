@@ -112,7 +112,7 @@ export default function TestimoniosSection() {
 
   return (
     // FIX commit3: overflow-hidden en section evita scroll horizontal en 390px
-    <section className="bg-white py-10 md:py-14 lg:py-16 w-full overflow-hidden">
+    <section className="bg-white dark:bg-stone-900 py-10 md:py-14 lg:py-16 w-full overflow-hidden">
       <div className="max-w-[1100px] mx-auto px-4 sm:px-6 md:px-8">
 
         {/* Título */}
