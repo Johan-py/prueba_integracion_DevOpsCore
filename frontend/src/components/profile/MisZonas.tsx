@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Trash2, Pencil, Check, X, Loader2, MapPin, Plus, Eye, EyeOff } from 'lucide-react'
+import { Trash2, Pencil, Check, X, Loader2, MapPin, Plus, Eye, EyeOff, BarChart2 } from 'lucide-react'
+import Link from 'next/link'
 import nextDynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 
@@ -230,11 +231,21 @@ export default function MisZonas() {
 
   return (
     <div className="px-4 py-6 max-w-7xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-stone-900">Mis Zonas</h1>
-        <p className="text-sm text-stone-500 mt-1">
-          Todas tus zonas se muestran en el mapa. Activa el checkbox para ver las propiedades dentro de cada zona.
-        </p>
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-stone-900">Mis Zonas</h1>
+          <p className="text-sm text-stone-500 mt-1">
+            Todas tus zonas se muestran en el mapa. Activa el checkbox para ver las propiedades dentro de cada zona.
+          </p>
+        </div>
+        <Link
+          href="/estadisticas-zona"
+          id="btn-estadisticas-propiedades"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#E07B2A] text-white text-sm font-semibold hover:bg-[#c96a1d] transition-colors shadow-sm whitespace-nowrap self-start"
+        >
+          <BarChart2 size={16} />
+          Estadísticas de propiedades
+        </Link>
       </div>
 
       {error && (

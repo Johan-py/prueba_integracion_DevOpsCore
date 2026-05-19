@@ -16,12 +16,28 @@
 
 @layer base {
   :root {
-    --primary: 31 100% 50%; /* #D97706 - Ámbar para acentos */
-    --background: 0 0% 100%; /* #ffffff - Blanco */
-    --foreground: 20 6% 15%; /* #292524 - Stone-900 para títulos */
-    --muted: 30 5% 45%; /* #78716c - Stone-600 para texto secundario */
-    --border: 30 10% 96%; /* #f5f5f4 - Stone-100 para bordes */
-    --card: 0 0% 100%; /* #ffffff - Blanco para superficies */
+    --primary: 31 100% 50%;
+    /* #D97706 - Ámbar para acentos */
+    --background: 0 0% 100%;
+    /* #ffffff - Blanco */
+    --foreground: 20 6% 15%;
+    /* #292524 - Stone-900 para títulos */
+    --muted: 30 5% 45%;
+    /* #78716c - Stone-600 para texto secundario */
+    --border: 30 10% 96%;
+    /* #f5f5f4 - Stone-100 para bordes */
+    --card: 0 0% 100%;
+    /* #ffffff - Blanco para superficies */
+  }
+
+  html.dark {
+    --background: 20 6% 10%;  /* stone-900 oscuro */
+    --foreground: 30 6% 94%;  /* stone-100 claro */
+    --muted: 30 5% 65%;       /* stone-600 claro */
+    --border: 20 5% 25%;      /* stone-800 oscuro */
+    --card: 20 6% 15%;        /* stone-900 oscuro */
+    
+    --primary: 30 100% 50%;   /* Ámbar para acentos, se mantiene igual */ 
   }
 
   body {
@@ -36,9 +52,11 @@
 }
 
 @layer utilities {
+
   /* Acentos - Ámbar */
   .bg-primary {
-    background-color: #d97706; /* amber-600 */
+    background-color: #d97706;
+    /* amber-600 */
   }
 
   .font-heading {
@@ -106,9 +124,11 @@
   .cluster-bubble--high {
     /* verde   ≥ 10 */
   }
+
   .cluster-bubble--medium {
     /* naranja 2-9  */
   }
+
   .cluster-bubble--low {
     /* azul    1    */
   }
@@ -136,6 +156,7 @@
   .leaflet-popup {
     z-index: 1001 !important;
   }
+
   /* Commit 1: tamaño clusters móvil */
   @media (max-width: 768px) {
     .cluster-bubble {
@@ -146,6 +167,7 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
     }
   }
+
   /* Commit 2: sin hover en touch */
   @media (max-width: 768px) {
     .cluster-bubble:hover {
@@ -153,29 +175,34 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
     }
   }
+
   /* Commit 3: popup móvil */
   @media (max-width: 768px) {
     .leaflet-popup-content-wrapper {
       max-width: 220px;
       border-radius: 12px;
     }
+
     .leaflet-popup-content {
       margin: 10px 12px;
       font-size: 13px;
       line-height: 1.4;
       word-break: break-word;
     }
+
     .leaflet-popup-tip {
       width: 10px;
       height: 10px;
     }
   }
+
   /* Commit 4: controles y animaciones */
   @media (max-width: 768px) {
     .leaflet-control-zoom {
       transform: scale(0.9);
       transform-origin: bottom right;
     }
+
     .leaflet-marker-icon,
     .leaflet-marker-shadow,
     .leaflet-cluster-anim .leaflet-marker-icon,
@@ -185,6 +212,7 @@
         opacity 250ms ease;
     }
   }
+
   /* Commit 5: celulares pequeños ≤480px */
   @media (max-width: 480px) {
     .cluster-bubble {
@@ -193,13 +221,16 @@
       font-size: 11px;
       border-width: 2px;
     }
+
     .leaflet-popup-content-wrapper {
       max-width: 180px;
     }
+
     .leaflet-popup-content {
       margin: 8px 10px;
       font-size: 12px;
     }
+
     .leaflet-control-zoom {
       transform: scale(0.85);
     }
@@ -231,9 +262,11 @@
 .cluster-bubble--high {
   /* verde   ≥ 10 */
 }
+
 .cluster-bubble--medium {
   /* naranja 2-9  */
 }
+
 .cluster-bubble--low {
   /* azul    1    */
 }
@@ -261,6 +294,7 @@
 .leaflet-popup {
   z-index: 1001 !important;
 }
+
 /* Commit 1: tamaño clusters móvil */
 @media (max-width: 768px) {
   .cluster-bubble {
@@ -271,6 +305,7 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
   }
 }
+
 /* Commit 2: sin hover en touch */
 @media (max-width: 768px) {
   .cluster-bubble:hover {
@@ -278,29 +313,34 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
   }
 }
+
 /* Commit 3: popup móvil */
 @media (max-width: 768px) {
   .leaflet-popup-content-wrapper {
     max-width: 220px;
     border-radius: 12px;
   }
+
   .leaflet-popup-content {
     margin: 10px 12px;
     font-size: 13px;
     line-height: 1.4;
     word-break: break-word;
   }
+
   .leaflet-popup-tip {
     width: 10px;
     height: 10px;
   }
 }
+
 /* Commit 4: controles y animaciones */
 @media (max-width: 768px) {
   .leaflet-control-zoom {
     transform: scale(0.9);
     transform-origin: bottom right;
   }
+
   .leaflet-marker-icon,
   .leaflet-marker-shadow,
   .leaflet-cluster-anim .leaflet-marker-icon,
@@ -310,6 +350,7 @@
       opacity 250ms ease;
   }
 }
+
 /* Commit 5: celulares pequeños ≤480px */
 @media (max-width: 480px) {
   .cluster-bubble {
@@ -318,31 +359,42 @@
     font-size: 11px;
     border-width: 2px;
   }
+
   .leaflet-popup-content-wrapper {
     max-width: 180px;
   }
+
   .leaflet-popup-content {
     margin: 8px 10px;
     font-size: 12px;
   }
+
   .leaflet-control-zoom {
     transform: scale(0.85);
   }
 }
+
 @keyframes fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
+
 .animate-fade {
   animation: fade-in 0.6s ease-in-out;
 }
 
 /* ==================================================
-   PROPBOL - Modo oscuro global
-    / preparado para componentes nuevos
+   PROPBOL - Sistema de temas
+   next-themes emite class="dark" en <html>
+   AccessibilityProvider emite data-accessibility="..."
 ================================================== */
 
-html.propbol-theme-dark {
+html.dark {
   color-scheme: dark;
   --pb-bg: #000000;
   --pb-surface: #050505;
@@ -356,38 +408,60 @@ html.propbol-theme-dark {
 }
 
 /* Reset modo claro / accesibilidad */
-html.propbol-theme-light,
-html.propbol-accessibility-none body {
+html:not(.dark) body,
+html[data-accessibility="none"] body {
   filter: none !important;
 }
 
-html.propbol-accessibility-deuteranopia body {
+/* Daltonismo – Deuteranopia (dificultad para ver el verde) */
+html[data-accessibility="deuteranopia"] body {
   filter: saturate(0.75) hue-rotate(-18deg) contrast(1.12) !important;
 }
 
-html.propbol-accessibility-deuteranopia .propbol-visual-settings-page,
-html.propbol-accessibility-deuteranopia .visual-option-preview {
+html[data-accessibility="deuteranopia"] .propbol-visual-settings-page,
+html[data-accessibility="deuteranopia"] .visual-option-preview {
+  filter: none !important;
+}
+
+/* Daltonismo – Protanopia (dificultad para ver el rojo) */
+html[data-accessibility="protanopia"] body {
+  filter: saturate(0.65) hue-rotate(12deg) contrast(1.15) !important;
+}
+
+html[data-accessibility="protanopia"] .propbol-visual-settings-page,
+html[data-accessibility="protanopia"] .visual-option-preview {
+  filter: none !important;
+}
+
+/* Daltonismo – Tritanopia (dificultad para ver el azul) */
+html[data-accessibility="tritanopia"] body {
+  filter: saturate(0.7) hue-rotate(180deg) contrast(1.1) !important;
+}
+
+html[data-accessibility="tritanopia"] .propbol-visual-settings-page,
+html[data-accessibility="tritanopia"] .visual-option-preview {
   filter: none !important;
 }
 
 /* Fondo general */
-html.propbol-theme-dark,
-html.propbol-theme-dark body,
-html.propbol-theme-dark main,
-html.propbol-theme-dark nav,
-html.propbol-theme-dark footer,
-html.propbol-theme-dark .propbol-visual-settings-page,
-html.propbol-theme-dark .propbol-sesiones-activas,
-html.propbol-theme-dark .propbol-active-sessions-page {
+html.dark,
+html.dark body,
+html.dark main,
+html.dark nav,
+html.dark footer,
+html.dark .propbol-visual-settings-page,
+html.dark .propbol-sesiones-activas,
+html.dark .propbol-active-sessions-page {
   background: var(--pb-bg) !important;
   color: var(--pb-text) !important;
   border-color: var(--pb-border) !important;
 }
 
 /* Convierte fondos claros, azules y grises a negro */
-html.propbol-theme-dark body :where([class*="bg-white"],
+html.dark body :where([class*="bg-white"],
   [class*="bg-gray"],
   [class*="bg-slate"],
+  [class*="text-slate"],
   [class*="bg-neutral"],
   [class*="bg-zinc"],
   [class*="bg-stone"],
@@ -404,14 +478,20 @@ html.propbol-theme-dark body :where([class*="bg-white"],
   [class*="bg-[#D"],
   [class*="bg-[#d"],
   [class*="bg-[#E7"],
-  [class*="bg-[#e7"]) {
+  [class*="bg-[#e7"],
+  [class*="bg-[#fb"],
+  [class*="bg-[#FB"],
+  [class*="bg-[#f5"],
+  [class*="bg-[#F5"],
+  [class*="bg-[#f8"],
+  [class*="bg-[#F8"]):not([class*="/"]) {
   background: var(--pb-surface) !important;
   background-image: none !important;
   color: var(--pb-text) !important;
 }
 
 /* Cards, formularios y bloques internos */
-html.propbol-theme-dark body :where(section,
+html.dark body :where(section,
   article,
   aside,
   form,
@@ -430,7 +510,7 @@ html.propbol-theme-dark body :where(section,
 }
 
 /* Dropdowns, popups, menús y ventanas flotantes */
-html.propbol-theme-dark :where(nav [class*="absolute"],
+html.dark :where(nav [class*="absolute"],
   nav [class*="fixed"],
   [role="menu"],
   [role="dialog"],
@@ -452,7 +532,7 @@ html.propbol-theme-dark :where(nav [class*="absolute"],
 }
 
 /* Elementos internos de popups */
-html.propbol-theme-dark :where(nav [class*="absolute"] *,
+html.dark :where(nav [class*="absolute"] *,
   nav [class*="fixed"] *,
   [role="menu"] *,
   [role="dialog"] *) {
@@ -461,7 +541,7 @@ html.propbol-theme-dark :where(nav [class*="absolute"] *,
 }
 
 /* Textos */
-html.propbol-theme-dark body :where(h1,
+html.dark body :where(h1,
   h2,
   h3,
   h4,
@@ -483,7 +563,7 @@ html.propbol-theme-dark body :where(h1,
 }
 
 /* Textos secundarios */
-html.propbol-theme-dark body :where(small,
+html.dark body :where(small,
   input::placeholder,
   textarea::placeholder,
   [class*="placeholder"],
@@ -492,7 +572,7 @@ html.propbol-theme-dark body :where(small,
 }
 
 /* Inputs */
-html.propbol-theme-dark body :where(input,
+html.dark body :where(input,
   select,
   textarea) {
   background: var(--pb-input) !important;
@@ -501,7 +581,7 @@ html.propbol-theme-dark body :where(input,
 }
 
 /* Bordes y sombras */
-html.propbol-theme-dark body :where([class*="border-gray"],
+html.dark body :where([class*="border-gray"],
   [class*="border-slate"],
   [class*="border-neutral"],
   [class*="border-zinc"],
@@ -513,13 +593,13 @@ html.propbol-theme-dark body :where([class*="border-gray"],
   --tw-ring-shadow: 0 0 #0000 !important;
 }
 
-html.propbol-theme-dark body :where([class*="shadow"],
+html.dark body :where([class*="shadow"],
   [class*="drop-shadow"]) {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75) !important;
 }
 
 /* Botones principales naranjas */
-html.propbol-theme-dark body :where([class*="bg-orange-500"],
+html.dark body :where([class*="bg-orange-500"],
   [class*="bg-orange-600"],
   [class*="bg-[#E68B25]"],
   [class*="bg-[#e68b25]"],
@@ -531,26 +611,26 @@ html.propbol-theme-dark body :where([class*="bg-orange-500"],
 }
 
 /* Hover general */
-html.propbol-theme-dark body :where(a:hover,
+html.dark body :where(a:hover,
   button:hover,
   [role="menuitem"]:hover) {
   background-color: var(--pb-surface-2) !important;
 }
 
 /* Botón deshabilitado */
-html.propbol-theme-dark body button:disabled {
+html.dark body button:disabled {
   background: #222222 !important;
   color: var(--pb-muted) !important;
   opacity: 0.8 !important;
 }
 
 /* panel superior de mis publicaciones */
-html.propbol-theme-dark .rounded-2xl,
-html.propbol-theme-dark .rounded-xl,
-html.propbol-theme-dark [class*="from-white"],
-html.propbol-theme-dark [class*="from-gray"],
-html.propbol-theme-dark [class*="to-white"],
-html.propbol-theme-dark [class*="to-gray"] {
+html.dark .rounded-2xl,
+html.dark .rounded-xl,
+html.dark [class*="from-white"],
+html.dark [class*="from-gray"],
+html.dark [class*="to-white"],
+html.dark [class*="to-gray"] {
   background: #000000 !important;
   background-image: none !important;
   color: #ffffff !important;
@@ -558,21 +638,21 @@ html.propbol-theme-dark [class*="to-gray"] {
 }
 
 /* Botón principal del popup de bienvenida/login */
-html.propbol-theme-dark nav [class*="absolute"] button:not([aria-label]),
-html.propbol-theme-dark nav [class*="fixed"] button:not([aria-label]) {
+html.dark nav [class*="absolute"] button:not([aria-label]),
+html.dark nav [class*="fixed"] button:not([aria-label]) {
   background: var(--pb-accent) !important;
   color: #ffffff !important;
   border-color: var(--pb-accent) !important;
 }
 
-html.propbol-theme-dark nav [class*="absolute"] button:not([aria-label]) *,
-html.propbol-theme-dark nav [class*="fixed"] button:not([aria-label]) * {
+html.dark nav [class*="absolute"] button:not([aria-label]) *,
+html.dark nav [class*="fixed"] button:not([aria-label]) * {
   color: #ffffff !important;
   stroke: #ffffff !important;
 }
 
 /* Alertas de éxito en modo oscuro */
-html.propbol-theme-dark :where(.bg-green-50,
+html.dark :where(.bg-green-50,
   .bg-green-100,
   .bg-emerald-50,
   .bg-emerald-100,
@@ -585,7 +665,7 @@ html.propbol-theme-dark :where(.bg-green-50,
   border: 1px solid rgba(34, 197, 94, 0.35) !important;
 }
 
-html.propbol-theme-dark :where(.bg-green-50,
+html.dark :where(.bg-green-50,
   .bg-green-100,
   .bg-emerald-50,
   .bg-emerald-100,
@@ -600,7 +680,7 @@ html.propbol-theme-dark :where(.bg-green-50,
    Alertas de error en modo oscuro
 ===================================== */
 
-html.propbol-theme-dark :where(.bg-red-50,
+html.dark :where(.bg-red-50,
   .bg-red-100,
   .bg-rose-50,
   .bg-rose-100,
@@ -615,7 +695,7 @@ html.propbol-theme-dark :where(.bg-red-50,
   border: 1px solid rgba(239, 68, 68, 0.35) !important;
 }
 
-html.propbol-theme-dark :where(.bg-red-50,
+html.dark :where(.bg-red-50,
   .bg-red-100,
   .bg-rose-50,
   .bg-rose-100,
@@ -629,26 +709,26 @@ html.propbol-theme-dark :where(.bg-red-50,
 }
 
 /* Botones de sesiones activas solo en modo oscuro */
-html.propbol-theme-dark .propbol-btn-select-all {
+html.dark .propbol-btn-select-all {
   background: #050505 !important;
   color: #ffffff !important;
   border: 1px solid #333333 !important;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55) !important;
 }
 
-html.propbol-theme-dark .propbol-btn-select-all:hover {
+html.dark .propbol-btn-select-all:hover {
   background: #111111 !important;
   border-color: #525252 !important;
 }
 
-html.propbol-theme-dark .propbol-btn-close-session {
+html.dark .propbol-btn-close-session {
   background: rgba(127, 29, 29, 0.2) !important;
   color: #fca5a5 !important;
   border: 1px solid rgba(239, 68, 68, 0.65) !important;
   box-shadow: 0 12px 30px rgba(127, 29, 29, 0.25) !important;
 }
 
-html.propbol-theme-dark .propbol-btn-close-session:hover {
+html.dark .propbol-btn-close-session:hover {
   background: rgba(127, 29, 29, 0.35) !important;
   color: #fecaca !important;
   border-color: rgba(248, 113, 113, 0.9) !important;
@@ -661,10 +741,106 @@ html.propbol-theme-dark .propbol-btn-close-session:hover {
 .leaflet-gesture-handling-scroll-warning::after,
 .leaflet-container[data-gesture-handling-touch-warning]::after,
 .leaflet-container[data-gesture-handling-scroll-warning]::after {
-    display: none !important;
-    content: none !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    background: transparent !important;
-    pointer-events: none !important;
+  display: none !important;
+  content: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  background: transparent !important;
+  pointer-events: none !important;
+}
+
+/* Fix para botones naranjas y overlays en modo oscuro */
+html.propbol-theme-dark body :where([class*="bg-orange-500"], [class*="bg-orange-600"], [class*="bg-amber-"], [class*="bg-primary"], [class*="bg-[#A67C00]"], [class*="bg-[#D97706]"]) {
+  background: var(--pb-accent) !important;
+  color: #ffffff !important;
+  border-color: var(--pb-accent) !important;
+}
+
+
+/* Forzar fondo oscuro en contenedores con gradientes específicos de blogs */
+html.propbol-theme-dark :where([class*="bg-[linear-gradient"]) {
+  background: var(--pb-bg) !important;
+  background-image: none !important;
+}
+
+/* Protegemos colores semánticos sin afectar al modo claro */
+html.propbol-theme-dark body :where([class*="bg-[#E8F7EE]"], [class*="bg-green-50"]) {
+  background: rgba(22, 101, 52, 0.25) !important;
+  color: #86efac !important;
+  border-color: rgba(34, 197, 94, 0.4) !important;
+}
+
+html.propbol-theme-dark body :where([class*="bg-[#FDECEC]"], [class*="bg-red-50"]) {
+  background: rgba(127, 29, 29, 0.25) !important;
+  color: #fca5a5 !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+}
+
+html.propbol-theme-dark body :where([class*="bg-amber-50"]) {
+  background: rgba(120, 53, 15, 0.25) !important;
+  color: #fcd34d !important;
+  border-color: rgba(217, 119, 6, 0.4) !important;
+}
+
+html.propbol-theme-dark body :where([class*="text-green-600"], [class*="text-[#198754]"]) {
+  color: #86efac !important;
+}
+
+html.propbol-theme-dark body :where([class*="text-amber-600"], [class*="text-amber-700"]) {
+  color: #fbbf24 !important;
+}
+
+html.propbol-theme-dark body :where([class*="text-red-600"], [class*="text-[#D94848]"]) {
+  color: #fca5a5 !important;
+}
+/* === FIX BLOG FORM DARK MODE === */
+/* Fondos con opacidad Tailwind (bg-[#FAFAFA]/50) que el selector global excluye */
+html.dark body [class*="bg-[#FAFAFA]"] {
+  background: var(--pb-surface) !important;
+  color: var(--pb-text) !important;
+}
+
+/* TipTap prose editor en dark mode */
+html.dark .prose {
+  color: var(--pb-text) !important;
+}
+html.dark .prose h1,
+html.dark .prose h2,
+html.dark .prose h3 {
+  color: var(--pb-text) !important;
+}
+html.dark .prose p,
+html.dark .prose li {
+  color: var(--pb-muted) !important;
+}
+html.dark .prose blockquote {
+  border-left-color: var(--pb-accent) !important;
+  color: var(--pb-muted) !important;
+}
+html.dark .prose a {
+  color: var(--pb-accent) !important;
+}
+html.dark .prose p.is-editor-empty:first-child::before {
+  color: #666666 !important;
+}
+
+/* === FIX MAPAS MODO OSCURO (RESTAURADO) === */
+html.dark .leaflet-popup-content-wrapper,
+html.propbol-theme-dark .leaflet-popup-content-wrapper {
+  background-color: #1f2937 !important;
+}
+html.dark .leaflet-popup-tip,
+html.propbol-theme-dark .leaflet-popup-tip {
+  background-color: #1f2937 !important;
+}
+html.dark .pb-map-popup-dark-fix,
+html.propbol-theme-dark .pb-map-popup-dark-fix {
+  color: var(--popup-dark-color, inherit) !important;
+}
+html:not(.dark):not(.propbol-theme-dark) .pb-map-popup-dark-fix {
+  color: var(--popup-light-color, inherit) !important;
+}
+html.dark .pb-map-label-container > .pb-map-label,
+html.propbol-theme-dark .pb-map-label-container > .pb-map-label {
+  text-shadow: 0 1px 3px rgba(0,0,0,0.95), 0 -1px 3px rgba(0,0,0,0.95), 1px 0 3px rgba(0,0,0,0.95), -1px 0 3px rgba(0,0,0,0.95) !important;
 }

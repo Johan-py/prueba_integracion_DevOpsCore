@@ -214,6 +214,19 @@ export default function TourGuiado() {
   const ioRef = useRef<IntersectionObserver | null>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [tooltipH, setTooltipH] = useState(0);
+  const [isDark, setIsDark] = useState(false);
+
+useEffect(() => {
+  const check = () =>
+    setIsDark(document.documentElement.classList.contains("dark")); // Detecta el modo oscuro actual al montar el componente y cada vez que cambie la clase "dark" en el <html>
+  check();
+  const observer = new MutationObserver(check);
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["class"],
+  });
+  return () => observer.disconnect();
+}, []);
 
   // Ref para trackear el step desde el que venimos REALMENTE
   // (funciona igual en navegación hacia adelante y hacia atrás)
@@ -296,14 +309,17 @@ export default function TourGuiado() {
   }, []);
 
   useEffect(() => {
-    if (showTour) {
-      document.body.style.overflow = "hidden";
-      window.scrollTo({ top: 0, behavior: "auto" });
-      return () => {
-        document.body.style.overflow = "";
-      };
-    }
-  }, [showTour]);
+  if (showTour) {
+    document.body.style.overflow = "hidden";
+    window.scrollTo({ top: 0, behavior: "auto" });
+  } else {
+    document.body.style.overflow = "";
+  }
+
+  return () => {
+    document.body.style.overflow = "";
+  };
+}, [showTour]);
 
   useEffect(() => {
     if (!showTour) return;
@@ -573,8 +589,16 @@ export default function TourGuiado() {
     completeTour();
     setShowTour(false);
   };
+  const theme = {
+  bg:           isDark ? "#111111" : "#ffffff",
+  text:         isDark ? "#ffffff" : "#111827",
+  textMuted:    isDark ? "#d1d5db" : "#374151",
+  textSubtle:   isDark ? "#6b7280" : "#9ca3af",
+  stepInactive: isDark ? "#374151" : "#e5e7eb",
+};
 
   if (!showTour) return null;
+  
 
   const PADDING = 8;
   const hasValid = highlight !== null;
@@ -671,7 +695,8 @@ export default function TourGuiado() {
           left,
           width: tooltipW,
           zIndex: 9999,
-          background: "#fff",
+          background: theme.bg,
+          color: theme.text,
           borderRadius: 12,
           padding: tooltipPad,
           boxShadow: "0 8px 32px rgba(0,0,0,0.18)",
@@ -690,7 +715,7 @@ export default function TourGuiado() {
                 flex: 1,
                 height: 3,
                 borderRadius: 99,
-                background: i <= currentStep ? "#E68B25" : "#e5e7eb",
+                background: i <= currentStep ? "#E68B25" : theme.stepInactive,
               }}
             />
           ))}
@@ -700,7 +725,7 @@ export default function TourGuiado() {
           {TOUR_STEPS[currentStep].title}
         </p>
 
-        <p style={{ fontSize: fontDesc, color: "#374151", marginBottom: !hasValid ? 8 : 14 }}>
+        <p style={{ fontSize: fontDesc, color: theme.textMuted, marginBottom: !hasValid ? 8 : 14 }}>
           {TOUR_STEPS[currentStep].description}
         </p>
 
@@ -708,9 +733,9 @@ export default function TourGuiado() {
           <p
             style={{
               fontSize: fontMeta,
-              color: "#9ca3af",
+              color: theme.textSubtle,
               marginBottom: 14,
-              fontStyle: "italic",
+            fontStyle: "italic",
             }}
           >
             Esta sección no está visible en tu dispositivo actual.
@@ -728,7 +753,7 @@ export default function TourGuiado() {
             onClick={handleSkip}
             style={{
               fontSize: fontSkip,
-              color: "#9ca3af",
+              color: theme.textSubtle,
               background: "none",
               border: "none",
               cursor: "pointer",
@@ -743,17 +768,20 @@ export default function TourGuiado() {
             {currentStep > 0 && (
               <button
                 onClick={() => setCurrentStep((prev) => prev - 1)}
+                className="propbol-tour-btn-prev"
                 style={{
-                  background: "none",
-                  color: "#E68B25",
-                  border: "1px solid #E68B25",
-                  borderRadius: 8,
-                  padding: isMobile ? "8px 12px" : "10px 18px",
-                  fontSize: fontBtn,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  minHeight: 44,
-                }}
+                 background: "none",
+                 color: "#E68B25",
+                 border: "1px solid #E68B25",
+                 borderRadius: 8,
+                 padding: isMobile ? "8px 12px" : "10px 18px",
+                 fontSize: fontBtn,
+                 fontWeight: 600,
+                 cursor: "pointer",
+                 minHeight: 44,
+                 backgroundColor: isDark ? "transparent" : "transparent",
+                 WebkitTextFillColor: "#E68B25",
+            }}
               >
                 ← Anterior
               </button>

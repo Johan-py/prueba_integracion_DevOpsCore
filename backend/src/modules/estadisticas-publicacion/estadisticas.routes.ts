@@ -1,44 +1,44 @@
-import { Router } from 'express'
-import { EstadisticasPublicacionController } from './estadisticas.controller.js'
-import { requireAuth } from '../../middleware/auth.middleware.js'
-import { optionalAuth } from '../../middleware/optional-auth.middleware.js'
+import { Router } from "express";
+import { EstadisticasPublicacionController } from "./estadisticas.controller.js";
+import { requireAuth } from "../../middleware/auth.middleware.js";
+import { optionalAuth } from "../../middleware/optional-auth.middleware.js";
 
-const router = Router()
+const router = Router();
 
 router.post(
-  '/publicaciones/:publicacionId/vistas',
+  "/publicaciones/:publicacionId/vistas",
   optionalAuth,
-  EstadisticasPublicacionController.registrarVista
-)
+  EstadisticasPublicacionController.registrarVista,
+);
 
 router.post(
-  '/inmuebles/:inmuebleId/vistas',
+  "/inmuebles/:inmuebleId/vistas",
   optionalAuth,
-  EstadisticasPublicacionController.registrarVistaPorInmueble
-)
+  EstadisticasPublicacionController.registrarVistaPorInmueble,
+);
 
 router.post(
-  '/publicaciones/:publicacionId/compartidos',
+  "/publicaciones/:publicacionId/compartidos",
   requireAuth,
-  EstadisticasPublicacionController.registrarCompartido
-)
+  EstadisticasPublicacionController.registrarCompartido,
+);
 
 router.post(
-  '/inmuebles/:inmuebleId/compartidos',
+  "/inmuebles/:inmuebleId/compartidos",
   requireAuth,
-  EstadisticasPublicacionController.registrarCompartidoPorInmueble
-)
+  EstadisticasPublicacionController.registrarCompartidoPorInmueble,
+);
 
 router.get(
-  '/publicaciones/:publicacionId/estadisticas',
+  "/publicaciones/:publicacionId/estadisticas",
   requireAuth,
-  EstadisticasPublicacionController.obtenerEstadisticas
-)
+  EstadisticasPublicacionController.obtenerEstadisticas,
+);
 
 router.get(
-  '/usuarios/me/propiedades-vistas',
+  "/usuarios/me/propiedades-vistas",
   requireAuth,
-  EstadisticasPublicacionController.obtenerMisPropiedadesVistas
-)
+  EstadisticasPublicacionController.obtenerMisPropiedadesVistas,
+);
 
-export default router
+export default router;

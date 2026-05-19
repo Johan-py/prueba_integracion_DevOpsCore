@@ -1,6 +1,6 @@
 'use client'
 
-import { Newspaper, Clock, CreditCard, MessageSquareText, Cog } from 'lucide-react'
+import { Newspaper, Clock, CreditCard, MessageSquareText, Cog, Package } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
@@ -26,7 +26,7 @@ export default function AdminDashboard() {
           fetch(`${API_URL}/api/transacciones/admin`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch(`${API_URL}/api/testimonios/count`, {
+          fetch(`${API_URL}/api/admin/testimonios`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ])
@@ -41,7 +41,7 @@ export default function AdminDashboard() {
         }
         if (testimoniosRes.ok) {
           const data = await testimoniosRes.json()
-          setTestimonioCount(data.total)
+          setTestimonioCount(Array.isArray(data) ? data.length : data.total || 0)
         }
       } catch (error) {
         console.error('Error fetching pending counts:', error)     
@@ -151,6 +151,25 @@ export default function AdminDashboard() {
                     <h3 className="text-2xl font-bold font-montserrat text-stone-900">
                       {isLoading ? <div className="h-8 w-12 bg-stone-100 animate-pulse rounded"></div> : (testimonioCount ?? 0)}
                     </h3>
+                  </div>
+                </div>
+                <div className="h-8 w-8 rounded-full bg-stone-50 flex items-center justify-center transition-colors group-hover:bg-amber-600 group-hover:text-white">
+                  <Cog className="h-4 w-4" />
+                </div>
+              </Link>
+
+              {/* Planes */}
+              <Link
+                href="/admin/planes"
+                className="group flex items-center justify-between rounded-2xl border border-stone-100 bg-white p-6 shadow-sm transition-all hover:shadow-md hover:border-amber-600"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="rounded-xl bg-amber-50 p-3 text-amber-600 transition-colors group-hover:bg-amber-100">
+                    <Package className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium font-inter text-stone-500">Gestión de Planes</p>
+                    <h3 className="text-lg font-bold font-montserrat text-stone-900">Suscripciones</h3>
                   </div>
                 </div>
                 <div className="h-8 w-8 rounded-full bg-stone-50 flex items-center justify-center transition-colors group-hover:bg-amber-600 group-hover:text-white">

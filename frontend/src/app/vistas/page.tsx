@@ -60,12 +60,12 @@ export default function VistasRecientesPage() {
 
     // --- ESTADOS PARA EL FILTRO DE CALENDARIO ---
     const [showCalendar, setShowCalendar] = useState(false);
-    const hoy = new Date(2026, 4, 9); // Referencia actual: 9 de Mayo 2026
-    const [currentDate, setCurrentDate] = useState(new Date(2026, 4, 1));
+    const hoy = new Date();
+    const [currentDate, setCurrentDate] = useState(new Date(hoy.getFullYear(), hoy.getMonth(), 1));
     const [rangeStart, setRangeStart] = useState<Date | null>(null);
     const [rangeEnd, setRangeEnd] = useState<Date | null>(null);
 
-    // --- CONFIGURACIÓN DE PAGINACIÓN (CAMBIADO A 10) ---
+    // --- CONFIGURACIÓN DE PAGINACIÓN ---
     const [currentPage, setCurrentPage] = useState(1);
     const propertiesPerPage = 10;
 
@@ -148,17 +148,17 @@ export default function VistasRecientesPage() {
         const monthName = target.toLocaleString('es-ES', { month: 'long', year: 'numeric' });
 
         return (
-            <div className="flex-1">
-                <div className="flex justify-between items-center mb-6 px-2 text-[#E87B00]">
-                    {offset === 0 ? <ChevronLeft size={18} className="cursor-pointer" onClick={() => changeMonth(-1)} /> : <div className="w-4" />}
-                    <span className="font-bold text-gray-800 text-sm capitalize">{monthName}</span>
-                    {offset === 1 ? <ChevronRight size={18} className="cursor-pointer" onClick={() => changeMonth(1)} /> : <div className="w-4" />}
+            <div className="flex-1 min-w-[200px]">
+                <div className="flex justify-between items-center mb-3 px-1 text-[#E87B00]">
+                    {offset === 0 ? <ChevronLeft size={16} className="cursor-pointer hover:scale-110 transition-transform" onClick={() => changeMonth(-1)} /> : <div className="w-4" />}
+                    <span className="font-bold text-gray-800 text-xs capitalize">{monthName}</span>
+                    {offset === 1 ? <ChevronRight size={16} className="cursor-pointer hover:scale-110 transition-transform" onClick={() => changeMonth(1)} /> : <div className="w-4" />}
                 </div>
-                <div className="grid grid-cols-7 text-center text-[12px]">
-                    {['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'].map(d => (
-                        <div key={d} className="text-gray-400 font-medium mb-3">{d}</div>
+                <div className="grid grid-cols-7 text-center text-[10px]">
+                    {['do', 'lu', 'ma', 'mi', 'ju', 'vi', 'sá'].map(d => (
+                        <div key={d} className="text-gray-400 font-semibold mb-2 capitalize">{d}</div>
                     ))}
-                    {[...Array(firstDayOfMonth)].map((_, i) => <div key={i} className="py-2"></div>)}
+                    {[...Array(firstDayOfMonth)].map((_, i) => <div key={i} className="py-1"></div>)}
                     {[...Array(daysInMonth)].map((_, i) => {
                         const day = i + 1;
                         const dObj = new Date(target.getFullYear(), target.getMonth(), day);
@@ -167,15 +167,27 @@ export default function VistasRecientesPage() {
                         const inRange = rangeStart && rangeEnd && dObj > rangeStart && dObj < rangeEnd;
                         const isToday = hoy.toDateString() === dObj.toDateString();
 
+                        // Determinar los bordes redondeados según el estado del rango seleccionado
+                        let roundedClass = "rounded-none";
+                        if (isStart && isEnd) {
+                            roundedClass = "rounded-full";
+                        } else if (isStart) {
+                            roundedClass = rangeEnd ? "rounded-l-full" : "rounded-full";
+                        } else if (isEnd) {
+                            roundedClass = "rounded-r-full";
+                        }
+
                         return (
                             <div
                                 key={day}
                                 onClick={() => handleDateClick(day, offset)}
-                                className={`relative py-2 cursor-pointer flex justify-center items-center ${inRange || isStart || isEnd ? 'bg-[#F7D8B5]' : 'hover:bg-gray-50'}`}
+                                className={`relative py-1 cursor-pointer flex justify-center items-center transition-colors 
+                                    ${inRange || isStart || isEnd ? 'bg-[#F7D8B5]' : 'hover:bg-gray-100 rounded-full'} 
+                                    ${roundedClass}`}
                             >
-                                <span className={`z-10 w-7 h-7 flex items-center justify-center rounded-full font-bold 
-                                    ${isStart || isEnd ? 'border-2 border-black' : ''} 
-                                    ${isToday ? 'bg-[#E87B00] border-2 border-black text-white' : ''}`}
+                                <span className={`z-10 w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold transition-all
+                                    ${isStart || isEnd ? 'border border-black bg-white text-black' : ''} 
+                                    ${isToday ? 'bg-[#E87B00] border border-black text-white' : ''}`}
                                 >
                                     {day}
                                 </span>
@@ -195,16 +207,27 @@ export default function VistasRecientesPage() {
     const handleClearHistory = async () => {
         if (properties.length === 0) return;
         if (!confirm("¿Deseas borrar todo tu historial de vistas?")) return;
+
         const token = localStorage.getItem('token');
         try {
-            await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/perfil/historial/vistas`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/perfil/historial/limpiar`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
             });
-            setProperties([]);
-            setFilteredProperties([]);
-            setCurrentPage(1);
-        } catch (error) { console.error(error); }
+
+            if (response.ok) {
+                setProperties([]);
+                setFilteredProperties([]);
+                setCurrentPage(1);
+            } else {
+                console.error("Error al intentar limpiar el historial en el servidor");
+            }
+        } catch (error) {
+            console.error("Error de red:", error);
+        }
     };
 
     if (loading) return <div className="p-20 text-center font-bold text-black">Conectando con PropBol...</div>;
@@ -240,37 +263,40 @@ export default function VistasRecientesPage() {
                     </div>
                 </div>
 
-                {/* CALENDARIO */}
+                {/* CALENDARIO REAJUSTADO - COMPACTO Y ADAPTABLE */}
                 {showCalendar && (
-                    <div className="absolute top-16 right-0 z-50 bg-[#FDF9F0] border-2 border-[#F3C291] rounded-2xl shadow-xl p-8 w-[650px] animate-in fade-in zoom-in duration-200">
+                    <div className="absolute top-16 right-0 z-50 bg-[#FDF9F0] border border-[#F3C291] rounded-xl shadow-lg p-4 w-full max-w-[460px] animate-in fade-in zoom-in duration-200">
                         <button
                             onClick={() => setShowCalendar(false)}
-                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+                            className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors"
                         >
-                            <X size={20} />
+                            <X size={16} />
                         </button>
-                        <div className="flex gap-10">
+                        <div className="flex flex-col sm:flex-row gap-4 mt-2">
                             {renderMonth(currentDate, 0)}
                             {renderMonth(currentDate, 1)}
                         </div>
-                        <div className="flex justify-center gap-4 mt-10">
+                        <div className="flex justify-end gap-2 mt-4 pt-2 border-t border-orange-100">
+                            {/* APLICAR RANGO (IZQUIERDA) */}
                             <button
                                 onClick={applyRangeFilter}
-                                className="bg-[#E87B00] text-white px-10 py-2.5 rounded-xl font-bold text-sm shadow-md hover:bg-orange-600 transition-colors"
+                                disabled={!rangeStart || !rangeEnd}
+                                className="bg-[#E87B00] text-white px-5 py-1.5 rounded-lg font-bold text-xs shadow-sm hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 aplicar rango
                             </button>
+                            {/* LIMPIAR (DERECHA) */}
                             <button
                                 onClick={handleResetFilter}
-                                className="bg-[#D1D5DB] text-[#4B4B4B] px-8 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-gray-300 transition-colors"
+                                className="bg-[#D1D5DB] text-[#4B4B4B] px-4 py-1.5 rounded-lg font-bold text-xs flex items-center gap-1 hover:bg-gray-300 transition-colors"
                             >
-                                <Trash2 size={16} /> limpiar
+                                <Trash2 size={12} /> limpiar
                             </button>
                         </div>
                     </div>
                 )}
 
-                {/* GRID DE CARDS (AJUSTADO PARA 10) */}
+                {/* GRID DE CARDS */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 min-h-[600px]">
                     {currentProperties.length > 0 ? (
                         currentProperties.map((prop: any) => (

@@ -1,30 +1,32 @@
-import { prisma } from '../../lib/prisma.client.js'
+import { prisma } from "../../lib/prisma.client.js";
 
-const ESTADO_PUBLICACION_ELIMINADA = 'ELIMINADA' as const
-const ESTADO_INMUEBLE_INACTIVO = 'INACTIVO' as const
+const ESTADO_PUBLICACION_ELIMINADA = "ELIMINADA" as const;
+const ESTADO_INMUEBLE_INACTIVO = "INACTIVO" as const;
 
-type TipoAccionValue = 'VENTA' | 'ALQUILER' | 'ANTICRETO'
+type TipoAccionValue = "VENTA" | "ALQUILER" | "ANTICRETO";
 
 type ActualizarPublicacionInput = {
-  titulo?: unknown
-  title?: unknown
-  descripcion?: unknown
-  details?: unknown
-  tipoAccion?: unknown
-  operationType?: unknown
-  ubicacion?: unknown
-  location?: unknown
-  precio?: unknown
-  price?: unknown
-}
+  titulo?: unknown;
+  title?: unknown;
+  descripcion?: unknown;
+  details?: unknown;
+  tipoAccion?: unknown;
+  operationType?: unknown;
+  ubicacion?: unknown;
+  location?: unknown;
+  precio?: unknown;
+  price?: unknown;
+};
 
-export const buscarPublicacionesPorUsuarioRepository = async (usuarioId: number) => {
+export const buscarPublicacionesPorUsuarioRepository = async (
+  usuarioId: number,
+) => {
   return prisma.publicacion.findMany({
     where: {
       usuarioId,
       estado: {
-        not: ESTADO_PUBLICACION_ELIMINADA
-      }
+        not: ESTADO_PUBLICACION_ELIMINADA,
+      },
     },
     include: {
       multimedia: true,
@@ -37,17 +39,17 @@ export const buscarPublicacionesPorUsuarioRepository = async (usuarioId: number)
               latitud: true,
               longitud: true,
               inmuebleId: true,
-              ubicacionMaestraId: true
-            }
-          }
-        }
-      }
+              ubicacionMaestraId: true,
+            },
+          },
+        },
+      },
     },
     orderBy: {
-      fechaPublicacion: 'desc'
-    }
-  })
-}
+      fechaPublicacion: "desc",
+    },
+  });
+};
 
 export const buscarPublicacionPorIdRepository = async (id: number) => {
   return prisma.publicacion.findUnique({
@@ -55,15 +57,17 @@ export const buscarPublicacionPorIdRepository = async (id: number) => {
     include: {
       inmueble: {
         include: {
-          ubicacion: true
-        }
+          ubicacion: true,
+        },
       },
-      multimedia: true
-    }
-  })
-}
+      multimedia: true,
+    },
+  });
+};
 
-export const buscarResumenFinalPorIdRepository = async (publicacionId: number) => {
+export const buscarResumenFinalPorIdRepository = async (
+  publicacionId: number,
+) => {
   return prisma.publicacion.findUnique({
     where: { id: publicacionId },
     select: {
@@ -92,105 +96,107 @@ export const buscarResumenFinalPorIdRepository = async (publicacionId: number) =
               ciudad: true,
               zona: true,
               latitud: true,
-              longitud: true
-            }
+              longitud: true,
+            },
           },
           inmueble_etiqueta: {
             select: {
               etiqueta: {
                 select: {
                   id: true,
-                  nombre: true
-                }
-              }
-            }
-          }
-        }
+                  nombre: true,
+                },
+              },
+            },
+          },
+        },
       },
       multimedia: {
         select: {
           id: true,
           url: true,
           tipo: true,
-          pesoMb: true
+          pesoMb: true,
         },
         orderBy: {
-          id: 'asc'
-        }
-      }
-    }
-  })
-}
+          id: "asc",
+        },
+      },
+    },
+  });
+};
 
 export const actualizarPublicacionRepository = async (
   publicacionId: number,
-  data: ActualizarPublicacionInput
+  data: ActualizarPublicacionInput,
 ) => {
-  const tituloRaw = data.titulo ?? data.title
-  const descripcionRaw = data.descripcion ?? data.details
-  const tipoAccionRaw = data.tipoAccion ?? data.operationType
-  const direccionRaw = data.ubicacion ?? data.location
-  const precioRaw = data.precio ?? data.price
+  const tituloRaw = data.titulo ?? data.title;
+  const descripcionRaw = data.descripcion ?? data.details;
+  const tipoAccionRaw = data.tipoAccion ?? data.operationType;
+  const direccionRaw = data.ubicacion ?? data.location;
+  const precioRaw = data.precio ?? data.price;
 
   const dataToUpdate: {
-    titulo?: string
-    descripcion?: string
+    titulo?: string;
+    descripcion?: string;
     inmueble?: {
       update: {
-        tipoAccion?: TipoAccionValue
-        precio?: number
+        tipoAccion?: TipoAccionValue;
+        precio?: number;
         ubicacion?: {
           update: {
-            direccion: string
-          }
-        }
-      }
-    }
-  } = {}
+            direccion: string;
+          };
+        };
+      };
+    };
+  } = {};
 
   const inmuebleData: {
-    tipoAccion?: TipoAccionValue
-    precio?: number
+    tipoAccion?: TipoAccionValue;
+    precio?: number;
     ubicacion?: {
       update: {
-        direccion: string
-      }
-    }
-  } = {}
+        direccion: string;
+      };
+    };
+  } = {};
 
   if (tituloRaw !== undefined) {
-    dataToUpdate.titulo = String(tituloRaw).trim()
+    dataToUpdate.titulo = String(tituloRaw).trim();
   }
 
   if (descripcionRaw !== undefined) {
-    dataToUpdate.descripcion = String(descripcionRaw).trim()
+    dataToUpdate.descripcion = String(descripcionRaw).trim();
   }
 
   if (tipoAccionRaw !== undefined) {
-    inmuebleData.tipoAccion = String(tipoAccionRaw).trim().toUpperCase() as TipoAccionValue
+    inmuebleData.tipoAccion = String(tipoAccionRaw)
+      .trim()
+      .toUpperCase() as TipoAccionValue;
   }
 
   if (
     precioRaw !== undefined &&
     precioRaw !== null &&
-    precioRaw !== '' &&
+    precioRaw !== "" &&
     !Number.isNaN(Number(precioRaw))
   ) {
-    inmuebleData.precio = Number(precioRaw)
+    inmuebleData.precio = Number(precioRaw);
   }
 
   if (direccionRaw !== undefined) {
     inmuebleData.ubicacion = {
       update: {
-        direccion: String(direccionRaw).trim()
-      }
-    }
+        direccion: String(direccionRaw).trim(),
+      },
+    };
   }
 
   if (Object.keys(inmuebleData).length > 0) {
     dataToUpdate.inmueble = {
-      update: inmuebleData
-    }
+      update: inmuebleData,
+    };
   }
 
   return prisma.publicacion.update({
@@ -200,34 +206,36 @@ export const actualizarPublicacionRepository = async (
       multimedia: true,
       inmueble: {
         include: {
-          ubicacion: true
-        }
-      }
-    }
-  })
-}
+          ubicacion: true,
+        },
+      },
+    },
+  });
+};
 
 export const eliminarLogicamentePublicacionRepository = async (
   publicacionId: number,
-  inmuebleId: number
+  inmuebleId: number,
 ) => {
   return prisma.$transaction([
     prisma.publicacion.update({
       where: { id: publicacionId },
       data: {
-        estado: ESTADO_PUBLICACION_ELIMINADA
-      }
+        estado: ESTADO_PUBLICACION_ELIMINADA,
+      },
     }),
     prisma.inmueble.update({
       where: { id: inmuebleId },
       data: {
-        estado: ESTADO_INMUEBLE_INACTIVO
-      }
-    })
-  ])
-}
+        estado: ESTADO_INMUEBLE_INACTIVO,
+      },
+    }),
+  ]);
+};
 
-export const buscarDetallePublicacionPorIdRepository = async (publicacionId: number) => {
+export const buscarDetallePublicacionPorIdRepository = async (
+  publicacionId: number,
+) => {
   return prisma.publicacion.findUnique({
     where: { id: publicacionId },
     select: {
@@ -248,10 +256,10 @@ export const buscarDetallePublicacionPorIdRepository = async (publicacionId: num
             select: {
               codigoPais: true,
               numero: true,
-              principal: true
-            }
-          }
-        }
+              principal: true,
+            },
+          },
+        },
       },
       inmueble: {
         select: {
@@ -271,43 +279,45 @@ export const buscarDetallePublicacionPorIdRepository = async (publicacionId: num
               latitud: true,
               longitud: true,
               inmuebleId: true,
-              ubicacionMaestraId: true
-            }
+              ubicacionMaestraId: true,
+            },
           },
           inmueble_etiqueta: {
             select: {
               etiqueta: {
                 select: {
                   id: true,
-                  nombre: true
-                }
-              }
-            }
-          }
-        }
+                  nombre: true,
+                },
+              },
+            },
+          },
+        },
       },
       multimedia: {
         select: {
           id: true,
           url: true,
           tipo: true,
-          pesoMb: true
+          pesoMb: true,
         },
         orderBy: {
-          id: 'asc'
-        }
-      }
-    }
-  })
-}
+          id: "asc",
+        },
+      },
+    },
+  });
+};
 
-export const buscarDetallePublicacionPorInmuebleIdRepository = async (inmuebleId: number) => {
+export const buscarDetallePublicacionPorInmuebleIdRepository = async (
+  inmuebleId: number,
+) => {
   return prisma.publicacion.findFirst({
     where: {
       inmuebleId,
       estado: {
-        not: 'ELIMINADA'
-      }
+        not: "ELIMINADA",
+      },
     },
     select: {
       id: true,
@@ -327,10 +337,10 @@ export const buscarDetallePublicacionPorInmuebleIdRepository = async (inmuebleId
             select: {
               codigoPais: true,
               numero: true,
-              principal: true
-            }
-          }
-        }
+              principal: true,
+            },
+          },
+        },
       },
       inmueble: {
         select: {
@@ -349,106 +359,192 @@ export const buscarDetallePublicacionPorInmuebleIdRepository = async (inmuebleId
             select: {
               direccion: true,
               latitud: true,
-              longitud: true
-            }
+              longitud: true,
+            },
+          },
+          puntosDeInteres: {
+            select: {
+              id: true,
+              nombre: true,
+              latitud: true,
+              longitud: true,
+            },
           },
           inmueble_etiqueta: {
             select: {
               etiqueta: {
                 select: {
                   id: true,
-                  nombre: true
-                }
-              }
-            }
-          }
-        }
+                  nombre: true,
+                },
+              },
+            },
+          },
+        },
       },
       multimedia: {
         select: {
           id: true,
           url: true,
           tipo: true,
-          pesoMb: true
+          pesoMb: true,
         },
         orderBy: {
-          id: 'asc'
-        }
-      }
-    }
-  })
-}
+          id: "asc",
+        },
+      },
+    },
+  });
+};
 
 export const confirmarPublicacionRepository = async (publicacionId: number) => {
   return prisma.publicacion.update({
     where: { id: publicacionId },
     data: {
-      estado: 'ACTIVA'
+      estado: "ACTIVA",
     },
     include: {
       multimedia: true,
       inmueble: {
         include: {
-          ubicacion: true
-        }
-      }
-    }
-  })
-}
+          ubicacion: true,
+        },
+      },
+    },
+  });
+};
 
 type NuevaMultimediaInput = {
-  url: string
-  tipo: 'IMAGEN' | 'VIDEO'
-  pesoMb?: number | null
-  publicacionId: number
-}
+  url: string;
+  tipo: "IMAGEN" | "VIDEO";
+  pesoMb?: number | null;
+  publicacionId: number;
+};
 
 export const eliminarMultimediaPorIdsRepository = async (
   publicacionId: number,
-  multimediaIds: number[]
+  multimediaIds: number[],
 ) => {
-  if (multimediaIds.length === 0) return { count: 0 }
+  if (multimediaIds.length === 0) return { count: 0 };
 
   return prisma.multimedia.deleteMany({
     where: {
       id: {
-        in: multimediaIds
+        in: multimediaIds,
       },
-      publicacionId
-    }
-  })
-}
+      publicacionId,
+    },
+  });
+};
 
 export const eliminarVideosDePublicacionRepository = async (
-  publicacionId: number
+  publicacionId: number,
 ) => {
   return prisma.multimedia.deleteMany({
     where: {
       publicacionId,
-      tipo: 'VIDEO'
-    }
-  })
-}
+      tipo: "VIDEO",
+    },
+  });
+};
 
 export const crearMultimediaRepository = async (
-  data: NuevaMultimediaInput[]
+  data: NuevaMultimediaInput[],
 ) => {
-  if (data.length === 0) return { count: 0 }
+  if (data.length === 0) return { count: 0 };
 
   return prisma.multimedia.createMany({
-    data
-  })
-}
+    data,
+  });
+};
 
 export const buscarMultimediaPublicacionRepository = async (
-  publicacionId: number
+  publicacionId: number,
 ) => {
   return prisma.multimedia.findMany({
     where: {
-      publicacionId
+      publicacionId,
     },
     orderBy: {
-      id: 'asc'
-    }
-  })
-}
+      id: "asc",
+    },
+  });
+};
+// ==================== NUEVOS REPOSITORIOS PARA HU-11 ====================
+// PUBLICIDAD DE PROPIEDADES
+
+export const activarPublicidadRepository = async (
+  publicacionId: number,
+  usuarioId: number,
+  paymentIntentId: string,
+  duracionDias: number = 30
+) => {
+  const fechaInicio = new Date();
+  const fechaExpiracion = new Date();
+  fechaExpiracion.setDate(fechaExpiracion.getDate() + duracionDias);
+
+  return prisma.publicacion.update({
+    where: {
+      id: publicacionId,
+      usuarioId: usuarioId,
+    },
+    data: {
+      promoted: true,
+      promotedAt: fechaInicio,
+      promotedExpiresAt: fechaExpiracion,
+      paymentIntentId: paymentIntentId,
+    },
+  });
+};
+
+export const cancelarPublicidadRepository = async (
+  publicacionId: number,
+  usuarioId: number
+) => {
+  return prisma.publicacion.update({
+    where: {
+      id: publicacionId,
+      usuarioId: usuarioId,
+    },
+    data: {
+      promoted: false,
+      promotedAt: null,
+      promotedExpiresAt: null,
+      paymentIntentId: null,
+    },
+  });
+};
+
+export const buscarPublicacionPorIdSimpleRepository = async (
+  publicacionId: number
+) => {
+  return prisma.publicacion.findUnique({
+    where: { id: publicacionId },
+    select: {
+      id: true,
+      promoted: true,
+      promotedAt: true,
+      promotedExpiresAt: true,
+    },
+  });
+};
+
+export const verificarPublicidadActivaRepository = async (
+  publicacionId: number
+) => {
+  const publicacion = await prisma.publicacion.findUnique({
+    where: { id: publicacionId },
+    select: {
+      promoted: true,
+      promotedExpiresAt: true,
+    },
+  });
+
+  if (!publicacion) return false;
+
+  return (
+    publicacion.promoted === true &&
+    publicacion.promotedExpiresAt !== null &&
+    new Date(publicacion.promotedExpiresAt) > new Date()
+  );
+};

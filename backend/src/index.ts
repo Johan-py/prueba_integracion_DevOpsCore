@@ -1,14 +1,19 @@
-import path from 'path'
-import 'dotenv/config'
-import express from 'express'
-import cors from 'cors'
-import { env } from './config/env.js'
-import type { Request, Response } from 'express'
-import { prisma } from './lib/prisma.client.js'
-import zonaRoutes from './modules/perfil/zonaUsario.routes.js'
-import telemetriaRouter from './modules/perfil/telemetria.routes.js'
-import locationRoutes from './modules/locations/locations.routes.js'
-import consumoRoutes from './modules/LimiteSuscripcion/consumo.routes.js'
+﻿import path from "path";
+import http from "http";
+import "dotenv/config";
+import express from "express";
+import cors from "cors";
+import { env } from "./config/env.js";
+import type { Request, Response } from "express";
+import { prisma } from "./lib/prisma.client.js";
+import zonaRoutes from "./modules/perfil/zonaUsario.routes.js";
+import telemetriaRouter from "./modules/perfil/telemetria.routes.js";
+import locationRoutes from "./modules/locations/locations.routes.js";
+import consumoRoutes from "./modules/LimiteSuscripcion/consumo.routes.js";
+import { iniciarCronRetroalimentacion } from './modules/recomendaciones/retroalimentacionCron.js'
+import mlRoutes from './modules/ml/ml.routes.js'
+import { cargarModeloActivo } from './modules/ml/model-loader.js'
+
 // --------------------
 // CONTROLLERS
 // --------------------
@@ -43,7 +48,14 @@ import {
   get2FAStatusController,
   forgotPasswordController,
   resetPasswordController,
-  resend2FAController
+  resend2FAController,
+  requestMagicLinkController,
+  loginWithMagicLinkController,
+  resendMagicLinkController,
+  activateAccountByPasswordController,
+  requestActivationCodeController,
+  activateAccountByCodeController,
+  resendRegisterCodeController,
 } from './modules/auth/auth.controller.js'
 import { requireAuth } from './middleware/auth.middleware.js'
 
@@ -83,6 +95,8 @@ import router from "./modules/registro-publicacion/publicacion.routes.js";
 import parametrosRoutes from "./modules/parametros-publicacion/parametros.routes.js";
 import tutorialPublicacionRoutes from "./modules/tutorial-publicacion/tutorial-publicacion.routes.js";
 import estadisticasRoutes from "./modules/estadisticas-publicacion/estadisticas.routes.js";
+import tagsRoutes from "./modules/tags/tags.routes.js";
+import estadisticasZonaRoutes from "./modules/estadisticas-zona/estadisticas-zona.routes.js";
 
 import {
   facebookCallbackController,
@@ -111,7 +125,7 @@ import testimoniosRoutes from './modules/testimonios/testimonios.routes.js'
 // --------------------
 // LEGACY
 // --------------------
-// Borra la línea 66 y pon esta:
+// Borra la l├¡nea 66 y pon esta:
 import historialRoutes from './modules/perfil/historial.routes.js'
 
 // --------------------
@@ -120,18 +134,22 @@ import historialRoutes from './modules/perfil/historial.routes.js'
 import { verifyEmailTransport } from './lib/email.service.js'
 
 // FAVORITES
-import favoritesRoutes from './modules/favorites/favorites.routes.js'
-import telemetriaRoutes from './modules/telemetria/telemetria.routes.js'
-import recomendacionesRoutes from './modules/recomendaciones/recomendaciones.routes.js'
-import transaccionesRoutes from './modules/transacciones/transacciones.routes.js'
-import suscripcionesRoutes from './modules/suscripciones/suscripciones.routes.js'
-import plansRoutes from './modules/plans/plans.routes.js'
-import historialBusquedaRoutes from './modules/perfil/historialBusqueda.routes.js'
-import whatsappRoutes from './modules/whatsapp/whatsapp.routes.js'
-import { getAdminTestimonios } from './modules/testimonios/adminTestimonios.controller.js'
-import sesionRoutes from './modules/perfil/sesion.routes.js'
+import favoritesRoutes from "./modules/favorites/favorites.routes.js";
+import telemetriaRoutes from "./modules/telemetria/telemetria.routes.js";
+import recomendacionesRoutes from "./modules/recomendaciones/recomendaciones.routes.js";
+import transaccionesRoutes from "./modules/transacciones/transacciones.routes.js";
+import suscripcionesRoutes from "./modules/suscripciones/suscripciones.routes.js";
+import plansRoutes from "./modules/plans/plans.routes.js";
+import usdtRoutes from "./modules/usdt/usdt.routes.js";
+import historialBusquedaRoutes from "./modules/perfil/historialBusqueda.routes.js";
+import whatsappRoutes from "./modules/whatsapp/whatsapp.routes.js";
+import adminTestimoniosRoutes from "./modules/testimonios/adminTestimonios.routes.js";
+import adminPlanesRoutes from "./modules/planes/adminPlanes.routes.js";
+import sesionRoutes from "./modules/perfil/sesion.routes.js";
+import poisRoutes from "./modules/pois/pois.routes.js";
 
-import './jobs/suscripcion.job.js'
+import "./jobs/suscripcion.job.js";
+import { initSocket } from "./services/socket.service.js";
 
 // --------------------
 // SERVER
@@ -173,19 +191,22 @@ app.use('/uploads', express.static(path.resolve('uploads')))
 // --------------------
 // RUTAS LEGACY
 // --------------------
-app.post('/api/auth/forgot-password', forgotPasswordController)
-app.post('/api/auth/resend-2fa', resend2FAController)
-app.post('/api/auth/reset-password', resetPasswordController)
-app.use('/api/auth-legacy', authRoutes)
-app.get('/api/users/:id/publicaciones/free', authMiddleware, (_req, res) => {
-  res.json({ restantes: 2 })
-})
+app.post("/api/auth/forgot-password", forgotPasswordController);
+app.post("/api/auth/magic-link/request", requestMagicLinkController);
+app.post("/api/auth/magic-link/login", loginWithMagicLinkController);
+app.post("/api/auth/magic-link/resend", resendMagicLinkController);
+app.post("/api/auth/resend-2fa", resend2FAController);
+app.post("/api/auth/reset-password", resetPasswordController);
+app.use("/api/auth-legacy", authRoutes);
+app.get("/api/users/:id/publicaciones/free", authMiddleware, (_req, res) => {
+  res.json({ restantes: 2 });
+});
 app.get(
-  '/api/publicaciones/validar-limite/:id',
+  "/api/publicaciones/validar-limite/:id",
   authMiddleware,
   validarPublicacionesFree
-)
-app.use('/api/publicaciones-legacy', publicacionesRoutes)
+);
+app.use("/api/publicaciones-legacy", publicacionesRoutes);
 
 // --------------------
 // RUTAS PRINCIPALES
@@ -199,7 +220,9 @@ app.use("/api/perfil/zonas", zonaRoutes);
 app.use("/api", router);
 app.use("/api", consumoRoutes);
 app.use("/api", parametrosRoutes);
+app.use("/api/tags", tagsRoutes);
 app.use("/api", estadisticasRoutes);
+app.use("/api/estadisticas-zona", estadisticasZonaRoutes);
 app.use("/api/security", securityRoutes);
 app.use("/api/favorites", favoritesRoutes);
 app.use("/api/telemetria", telemetriaRoutes);
@@ -222,12 +245,14 @@ app.use("/api/blogs", blogsRoutes);
 app.use("/api/testimonios", testimoniosRoutes);
 app.use("/api/telemetria", telemetriaRouter);
 app.use("/api/comparaciones", comparacionRoutes);
-
-app.use('/api/transacciones', transaccionesRoutes)
-app.use('/api/suscripciones', suscripcionesRoutes)
-app.use('/api/planes', plansRoutes)
-app.use('/api/whatsapp', whatsappRoutes)
-app.use('/api/locations', locationRoutes)
+app.use("/api/sesion", sesionRoutes);
+app.use('/api/ml', mlRoutes)
+app.use("/api/transacciones", transaccionesRoutes);
+app.use("/api/suscripciones", suscripcionesRoutes);
+app.use("/api/planes", plansRoutes);
+app.use("/api/usdt", usdtRoutes);
+app.use("/api/whatsapp", whatsappRoutes);
+app.use("/api/locations", locationRoutes);
 
 // --------------------
 // MOCK / TEST
@@ -248,24 +273,30 @@ app.post('/api/auth/deactivate-2fa', requireAuth, deactivate2FAController)
 app.get('/api/auth/2fa-status', requireAuth, get2FAStatusController)
 app.post('/api/auth/logout', logoutController)
 app.post('/api/auth/verify-register', verifyRegisterCodeController)
-app.get('/api/auth/me', getMeController)
-app.get('/api/auth/google/login', StratGoogleLoginController)
-app.get('/api/auth/google/register', StartGoogleRegisterController)
-app.get('/api/auth/google/callback', googleCallbackController)
 app.post('/api/auth/register', registerController)
 app.post('/api/auth/login', loginController)
 app.post('/api/auth/logout', logoutController)
 app.post('/api/auth/verify-register', verifyRegisterCodeController)
+app.post('/api/auth/resend-register-code', resendRegisterCodeController)
+
+app.post('/api/auth/activate-by-password', activateAccountByPasswordController)
+app.post('/api/auth/request-activation-code', requestActivationCodeController)
+app.post('/api/auth/activate-by-code', activateAccountByCodeController)
+
 app.get('/api/auth/me', getMeController)
-app.get('/api/auth/google/login', StratGoogleLoginController)
-app.get('/api/auth/google/register', StartGoogleRegisterController)
-app.get('/api/auth/google/callback', googleCallbackController)
-app.get('/api/auth/discord/login', startDiscordLoginController)
-app.get('/api/auth/discord/register', startDiscordRegisterController)
-app.get('/api/auth/discord/callback', discordCallbackController)
-app.get('/api/auth/facebook/login', startFacebookLoginController)
-app.get('/api/auth/facebook/register', startFacebookRegisterController)
-app.get('/api/auth/facebook/callback', facebookCallbackController)
+
+app.get("/api/auth/google/login", StratGoogleLoginController);
+app.get("/api/auth/google/register", StartGoogleRegisterController);
+app.get("/api/auth/google/callback", googleCallbackController);
+
+app.get("/api/auth/discord/login", startDiscordLoginController);
+app.get("/api/auth/discord/register", startDiscordRegisterController);
+app.get("/api/auth/discord/callback", discordCallbackController);
+
+app.get("/api/auth/facebook/login", startFacebookLoginController);
+app.get("/api/auth/facebook/register", startFacebookRegisterController);
+app.get("/api/auth/facebook/callback", facebookCallbackController);
+
 app.get('/api/auth/social-links', requireAuth, getSocialLinksController)
 app.get('/api/auth/linkedin/original-email', requireAuth, getLinkedInOriginalEmailController)
 app.delete('/api/auth/social-links/:provider', requireAuth, unlinkSocialProviderController)
@@ -338,13 +369,15 @@ app.patch('/notificaciones/:id/archivar', requireAuth, archiveNotificationContro
 // --------------------
 app.post('/api/publicaciones', (req, res) => {
   const nuevaPublicacion = req.body
-  res.json({ message: 'Publicación creada', publicacion: nuevaPublicacion })
+  res.json({ message: 'Publicaci├│n creada', publicacion: nuevaPublicacion })
 })
 
 // --------------------
 // TESTIMONIOSADMIN
 // --------------------
-app.get('/api/admin/testimonios', getAdminTestimonios)
+app.use("/api/admin", adminTestimoniosRoutes);
+app.use("/api/admin", adminPlanesRoutes);
+app.use("/api/pois", poisRoutes);
 
 // --------------------
 // LEVANTAR SERVIDOR
@@ -357,14 +390,14 @@ async function seedPlanes() {
   await prisma.plan_suscripcion.createMany({
     data: [
       {
-        nombre_plan: 'Básico',
+        nombre_plan: 'B├ísico',
         precio_plan: 0,
         nro_publicaciones_plan: 3,
         duracion_plan_dias: 30,
         imagen_gr_url: '/qrs/basico.png'
       },
       {
-        nombre_plan: 'Estándar',
+        nombre_plan: 'Est├índar',
         precio_plan: 99,
         nro_publicaciones_plan: 10,
         duracion_plan_dias: 30,
@@ -379,24 +412,32 @@ async function seedPlanes() {
       }
     ]
   })
-  console.log('✅ Planes de suscripción inicializados en DB')
+  console.log('Ô£à Planes de suscripci├│n inicializados en DB')
 }
 
-app.listen(PORT, async () => {
-  console.log(`🚀 Server running on port ${PORT}`)
-  console.log(`Health check: http://localhost:${PORT}/health`)
+iniciarCronRetroalimentacion()
+
+const server = http.createServer(app);
+initSocket(server);
+
+server.listen(PORT, async () => {
+  console.log(`­ƒÜÇ Server running on port ${PORT}`);
+  console.log(`Health check: http://localhost:${PORT}/health`);
+  await cargarModeloActivo()
+
 
   try {
     await seedPlanes()
   } catch (error) {
-    console.error('❌ Error al inicializar planes:', error)
+    console.error('ÔØî Error al inicializar planes:', error)
   }
+
 
   try {
     await verifyEmailTransport()
-    console.log('✅ Servicio de email de registro listo')
+    console.log('Ô£à Servicio de email de registro listo')
   } catch (error) {
-    console.error('❌ Error en configuración de email de registro:', error)
+    console.error('ÔØî Error en configuraci├│n de email de registro:', error)
   }
 })
 

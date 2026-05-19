@@ -257,6 +257,23 @@ export async function getEditableBlog(id: number): Promise<EditableBlog> {
   }
 }
 
+export async function resubmitBlog(id: number): Promise<CreatedBlogResponse> {
+  const response = await fetch(`${getApiUrl()}/api/blogs/${id}/resubmit`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${getToken()}`
+    }
+  })
+
+  const data = await response.json()
+
+  if (!response.ok) {
+    throw new Error(data.message || 'No se pudo reenviar el blog')
+  }
+
+  return data
+}
+
 export async function uploadBlogImage(file: File): Promise<UploadedBlogImageResponse> {
   const formData = new FormData()
   formData.append('imagen', file)

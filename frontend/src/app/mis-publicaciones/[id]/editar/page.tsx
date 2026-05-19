@@ -507,26 +507,32 @@ export default function EditarPublicacionPage() {
       </form>
 
           {detallePublicacion && (
-        <EditarMultimediaModal
-          open={mostrarModalMultimedia}
-          publicacionId={publicacionId}
-          imagenesActuales={
-            detallePublicacion.imagenes?.map((imagen) =>
-              typeof imagen === 'string' ? imagen : imagen.url
-            ) ?? []
-          }
-          videoActual={detallePublicacion.videoUrl}
-          onClose={() => setMostrarModalMultimedia(false)}
-          onSaved={async () => {
-            const detalleActualizado =
-              await obtenerDetallePublicacion(publicacionId)
+            <EditarMultimediaModal
+    open={mostrarModalMultimedia}
+    publicacionId={publicacionId}
+    imagenesActuales={
+      detallePublicacion.imagenes?.map((imagen) =>
+        typeof imagen === 'string' ? imagen : imagen.url
+      ) ?? []
+    }
+    videoActual={detallePublicacion.videoUrl}
+    videoUrlsActuales={
+     detallePublicacion.videoUrls?.filter(
+    (video): video is string => typeof video === 'string' && video.trim() !== ''
+     ) ??
+     (detallePublicacion.videoUrl ? [detallePublicacion.videoUrl] : [])
+   }
+    onClose={() => setMostrarModalMultimedia(false)}
+    onSaved={async () => {
+      const detalleActualizado =
+        await obtenerDetallePublicacion(publicacionId)
 
-            setDetallePublicacion(detalleActualizado)
-            setMostrarModalMultimedia(false)
-            router.refresh()
-          }}
-        />
-      )}
+      setDetallePublicacion(detalleActualizado)
+      setMostrarModalMultimedia(false)
+      router.refresh()
+    }}
+  />
+)}
     </div>
   )
 }

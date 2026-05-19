@@ -1,6 +1,6 @@
 'use client'
 
-import { MapContainer as BaseMapContainer, TileLayer, Marker, Polygon, CircleMarker, useMapEvents } from 'react-leaflet'
+import { MapContainer as BaseMapContainer, TileLayer, Marker, Polygon, CircleMarker, Tooltip, useMapEvents } from 'react-leaflet'
 import { useState, useEffect } from 'react'
 import L from 'leaflet'
 // Importar CSS y L dinámicamente para evitar errores de SSR
@@ -49,6 +49,23 @@ const pinIcon = L.divIcon({
   iconAnchor: [10, 20]
 })
 
+const poiIcon = L.divIcon({
+  className: '',
+  html: `
+    <div style="
+      width: 14px;
+      height: 14px;
+      background: #3b82f6;
+      border-radius: 50%;
+      border: 2px solid white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      cursor: grab;
+    "></div>
+  `,
+  iconSize: [14, 14],
+  iconAnchor: [7, 7]
+})
+
 type Props = {
   pinCoords: { lat: number; lng: number } | null
   setPinCoords: (v: { lat: number; lng: number } | null) => void
@@ -58,6 +75,24 @@ type Props = {
 
   modoPinActivo: boolean
   modoDifuminadoActivo: boolean
+  pois: {
+  id: number
+  nombre: string
+  lat: number
+  lng: number
+}[]
+setPois: React.Dispatch<
+  React.SetStateAction<
+    {
+      id: number
+      nombre: string
+      lat: number
+      lng: number
+    }[]
+  >
+>
+poiSeleccionado: number | null
+setPoiSeleccionado: (v: number | null) => void
 }
 
 function EventosMapa({
@@ -282,8 +317,18 @@ export default function MapaPinSelector({
   vertices,
   setVertices,
   modoPinActivo,
-  modoDifuminadoActivo
+  modoDifuminadoActivo,
+  pois,
+  setPois,
+  poiSeleccionado,
+  setPoiSeleccionado
 }: Props) {
+const offsets = [
+  [0, -50], //arriba     
+  [70, 0],  //derecha    
+  [0, 40],  //abajo 
+  [-70, 0], //izquierda
+]
   const [mensajeLimite, setMensajeLimite] = useState(false)
  
   return (
@@ -313,39 +358,70 @@ export default function MapaPinSelector({
   <Marker
     position={[pinCoords.lat, pinCoords.lng]}
     icon={pinIcon}
-    draggable={true}
-     eventHandlers={{
-      drag: (e) => {
-        const map = e.target._map
-        const bounds = map.getBounds()
-        const pos = e.target.getLatLng()
-
-        const lat = Math.min(
-          Math.max(pos.lat, bounds.getSouth()),
-          bounds.getNorth()
-        )
-
-        const lng = Math.min(
-          Math.max(pos.lng, bounds.getWest()),
-          bounds.getEast()
-        )
-        e.target.setLatLng([lat, lng])
-      },
-
-      dragend: (e) => {
-        const pos = e.target.getLatLng()
-
-        setPinCoords({
-          lat: pos.lat,
-          lng: pos.lng
-        })
-      }
-    }}
-    
+    draggable={false}
   />
 )}
 
-{vertices.length >= 3 && (
+{pois.map((poi, i) => (
+  <Marker
+    key={poi.id}
+    position={[poi.lat, poi.lng]}
+    icon={poiIcon}
+    draggable={true}
+    eventHandlers={{
+      dragend: (e) => {
+        const marker = e.target
+        const position = marker.getLatLng()
+        const nuevosPois = [...pois]
+        nuevosPois[i].lat = position.lat
+        nuevosPois[i].lng = position.lng
+        setPois(nuevosPois)
+      }
+    }}
+  >
+    <Tooltip
+      permanent
+      interactive={true}
+      sticky={false}
+      direction="top"
+      offset={[0, -5]}
+      opacity={1}
+      className="!bg-transparent !border-0 !shadow-none"
+    >
+      <input
+        type="text"
+        maxLength={20}
+        value={poi.nombre ?? ''}
+        placeholder="..."
+        onMouseDown={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
+        onFocus={() => setPoiSeleccionado(poi.id)}
+        onKeyDown={(e) => e.stopPropagation()}
+        onChange={(e) => {
+          const nuevosPois = [...pois]
+          nuevosPois[i].nombre = e.target.value
+          setPois(nuevosPois)
+        }}
+         className={`
+  px-3
+  py-1
+  rounded-full
+  text-[11px]
+  bg-white
+  border
+  ${poiSeleccionado === poi.id ? 'border-red-500' : 'border-gray-300'}
+  shadow-sm
+  min-w-[70px]
+  max-w-[90px]
+  outline-none
+  text-center
+              `}
+                />
+             </Tooltip>
+          </Marker>
+             ))}
+
+           {vertices.length >= 3 && (
   <Polygon
     positions={vertices}
     pathOptions={{
@@ -353,28 +429,27 @@ export default function MapaPinSelector({
       fillOpacity: 0.45
     }}
   />
-)}
+          )}
 
-{vertices.map((p, i) => (
-  <CircleMarker
-    key={i}
-    center={p}
-    radius={5}
-    pathOptions={{
-      color: '#f97316',
-      fillColor: '#f97316',
-      fillOpacity: 1
-    }}
-  />
-))}
-   </MapContainer>
+          {vertices.map((p, i) => (
+          <CircleMarker
+            key={i}
+            center={p}
+            radius={5}
+            pathOptions={{
+              color: '#f97316',
+              fillColor: '#f97316',
+              fillOpacity: 1
+            }}
+          />
+        ))}
+      </MapContainer>
 
-{mensajeLimite && (
- <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[9999] text-orange-500 text-sm font-medium">
-    Límite máximo de 10 puntos alcanzado
-  </div>
-)}
-
-</div>
-)
+      {mensajeLimite && (
+        <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[9999] text-orange-500 text-sm font-medium">
+          Límite máximo de 10 puntos alcanzado
+        </div>
+      )}
+    </div>
+  )
 }

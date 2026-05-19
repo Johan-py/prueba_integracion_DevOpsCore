@@ -23,9 +23,19 @@ export default function PagoPendientePage() {
     }
     try {
       const data = JSON.parse(stored)
-      setPaymentId(String(data.id))
+      const id = String(data.id)
+      setPaymentId(id)
       setPlanNombre(data.planNombre ?? null)
       setReferencia(data.referencia ?? null)
+
+      // HU-14: notificar al admin que el usuario indicó haber realizado el pago
+      const token = localStorage.getItem('token')
+      if (token) {
+        fetch(`${API_URL}/api/transacciones/${id}/notificar-admin`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+        }).catch(() => {})
+      }
     } catch {
       router.push('/cobros-suscripciones')
     }

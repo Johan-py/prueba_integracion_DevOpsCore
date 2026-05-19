@@ -61,7 +61,8 @@ function centroide(coords: [number, number][]): [number, number] {
 function dimensionarEtiqueta(
   nombre: string,
   zoom: number,
-  isSelected: boolean
+  isSelected: boolean,
+  tipoZona: TipoZona = 'predefinida'
 ): {
   width: number
   height: number
@@ -80,7 +81,11 @@ function dimensionarEtiqueta(
   // Para zoom=13: 0.64, para zoom=18: ~1.02, para zoom<13: reduce hasta 0.36
   const zoomOffset = Math.max(-MIN_ZOOM_LABELS, zoom - MIN_ZOOM_LABELS) // Puede ser negativo
   const zoomProportional = 0.70 + (zoomOffset / 8) * 0.40 // Rango: 0.36 a ~1.02
-  const scale = Math.max(0.40, Math.min(1.12, zoomProportional + selectedBoost))
+  let scale = Math.max(0.40, Math.min(1.12, zoomProportional + selectedBoost))
+
+   if (tipoZona === 'personalizada') {
+    scale = scale * 1.2
+  }
 
   const paddingX = Math.round((8 * scale) * 10) / 10
   const paddingY = Math.round((5 * scale) * 10) / 10
@@ -245,7 +250,7 @@ function labelIcon(nombre: string, isSelected: boolean, zoom: number, tipoZona: 
     paddingX,
     paddingY,
     maxCharsPorLinea
-  } = dimensionarEtiqueta(nombreVisible, zoom, isSelected)
+  } = dimensionarEtiqueta(nombreVisible, zoom, isSelected, tipoZona)
   const textoHtml = htmlEtiquetaConWrap(nombreVisible, maxCharsPorLinea)
   const nombreCompletoEscapado = escaparHtml(nombre)
   
@@ -257,8 +262,9 @@ function labelIcon(nombre: string, isSelected: boolean, zoom: number, tipoZona: 
     : '0 1px 3px rgba(255,255,255,0.95), 0 -1px 3px rgba(255,255,255,0.95), 1px 0 3px rgba(255,255,255,0.95), -1px 0 3px rgba(255,255,255,0.95)'
 
   return L.divIcon({
-    className: '',
+    className: 'pb-map-label-container',
     html: `<div
+      class="pb-map-label"
       aria-hidden="true"
       style="
         background: transparent;
@@ -404,6 +410,26 @@ function ZonaInteractiva({
   
   recalcularCentroOptimo()
 }, [zoom, zona.coordenadas])
+
+  useEffect(() => {
+    const layer = polygonRef.current
+    if (!layer) return
+
+    layer.setStyle({
+      color: selected ? colorConfig.borderActive : colorConfig.borderInactive,
+      weight: selected ? 2 : 1.8,
+      dashArray: selected ? '6,6' : undefined,
+      fillColor: selected ? colorConfig.fillActive : colorConfig.fillInactive,
+      fillOpacity: selected ? colorConfig.fillOpacityActive : colorConfig.fillOpacityInactive,
+      lineJoin: 'round',
+      lineCap: 'round'
+    })
+
+    const element = layer.getElement() as SVGPathElement | null
+    if (element) {
+      element.setAttribute('aria-pressed', String(selected))
+    }
+  }, [selected, colorConfig.borderActive, colorConfig.borderInactive, colorConfig.fillActive, colorConfig.fillInactive, colorConfig.fillOpacityActive, colorConfig.fillOpacityInactive])
 
 
 

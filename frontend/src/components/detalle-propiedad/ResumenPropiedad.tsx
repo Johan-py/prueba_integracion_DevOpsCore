@@ -38,8 +38,8 @@ function traducirTipo(value: string | null) {
   }
 }
 
-export default function ResumenPropiedad({ detalle }: Props) {
-  const precioFormateado = `${detalle.precio.toLocaleString()}$`
+export default function ResumenPropiedad({ detalle, esOferta, porcentajeDescuento, formatPrice }: Props) {
+  const precioFormateado = `$${detalle.precio.toLocaleString()} USD`
   const tipo = traducirTipo(detalle.tipoInmueble)
   const operacion = traducirOperacion(detalle.tipoOperacion)
 
@@ -51,9 +51,20 @@ export default function ResumenPropiedad({ detalle }: Props) {
         {detalle.titulo}
       </h1>
 
-      <p className="text-[24px] font-bold text-[#1f1f1f] md:text-[26px]">
-        {precioFormateado}
-      </p>
+      {esOferta ? (
+        <div className="flex items-center gap-3 flex-wrap">
+          <span className="text-[24px] font-bold text-orange-600 md:text-[26px]">
+            ${formatPrice?.(detalle.precio)} USD
+          </span>
+          <span className="text-lg text-gray-500 line-through font-bold">
+            ${formatPrice?.(detalle.precio_anterior)} USD
+          </span>
+        </div>
+      ) : (
+        <p className="text-[24px] font-bold text-orange-600 md:text-[26px]">
+          {precioFormateado}
+        </p>
+      )}
 
       <div className="flex flex-wrap gap-3 pt-1">
         {tipo && (

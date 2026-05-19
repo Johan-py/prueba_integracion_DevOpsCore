@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Clock, CheckCircle } from 'lucide-react'
+import { ArrowLeft, Clock, CheckCircle, Upload, X, FileText } from 'lucide-react'
 import Stepper from '@/components/ui/Stepper'
 import { useCurrentPayment } from '@/hooks/payment/useCurrentPayment'
 import { usePaymentStatus } from '@/hooks/payment/usePaymentStatus'
@@ -12,6 +12,9 @@ import { ExpiredView } from '@/components/payment/ExpiredView'
 import { CancelPaymentModal } from '@/components/payment/CancelPaymentModal'
 
 const BANKS = ['BNB', 'Banco Unión', 'Económica', 'Fassil']
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000'
+const MAX_FILE_SIZE = 5 * 1024 * 1024
+const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf']
 
 export default function PagoQRPage() {
   const router = useRouter()
@@ -22,6 +25,10 @@ export default function PagoQRPage() {
   const [timeLeft, setTimeLeft] = useState<number | null>(null)
   const [isExpired, setIsExpired] = useState(false)
   const expiredHandled = useRef(false)
+  const [comprobanteFile, setComprobanteFile] = useState<File | null>(null)
+  const [comprobantePreview, setComprobantePreview] = useState<string | null>(null)
+  const [fileError, setFileError] = useState<string | null>(null)
+  const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
     if (!payment) return
@@ -51,8 +58,51 @@ export default function PagoQRPage() {
     if (status === 'pagado') router.push('/pago/confirmacion')
   }, [status, router])
 
-  const handleConfirmarPago = () => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null
+    setFileError(null)
+    if (!file) return
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setFileError('Formato no válido. Solo JPG, PNG o PDF.')
+      return
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      setFileError('El archivo supera el límite de 5 MB.')
+      return
+    }
+    setComprobanteFile(file)
+    if (file.type.startsWith('image/')) {
+      setComprobantePreview(URL.createObjectURL(file))
+    } else {
+      setComprobantePreview(null)
+    }
+  }
+
+  const handleRemoveFile = () => {
+    setComprobanteFile(null)
+    setComprobantePreview(null)
+    setFileError(null)
+  }
+
+  const handleConfirmarPago = async () => {
     if (!payment) return
+
+    if (comprobanteFile) {
+      try {
+        setUploading(true)
+        const token = localStorage.getItem('token')
+        const formData = new FormData()
+        formData.append('comprobante', comprobanteFile)
+        await fetch(`${API_URL}/api/transacciones/${payment.id}/comprobante`, {
+          method: 'POST',
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          body: formData,
+        })
+      } catch { /* non-blocking — proceed anyway */ } finally {
+        setUploading(false)
+      }
+    }
+
     localStorage.setItem('currentPayment', JSON.stringify(payment))
     router.push('/pago/pendiente')
   }
@@ -258,6 +308,55 @@ export default function PagoQRPage() {
               </div>
             </div>
 
+            {/* Upload comprobante */}
+            <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-5">
+              <p className="text-xs font-semibold uppercase tracking-wide text-stone-400 mb-3">
+                Adjuntar comprobante <span className="normal-case font-normal">(opcional)</span>
+              </p>
+
+              {!comprobanteFile ? (
+                <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-stone-200 hover:border-amber-400 hover:bg-amber-50 cursor-pointer p-6 transition-colors">
+                  <Upload size={24} className="text-stone-400" />
+                  <span className="text-sm font-medium text-stone-600">Haz clic para adjuntar</span>
+                  <span className="text-xs text-stone-400">JPG, PNG o PDF · máx. 5 MB</span>
+                  <input
+                    type="file"
+                    accept=".jpg,.jpeg,.png,.pdf"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                </label>
+              ) : (
+                <div className="space-y-3">
+                  {comprobantePreview ? (
+                    <img
+                      src={comprobantePreview}
+                      alt="Vista previa"
+                      className="w-full max-h-48 object-contain rounded-lg border border-stone-100"
+                    />
+                  ) : (
+                    <div className="flex items-center gap-3 rounded-lg border border-stone-100 bg-stone-50 p-3">
+                      <FileText size={24} className="text-red-500 shrink-0" />
+                      <span className="text-sm text-stone-700 truncate">{comprobanteFile.name}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-stone-500 truncate max-w-[70%]">{comprobanteFile.name}</span>
+                    <button
+                      onClick={handleRemoveFile}
+                      className="flex items-center gap-1 text-xs text-red-500 hover:text-red-700 transition-colors"
+                    >
+                      <X size={12} /> Quitar
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {fileError && (
+                <p className="mt-2 text-xs text-red-500">{fileError}</p>
+              )}
+            </div>
+
             {/* Confirmar pago */}
             <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-4">
               <p className="text-sm font-semibold text-stone-800 mb-1">¿Ya realizaste el pago?</p>
@@ -266,10 +365,11 @@ export default function PagoQRPage() {
               </p>
               <button
                 onClick={handleConfirmarPago}
-                className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-lg text-sm font-semibold transition-colors"
+                disabled={uploading}
+                className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white py-2.5 rounded-lg text-sm font-semibold transition-colors"
               >
                 <CheckCircle size={16} />
-                Ya realicé el pago
+                {uploading ? 'Subiendo comprobante...' : 'Ya realicé el pago'}
               </button>
             </div>
 

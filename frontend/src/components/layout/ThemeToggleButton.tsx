@@ -1,94 +1,48 @@
-
 "use client";
 
 import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
-
-type ThemeOption = "light" | "dark";
-
-const THEME_STORAGE_KEY = "propbol-theme";
-const THEME_CLASSES = ["propbol-theme-light", "propbol-theme-dark"];
-
-function isThemeOption(value: string | null): value is ThemeOption {
-    return value === "light" || value === "dark";
-}
-
-function applyTheme(theme: ThemeOption) {
-    const root = document.documentElement;
-
-    root.classList.remove(...THEME_CLASSES);
-    root.classList.add(`propbol-theme-${theme}`);
-
-    localStorage.setItem(THEME_STORAGE_KEY, theme);
-
-    window.dispatchEvent(
-        new CustomEvent("propbol-theme-change", {
-            detail: theme,
-        })
-    );
-}
+import { useTheme } from "next-themes";
 
 export default function ThemeToggleButton() {
-    const [theme, setTheme] = useState<ThemeOption>("light");
+    const { resolvedTheme, setTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
 
-    useEffect(() => {
-        const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+    useEffect(() => setMounted(true), []);
 
-        if (isThemeOption(savedTheme)) {
-            setTheme(savedTheme);
-            applyTheme(savedTheme);
-            return;
-        }
+    if (!mounted) {
+        return (
+            <div
+        aria-hidden="true"
+        className="h-8 w-16 rounded-full bg-gray-200 animate-pulse"
+      />
+        );
+    }
 
-        applyTheme("light");
-    }, []);
-
-    useEffect(() => {
-        const handleThemeChange = (event: Event) => {
-            const customEvent = event as CustomEvent<ThemeOption>;
-
-            if (isThemeOption(customEvent.detail)) {
-                setTheme(customEvent.detail);
-            }
-        };
-
-        const handleStorageChange = (event: StorageEvent) => {
-            if (event.key === THEME_STORAGE_KEY && isThemeOption(event.newValue)) {
-                setTheme(event.newValue);
-                applyTheme(event.newValue);
-            }
-        };
-
-        window.addEventListener("propbol-theme-change", handleThemeChange);
-        window.addEventListener("storage", handleStorageChange);
-
-        return () => {
-            window.removeEventListener("propbol-theme-change", handleThemeChange);
-            window.removeEventListener("storage", handleStorageChange);
-        };
-    }, []);
-
-    const handleToggleTheme = () => {
-        const nextTheme: ThemeOption = theme === "dark" ? "light" : "dark";
-
-        setTheme(nextTheme);
-        applyTheme(nextTheme);
-    };
-
-    const isDarkMode = theme === "dark";
+    const isDark = resolvedTheme === "dark";  
 
     return (
         <button
             type="button"
-            onClick={handleToggleTheme}
-            aria-label={
-                isDarkMode ? "Cambiar a modo claro" : "Cambiar a modo oscuro"
-            }
-            className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-orange-400 hover:text-orange-600"
+            role="switch"
+            aria-checked={isDark}
+            aria-label={isDark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+            onClick={() => setTheme(isDark ? "light" : "dark")}
+            className={`relative inline-flex h-8 w-16 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 ${
+                isDark ? "bg-slate-700" : "bg-orange-100"
+            }`}
+        > 
+            <span
+            className={`pointer-events-none inline-flex h-6 w-6 items-center justify-center rounded-full bg-white shadow-md ring-0 transition-transform duration-300 ${
+            isDark ? "translate-x-8" : "translate-x-0"
+            }`}
         >
-            {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
-
-            <span>{isDarkMode ? "Modo claro" : "Modo oscuro"}</span>
+            {isDark ? (
+            <Moon size={13} className="text-slate-700" />
+            ) : (
+            <Sun size={13} className="text-orange-500" />
+            )}
+        </span>
         </button>
     );
 }

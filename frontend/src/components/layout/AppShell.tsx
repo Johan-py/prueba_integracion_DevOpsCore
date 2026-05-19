@@ -13,6 +13,7 @@ const AUTH_ROUTES = ["/sign-in", "/sign-up", "/sign-in/verify-2fa"];
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
 const SESSION_EXPIRES_KEY = "propbol_session_expires";
 const TOKEN_STORAGE_KEY = "token";
+const AUTH_SYNC_EVENT_KEY = "propbol_auth_sync";
 const SESSION_DURATION_MS = 60 * 60 * 1000;
 
 function SessionManager() {
@@ -21,6 +22,7 @@ function SessionManager() {
   const handleWarning = useCallback(() => {
     setShowWarning(true);
   }, []);
+
   const handleLogout = useCallback(() => {
     setShowWarning(false);
   }, []);
@@ -56,6 +58,10 @@ const clearSession = () => {
   localStorage.removeItem(USER_STORAGE_KEY);
   localStorage.removeItem(SESSION_EXPIRES_KEY);
   localStorage.removeItem(TOKEN_STORAGE_KEY);
+  localStorage.removeItem("nombre");
+  localStorage.removeItem("correo");
+  localStorage.removeItem("avatar");
+  localStorage.removeItem("controlador");
   localStorage.removeItem("searchHistory");
 };
 
@@ -64,12 +70,44 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const isAuthRoute = AUTH_ROUTES.includes(pathname);
 
   useEffect(() => {
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === AUTH_SYNC_EVENT_KEY && event.newValue) {
+        try {
+          const payload = JSON.parse(event.newValue) as { type?: string };
+
+          if (payload.type === "logout") {
+            clearSession();
+            window.dispatchEvent(new Event("propbol:session-changed"));
+            window.dispatchEvent(new Event("auth-state-changed"));
+            return;
+          }
+        } catch {
+          return;
+        }
+      }
+
+      if (event.key === TOKEN_STORAGE_KEY && event.newValue === null) {
+        clearSession();
+        window.dispatchEvent(new Event("propbol:session-changed"));
+        window.dispatchEvent(new Event("auth-state-changed"));
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+
+  useEffect(() => {
     const validateSession = async () => {
       const token = localStorage.getItem(TOKEN_STORAGE_KEY);
 
       if (!token) {
         clearSession();
         window.dispatchEvent(new Event("propbol:session-changed"));
+        window.dispatchEvent(new Event("auth-state-changed"));
         return;
       }
 
@@ -90,6 +128,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         if (response.status === 403 || response.status === 401) {
           clearSession();
           window.dispatchEvent(new Event("propbol:session-changed"));
+          window.dispatchEvent(new Event("auth-state-changed"));
           return;
         }
 
@@ -101,9 +140,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           SESSION_EXPIRES_KEY,
           String(Date.now() + SESSION_DURATION_MS),
         );
-        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(buildSessionUser(data.user)));
+
+        localStorage.setItem(
+          USER_STORAGE_KEY,
+          JSON.stringify(buildSessionUser(data.user)),
+        );
 
         window.dispatchEvent(new Event("propbol:session-changed"));
+        window.dispatchEvent(new Event("auth-state-changed"));
       } catch {
         // Timeout o error de red — NO limpiar sesión
       }

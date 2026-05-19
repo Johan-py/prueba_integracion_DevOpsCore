@@ -185,16 +185,26 @@ export default function NotificationsPage() {
                       if (notification.status === 'no leida' && isOnline) {
                         void markAsRead(notification.id)
                       }
-
-                      router.push(`/notificaciones/${notification.id}`)
+                      if (notification.tipo === 'BLOG_APROBADO' && notification.blogId) {
+                        router.push(`/blog/${notification.blogId}`)
+                      } else if (notification.tipo === 'BLOG_RECHAZADO' && notification.blogId) {
+                        router.push(`/blog/${notification.blogId}/edit`)
+                      } else {
+                        router.push(`/notificaciones/${notification.id}`)
+                      }
                     }}
                     onKeyDown={(event) => {
                       if (event.key === 'Enter' || event.key === ' ') {
                         if (notification.status === 'no leida' && isOnline) {
                           void markAsRead(notification.id)
                         }
-
-                        router.push(`/notificaciones/${notification.id}`)
+                        if (notification.tipo === 'BLOG_APROBADO' && notification.blogId) {
+                          router.push(`/blog/${notification.blogId}`)
+                        } else if (notification.tipo === 'BLOG_RECHAZADO' && notification.blogId) {
+                          router.push(`/blog/${notification.blogId}/edit`)
+                        } else {
+                          router.push(`/notificaciones/${notification.id}`)
+                        }
                       }
                     }}
                     role="button"
@@ -210,7 +220,7 @@ export default function NotificationsPage() {
                           {notification.title?.trim() || '(Sin título)'}
                         </h2>
 
-                        <p className="mt-1 break-words text-sm text-stone-600">
+                        <p className={`mt-1 line-clamp-2 text-sm ${notification.tipo === 'BLOG_RECHAZADO' ? 'text-red-600' : 'text-stone-600'}`}>
                           {notification.description?.trim() || '(Sin descripción disponible)'}
                         </p>
                       </div>
@@ -219,6 +229,21 @@ export default function NotificationsPage() {
 
                   <div className="flex shrink-0 flex-col items-end gap-2">
                     <div className="text-right">
+                      {notification.tipo === 'BLOG_APROBADO' && (
+                        <span className="mb-1 inline-block rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-700">
+                          Aprobado
+                        </span>
+                      )}
+                      {notification.tipo === 'BLOG_RECHAZADO' && (
+                        <span className="mb-1 inline-block rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-600">
+                          Rechazado
+                        </span>
+                      )}
+                      {notification.tipo === 'BLOG_PENDIENTE' && (
+                        <span className="mb-1 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
+                          Pendiente
+                        </span>
+                      )}
                       <p
                         className={`text-[11px] font-semibold uppercase tracking-wide ${
                           notification.status === 'no leida' ? 'text-amber-600' : 'text-stone-400'
