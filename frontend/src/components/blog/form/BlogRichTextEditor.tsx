@@ -71,9 +71,9 @@ export default function BlogRichTextEditor({
   if (!editor) return null;
 
   return (
-    <div className="flex flex-col rounded-b-[32px] bg-white overflow-hidden border-t border-[#F5F5F4]">
+    <div className="flex flex-col rounded-b-[32px] bg-white dark:bg-[#111] overflow-hidden border-t border-[#F5F5F4] dark:border-[#333]">
       {/* Mini Toolbar Interna */}
-      <div className="flex items-center gap-1 px-6 py-3 border-b border-[#F5F5F4] bg-[#FAFAFA]/50">
+      <div className="flex items-center gap-1 px-6 py-3 border-b border-[#F5F5F4] dark:border-[#333] bg-[#FAFAFA]/50 dark:bg-[#0a0a0a]">
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBold().run()}
@@ -156,6 +156,12 @@ export default function BlogRichTextEditor({
         .prose h1 { color: #1C1917 !important; font-weight: 700 !important; font-size: 1.875rem !important; }
         .prose h2 { color: #1C1917 !important; font-weight: 700 !important; font-size: 1.5rem !important; }
         .prose h3 { color: #1C1917 !important; font-weight: 700 !important; font-size: 1.25rem !important; }
+        html.dark .prose h1,
+        html.dark .prose h2,
+        html.dark .prose h3 { color: #ffffff !important; }
+        html.dark .prose p { color: #cbd5e1 !important; }
+        html.dark .prose blockquote { border-left-color: #e68b25 !important; color: #cbd5e1 !important; }
+        html.dark .prose a { color: #e68b25 !important; }
       `}</style>
     </div>
   );
