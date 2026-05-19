@@ -41,7 +41,7 @@ export default function BlogCard({
           flex-col
           overflow-hidden
           rounded-[32px]
-          bg-white
+          bg-white dark:bg-stone-800
           transition-all
           duration-500
           group-hover:shadow-[0_24px_80px_-15px_rgba(41,37,36,0.15)]
@@ -61,18 +61,18 @@ export default function BlogCard({
         <div className="flex flex-1 flex-col p-6 sm:p-8">
           {/* Categoría Pill */}
           <div className="mb-4">
-            <span className="inline-block rounded-full border border-[#D97706]/20 bg-[#D97706]/5 px-4 py-1 text-[10px] font-bold uppercase tracking-widest text-[#D97706]">
+            <span className="inline-block rounded-full border border-[#D97706]/20 bg-[#D97706]/5 px-4 py-1 text-[10px] font-bold uppercase tracking-widest text-[#D97706] dark:text-[#D97706]/80">  /* Cambia el color del texto para modo oscuro */
               {categoryLabel ?? category}
             </span>
           </div>
 
           {/* Título */}
-          <h2 className="font-['Montserrat'] mb-3 line-clamp-2 text-xl font-bold leading-tight text-stone-900 transition-colors group-hover:text-[#D97706] sm:text-2xl">
+          <h2 className="font-['Montserrat'] mb-3 line-clamp-2 text-xl font-bold leading-tight text-stone-900 dark:text-stone-100 transition-colors group-hover:text-[#D97706] sm:text-2xl">
             {title}
           </h2>
 
           {/* Resumen */}
-          <p className="font-['Inter'] mb-6 line-clamp-3 text-sm leading-relaxed text-stone-600 sm:text-base">
+          <p className="font-['Inter'] mb-6 line-clamp-3 text-sm leading-relaxed text-stone-600 dark:text-stone-400 sm:text-base">
             {truncateExcerpt(excerpt)}
           </p>
 
@@ -85,10 +85,10 @@ export default function BlogCard({
             </div>
 
             <div className="text-right">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400 dark:text-stone-500">
                 {authorName}
               </p>
-              <p className="text-[9px] text-stone-400">
+              <p className="text-[9px] text-stone-400 dark:text-stone-500">
                 {new Date(publishedAt).toLocaleDateString('es-ES', { month: 'short', day: 'numeric', year: 'numeric' })}
               </p>
             </div>

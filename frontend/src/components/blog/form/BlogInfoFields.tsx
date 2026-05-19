@@ -36,7 +36,7 @@ export default function BlogInfoFields({
           value={titulo}
           onChange={(event) => setTitulo(event.target.value)}
           placeholder="Escribe un título"
-          className="w-full rounded-[20px] bg-[#F5F5F4] px-6 py-5 text-xl font-bold text-[#1C1917] placeholder:text-[#D6D3D1] outline-none transition focus:bg-white focus:ring-2 focus:ring-[#F59E0B]/20"
+          className="w-full rounded-[20px] bg-[#F5F5F4] dark:bg-[#111] px-6 py-5 text-xl font-bold text-[#1C1917] dark:text-white placeholder:text-[#D6D3D1] dark:placeholder:text-[#666] outline-none transition focus:bg-white dark:focus:bg-[#1a1a1a] focus:ring-2 focus:ring-[#F59E0B]/20"
         />
         {errors.titulo && (
           <p className="px-2 text-sm font-medium text-red-500">{errors.titulo}</p>
@@ -45,7 +45,7 @@ export default function BlogInfoFields({
 
       {/* Category Section */}
       <div className="space-y-3">
-        <span className="px-1 text-[10px] font-bold uppercase tracking-[0.15em] text-[#A8A29E]">
+        <span className="px-1 text-[10px] font-bold uppercase tracking-[0.15em] text-[#A8A29E] dark:text-[#999]">
           Categoría
         </span>
         <div className="relative">
@@ -53,7 +53,7 @@ export default function BlogInfoFields({
             value={categoriaId}
             onChange={(event) => setCategoriaId(event.target.value)}
             disabled={isLoadingCategories}
-            className="w-full appearance-none rounded-2xl bg-[#F5F5F4] px-6 py-4 text-sm font-semibold text-[#44403C] outline-none transition focus:bg-white focus:ring-2 focus:ring-[#F59E0B]/20 disabled:opacity-50"
+            className="w-full appearance-none rounded-2xl bg-[#F5F5F4] dark:bg-[#111] px-6 py-4 text-sm font-semibold text-[#44403C] dark:text-white outline-none transition focus:bg-white dark:focus:bg-[#1a1a1a] focus:ring-2 focus:ring-[#F59E0B]/20 disabled:opacity-50"
           >
             <option value="">
               {isLoadingCategories ? "Cargando..." : "Selecciona una categoría"}

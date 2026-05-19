@@ -11,6 +11,8 @@ import {
   Trash2,
   CheckCircle2,
   XCircle,
+  Heart,
+  Send,
 } from 'lucide-react'
 import FormularioTestimonios from './formularioTestimonio'
 
@@ -50,6 +52,17 @@ export default function AdminTestimoniosPage() {
     process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000'
 
   useEffect(() => {
+    if (showForm || showEditModal || showDeleteConfirm) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [showForm, showEditModal, showDeleteConfirm])
+
+  useEffect(() => {
     const fetchTestimonios = async () => {
       try {
         setIsLoading(true)
@@ -84,7 +97,6 @@ export default function AdminTestimoniosPage() {
       categoria: testimonio.categoria,
       texto: testimonio.texto,
       activo: testimonio.activo,
-      calificacion: testimonio.calificacion || 5,
     })
     const nameParts = (testimonio.nombreTestimonial || '').split(' ')
     setEditUserName(nameParts[0] || '')
@@ -113,7 +125,6 @@ export default function AdminTestimoniosPage() {
           visible: editingData.activo,
           nombreAutor: editUserName.trim(),
           apellidoAutor: editUserLastName.trim(),
-          calificacion: editingData.calificacion,
         }),
       })
 
@@ -194,8 +205,8 @@ export default function AdminTestimoniosPage() {
             <h1 className="text-3xl font-bold font-montserrat text-stone-900">
               Gestión de <span className="text-amber-600">Testimonios</span>
             </h1>
-            <p className="mt-2 text-stone-600 font-inter max-w-2xl">
-              Administra las reseñas que aparecen en el Home. Selecciona un departamento y crea testimonios con estilo.
+            <p className="mt-2 text-stone-500 text-sm max-w-2xl">
+              Administra y publica los testimonios del carrusel.
             </p>
           </div>
           <button
@@ -229,119 +240,94 @@ export default function AdminTestimoniosPage() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-3">
-                <div className="rounded-2xl bg-amber-100 p-3 text-amber-700 shadow-sm">
-                  <MessageCircle className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold uppercase text-amber-600 tracking-[0.12em]">Listado</p>
-                  <h2 className="text-xl font-semibold text-stone-900">Testimonios creados</h2>
-                </div>
+            <div className="flex flex-col gap-4 mt-6">
+              <div className="flex items-center gap-2">
+                <List className="h-5 w-5 text-amber-500" />
+                <h2 className="text-base font-bold text-stone-800">Testimonios creados</h2>
               </div>
 
-              <div className="overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm">
-                <div className="flex flex-col gap-4 border-b border-stone-100 bg-stone-50 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex items-center gap-2 text-sm font-semibold text-stone-900">
-                    <MessageCircle className="h-4 w-4 text-amber-600" />
-                    <span>{testimonios.length} testimonios</span>
+              <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white">
+                <div className="flex flex-col gap-4 border-b border-stone-100 bg-white px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-2 text-base font-bold text-stone-900">
+                    <MessageCircle className="h-5 w-5 text-amber-500" />
+                    <span>{testimoniosFiltrados.length} testimonios</span>
+                  </div>
+                  <div className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">
+                    {testimonios.length} total
                   </div>
                 </div>
 
-                <div className="overflow-x-auto">
-                  <table className="min-w-full border-collapse text-left">
-                    <thead>
-                      <tr className="bg-stone-50 border-b border-stone-200">
-                        <th className="px-6 py-3 text-xs font-semibold text-stone-600 uppercase tracking-wider">Departamento</th>
-                        <th className="px-6 py-3 text-xs font-semibold text-stone-600 uppercase tracking-wider">Persona</th>
-                        <th className="px-6 py-3 text-xs font-semibold text-stone-600 uppercase tracking-wider">Categoría</th>
-                        <th className="px-6 py-3 text-xs font-semibold text-stone-600 uppercase tracking-wider">Calificación</th>
-                        <th className="px-6 py-3 text-xs font-semibold text-stone-600 uppercase tracking-wider text-center">Likes</th>
-                        <th className="px-6 py-3 text-xs font-semibold text-stone-600 uppercase tracking-wider text-right">Acciones</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-stone-100">
-                      {isLoading ? (
-                        [1, 2, 3].map((i) => (
-                          <tr key={i} className="animate-pulse">
-                            <td colSpan={6} className="px-6 py-8">
-                              <div className="h-4 rounded-lg bg-stone-100"></div>
-                            </td>
-                          </tr>
-                        ))
-                      ) : testimoniosFiltrados.length > 0 ? (
-                        testimoniosFiltrados.map((t) => (
-                          <tr key={t.id} className="group hover:bg-stone-50 transition-colors">
-                            <td className="px-6 py-4">
-                              <div className="flex items-center gap-3">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-amber-200 to-orange-200 text-amber-900 font-bold shadow-sm">
-                                  {String(t.departamento || '').charAt(0) || '?'}
-                                </div>
-                                <div className="flex flex-col">
-                                  <span className="font-medium text-stone-900">{t.departamento}</span>
-                                  <span className="text-xs text-stone-500">{t.zonaBarrio}</span>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4">
-                              <div className="flex items-center gap-2">
-                                <div className="h-8 w-8 rounded-full bg-stone-100 flex items-center justify-center text-stone-500 font-bold overflow-hidden">
-                                  {String(t.nombreTestimonial || '').charAt(0)}
-                                </div>
-                                <span className="text-sm font-medium text-stone-900">{t.nombreTestimonial}</span>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4">
-                              <span className="inline-flex rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
-                                {t.categoria}
+                <div className="flex flex-col divide-y divide-stone-100">
+                  {isLoading ? (
+                    [1, 2, 3].map((i) => (
+                      <div key={i} className="animate-pulse p-6">
+                        <div className="h-24 rounded-lg bg-stone-100"></div>
+                      </div>
+                    ))
+                  ) : testimoniosFiltrados.length > 0 ? (
+                    testimoniosFiltrados.map((t) => (
+                      <div key={t.id} className="flex flex-col sm:flex-row gap-4 p-6 hover:bg-stone-50 transition-colors relative">
+                        <div className="flex-shrink-0">
+                          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 text-amber-700 font-bold text-lg">
+                            {(t.nombreTestimonial || '').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || '?'}
+                          </div>
+                        </div>
+                        <div className="flex-1 flex flex-col gap-2">
+                          <div className="flex flex-col">
+                            <h3 className="font-bold text-stone-900">{t.nombreTestimonial}</h3>
+                            <p className="text-xs text-stone-400">{t.zonaBarrio} · {t.departamento}</p>
+                          </div>
+                          
+                          <div className="self-start">
+                            <span className="inline-block rounded-full bg-stone-100 px-3 py-1 text-[10px] font-bold text-stone-500 uppercase tracking-wider">
+                              {t.categoria}
+                            </span>
+                          </div>
+
+                          <p className="text-sm italic text-stone-500">
+                            "{t.texto}"
+                          </p>
+
+                          <div className="flex items-center gap-4 mt-1">
+                            <div className="flex items-center gap-1.5 text-stone-400">
+                              <Heart className="h-4 w-4" />
+                              <span className="text-sm font-medium">{t.likes || 0}</span>
+                            </div>
+                            {t.activo ? (
+                              <span className="inline-flex rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-bold text-emerald-600">
+                                Publicado
                               </span>
-                            </td>
-                            <td className="px-6 py-4">
-                              <div className="flex items-center gap-0.5">
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                  <Star
-                                    key={star}
-                                    className={`h-3.5 w-3.5 ${
-                                      star <= (t.calificacion || 0)
-                                        ? 'fill-amber-400 text-amber-400'
-                                        : 'text-stone-200'
-                                    }`}
-                                  />
-                                ))}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 text-center">
-                              <span className="text-sm font-bold text-stone-600">{t.likes || 0}</span>
-                            </td>
-                            <td className="px-6 py-4 text-right">
-                              <div className="flex justify-end gap-2">
-                                <button
-                                  onClick={() => handleEditClick(t)}
-                                  className="rounded-lg p-2 text-stone-400 transition hover:bg-amber-50 hover:text-amber-600"
-                                  title="Editar"
-                                >
-                                  <Pencil className="h-4 w-4" />
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteClick(t.id)}
-                                  className="rounded-lg p-2 text-stone-400 transition hover:bg-red-50 hover:text-red-600"
-                                  title="Eliminar"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan={6} className="px-6 py-16 text-center text-sm text-stone-500">
-                            No hay testimonios registrados aún.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
+                            ) : (
+                              <span className="inline-flex rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-bold text-stone-500">
+                                Borrador
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex items-start gap-2 mt-4 sm:mt-0 sm:absolute sm:right-6 sm:top-6">
+                          <button
+                            onClick={() => handleEditClick(t)}
+                            className="flex h-9 w-9 items-center justify-center rounded-xl border border-amber-200 text-amber-500 transition hover:bg-amber-50"
+                            title="Editar"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClick(t.id)}
+                            className="flex h-9 w-9 items-center justify-center rounded-xl border border-red-200 text-red-400 transition hover:bg-red-50"
+                            title="Eliminar"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="px-6 py-16 text-center text-sm text-stone-500">
+                      No hay testimonios registrados aún.
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -349,7 +335,7 @@ export default function AdminTestimoniosPage() {
         </div>
 
         {showForm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-6 sm:px-6 overflow-hidden">
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 px-4 py-6 sm:px-6 overflow-hidden">
             <div className="w-full max-w-3xl rounded-2xl bg-gradient-to-br from-white via-amber-50 to-orange-50 p-4 shadow-2xl ring-1 ring-amber-100 sm:p-6 max-h-[80vh] overflow-hidden">
               <div className="flex justify-end px-2 py-1">
                 <button
@@ -367,6 +353,7 @@ export default function AdminTestimoniosPage() {
                     setTestimonios((prev) => [nuevoTestimonio as Testimonio, ...prev])
                     setShowForm(false)
                   }}
+                  onCancel={() => setShowForm(false)}
                 />
               </div>
             </div>
@@ -375,7 +362,7 @@ export default function AdminTestimoniosPage() {
 
         {/* MODAL EDITAR */}
         {showEditModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 py-4 sm:px-6 overflow-hidden backdrop-blur-sm">
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 px-4 py-4 sm:px-6 overflow-hidden backdrop-blur-sm">
             <div className="w-full max-w-2xl rounded-3xl bg-white p-0 shadow-2xl ring-1 ring-amber-100 flex flex-col max-h-[90vh] overflow-hidden">
               <div className="flex justify-between items-center px-6 py-4 border-b border-stone-100 bg-stone-50/50">
                 <div>
@@ -391,30 +378,32 @@ export default function AdminTestimoniosPage() {
               </div>
 
               <div className="flex-1 overflow-y-auto p-6 space-y-5 custom-scrollbar">
-                <div>
-                  <label className="block text-sm font-semibold text-stone-700 mb-2">
-                    Persona (Nombre)
-                  </label>
-                  <input
-                    type="text"
-                    value={editUserName}
-                    onChange={(e) => setEditUserName(e.target.value)}
-                    className="w-full rounded-xl border border-amber-200 bg-amber-50/30 px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-300"
-                    placeholder="Nombre que aparecerá en el testimonio..."
-                  />
-                </div>
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-semibold text-stone-700 mb-2">
+                      Persona (Nombre)
+                    </label>
+                    <input
+                      type="text"
+                      value={editUserName}
+                      onChange={(e) => setEditUserName(e.target.value)}
+                      className="w-full rounded-xl border border-amber-200 bg-amber-50/30 px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-300"
+                      placeholder="Nombre que aparecerá en el testimonio..."
+                    />
+                  </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-stone-700 mb-2">
-                    Apellido
-                  </label>
-                  <input
-                    type="text"
-                    value={editUserLastName}
-                    onChange={(e) => setEditUserLastName(e.target.value)}
-                    className="w-full rounded-xl border border-amber-200 bg-amber-50/30 px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-300"
-                    placeholder="Apellido..."
-                  />
+                  <div>
+                    <label className="block text-sm font-semibold text-stone-700 mb-2">
+                      Apellido
+                    </label>
+                    <input
+                      type="text"
+                      value={editUserLastName}
+                      onChange={(e) => setEditUserLastName(e.target.value)}
+                      className="w-full rounded-xl border border-amber-200 bg-amber-50/30 px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-300"
+                      placeholder="Apellido..."
+                    />
+                  </div>
                 </div>
 
                 <div className="grid gap-5 sm:grid-cols-2">
@@ -441,7 +430,9 @@ export default function AdminTestimoniosPage() {
                       <option value="Pando">Pando</option>
                     </select>
                   </div>
+                </div>
 
+                <div className="grid gap-5 sm:grid-cols-2">
                   <div>
                     <label className="block text-sm font-semibold text-stone-700 mb-2">
                       Zona / Barrio
@@ -455,20 +446,20 @@ export default function AdminTestimoniosPage() {
                       className="w-full rounded-xl border border-amber-200 bg-amber-50/30 px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-300"
                     />
                   </div>
-                </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-stone-700 mb-2">
-                    Categoría
-                  </label>
-                  <input
-                    type="text"
-                    value={editingData.categoria || ''}
-                    onChange={(e) =>
-                      setEditingData({ ...editingData, categoria: e.target.value })
-                    }
-                    className="w-full rounded-xl border border-amber-200 bg-amber-50/30 px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-300"
-                  />
+                  <div>
+                    <label className="block text-sm font-semibold text-stone-700 mb-2">
+                      Categoría
+                    </label>
+                    <input
+                      type="text"
+                      value={editingData.categoria || ''}
+                      onChange={(e) =>
+                        setEditingData({ ...editingData, categoria: e.target.value })
+                      }
+                      className="w-full rounded-xl border border-amber-200 bg-amber-50/30 px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-300"
+                    />
+                  </div>
                 </div>
 
                 <div>
@@ -483,36 +474,27 @@ export default function AdminTestimoniosPage() {
                   />
                 </div>
 
-                <div className="grid gap-5 sm:grid-cols-2">
-                  <div className="flex flex-col justify-center">
-                    <span className="text-sm font-semibold text-stone-700 mb-2">Calificación</span>
-                    <div className="flex gap-1">
-                      {[1, 2, 3, 4, 5].map((num) => (
-                        <button
-                          key={num}
-                          type="button"
-                          onClick={() => setEditingData({ ...editingData, calificacion: num })}
-                          className={`h-10 w-10 rounded-xl border text-sm font-bold transition-all ${
-                            (editingData.calificacion ?? 5) >= num
-                              ? 'border-amber-500 bg-amber-500 text-white shadow-lg'
-                              : 'border-stone-200 bg-stone-50 text-stone-400'
-                          }`}
-                        >
-                          {num}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 bg-stone-50 p-4 rounded-2xl border border-stone-100">
-                    <input
-                      type="checkbox"
-                      id="edit-activo"
-                      checked={editingData.activo ?? false}
-                      onChange={(e) => setEditingData({ ...editingData, activo: e.target.checked })}
-                      className="h-6 w-6 rounded-lg border-amber-300 text-amber-600 focus:ring-amber-500"
-                    />
-                    <label htmlFor="edit-activo" className="text-sm font-bold text-stone-700 cursor-pointer">Testimonio Visible</label>
+                <div className="flex items-center justify-between border-t border-stone-100 pt-6 mt-2">
+                  <span className="text-sm font-semibold text-stone-700">Estado de publicación</span>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={editingData.activo ?? false}
+                      onClick={() => setEditingData({ ...editingData, activo: !editingData.activo })}
+                      className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
+                        editingData.activo ? 'bg-amber-500' : 'bg-stone-200'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                          editingData.activo ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                    <span className={`text-sm font-medium ${editingData.activo ? 'text-stone-500' : 'text-stone-400'}`}>
+                      {editingData.activo ? 'Publicado' : 'Borrador'}
+                    </span>
                   </div>
                 </div>
 
@@ -524,18 +506,19 @@ export default function AdminTestimoniosPage() {
                 )}
               </div>
 
-              <div className="p-6 border-t border-stone-100 bg-stone-50/50 flex gap-4">
+              <div className="p-6 border-t border-stone-100 bg-white flex justify-end gap-3">
                 <button
                   onClick={() => setShowEditModal(false)}
-                  className="flex-1 rounded-xl border border-stone-200 px-4 py-3 text-sm font-bold text-stone-600 transition hover:bg-white hover:shadow-md"
+                  className="rounded-xl border border-stone-200 px-6 py-2.5 text-sm font-bold text-stone-500 transition hover:bg-stone-50 hover:text-stone-700"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={handleSaveEdit}
-                  className="flex-[2] rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-amber-200 transition hover:brightness-110 active:scale-[0.98]"
+                  className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-6 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-amber-600 active:scale-[0.98]"
                 >
-                  Guardar cambios
+                  <Send className="h-4 w-4" />
+                  Publicar
                 </button>
               </div>
             </div>
@@ -544,7 +527,7 @@ export default function AdminTestimoniosPage() {
 
         {/* MODAL ELIMINAR */}
         {showDeleteConfirm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-6 sm:px-6">
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 px-4 py-6 sm:px-6">
             <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-stone-200">
               <h3 className="text-lg font-bold text-stone-900 mb-2">¿Eliminar testimonio?</h3>
               <p className="text-sm text-stone-600 mb-6">

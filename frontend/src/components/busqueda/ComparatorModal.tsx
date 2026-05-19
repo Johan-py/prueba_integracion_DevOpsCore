@@ -77,14 +77,15 @@ export default function ComparatorModal({ isOpen, onClose }: ComparatorModalProp
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200">
-       
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200 bg-stone-50">
+    //  Modal superpuesto oscureciendo el fondo
+    <div className="fixed inset-0 z-[9999] bg-stone-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200">
+        
+        {/* Header del Modal */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200">
           <div className="flex items-center gap-2">
             <BarChart2 className="w-5 h-5 text-[#ea580c]" />
-            <h2 className="text-xl font-bold text-slate-800">Análisis Comparativo</h2>
+            <h2 className="text-xl font-bold text-stone-800">Comparativa de Inmuebles</h2>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-stone-200 rounded-full transition-colors">
             <X className="w-5 h-5 text-stone-500" />
@@ -130,70 +131,33 @@ export default function ComparatorModal({ isOpen, onClose }: ComparatorModalProp
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-stone-100">
-                  
-                  {/* === SECCIÓN: PARÁMETROS BÁSICOS === */}
-                  <tr className="bg-stone-50">
-                    <td colSpan={properties.length + 1} className="py-2 px-4 border-y border-stone-200 sticky left-0 z-20">
-                      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-stone-500">
-                        <Info className="w-3.5 h-3.5" /> Parámetros Básicos
-                      </div>
-                    </td>
+                <tbody className="divide-y divide-stone-200 bg-white">
+                  <tr>
+                    <td className="sticky left-0 z-20 bg-white border-r border-stone-200 p-4 text-sm font-semibold text-stone-600 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Precio</td>
+                    {properties.map(prop => <td key={prop.id} className="p-4 text-lg font-bold text-[#ea580c]">$ {prop.precio}</td>)}
                   </tr>
-                  <tr className="hover:bg-stone-50/50 transition-colors">
-                    <td className="sticky left-0 z-20 bg-white border-r border-stone-200 p-4 text-sm font-semibold text-slate-600 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">Precio</td>
-                    {properties.map(prop => <td key={prop.id} className="p-4 text-lg font-bold text-[#ea580c]">$ {prop.precio?.toLocaleString('en-US')}</td>)}
-                  </tr>
-                  <tr className="hover:bg-stone-50/50 transition-colors">
-                    <td className="sticky left-0 z-20 bg-white border-r border-stone-200 p-4 text-sm font-semibold text-slate-600 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">Categoría</td>
+                  <tr>
+                    <td className="sticky left-0 z-20 bg-white border-r border-stone-200 p-4 text-sm font-semibold text-stone-600 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Tipo</td>
                     {properties.map(prop => (
                       <td key={prop.id} className="p-4">
                         <span className="px-2.5 py-1 bg-stone-100 text-stone-600 text-xs font-bold rounded-md uppercase">{prop.categoria || '-'}</span>
                       </td>
                     ))}
                   </tr>
-                  <tr className="hover:bg-stone-50/50 transition-colors">
-                    <td className="sticky left-0 z-20 bg-white border-r border-stone-200 p-4 text-sm font-semibold text-slate-600 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">Superficie</td>
+                  <tr>
+                    <td className="sticky left-0 z-20 bg-white border-r border-stone-200 p-4 text-sm font-semibold text-stone-600 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Superficie</td>
                     {properties.map(prop => <td key={prop.id} className="p-4 text-sm">{renderVal(prop.superficieM2, 'm²')}</td>)}
                   </tr>
-                  <tr className="hover:bg-stone-50/50 transition-colors">
-                    <td className="sticky left-0 z-20 bg-white border-r border-stone-200 p-4 text-sm font-semibold text-slate-600 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">Dormitorios</td>
+                  <tr>
+                    <td className="sticky left-0 z-20 bg-white border-r border-stone-200 p-4 text-sm font-semibold text-stone-600 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Habitaciones</td>
                     {properties.map(prop => <td key={prop.id} className="p-4 text-sm">{renderVal(prop.nroCuartos)}</td>)}
                   </tr>
-                  <tr className="hover:bg-stone-50/50 transition-colors">
-                    <td className="sticky left-0 z-20 bg-white border-r border-stone-200 p-4 text-sm font-semibold text-slate-600 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">Baños</td>
+                  <tr>
+                    <td className="sticky left-0 z-20 bg-white border-r border-stone-200 p-4 text-sm font-semibold text-stone-600 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Baños</td>
                     {properties.map(prop => <td key={prop.id} className="p-4 text-sm">{renderVal(prop.nroBanos)}</td>)}
                   </tr>
-
-                  {/* === SECCIÓN: PARÁMETROS AVANZADOS === */}
-                  <tr className="bg-stone-50">
-                    <td colSpan={properties.length + 1} className="py-2 px-4 border-y border-stone-200 sticky left-0 z-20">
-                      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-stone-500">
-                        <Info className="w-3.5 h-3.5" /> Parámetros Avanzados
-                      </div>
-                    </td>
-                  </tr>
-                  <tr className="hover:bg-stone-50/50 transition-colors">
-                    <td className="sticky left-0 z-20 bg-white border-r border-stone-200 p-4 text-sm font-semibold text-slate-600 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">Parqueos</td>
-                    {properties.map(prop => <td key={prop.id} className="p-4 text-sm">{renderVal(prop.nroParqueos)}</td>)}
-                  </tr>
-                  <tr className="hover:bg-stone-50/50 transition-colors">
-                    <td className="sticky left-0 z-20 bg-white border-r border-stone-200 p-4 text-sm font-semibold text-slate-600 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">Antigüedad</td>
-                    {properties.map(prop => <td key={prop.id} className="p-4 text-sm">{renderVal(prop.antiguedad, 'años')}</td>)}
-                  </tr>
-
-                  {/* === SECCIÓN: PARÁMETROS CUSTOM === */}
-                  <tr className="bg-stone-50">
-                    <td colSpan={properties.length + 1} className="py-2 px-4 border-y border-stone-200 sticky left-0 z-20">
-                      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#ea580c]">
-                        <Info className="w-3.5 h-3.5" /> Parámetros Custom
-                      </div>
-                    </td>
-                  </tr>
-                  
-                  {/* FILA 1: ETIQUETAS */}
-                  <tr className="hover:bg-stone-50/50 transition-colors">
-                    <td className="sticky left-0 z-20 bg-white border-r border-stone-200 p-4 text-sm font-semibold text-slate-600 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">Etiquetas</td>
+                  <tr>
+                    <td className="sticky left-0 z-20 bg-white border-r border-stone-200 p-4 text-sm font-semibold text-stone-600 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Etiquetas</td>
                     {properties.map(prop => {
                       const tags = prop.inmueble_etiqueta || [];
                       return (

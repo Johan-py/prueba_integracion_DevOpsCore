@@ -34,12 +34,12 @@ export default function BlogsPage() {
   } = useBlogFeed();
 
   return (
-    <div className="min-h-screen bg-[linear-gradient(180deg,#fbf6ef_0%,#f5efe7_45%,#ffffff_100%)]">
+    <div className="min-h-screen bg-[linear-gradient(180deg,#fbf6ef_0%,#f5efe7_45%,#ffffff_100%)] dark:bg-stone-950">
       <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
         <MyRecentBlogsPanel />
 
         <section className="space-y-6">
-          <h1 className="max-w-3xl font-heading text-4xl font-bold leading-tight text-stone-900 sm:text-5xl">
+          <h1 className="max-w-3xl font-heading text-4xl font-bold leading-tight text-stone-900 dark:text-stone-100 sm:text-5xl">
             Perspectivas para el Bien Raiz Moderno.
           </h1>
 
@@ -58,27 +58,27 @@ export default function BlogsPage() {
         </section>
 
         {isLoading ? (
-          <section className="rounded-[32px] border border-stone-200 bg-white px-6 py-12 text-center shadow-sm">
+          <section className="rounded-[32px] border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 px-6 py-12 text-center shadow-sm">
             <div className="animate-pulse flex flex-col items-center">
               <div className="h-4 bg-stone-200 rounded w-1/4 mb-4"></div>
               <div className="h-8 bg-stone-200 rounded w-1/2 mb-4"></div>
               <div className="h-4 bg-stone-200 rounded w-3/4"></div>
             </div>
-            <p className="mt-4 text-sm text-stone-400">Cargando artículos...</p>
+            <p className="mt-4 text-sm text-stone-400 dark:text-stone-500">Cargando artículos...</p>
           </section>
         ) : hasResults && featuredBlog ? (
           <FeaturedBlogSpotlight blog={featuredBlog} />
         ) : (
-          <section className="rounded-[32px] border border-dashed border-stone-300 bg-white px-6 py-12 text-center shadow-sm">
-            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-stone-400">
+          <section className="rounded-[32px] border border-dashed border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-900 px-6 py-12 text-center shadow-sm">
+            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-stone-400 dark:text-stone-500">
               Sin resultados
             </p>
 
-            <h2 className="mt-3 font-heading text-3xl font-bold text-stone-900">
+            <h2 className="mt-3 font-heading text-3xl font-bold text-stone-900 dark:text-stone-100">
               No encontramos articulos en esta categoria por ahora.
             </h2>
 
-            <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-stone-600">
+            <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-stone-600 dark:text-stone-400">
               Prueba con otra etiqueta para seguir explorando las publicaciones
               disponibles.
             </p>
@@ -94,7 +94,7 @@ export default function BlogsPage() {
                 ))}
               </div>
             ) : hasResults ? (
-              <div className="rounded-[28px] border border-stone-200 bg-white px-6 py-10 text-center text-stone-600 shadow-sm">
+              <div className="rounded-[28px] border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 px-6 py-10 text-center text-stone-600 dark:text-stone-300 shadow-sm">
                 Esta categoria solo tiene un articulo destacado por el momento.
               </div>
             ) : null}
@@ -104,7 +104,7 @@ export default function BlogsPage() {
                 <button
                   type="button"
                   onClick={loadMore}
-                  className="rounded-full border border-amber-600 px-6 py-3 text-sm font-semibold text-amber-700 transition-colors hover:bg-amber-600 hover:text-white"
+                  className="rounded-full border border-amber-600 dark:border-amber-500 px-6 py-3 text-sm font-semibold text-amber-700 dark:text-amber-400 transition-colors hover:bg-amber-600 hover:text-white dark:hover:bg-amber-600 dark:hover:text-white"
                 >
                   CONTINUAR LEYENDO
                 </button>

@@ -23,6 +23,7 @@ type PropsTarjeta = {
   lng?: number | null
   precio?: number
   precio_anterior?: number
+  esRecomendadoIA?: boolean 
   onViewDetails?: () => void
 }
 
@@ -52,7 +53,8 @@ export default function PropertyCard({
   lng,
   onViewDetails,
   precio,
-  precio_anterior
+  precio_anterior,
+  esRecomendadoIA
 }: PropsTarjeta) {
   const [isHovered, setIsHovered] = useState(false)
 
@@ -119,6 +121,12 @@ export default function PropertyCard({
             {porcentajeDescuento}% OFF
           </span>
         )}
+        {/* Badge IA */}
+       {esRecomendadoIA && (
+          <span className="absolute bottom-3 left-3 flex items-center gap-1 bg-purple-600 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-full shadow-md z-10">
+        ✨ Recomendado por IA
+      </span>
+       )}
       </div>
 
       <div className="p-3 flex flex-col gap-2 flex-1">

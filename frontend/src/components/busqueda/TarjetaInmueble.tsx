@@ -8,9 +8,10 @@ import { useCompareStore } from '@/hooks/useCompareStore'
 interface TarjetaInmuebleProps {
   inmueble: Inmueble
   posicion?: number
+  esRecomendadoIA?: boolean
 }
 
-export const TarjetaInmueble = ({ inmueble, posicion }: TarjetaInmuebleProps) => {
+export const TarjetaInmueble = ({ inmueble, posicion, esRecomendadoIA }: TarjetaInmuebleProps) => {
   const [isHovered, setIsHovered] = useState(false)
   
   // Conectamos la tarjeta al estado global de comparación
@@ -87,6 +88,13 @@ export const TarjetaInmueble = ({ inmueble, posicion }: TarjetaInmuebleProps) =>
             <TrendingUp className="w-3.5 h-3.5 text-orange-500" />
             <span className="text-xs font-semibold text-gray-800 dark:text-stone-200">Popular</span>
           </div>
+        )}
+        {/* Badge IA — agregar aquí */}
+        {esRecomendadoIA && (
+          <div className="absolute bottom-3 left-3 bg-purple-600 text-white px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm z-10">
+            <span className="text-xs">✨</span>
+           <span className="text-xs font-semibold">Recomendado por IA</span>
+         </div>
         )}
       </div>
 

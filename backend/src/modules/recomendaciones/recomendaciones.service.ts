@@ -53,7 +53,7 @@ export class RecomendacionesService {
       )
 
       if (resultadosML && resultadosML.length > 0) {
-        return resultadosML
+         return resultadosML.map(r => ({ ...r, modeloUsado: 'ML' as const }))
       }
       console.log('[ML] Sin resultados suficientes, usando fallback')
     }
@@ -163,6 +163,7 @@ export class RecomendacionesService {
 
     inmueblesConScore.sort((a, b) => b.score - a.score)
     const resultado = inmueblesConScore.slice(0, limit)
+    const resultadoConModelo = resultado.map(r => ({ ...r, modeloUsado: 'REGLAS' as const }))
     cache.set(cacheKey, resultado, 5 * 60 * 1000)
     return resultado
   }

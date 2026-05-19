@@ -23,7 +23,7 @@ export default function BlogFilterChips({
         className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200 cursor-pointer ${
           activeCategory === null
             ? "bg-stone-900 text-white border-stone-900"
-            : "bg-white text-stone-900 border-stone-300 hover:border-stone-500"
+            : "bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-200 border-stone-300 dark:border-stone-600 hover:border-stone-500 dark:hover:border-stone-500"
         }`}
       >
         Todos
@@ -42,7 +42,7 @@ export default function BlogFilterChips({
             className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200 cursor-pointer ${
               isActive
                 ? "bg-stone-900 text-white border-stone-900"
-                : `bg-white text-stone-900 border-stone-300 ${color.hoverBorder}`
+                : `bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-200 border-stone-300 dark:border-stone-600 ${color.hoverBorder}`
             }`}
           >
             {category}
