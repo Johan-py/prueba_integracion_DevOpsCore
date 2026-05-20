@@ -1255,24 +1255,12 @@ function BusquedaMapaContent() {
           </div>
 
           {/* ── BOTONES FLOTANTES DE ZONAS (portrait móvil) ──
-              z-[35] para quedar siempre sobre el bottom sheet (z-[30])
+              z-[25] para quedar detrás del bottom sheet (z-[30]) cuando este se expande
               Alineados a la derecha en la parte superior del mapa para no solapar el zoom */}
-          <div className="absolute top-3 right-4 z-[35] flex flex-col items-end gap-2 pointer-events-none">
-            {/* Estado normal: Mis zonas + Dibujar zona */}
+          <div className="absolute top-3 right-4 z-[25] flex flex-col items-end gap-2 pointer-events-none">
+            {/* Estado normal: Dibujar zona + Mis zonas */}
             {!isDrawingMode && !editingZoneId && (
               <div className="flex flex-row gap-2 pointer-events-auto">
-                <button
-                  onClick={() => {
-                    if (!isAuthenticated) {
-                      router.push('/sign-in')
-                    } else {
-                      setIsMisZonasOpen(true)
-                    }
-                  }}
-                  className="bg-white text-stone-700 px-4 py-2.5 rounded-lg shadow-md border border-stone-200 hover:bg-stone-50 active:bg-stone-100 transition-all text-sm font-semibold"
-                >
-                  Mis zonas
-                </button>
                 {drawnPolygons.length === 0 && (
                   <button
                     onClick={() => {
@@ -1287,6 +1275,18 @@ function BusquedaMapaContent() {
                     Dibujar zona
                   </button>
                 )}
+                <button
+                  onClick={() => {
+                    if (!isAuthenticated) {
+                      router.push('/sign-in')
+                    } else {
+                      setIsMisZonasOpen(true)
+                    }
+                  }}
+                  className="bg-white text-stone-700 px-4 py-2.5 rounded-lg shadow-md border border-stone-200 hover:bg-stone-50 active:bg-stone-100 transition-all text-sm font-semibold"
+                >
+                  Mis zonas
+                </button>
               </div>
             )}
 
