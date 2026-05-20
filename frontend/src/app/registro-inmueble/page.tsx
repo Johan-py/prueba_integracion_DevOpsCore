@@ -29,7 +29,40 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL
 
 export default function MiRegistroPage() {
   const router = useRouter()
-  const [mostrarVideo, setMostrarVideo] = useState(true)
+  const [mostrarVideo, setMostrarVideo] = useState(false)
+
+  const contenidoTutorial = {
+    titulo: 'Antes de publicar tu propiedad',
+    mensaje:
+      'Mira este video y conoce qué necesitas tener listo para crear tu publicación de forma exitosa.',
+    videoUrl: '',
+    thumbnailUrl: null,
+    subtitlesUrl: null,
+    checkboxLabel: 'Sí entiendo qué necesito para publicar una propiedad'
+  }
+
+  const getTutorialKey = () => {
+    const token = localStorage.getItem('token')
+
+    if (!token) return 'propbol-tutorial-publicacion-visto-sin-token'
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]))
+
+      const usuarioKey =
+        payload.id ||
+        payload.userId ||
+        payload.usuarioId ||
+        payload.sub ||
+        payload.email ||
+        payload.correo ||
+        token
+
+      return `propbol-tutorial-publicacion-visto-${usuarioKey}`
+    } catch {
+      return `propbol-tutorial-publicacion-visto-${token}`
+    }
+  }
 
   const [datos, setDatos] = useState({
     titulo: '',
@@ -666,6 +699,67 @@ const [poiSeleccionado, setPoiSeleccionado] = useState<number | null>(null)
     }
   }
 
+  useEffect(() => {
+    const verificarTutorialPublicacion = async () => {
+      const token = localStorage.getItem('token')
+
+      if (!token) return
+
+      const tutorialKey = getTutorialKey()
+      const yaVioTutorial = localStorage.getItem(tutorialKey)
+
+      if (yaVioTutorial === 'true') {
+        setMostrarVideo(false)
+        return
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/api/tutorial-publicacion/estado`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+
+        const result = await response.json().catch(() => null)
+
+        if (response.ok && result?.data?.debeMostrarTutorial === false) {
+          localStorage.setItem(tutorialKey, 'true')
+          setMostrarVideo(false)
+          return
+        }
+
+        setMostrarVideo(true)
+      } catch (error) {
+        console.error('Error al verificar tutorial de publicación:', error)
+        setMostrarVideo(true)
+      }
+    }
+
+    verificarTutorialPublicacion()
+  }, [])
+
+  const confirmarTutorialPublicacion = async () => {
+    const token = localStorage.getItem('token')
+    const tutorialKey = getTutorialKey()
+
+    localStorage.setItem(tutorialKey, 'true')
+    setMostrarVideo(false)
+
+    try {
+      if (token) {
+        await fetch(`${API_URL}/api/tutorial-publicacion/confirmar`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+      }
+    } catch (error) {
+      console.error('Error al confirmar tutorial de publicación:', error)
+    }
+  }
+
   const errorTitulo = campoError === 'titulo'
   const errorDescripcion = campoError === 'descripcion'
   const errorDireccion = campoError === 'direccion'
@@ -681,8 +775,9 @@ const [poiSeleccionado, setPoiSeleccionado] = useState<number | null>(null)
      <>
     {mostrarVideo && (
       <VideoPublicacionModal
+        contenido={contenidoTutorial}
         onClose={() => setMostrarVideo(false)}
-        onContinue={() => setMostrarVideo(false)}
+        onContinue={confirmarTutorialPublicacion}
       />
     )}
     <div className="min-h-screen bg-white text-gray-900">
