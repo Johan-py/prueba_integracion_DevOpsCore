@@ -562,6 +562,13 @@ html.dark body :where(h1,
   color: var(--pb-text) !important;
 }
 
+/* Logo header: solo "Bol" en naranja */
+html.dark body #tour-logo .propbol-logo-bol,
+html.dark body a[id="tour-logo"] .propbol-logo-bol,
+.propbol-logo-bol {
+  color: #e68b25 !important;
+}
+
 /* Textos secundarios */
 html.dark body :where(small,
   input::placeholder,
