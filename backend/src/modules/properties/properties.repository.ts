@@ -463,6 +463,8 @@ export const propertiesRepository = {
         inmueble_amenidad: {
           include: { amenidad: true },
         },
+        ubicacion: true, 
+        propietario: true,
       },
     });
 
