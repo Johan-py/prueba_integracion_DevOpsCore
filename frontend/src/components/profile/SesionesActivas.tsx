@@ -77,7 +77,14 @@ export default function ActiveSessions() {
   }
 
   useEffect(() => {
+     cargarSesiones()
+
+  const interval = setInterval(() => {
     cargarSesiones()
+  }, 10000) // cada 10 segundos
+
+  return () => clearInterval(interval)
+
   }, [])
 
   // ── Seleccionar / deseleccionar ───────────────────────
@@ -102,6 +109,16 @@ export default function ActiveSessions() {
   // ── DELETE: Cerrar sesiones seleccionadas ─────────────
   const cerrarSesiones = async () => {
     if (seleccionadas.length === 0) return
+       const confirmar = window.confirm(
+                `¿Estás seguro de cerrar ${
+             seleccionadas.length > 1
+                  ? 'las sesiones seleccionadas'
+                  : 'la sesión seleccionada'
+              }?`
+        )
+
+  if (!confirmar) return
+
     setIsLoading(true)
     setError(null)
 
@@ -144,6 +161,11 @@ export default function ActiveSessions() {
 
   // ── DELETE: Cerrar todas excepto actual ───────────────
   const cerrarTodas = async () => {
+    const confirmar = window.confirm(
+         '¿Estás seguro de cerrar todas las sesiones activas?'
+     )
+
+  if (!confirmar) return
     setIsLoading(true)
     setError(null)
 
@@ -168,7 +190,7 @@ export default function ActiveSessions() {
       }
 
       // Mantener solo la sesión actual
-      setSesiones(prev => prev.filter(s => s.esActual))
+      setSesiones(prev => prev.filter(s => s.esActual && s.estado))
       setSeleccionadas([])
 
     } catch (err: any) {
@@ -196,10 +218,10 @@ export default function ActiveSessions() {
     }
   }
 
-  const todasSeleccionadas = sesiones.filter(s => !s.esActual).length > 0 &&
-    seleccionadas.length === sesiones.filter(s => !s.esActual).length
+  const todasSeleccionadas = sesiones.filter(s => s.estado && !s.esActual).length > 0 &&
+    seleccionadas.length === sesiones.filter(s => s.estado && !s.esActual).length
 
-  const sesionesActivasCount = sesiones.filter(s => !s.esActual).length
+  const sesionesActivasCount = sesiones.filter(s => s.estado).length
 
   return (
     <div className="min-h-screen bg-[#EAEAEA] p-4">
@@ -232,10 +254,10 @@ export default function ActiveSessions() {
             <p className="text-gray-600 text-lg">No hay sesiones activas</p>
           </div>
         ) : (
-          <div className="bg-[#F4F4F4] rounded-2xl p-8">
+          <div className="bg-[#F4F4F4] rounded-2xl p-8 overflow-x-auto">
 
             {/* HEADER TABLA */}
-            <div className="max-w-5xl mx-auto grid grid-cols-4 bg-[#E8962F] text-white font-bold rounded-lg py-4 px-6 mb-4 text-center text-lg">
+            <div className="max-w-5xl min-w-[700px] mx-auto grid grid-cols-4 bg-[#E8962F] text-white font-bold rounded-lg py-4 px-6 mb-4 text-center text-lg">
               <p>ID</p>
               <p>Última actividad</p>
               <p>Estado</p>
@@ -244,16 +266,18 @@ export default function ActiveSessions() {
 
             {/* FILAS */}
             <div className="space-y-3">
-              {sesiones.map((sesion) => (
+              {sesiones 
+                    .filter((sesion) => sesion.estado)
+                    .map((sesion) => (
                 <div
                   key={sesion.id}
-                  className={`max-w-5xl mx-auto grid grid-cols-4 items-center rounded-lg py-5 px-6 text-center text-lg transition-colors
+                  className={`max-w-5xl min-w-[700px] mx-auto grid grid-cols-4 items-center rounded-lg py-5 px-6 text-center text-lg transition-colors
                     ${seleccionadas.includes(sesion.id)
                       ? 'bg-amber-100'
                       : 'bg-[#E7DFD7]'
                     }`}
                 >
-                  <p className="font-medium">#{sesion.id}</p>
+                  <p className="font-medium">{sesion.id}</p>
                   <p>{formatearFecha(sesion.fechaInicio)}</p>
                   <p>
                     {sesion.esActual ? (

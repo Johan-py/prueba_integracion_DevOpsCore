@@ -134,7 +134,7 @@ export default function MisZonasSidebar({
                   editingZoneId === zona.id ? (
                     <li
                       key={zona.id}
-                      className="flex items-center gap-2 p-2.5 bg-stone-50 dark:bg-stone-600 border border-stone-200 dark:border-stone-400 rounded-xl shadow-sm"
+                      className="flex items-center gap-2 p-2.5 bg-stone-50 dark:bg-stone-900/50 border border-stone-200 dark:border-stone-700/50 rounded-xl shadow-sm"
                     >
                       <input
                         value={editingZoneName}
@@ -165,7 +165,7 @@ export default function MisZonasSidebar({
                     <li
                       key={zona.id}
                       onClick={() => onZoneSelect?.(Number(zona.id))}
-                      className="flex items-center justify-between p-3 bg-stone-50 dark:bg-stone-600 border border-stone-100 dark:border-stone-400 rounded-lg cursor-pointer hover:border-orange-200 dark:hover:border-orange-400 hover:-translate-y-1 hover:shadow-md active:translate-y-0 active:shadow-sm transition-all duration-200 group"
+                      className="flex items-center justify-between p-3 bg-stone-50 dark:bg-stone-900/50 border border-stone-100 dark:border-stone-700/50 rounded-lg cursor-pointer hover:border-orange-200 dark:hover:border-orange-400 hover:-translate-y-1 hover:shadow-md active:translate-y-0 active:shadow-sm transition-all duration-200 group"
                     >
                       <span className="text-sm font-medium text-stone-700 dark:text-white truncate pr-2">
                         {zona.nombre}
@@ -176,7 +176,7 @@ export default function MisZonasSidebar({
                             e.stopPropagation()
                             onEditZone(zona.id)
                           }}
-                          className="p-1.5 text-stone-400 hover:text-orange-500 hover:bg-orange-50 rounded-md transition-colors"
+                          className="p-1.5 text-stone-400 hover:text-orange-500 hover:bg-orange-50 dark:hover:bg-stone-700 rounded-md transition-colors"
                           title="Editar zona"
                         >
                           <Pencil size={16} />
@@ -186,7 +186,7 @@ export default function MisZonasSidebar({
                             e.stopPropagation()
                             onDeleteZone(zona.id)
                           }}
-                          className="p-1.5 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                          className="p-1.5 text-stone-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-stone-700 rounded-md transition-colors"
                           title="Eliminar zona"
                         >
                           <Trash2 size={16} />
@@ -197,7 +197,7 @@ export default function MisZonasSidebar({
                 )}
 
                 {isDraftZoneVisible && (
-                  <li className="flex items-center gap-2 p-2.5 bg-stone-50 dark:bg-stone-600 border border-stone-200 dark:border-stone-400 rounded-xl shadow-sm">
+                  <li className="flex items-center gap-2 p-2.5 bg-stone-50 dark:bg-stone-900/50 border border-stone-200 dark:border-stone-700/50 rounded-xl shadow-sm">
                     <input
                       value={draftZoneName}
                       onChange={(e) => onDraftZoneNameChange?.(e.target.value)}
@@ -246,20 +246,20 @@ export default function MisZonasSidebar({
 
         {/* Sheet que sube desde abajo */}
         <div
-          className="fixed left-0 right-0 bottom-0 z-[1100] bg-white rounded-t-2xl shadow-[0_-4px_32px_rgba(0,0,0,0.18)] flex flex-col transform transition-transform duration-300 ease-in-out"
+          className="fixed left-0 right-0 bottom-0 z-[1100] bg-white dark:bg-stone-800 rounded-t-2xl shadow-[0_-4px_32px_rgba(0,0,0,0.18)] flex flex-col transform transition-transform duration-300 ease-in-out"
           style={{
             maxHeight: '80dvh',
             transform: isOpen ? 'translateY(0)' : 'translateY(100%)',
           }}
         >
           {/* Handle + cabecera */}
-          <div className="shrink-0 flex flex-col items-center pt-3 pb-2 border-b border-stone-200">
-            <div className="w-10 h-1.5 bg-stone-300 rounded-full mb-3" />
+          <div className="shrink-0 flex flex-col items-center pt-3 pb-2 border-b border-stone-200 dark:border-stone-700">
+            <div className="w-10 h-1.5 bg-stone-300 dark:bg-stone-600 rounded-full mb-3" />
             <div className="flex items-center justify-between w-full px-4">
-              <h2 className="text-base font-semibold text-slate-800">Mis zonas</h2>
+              <h2 className="text-base font-semibold text-slate-800 dark:text-stone-100">Mis zonas</h2>
               <button
                 onClick={onClose}
-                className="p-1.5 text-stone-400 hover:text-stone-600 hover:bg-stone-100 rounded-full transition-colors"
+                className="p-1.5 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-full transition-colors"
               >
                 <X size={18} />
               </button>
@@ -283,15 +283,15 @@ export default function MisZonasSidebar({
       )}
 
       <aside
-        className={`absolute top-0 right-0 h-full w-full sm:w-80 bg-white shadow-2xl z-[1100] transform transition-transform duration-300 ease-in-out flex flex-col border-l border-stone-200 ${
+        className={`absolute top-0 right-0 h-full w-full sm:w-80 bg-white dark:bg-stone-800 shadow-2xl z-[1100] transform transition-transform duration-300 ease-in-out flex flex-col border-l border-stone-200 dark:border-stone-700 ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         <div className="flex items-center justify-between px-4 pt-4 pb-2 shrink-0">
-          <h2 className="text-lg text-slate-800">Mis zonas</h2>
+          <h2 className="text-lg text-slate-800 dark:text-stone-100">Mis zonas</h2>
           <button
             onClick={onClose}
-            className="p-1.5 text-stone-400 hover:text-stone-600 hover:bg-stone-100 rounded-full transition-colors"
+            className="p-1.5 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-full transition-colors"
           >
             <ChevronRight size={20} />
           </button>

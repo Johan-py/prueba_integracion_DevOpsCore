@@ -1,43 +1,35 @@
 export default function Terminos() {
   return (
     <div
-      className="min-h-screen py-10"
+      className="min-h-screen py-10 w-[100vw] -ml-[calc(50vw+50%)] overflow-x-hidden bg-cover bg-center bg-no-repeat bg-fixed dark:bg-black/60"
       style={{
         width: '100vw',
         marginLeft: 'calc(-50vw + 50%)',
-        backgroundImage: "url('/icons/fondoTerminos.jpg')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
         backgroundAttachment: 'fixed',
-        overflowX: 'hidden'
+        overflowX: 'hidden',
+        backgroundImage: "url('/icons/fondoTerminos.jpg')",
       }}
     >
       <div
-        className="max-w-4xl mx-auto p-10 shadow-md rounded-md"
-        style={{ backgroundColor: '#FFFFFF' }}
+        className="max-w-4xl mx-auto p-10 shadow-md rounded-md bg-white dark:bg-stone-800"
       >
         {/* Título */}
-        <h1 className="text-3xl font-bold mb-2" style={{ color: '#120C0C' }}>
+        <h1 className="text-3xl font-bold mb-2 text-stone-900 dark:text-stone-100">
           POLÍTICA DE PRIVACIDAD
         </h1>
 
         {/* Línea decorativa */}
-        <div
-          style={{
-            height: '3px',
-            width: '100%',
-            backgroundColor: '#BEAF87',
-            marginBottom: '20px'
-          }}
-        />
+        <div className="h-[3px] w-full bg-amber-600 dark:bg-amber-500 mb-5" />
 
         {/* Sección 1 */}
         <section className="mb-6">
-          <h2 className="font-semibold" style={{ color: '#120C0C' }}>
+          <h2 className="font-semibold text-stone-900 dark:text-stone-100">
             1. Introducción
           </h2>
-          <p className="text-sm leading-7 mt-2 text-justify" style={{ color: '#303030' }}>
+          <p className="text-sm leading-7 mt-2 text-justify text-stone-700 dark:text-stone-300">
             La presente Política de Privacidad tiene por objeto informar a los usuarios sobre la
             recopilación, uso, tratamiento y protección de sus datos personales en el marco del uso
             de la plataforma. El acceso y utilización del sistema implican la aceptación expresa de
@@ -54,23 +46,23 @@ export default function Terminos() {
 
         {/* Sección 2 */}
         <section className="mb-6">
-          <h2 className="font-semibold" style={{ color: '#120C0C' }}>
+          <h2 className="font-semibold text-stone-900 dark:text-stone-100">
             2. Información recopilada
           </h2>
 
-          <p className="text-sm leading-7 mt-2 text-justify" style={{ color: '#303030' }}>
+          <p className="text-sm leading-7 mt-2 text-justify text-stone-700 dark:text-stone-300">
             El usuario podrá proporcionar información personal de manera voluntaria al momento de
             registrarse o utilizar los servicios, incluyendo, entre otros:
           </p>
 
-          <ul className="list-disc ml-5 mt-3 text-sm" style={{ color: '#303030' }}>
+          <ul className="list-disc ml-5 mt-3 text-sm text-stone-700 dark:text-stone-300">
             <li>Nombre completo</li>
             <li>Correo electrónico</li>
             <li>Número de teléfono</li>
             <li>Información de navegación</li>
           </ul>
 
-          <p className="text-sm leading-7 mt-3 text-justify" style={{ color: '#303030' }}>
+          <p className="text-sm leading-7 mt-3 text-justify text-stone-700 dark:text-stone-300">
             Esta información es utilizada exclusivamente para la correcta identificación del usuario
             y la prestación de los servicios ofrecidos.
           </p>
@@ -78,21 +70,21 @@ export default function Terminos() {
 
         {/* Sección 3 */}
         <section className="mb-6">
-          <h2 className="font-semibold" style={{ color: '#120C0C' }}>
+          <h2 className="font-semibold text-stone-900 dark:text-stone-100">
             3. Uso de la información
           </h2>
 
-          <p className="text-sm leading-7 mt-2 text-justify" style={{ color: '#303030' }}>
+          <p className="text-sm leading-7 mt-2 text-justify text-stone-700 dark:text-stone-300">
             La información personal recopilada a través de la plataforma es utilizada con el
             propósito de garantizar el correcto funcionamiento del sistema, así como para mejorar la
             calidad de los servicios ofrecidos a los usuarios.
           </p>
 
-          <p className="text-sm leading-7 mt-3 text-justify" style={{ color: '#303030' }}>
+          <p className="text-sm leading-7 mt-3 text-justify text-stone-700 dark:text-stone-300">
             En particular, los datos podrán ser utilizados para las siguientes finalidades:
           </p>
 
-          <ul className="list-disc ml-5 mt-3 text-sm" style={{ color: '#303030' }}>
+          <ul className="list-disc ml-5 mt-3 text-sm text-stone-700 dark:text-stone-300">
             <li>
               <strong>Gestión de cuentas de usuario:</strong> Permitir la creación, administración y
               autenticación de cuentas, así como la identificación segura del usuario dentro de la
@@ -130,7 +122,7 @@ export default function Terminos() {
             </li>
           </ul>
 
-          <p className="text-sm leading-7 mt-3 text-justify" style={{ color: '#303030' }}>
+          <p className="text-sm leading-7 mt-3 text-justify text-stone-700 dark:text-stone-300">
             En ningún caso la información personal será utilizada para fines distintos a los aquí
             establecidos sin el consentimiento previo del usuario.
           </p>
@@ -138,10 +130,10 @@ export default function Terminos() {
 
         {/* Sección 4 */}
         <section className="mb-6">
-          <h2 className="font-semibold" style={{ color: '#120C0C' }}>
+          <h2 className="font-semibold text-stone-900 dark:text-stone-100">
             4. Seguridad
           </h2>
-          <p className="text-sm leading-7 mt-2 text-justify" style={{ color: '#303030' }}>
+          <p className="text-sm leading-7 mt-2 text-justify text-stone-700 dark:text-stone-300">
             La plataforma implementa medidas técnicas y organizativas adecuadas con el fin de
             garantizar la seguridad, confidencialidad e integridad de los datos personales de los
             usuarios, evitando su pérdida, alteración, acceso no autorizado o uso indebido. Entre
@@ -157,34 +149,34 @@ export default function Terminos() {
 
         {/* Sección 5 */}
         <section className="mb-6">
-          <h2 className="font-semibold" style={{ color: '#120C0C' }}>
+          <h2 className="font-semibold text-stone-900 dark:text-stone-100">
             5. Uso de cookies y tecnologías similares
           </h2>
 
-          <p className="text-sm leading-7 mt-2 text-justify" style={{ color: '#303030' }}>
+          <p className="text-sm leading-7 mt-2 text-justify text-stone-700 dark:text-stone-300">
             La plataforma utiliza cookies y tecnologías similares con el fin de mejorar la
             experiencia del usuario, optimizar el funcionamiento del sistema y ofrecer servicios
             personalizados.
           </p>
 
-          <p className="text-sm leading-7 mt-3 text-justify" style={{ color: '#303030' }}>
+          <p className="text-sm leading-7 mt-3 text-justify text-stone-700 dark:text-stone-300">
             Las cookies son pequeños archivos de texto que se almacenan en el dispositivo del
             usuario cuando accede a la plataforma, permitiendo reconocer sus preferencias y
             facilitar futuras interacciones.
           </p>
 
-          <p className="text-sm leading-7 mt-3 text-justify" style={{ color: '#303030' }}>
+          <p className="text-sm leading-7 mt-3 text-justify text-stone-700 dark:text-stone-300">
             A través del uso de cookies, la plataforma puede:
           </p>
 
-          <ul className="list-disc ml-5 mt-3 text-sm" style={{ color: '#303030' }}>
+          <ul className="list-disc ml-5 mt-3 text-sm text-stone-700 dark:text-stone-300">
             <li>Recordar las preferencias del usuario</li>
             <li>Facilitar la navegación dentro del sistema</li>
             <li>Analizar el uso de la plataforma para mejorar su funcionamiento</li>
             <li>Ofrecer contenido más relevante según la interacción del usuario</li>
           </ul>
 
-          <p className="text-sm leading-7 mt-3 text-justify" style={{ color: '#303030' }}>
+          <p className="text-sm leading-7 mt-3 text-justify text-stone-700 dark:text-stone-300">
             El usuario puede configurar su navegador para aceptar, rechazar o eliminar las cookies
             en cualquier momento; sin embargo, la desactivación de estas puede afectar el correcto
             funcionamiento de algunas funcionalidades de la plataforma.
@@ -193,21 +185,21 @@ export default function Terminos() {
 
         {/* Sección 6 */}
         <section className="mb-6">
-          <h2 className="font-semibold" style={{ color: '#120C0C' }}>
+          <h2 className="font-semibold text-stone-900 dark:text-stone-100">
             6. Compartición de la información
           </h2>
 
-          <p className="text-sm leading-7 mt-2 text-justify" style={{ color: '#303030' }}>
+          <p className="text-sm leading-7 mt-2 text-justify text-stone-700 dark:text-stone-300">
             La plataforma no comercializa ni comparte los datos personales de los usuarios con
             terceros sin su consentimiento, salvo en los casos establecidos en la presente política
             o cuando sea requerido por la normativa vigente.
           </p>
 
-          <p className="text-sm leading-7 mt-3 text-justify" style={{ color: '#303030' }}>
+          <p className="text-sm leading-7 mt-3 text-justify text-stone-700 dark:text-stone-300">
             La información personal podrá ser compartida en los siguientes casos:
           </p>
 
-          <ul className="list-disc ml-5 mt-3 text-sm" style={{ color: '#303030' }}>
+          <ul className="list-disc ml-5 mt-3 text-sm text-stone-700 dark:text-stone-300">
             <li>
               <strong>Con consentimiento del usuario:</strong> Cuando el usuario autorice de manera
               expresa la transferencia de sus datos para fines específicos.
@@ -228,7 +220,7 @@ export default function Terminos() {
             </li>
           </ul>
 
-          <p className="text-sm leading-7 mt-3 text-justify" style={{ color: '#303030' }}>
+          <p className="text-sm leading-7 mt-3 text-justify text-stone-700 dark:text-stone-300">
             En todos los casos, se adoptarán las medidas necesarias para garantizar que el
             tratamiento de los datos personales se realice conforme a los principios de seguridad y
             confidencialidad.
@@ -237,28 +229,28 @@ export default function Terminos() {
 
         {/* Sección 7 */}
         <section className="mb-6">
-          <h2 className="font-semibold" style={{ color: '#120C0C' }}>
+          <h2 className="font-semibold text-stone-900 dark:text-stone-100">
             7. Derechos del usuario
           </h2>
 
-          <p className="text-sm leading-7 mt-2 text-justify" style={{ color: '#303030' }}>
+          <p className="text-sm leading-7 mt-2 text-justify text-stone-700 dark:text-stone-300">
             El usuario tiene derecho a conocer, acceder, actualizar y rectificar sus datos
             personales almacenados en la plataforma, conforme a los principios de transparencia y
             control sobre su información.
           </p>
 
-          <p className="text-sm leading-7 mt-3 text-justify" style={{ color: '#303030' }}>
+          <p className="text-sm leading-7 mt-3 text-justify text-stone-700 dark:text-stone-300">
             Asimismo, el usuario podrá solicitar la eliminación de sus datos personales cuando
             considere que no están siendo tratados conforme a los fines establecidos o cuando ya no
             sean necesarios para dichos fines.
           </p>
 
-          <p className="text-sm leading-7 mt-3 text-justify" style={{ color: '#303030' }}>
+          <p className="text-sm leading-7 mt-3 text-justify text-stone-700 dark:text-stone-300">
             El usuario también tiene derecho a oponerse al tratamiento de sus datos personales en
             determinadas circunstancias, así como a solicitar la limitación de su uso.
           </p>
 
-          <p className="text-sm leading-7 mt-3 text-justify" style={{ color: '#303030' }}>
+          <p className="text-sm leading-7 mt-3 text-justify text-stone-700 dark:text-stone-300">
             Para el ejercicio de estos derechos, el usuario podrá realizar la solicitud
             correspondiente a través de los canales habilitados por la plataforma, los cuales serán
             atendidos en un plazo razonable conforme a la normativa vigente en el Estado
@@ -268,28 +260,28 @@ export default function Terminos() {
 
         {/* Sección 8 */}
         <section>
-          <h2 className="font-semibold" style={{ color: '#120C0C' }}>
+          <h2 className="font-semibold text-stone-900 dark:text-stone-100">
             8. Cambios en la política
           </h2>
 
-          <p className="text-sm leading-7 mt-2 text-justify" style={{ color: '#303030' }}>
+          <p className="text-sm leading-7 mt-2 text-justify text-stone-700 dark:text-stone-300">
             La plataforma se reserva el derecho de modificar, actualizar o complementar la presente
             Política de Privacidad en cualquier momento, con el fin de adaptarla a cambios
             normativos, mejoras en los servicios o nuevas funcionalidades implementadas.
           </p>
 
-          <p className="text-sm leading-7 mt-3 text-justify" style={{ color: '#303030' }}>
+          <p className="text-sm leading-7 mt-3 text-justify text-stone-700 dark:text-stone-300">
             Cualquier modificación será publicada oportunamente en esta misma sección, indicando la
             fecha de la última actualización, con el objetivo de mantener informados a los usuarios.
           </p>
 
-          <p className="text-sm leading-7 mt-3 text-justify" style={{ color: '#303030' }}>
+          <p className="text-sm leading-7 mt-3 text-justify text-stone-700 dark:text-stone-300">
             En caso de realizarse cambios significativos que afecten el tratamiento de los datos
             personales, se podrán emplear medios adicionales de comunicación, tales como
             notificaciones dentro de la plataforma o correos electrónicos, cuando corresponda.
           </p>
 
-          <p className="text-sm leading-7 mt-3 text-justify" style={{ color: '#303030' }}>
+          <p className="text-sm leading-7 mt-3 text-justify text-stone-700 dark:text-stone-300">
             Se recomienda a los usuarios revisar periódicamente esta política para mantenerse
             informados sobre cómo se protege su información.
           </p>
@@ -297,25 +289,24 @@ export default function Terminos() {
 
         {/* Sección 9 */}
         <section className="mt-8">
-          <h2 className="font-semibold" style={{ color: '#120C0C' }}>
+          <h2 className="font-semibold text-stone-900 dark:text-stone-100">
             9. Contacto
           </h2>
 
-          <p className="text-sm leading-7 mt-2 text-justify" style={{ color: '#303030' }}>
+          <p className="text-sm leading-7 mt-2 text-justify text-stone-700 dark:text-stone-300">
             Si tienes dudas, consultas o solicitudes relacionadas con la presente Política de
             Privacidad o el tratamiento de tus datos personales, puedes comunicarte con nosotros a
             través de los siguientes medios:
           </p>
 
-          <ul className="mt-3 text-sm" style={{ color: '#303030' }}>
+          <ul className="mt-3 text-sm text-stone-700 dark:text-stone-300">
             <li>
               Facebook:{' '}
               <a
                 href="https://www.facebook.com/people/PropBol/61577818616490/"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ color: '#BEAF87' }}
-                className="hover:underline"
+                className="text-amber-600 dark:text-amber-400 hover:underline"
               >
                 PropBol
               </a>
@@ -327,15 +318,14 @@ export default function Terminos() {
                 href="https://www.instagram.com/prop.bol"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ color: '#BEAF87' }}
-                className="hover:underline"
+                className="text-amber-600 dark:text-amber-400 hover:underline"
               >
                 @prop.bol
               </a>
             </li>
           </ul>
 
-          <p className="text-sm leading-7 mt-3 text-justify" style={{ color: '#303030' }}>
+          <p className="text-sm leading-7 mt-3 text-justify text-stone-700 dark:text-stone-300">
             Las solicitudes serán atendidas en un plazo razonable conforme a la normativa vigente en
             el Estado Plurinacional de Bolivia.
           </p>

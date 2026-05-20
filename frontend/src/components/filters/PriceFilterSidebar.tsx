@@ -239,7 +239,24 @@ export default function PriceFilterSidebar({ isOpen, onClose, totalResultados = 
       </div>
 
       {/* 3. FOOTER (Fijo al fondo) */}
-      <div className="shrink-0 px-6 pb-6 pt-4 border-t border-stone-100 bg-white">
+      <div className="shrink-0 px-6 pb-6 pt-4 border-t border-stone-100 bg-white dark:border-stone-800 dark:bg-stone-900 relative">
+        
+        <style dangerouslySetInnerHTML={{__html: `
+          html body #btn-aplicar-precio {
+            background-color: #d97706 !important;
+            color: #ffffff !important;
+          }
+          html body #btn-aplicar-precio:hover {
+            background-color: #b95e00 !important;
+          }
+          html.dark body #btn-aplicar-precio {
+            background-color: #E87C1E !important;
+          }
+          html.dark body #btn-aplicar-precio:hover {
+            background-color: #d97706 !important;
+          }
+        `}} />
+
         <button
           type="button"
           onClick={() => {
@@ -249,7 +266,7 @@ export default function PriceFilterSidebar({ isOpen, onClose, totalResultados = 
             params.delete('currency')
             router.push(`/busqueda_mapa?${params.toString()}`)
           }}
-          className="text-xs text-stone-400 hover:text-[#d97706] transition-colors underline text-center w-full mb-3"
+          className="text-xs text-stone-400 hover:text-[#d97706] dark:text-stone-400 dark:hover:text-[#E87C1E] transition-colors underline text-center w-full mb-3"
         >
           Limpiar filtro
         </button>
@@ -258,7 +275,7 @@ export default function PriceFilterSidebar({ isOpen, onClose, totalResultados = 
         <button
           id="btn-aplicar-precio"
           onClick={handleApply}
-          className="bg-[#d97706] hover:bg-[#b95e00] text-white rounded-xl font-bold py-3 px-4 w-full transition-all active:scale-95 shadow-md"
+          className="rounded-[12px] font-bold py-3 px-4 w-full transition-all active:scale-95 shadow-md border-none"
         >
           Aplicar
         </button>

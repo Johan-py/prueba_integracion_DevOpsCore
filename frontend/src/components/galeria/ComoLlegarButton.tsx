@@ -6,16 +6,19 @@ interface ComoLlegarButtonProps {
   lat?: number | null
   lng?: number | null
   variant?: 'grid' | 'table'
+  disabled?: boolean
 }
-export default function ComoLlegarButton({ lat, lng, variant = 'grid' }: ComoLlegarButtonProps) {
+export default function ComoLlegarButton({ lat, lng, variant = 'grid', disabled = false }: ComoLlegarButtonProps) {
   const { openMap } = useMapRedirect()
   const isRedirecting = useRef(false)
   // #69 - Coordenadas validadas en rango geografico valido
   const hasLocation =
     lat != null && lng != null && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180
+  // Combinamos la lógica: está deshabilitado si no hay ubicación o si se pasa por prop (modo comparar)
+  const isButtonDisabled = !hasLocation || disabled
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation()
-    if (!hasLocation || isRedirecting.current) return
+    if (!hasLocation || isRedirecting.current || isButtonDisabled) return
     isRedirecting.current = true
     openMap(lat!, lng!)
     setTimeout(() => {
@@ -27,7 +30,7 @@ export default function ComoLlegarButton({ lat, lng, variant = 'grid' }: ComoLle
       <button
         type="button"
         onClick={handleClick}
-        disabled={!hasLocation}
+        disabled={isButtonDisabled}
         title={hasLocation ? '¿Cómo llegar?' : 'Ubicación no disponible'}
         aria-label="Calcular ruta hacia la propiedad en el mapa"
         data-testid="como-llegar-btn"
@@ -51,7 +54,7 @@ export default function ComoLlegarButton({ lat, lng, variant = 'grid' }: ComoLle
       <button
         type="button"
         onClick={handleClick}
-        disabled={!hasLocation}
+        disabled={isButtonDisabled}
         aria-label="Calcular ruta hacia la propiedad en el mapa"
         data-testid="como-llegar-btn"
         title={hasLocation ? '¿Cómo llegar?' : 'Ubicación no disponible'}

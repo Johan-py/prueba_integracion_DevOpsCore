@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-// Siempre usa el backend local en el servidor — sin problema de CORS
-const BACKEND = process.env.BACKEND_INTERNAL_URL || 'http://localhost:5000'
+// Usa URL de producción en Vercel, o localhost en desarrollo
+const BACKEND = process.env.NODE_ENV === 'production'
+  ? (process.env.NEXT_PUBLIC_API_URL || 'https://propbol-all-services.onrender.com')
+  : (process.env.BACKEND_INTERNAL_URL || 'http://localhost:5000')
 
 export async function GET(req: NextRequest) {
   try {

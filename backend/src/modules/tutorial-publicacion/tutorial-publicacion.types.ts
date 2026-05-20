@@ -1,6 +1,7 @@
 export type TutorialPublicacionContent = {
   titulo: string;
   mensaje: string;
+  requisitos: string[];
   videoUrl: string;
   thumbnailUrl: string | null;
   subtitlesUrl: string | null;
@@ -29,6 +30,7 @@ export type ConfirmTutorialInput = {
 };
 
 export type ConfirmTutorialResult = {
+  debeMostrarTutorial: boolean;
   confirmado: boolean;
   confirmadoEn: string | null;
 };

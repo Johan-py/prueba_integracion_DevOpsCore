@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 type EditarMultimediaModalProps = {
   open: boolean
   publicacionId: number
   imagenesActuales: string[]
   videoActual?: string | null
+  videoUrlsActuales?: string[]
   onClose: () => void
   onSaved: () => void | Promise<void>
 }
@@ -85,6 +86,7 @@ export default function EditarMultimediaModal({
   publicacionId,
   imagenesActuales,
   videoActual,
+  videoUrlsActuales,
   onClose,
   onSaved
 }: EditarMultimediaModalProps) {
@@ -96,6 +98,19 @@ export default function EditarMultimediaModal({
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [mostrarConfirmacionCancelar, setMostrarConfirmacionCancelar] =
+    useState(false)
+
+  const videosIniciales = useMemo(() => {
+    const videosDesdeProps =
+      videoUrlsActuales && videoUrlsActuales.length > 0
+        ? videoUrlsActuales
+        : videoActual
+          ? [videoActual]
+          : []
+
+    return [videosDesdeProps[0] ?? '', videosDesdeProps[1] ?? '']
+  }, [videoActual, videoUrlsActuales])
 
   const totalImagenes = imagenes.length + imagenesNuevas.length
   const videosValidos = videosUrl.every((video) => esVideoPermitido(video))
@@ -104,14 +119,40 @@ export default function EditarMultimediaModal({
   useEffect(() => {
     if (open) {
       setImagenes(imagenesActuales ?? [])
-      setVideosUrl([videoActual ?? '', ''])
+      setVideosUrl([videosIniciales[0] ?? '', videosIniciales[1] ?? ''])
       setImagenesNuevas([])
       setError('')
       setSuccess('')
+      setMostrarConfirmacionCancelar(false)
     }
-  }, [open, imagenesActuales, videoActual])
+  }, [open, imagenesActuales, videosIniciales])
 
   if (!open) return null
+
+  const hayCambiosSinGuardar = () => {
+    return (
+      JSON.stringify(imagenes) !== JSON.stringify(imagenesActuales ?? []) ||
+      imagenesNuevas.length > 0 ||
+      videosUrl[0] !== (videosIniciales[0] ?? '') ||
+      videosUrl[1] !== (videosIniciales[1] ?? '')
+    )
+  }
+
+  const handleCancelar = () => {
+    if (guardando) return
+
+    if (hayCambiosSinGuardar()) {
+      setMostrarConfirmacionCancelar(true)
+      return
+    }
+
+    onClose()
+  }
+
+  const confirmarCancelarCambios = () => {
+    setMostrarConfirmacionCancelar(false)
+    onClose()
+  }
 
   const handleAgregarImagen = () => {
     if (totalImagenes >= LIMITE_IMAGENES) {
@@ -289,7 +330,7 @@ export default function EditarMultimediaModal({
 
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleCancelar}
             disabled={guardando}
             className="text-3xl leading-none text-gray-500 hover:text-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
           >
@@ -473,7 +514,7 @@ export default function EditarMultimediaModal({
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleCancelar}
               disabled={guardando}
               className="h-14 rounded-lg border border-gray-400 font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
             >
@@ -491,6 +532,39 @@ export default function EditarMultimediaModal({
           </div>
         </div>
       </div>
+
+      {mostrarConfirmacionCancelar && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 px-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+            <h3 className="mb-3 text-xl font-bold text-gray-900">
+              ¿Cancelar cambios?
+            </h3>
+
+            <p className="mb-6 text-sm text-gray-600">
+              Tienes cambios sin guardar. Si cancelas, se perderán las
+              modificaciones realizadas en imágenes o videos.
+            </p>
+
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => setMostrarConfirmacionCancelar(false)}
+                className="h-12 rounded-lg border border-gray-400 font-semibold text-gray-700 hover:bg-gray-50"
+              >
+                Seguir editando
+              </button>
+
+              <button
+                type="button"
+                onClick={confirmarCancelarCambios}
+                className="h-12 rounded-lg bg-red-600 font-semibold text-white hover:bg-red-700"
+              >
+                Sí, cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

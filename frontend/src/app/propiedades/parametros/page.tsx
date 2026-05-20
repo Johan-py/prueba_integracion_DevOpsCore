@@ -66,6 +66,7 @@ function ParametrosPageContent() {
   const [mostrarModalExito, setMostrarModalExito] = useState(false);
   const [catalogoTags, setCatalogoTags] = useState<TagBackend[]>([]);
   const [tagsGuardados, setTagsGuardados] = useState<string[]>([]);
+  const [mostrarExitoTags, setMostrarExitoTags] = useState(false);
 
   const volverSegunOrigen = () => {
     const destino = returnTo || origen;
@@ -104,7 +105,7 @@ function ParametrosPageContent() {
           fetch(`${getApiUrl()}/api/parametros`),
           fetch(`${getApiUrl()}/api/publicaciones/${publicacionId}/parametros`),
           fetch(`${getApiUrl()}/api/tags`),
-          fetch(`${getApiUrl()}/api/publicaciones/${publicacionId}/tags`),
+          fetch(`${getApiUrl()}/api/tags/publicaciones/${publicacionId}`),
         ]);
 
         const catalogoJson = await catalogoRes.json().catch(() => null);
@@ -165,7 +166,7 @@ function ParametrosPageContent() {
       if (!token) throw new Error("No se encontró la sesión del usuario.");
 
       const response = await fetch(
-        `${getApiUrl()}/api/publicaciones/${publicacionId}/tags`,
+        `${getApiUrl()}/api/tags/publicaciones/${publicacionId}`,
         {
           method: "PUT",
           headers: {
@@ -179,6 +180,8 @@ function ParametrosPageContent() {
       const data = await response.json().catch(() => null);
       if (!response.ok) throw new Error(data?.mensaje || "No se pudieron guardar los tags.");
       setTagsGuardados(tags);
+      setMostrarExitoTags(true);
+      setTimeout(() => setMostrarExitoTags(false), 5000);
     } catch (error) {
       setMensaje(error instanceof Error ? error.message : "Error al guardar tags.");
     }
@@ -290,11 +293,11 @@ function ParametrosPageContent() {
     <main className="min-h-screen bg-[#f5efe7] p-8 relative">
       <div className="mx-auto max-w-3xl rounded-3xl bg-white p-8 shadow-md">
         <h1 className="mb-6 text-2xl font-bold text-gray-900">
-          Parámetros personalizados
+          Tags y Parámetros
         </h1>
 
         <p className="mb-6 text-gray-600">
-          Aquí puedes agregar o editar parámetros personalizados para tu inmueble.
+          Agrega tags para mejorar la búsqueda de tu inmueble, y parámetros personalizados para destacar sus características únicas.
         </p>
 
         {mensaje && (
@@ -315,6 +318,11 @@ function ParametrosPageContent() {
                   catalogoTags={catalogoTags}
                   onGuardar={manejarGuardarTags}
                 />
+                {mostrarExitoTags && (
+                  <p className="mt-2 text-sm font-medium text-green-600">
+                    ✓ Tags guardados correctamente
+                  </p>
+                )}
               </div>
             )}
 

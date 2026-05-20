@@ -44,6 +44,7 @@ export const confirmTutorialPublicacionService = async ({
   const estado = await upsertTutorialConfirmadoRepository(usuarioId);
 
   return {
+    debeMostrarTutorial: false,
     confirmado: estado.confirmado,
     confirmadoEn: estado.confirmadoEn
       ? estado.confirmadoEn.toISOString()

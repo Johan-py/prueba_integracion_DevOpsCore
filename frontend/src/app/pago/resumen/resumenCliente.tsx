@@ -229,47 +229,47 @@ export default function ResumenCliente() {
   };
 
   if (cargando)
-    return <div className="text-center py-10 text-gray-600">Cargando...</div>;
+    return <div className="text-center py-10 text-gray-600 dark:text-[#999]">Cargando...</div>;
 
   if (error)
-    return <div className="text-center py-10 text-red-600">Error: {error}</div>;
+    return <div className="text-center py-10 text-red-600 dark:text-red-400">Error: {error}</div>;
 
   if (!plan) return null;
 
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-white font-sans">
+    <div className="max-w-6xl mx-auto p-6 bg-white dark:bg-black font-sans">
       <div className="flex justify-between items-center mb-6">
         <Stepper />
-        <div className="text-gray-500 text-sm">PropBol Inmobiliaria</div>
+        <div className="text-gray-500 dark:text-[#999] text-sm">PropBol Inmobiliaria</div>
       </div>
 
-      <h1 className="text-3xl font-bold mb-2 text-gray-900">
+      <h1 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">
         Resumen de compra
       </h1>
 
-      <p className="text-gray-500 mb-6">
+      <p className="text-gray-500 dark:text-[#999] mb-6">
         Verifica tu pedido antes de realizar el pago
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         
         <div>
-          <div className="border border-gray-200 rounded-lg p-6 mb-6 shadow-md">
+          <div className="border border-gray-200 dark:border-[#333] rounded-lg p-6 mb-6 shadow-md dark:bg-[#1a1a1a]">
             <div className="flex items-center mb-3">
               <span className="text-3xl mr-3">🏠</span>
-              <h2 className="text-xl font-bold">
+              <h2 className="text-xl font-bold dark:text-white">
                 Plan {plan.nombre_plan}
               </h2>
             </div>
 
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-[#999]">
               {plan.nro_publicaciones_plan} publicaciones activas · Vigencia{' '}
               {plan.duracion_plan_dias ?? plan.duración_plan_días} días
             </p>
           </div>
 
-          <div className="border border-gray-200 rounded-lg p-6 mb-6 bg-white shadow-md">
-            <h3 className="text-xl font-semibold mb-4">
+          <div className="border border-gray-200 dark:border-[#333] rounded-lg p-6 mb-6 bg-white dark:bg-[#1a1a1a] shadow-md">
+            <h3 className="text-xl font-semibold mb-4 dark:text-white">
               TIPO DE FACTURACIÓN
             </h3>
 
@@ -278,12 +278,12 @@ export default function ResumenCliente() {
                 onClick={() => setTipoFacturacion('mensual')}
                 className={`p-4 rounded-lg border text-left transition ${
                   tipoFacturacion === 'mensual'
-                    ? 'border-orange-500 bg-orange-50'
-                    : 'border-gray-200 hover:bg-gray-50'
+                    ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
+                    : 'border-gray-200 dark:border-[#333] hover:bg-gray-50 dark:hover:bg-[#222]'
                 }`}
               >
-                <div className="font-semibold text-gray-900">Mensual</div>
-                <div className="text-sm text-gray-500">
+                <div className="font-semibold text-gray-900 dark:text-white">Mensual</div>
+                <div className="text-sm text-gray-500 dark:text-[#999]">
                   Pago mes a mes
                 </div>
               </button>
@@ -292,50 +292,50 @@ export default function ResumenCliente() {
                 onClick={() => setTipoFacturacion('anual')}
                 className={`p-4 rounded-lg border text-left transition ${
                   tipoFacturacion === 'anual'
-                    ? 'border-orange-500 bg-orange-50'
-                    : 'border-gray-200 hover:bg-gray-50'
+                    ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
+                    : 'border-gray-200 dark:border-[#333] hover:bg-gray-50 dark:hover:bg-[#222]'
                 }`}
               >
-                <div className="font-semibold text-gray-900">Anual</div>
-                <div className="text-sm text-green-600">
+                <div className="font-semibold text-gray-900 dark:text-white">Anual</div>
+                <div className="text-sm text-green-600 dark:text-green-400">
                   15% de descuento
                 </div>
               </button>
             </div>
           </div>
 
-          <div className="border border-gray-200 rounded-lg p-6 bg-white shadow-md">
-            <h3 className="text-xl font-semibold mb-4">
+          <div className="border border-gray-200 dark:border-[#333] rounded-lg p-6 bg-white dark:bg-[#1a1a1a] shadow-md">
+            <h3 className="text-xl font-semibold mb-4 dark:text-white">
               MÉTODO DE PAGO
             </h3>
 
             <div
               className={`flex items-start p-3 border rounded-lg cursor-pointer transition ${
                 metodoSeleccionado === 'qr'
-                  ? 'border-green-500 bg-green-50'
-                  : 'border-gray-200 bg-gray-50 hover:bg-gray-100'
+                  ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
+                  : 'border-gray-200 dark:border-[#333] bg-gray-50 dark:bg-[#111] hover:bg-gray-100 dark:hover:bg-[#222]'
               }`}
               onClick={() => setMetodoSeleccionado('qr')}
             >
               <span className="text-2xl mr-4">📱</span>
               <div>
-                <div className="font-bold">Pago por QR</div>
-                <div className="text-sm text-gray-500">Escanea con tu app bancaria</div>
+                <div className="font-bold dark:text-white">Pago por QR</div>
+                <div className="text-sm text-gray-500 dark:text-[#999]">Escanea con tu app bancaria</div>
               </div>
             </div>
 
             <div
               className={`flex items-start p-3 border rounded-lg cursor-pointer transition mt-3 ${
                 metodoSeleccionado === 'usdt'
-                  ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-200 bg-gray-50 hover:bg-gray-100'
+                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                  : 'border-gray-200 dark:border-[#333] bg-gray-50 dark:bg-[#111] hover:bg-gray-100 dark:hover:bg-[#222]'
               }`}
               onClick={() => setMetodoSeleccionado('usdt')}
             >
               <span className="text-2xl mr-4">💎</span>
               <div>
-                <div className="font-bold">USDT TRC20</div>
-                <div className="text-sm text-gray-500">Criptomoneda — Testnet Shasta</div>
+                <div className="font-bold dark:text-white">USDT TRC20</div>
+                <div className="text-sm text-gray-500 dark:text-[#999]">Criptomoneda — Testnet Shasta</div>
               </div>
             </div>
 
@@ -345,7 +345,7 @@ export default function ResumenCliente() {
               className={`w-full mt-6 py-3 rounded-lg font-semibold transition shadow-md ${
                 metodoSeleccionado
                   ? 'bg-orange-600 text-white hover:bg-orange-700'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-gray-300 dark:bg-[#333] text-gray-500 dark:text-[#666] cursor-not-allowed'
               }`}
             >
               Continuar con{' '}
@@ -356,7 +356,7 @@ export default function ResumenCliente() {
 
             <Link
               href="/cobros-suscripciones"
-              className="block w-full text-center mt-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
+              className="block w-full text-center mt-4 py-2 rounded-lg border border-gray-300 dark:border-[#444] text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-[#222] transition"
             >
               ← Volver a planes
             </Link>
@@ -377,27 +377,27 @@ export default function ResumenCliente() {
             }
           />
 
-          <div className="mt-6 border border-gray-200 rounded-lg p-6 bg-white shadow-md">
-            <h3 className="text-lg font-semibold mb-4 text-gray-900">
+          <div className="mt-6 border border-gray-200 dark:border-[#333] rounded-lg p-6 bg-white dark:bg-[#1a1a1a] shadow-md">
+            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
               Resumen de facturación
             </h3>
 
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-600">Tipo de facturación</span>
-                <span className="font-medium capitalize">
+                <span className="text-gray-600 dark:text-[#999]">Tipo de facturación</span>
+                <span className="font-medium capitalize dark:text-white">
                   {tipoFacturacion}
                 </span>
               </div>
 
               <div className="flex justify-between">
-                <span className="text-gray-600">Subtotal mensual</span>
+                <span className="text-gray-600 dark:text-[#999]">Subtotal mensual</span>
                 <span>Bs. {calculos.subtotalMensual.toFixed(2)}</span>
               </div>
 
               {tipoFacturacion === 'anual' && (
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Subtotal anual</span>
+                  <span className="text-gray-600 dark:text-[#999]">Subtotal anual</span>
                   <span>Bs. {calculos.subtotalAnual.toFixed(2)}</span>
                 </div>
               )}
@@ -419,24 +419,24 @@ export default function ResumenCliente() {
               )}
 
               <div className="flex justify-between">
-                <span className="text-gray-600">Inicio</span>
+                <span className="text-gray-600 dark:text-[#999]">Inicio</span>
                 <span>{calculos.fechaInicio}</span>
               </div>
 
               <div className="flex justify-between">
-                <span className="text-gray-600">Fin</span>
+                <span className="text-gray-600 dark:text-[#999]">Fin</span>
                 <span>{calculos.fechaFin}</span>
               </div>
 
-              <div className="border-t pt-3 flex justify-between font-bold text-base text-gray-900">
+              <div className="border-t dark:border-[#333] pt-3 flex justify-between font-bold text-base text-gray-900 dark:text-white">
                 <span>Total</span>
                 <span>Bs. {calculos.totalFinal.toFixed(2)}</span>
               </div>
             </div>
           </div>
 
-          <div className="mt-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="mt-6 p-4 border border-gray-200 dark:border-[#333] rounded-lg bg-gray-50 dark:bg-[#1a1a1a]">
+            <label className="block text-sm font-medium text-gray-700 dark:text-[#999] mb-2">
               ¿Tienes un código de descuento?
             </label>
 
@@ -446,7 +446,7 @@ export default function ResumenCliente() {
                 value={codigoCupon}
                 onChange={(e) => setCodigoCupon(e.target.value)}
                 placeholder="Ej: DESCUENTO10"
-                className="flex-1 border rounded px-3 py-2 text-sm"
+                className="flex-1 border dark:border-[#444] rounded px-3 py-2 text-sm dark:bg-[#222] dark:text-white dark:placeholder:text-[#666]"
               />
 
               <button
@@ -473,7 +473,7 @@ export default function ResumenCliente() {
         </div>
       </div>
 
-      <div className="mt-6 text-center text-xs text-gray-400">
+      <div className="mt-6 text-center text-xs text-gray-400 dark:text-[#666]">
         Pago seguro: SSI, 256-bit · Encriptado
       </div>
     </div>

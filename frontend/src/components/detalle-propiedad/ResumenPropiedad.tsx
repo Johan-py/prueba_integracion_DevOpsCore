@@ -39,7 +39,7 @@ function traducirTipo(value: string | null) {
 }
 
 export default function ResumenPropiedad({ detalle, esOferta, porcentajeDescuento, formatPrice }: Props) {
-  const precioFormateado = `${detalle.precio.toLocaleString()}$`
+  const precioFormateado = `$${detalle.precio.toLocaleString()} USD`
   const tipo = traducirTipo(detalle.tipoInmueble)
   const operacion = traducirOperacion(detalle.tipoOperacion)
 
@@ -51,7 +51,7 @@ export default function ResumenPropiedad({ detalle, esOferta, porcentajeDescuent
         {detalle.titulo}
       </h1>
 
-       {esOferta ? (
+      {esOferta ? (
         <div className="flex items-center gap-3 flex-wrap">
           <span className="text-[24px] font-bold text-orange-600 md:text-[26px]">
             ${formatPrice?.(detalle.precio)} USD
@@ -61,7 +61,7 @@ export default function ResumenPropiedad({ detalle, esOferta, porcentajeDescuent
           </span>
         </div>
       ) : (
-        <p className="text-[24px] font-bold text-[#1f1f1f] md:text-[26px]">
+        <p className="text-[24px] font-bold text-orange-600 md:text-[26px]">
           {precioFormateado}
         </p>
       )}

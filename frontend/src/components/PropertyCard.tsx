@@ -1,4 +1,5 @@
 import React from "react";
+import { Eye, Share2 } from "lucide-react";
 
 interface Property {
   image?: string;
@@ -8,6 +9,10 @@ interface Property {
   beds?: number | string;
   baths?: number | string;
   area?: string;
+
+  // Estadísticas individuales de la publicación
+  visualizaciones?: number;
+  compartidos?: number;
 }
 
 interface PropertyCardProps {
@@ -39,9 +44,27 @@ export default function PropertyCard({
           <h2 className="text-2xl font-semibold text-gray-800 leading-tight">
             {property.title}
           </h2>
+
           <span className="text-xl font-bold text-[#c97a1e] whitespace-nowrap">
             ${Number(property.price).toLocaleString("en-US")}
           </span>
+        </div>
+
+        {/* Estadísticas individuales de la publicación */}
+        <div className="mb-4 flex items-center justify-end gap-5 text-black">
+          <div className="flex items-center gap-2">
+            <Share2 size={22} strokeWidth={2.2} />
+            <span className="text-base font-medium">
+              {property.compartidos ?? 0}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Eye size={23} strokeWidth={2.2} />
+            <span className="text-base font-medium">
+              {property.visualizaciones ?? 0}
+            </span>
+          </div>
         </div>
 
         <div className="flex items-center gap-2 text-gray-500 mb-4">

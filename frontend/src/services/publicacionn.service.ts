@@ -94,4 +94,75 @@ export const publicacionService = {
       totalCompartidos: Number(pub.totalCompartidos ?? 0),
     }));
   },
+// ==================== NUEVOS MÉTODOS HU-11 ====================
+  // PUBLICIDAD DE PROPIEDADES
+
+  // Iniciar proceso de publicidad (simula pago)
+  async iniciarPublicidad(publicacionId: number): Promise<{ checkoutUrl: string }> {
+    const response = await fetch(`${API_URL}/api/publicaciones/${publicacionId}/publicitar`, {
+      method: "POST",
+      headers: getHeaders(),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Error al iniciar publicidad");
+    }
+
+    return data.data;
+  },
+
+  // Confirmar pago y activar publicidad
+  async confirmarPublicidad(
+    publicacionId: number,
+    paymentIntentId: string,
+    planId?: number
+  ): Promise<any> {
+    const response = await fetch(`${API_URL}/api/publicaciones/${publicacionId}/publicitar/confirmar`, {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify({ paymentIntentId, planId }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Error al confirmar publicidad");
+    }
+
+    return data;
+  },
+
+  // Cancelar publicidad activa
+  async cancelarPublicidad(publicacionId: number): Promise<{ ok: boolean; message: string }> {
+    const response = await fetch(`${API_URL}/api/publicaciones/${publicacionId}/publicitar/cancelar`, {
+      method: "DELETE",
+      headers: getHeaders(),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Error al cancelar publicidad");
+    }
+
+    return data;
+  },
+
+  // Obtener estado de publicidad de una publicación
+  async obtenerEstadoPublicidad(publicacionId: number): Promise<any> {
+    const response = await fetch(`${API_URL}/api/publicaciones/${publicacionId}/publicitar/estado`, {
+      method: "GET",
+      headers: getHeaders(),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Error al obtener estado de publicidad");
+    }
+
+    return data;
+  },
 };

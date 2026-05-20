@@ -362,6 +362,14 @@ export const buscarDetallePublicacionPorInmuebleIdRepository = async (
               longitud: true,
             },
           },
+          puntosDeInteres: {
+            select: {
+              id: true,
+              nombre: true,
+              latitud: true,
+              longitud: true,
+            },
+          },
           inmueble_etiqueta: {
             select: {
               etiqueta: {
@@ -461,4 +469,82 @@ export const buscarMultimediaPublicacionRepository = async (
       id: "asc",
     },
   });
+};
+// ==================== NUEVOS REPOSITORIOS PARA HU-11 ====================
+// PUBLICIDAD DE PROPIEDADES
+
+export const activarPublicidadRepository = async (
+  publicacionId: number,
+  usuarioId: number,
+  paymentIntentId: string,
+  duracionDias: number = 30
+) => {
+  const fechaInicio = new Date();
+  const fechaExpiracion = new Date();
+  fechaExpiracion.setDate(fechaExpiracion.getDate() + duracionDias);
+
+  return prisma.publicacion.update({
+    where: {
+      id: publicacionId,
+      usuarioId: usuarioId,
+    },
+    data: {
+      promoted: true,
+      promotedAt: fechaInicio,
+      promotedExpiresAt: fechaExpiracion,
+      paymentIntentId: paymentIntentId,
+    },
+  });
+};
+
+export const cancelarPublicidadRepository = async (
+  publicacionId: number,
+  usuarioId: number
+) => {
+  return prisma.publicacion.update({
+    where: {
+      id: publicacionId,
+      usuarioId: usuarioId,
+    },
+    data: {
+      promoted: false,
+      promotedAt: null,
+      promotedExpiresAt: null,
+      paymentIntentId: null,
+    },
+  });
+};
+
+export const buscarPublicacionPorIdSimpleRepository = async (
+  publicacionId: number
+) => {
+  return prisma.publicacion.findUnique({
+    where: { id: publicacionId },
+    select: {
+      id: true,
+      promoted: true,
+      promotedAt: true,
+      promotedExpiresAt: true,
+    },
+  });
+};
+
+export const verificarPublicidadActivaRepository = async (
+  publicacionId: number
+) => {
+  const publicacion = await prisma.publicacion.findUnique({
+    where: { id: publicacionId },
+    select: {
+      promoted: true,
+      promotedExpiresAt: true,
+    },
+  });
+
+  if (!publicacion) return false;
+
+  return (
+    publicacion.promoted === true &&
+    publicacion.promotedExpiresAt !== null &&
+    new Date(publicacion.promotedExpiresAt) > new Date()
+  );
 };

@@ -31,7 +31,7 @@ export default function NavLinks() {
     "hover:text-[#E68B25] hover:bg-[#E68B25]/10 px-3 py-2 rounded-md transition";
 
   return (
-    <div className="hidden md:flex items-center gap-6 text-[15px] font-medium text-gray-700">
+    <div className="hidden md:flex items-center gap-6 text-[15px] font-medium text-gray-700 dark:text-gray-300">
       <div id="tour-propiedades" className="relative" ref={dropdownRef}>
         <button
           type="button"
@@ -51,7 +51,7 @@ export default function NavLinks() {
         </button>
 
         {open && (
-          <div className="absolute top-full left-0 mt-2 w-56 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 z-50 py-2">
+          <div className="absolute top-full left-0 mt-2 w-56 rounded-md bg-white dark:bg-[#1a1a1a] shadow-lg ring-1 ring-black ring-opacity-5 dark:ring-white/10 z-50 py-2">
             {[
               "Casas",
               "Departamentos",
@@ -108,7 +108,7 @@ export default function NavLinks() {
 
                   router.push(`/busqueda_mapa?${params.toString()}`);
                 }}
-                className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-[#E68B25]"
+                className="block w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#222] hover:text-[#E68B25]"
               >
                 {item}
               </button>

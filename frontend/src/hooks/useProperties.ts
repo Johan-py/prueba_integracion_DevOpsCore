@@ -356,6 +356,8 @@ export function useProperties(): UsePropertiesResult {
     }
 
     async function fetchProperties() {
+       setIsLoading(true)   // ← AGREGAR
+       setProperties([]) 
       setError(null)
 
       // ✅ Modo recomendados (persistente por URL)
@@ -364,7 +366,6 @@ export function useProperties(): UsePropertiesResult {
         return
       }
 
-      // Si no es modo recomendados, búsqueda normal
       await fetchNormalSearch()
     }
 
