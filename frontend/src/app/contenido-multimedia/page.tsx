@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useRef, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import FotosSection from '@/components/contenido-multimedia/FotosSection'
 import VideosSection from '@/components/contenido-multimedia/VideosSection'
@@ -9,9 +9,10 @@ import PlanModal from '@/components/contenido-multimedia/PlanModal'
 
 type ImageItem = {
   id: string
-  file: File
+  file?: File
   previewUrl: string
   name: string
+  isExisting?: boolean
 }
 
 type VideoItem = {
@@ -65,11 +66,57 @@ function ContenidoMultimediaPageContent() {
   const imageInputRef = useRef<HTMLInputElement | null>(null)
   const videoInputRef = useRef<HTMLInputElement | null>(null)
 
-  /*
-   * Regla principal:
-   * La publicación necesita mínimo 1 foto.
-   * Los videos son opcionales y no reemplazan a la foto.
-   */
+  useEffect(() => {
+    const cargarMultimediaExistente = async () => {
+      if (!publicacionId || Number.isNaN(publicacionId)) return
+
+      try {
+        const response = await fetch(
+          `${getApiUrl()}/api/publicaciones/${publicacionId}/detalle`
+        )
+
+        const result = await response.json().catch(() => null)
+
+        if (!response.ok) {
+          throw new Error(result?.message || 'No se pudo cargar la multimedia existente.')
+        }
+
+        const imagenesBackend = result?.data?.imagenes || []
+        const videoUrlsBackend = result?.data?.videoUrls || []
+
+        const imagenesCargadas: ImageItem[] = imagenesBackend.map(
+          (imagen: { id: number; url: string }, index: number) => ({
+            id: String(imagen.id),
+            previewUrl: imagen.url,
+            name: `Imagen ${index + 1}`,
+            isExisting: true
+          })
+        )
+
+        const videosCargados: VideoItem[] = videoUrlsBackend.map(
+          (url: string, index: number) => {
+            const parsed = getYoutubeData(url)
+
+            return {
+              id: `video-existente-${index}`,
+              type: 'youtube',
+              name: `Video ${index + 1}`,
+              sourceUrl: url,
+              embedUrl: parsed?.embedUrl || url
+            }
+          }
+        )
+
+        setImages(imagenesCargadas.slice(0, 5))
+        setVideos(videosCargados.slice(0, 2))
+      } catch (error) {
+        console.error('Error al cargar multimedia existente:', error)
+      }
+    }
+
+    cargarMultimediaExistente()
+  }, [publicacionId])
+
   const hasRequiredPhoto = images.length > 0
 
   const handleOpenImagePicker = () => {
@@ -126,7 +173,8 @@ function ContenidoMultimediaPageContent() {
         id: `${file.name}-${Date.now()}-${Math.random()}`,
         file,
         previewUrl: URL.createObjectURL(file),
-        name: file.name
+        name: file.name,
+        isExisting: false
       })
     }
 
@@ -139,7 +187,7 @@ function ContenidoMultimediaPageContent() {
     setImages((prev) => {
       const target = prev.find((image) => image.id === id)
 
-      if (target?.previewUrl) {
+      if (target?.previewUrl?.startsWith('blob:')) {
         URL.revokeObjectURL(target.previewUrl)
       }
 
@@ -285,7 +333,7 @@ function ContenidoMultimediaPageContent() {
     setVideos((prev) => {
       const target = prev.find((video) => video.id === id)
 
-      if (target?.previewUrl) {
+      if (target?.previewUrl?.startsWith('blob:')) {
         URL.revokeObjectURL(target.previewUrl)
       }
 
@@ -303,12 +351,25 @@ function ContenidoMultimediaPageContent() {
 
     const formData = new FormData()
 
+    const imagenesActuales = images
+      .filter((image) => image.isExisting)
+      .map((image) => image.previewUrl)
+
+    const videoUrls = videos
+      .filter((video) => video.type === 'youtube' && video.sourceUrl)
+      .map((video) => video.sourceUrl as string)
+
+    formData.append('imagenesActuales', JSON.stringify(imagenesActuales))
+    formData.append('videoUrls', JSON.stringify(videoUrls))
+
     images.forEach((image) => {
-      formData.append('images', image.file)
+      if (image.file) {
+        formData.append('imagenesNuevas', image.file)
+      }
     })
 
-    const response = await fetch(`${getApiUrl()}/api/publicaciones/${publicacionId}/multimedia/images`, {
-      method: 'POST',
+    const response = await fetch(`${getApiUrl()}/api/publicaciones/${publicacionId}/multimedia`, {
+      method: 'PUT',
       headers: {
         Authorization: `Bearer ${token}`
       },
@@ -322,33 +383,8 @@ function ContenidoMultimediaPageContent() {
     }
   }
 
-  const uploadYoutubeLinks = async (token: string) => {
-    const youtubeVideos = videos.filter(
-      (video): video is VideoItem & { sourceUrl: string } =>
-        video.type === 'youtube' && typeof video.sourceUrl === 'string' && video.sourceUrl.length > 0
-    )
-
-    for (const video of youtubeVideos) {
-      const response = await fetch(
-        `${getApiUrl()}/api/publicaciones/${publicacionId}/multimedia/video-link`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            videoUrl: video.sourceUrl
-          })
-        }
-      )
-
-      const data = await response.json().catch(() => null)
-
-      if (!response.ok) {
-        throw new Error(data?.message || 'No se pudo registrar el enlace del video.')
-      }
-    }
+  const uploadYoutubeLinks = async (_token: string) => {
+    return
   }
 
   const handlePublish = async () => {

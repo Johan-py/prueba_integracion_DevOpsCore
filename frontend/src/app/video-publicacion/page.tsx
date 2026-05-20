@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { X } from 'lucide-react';
+import VideoPublicacionModal from '@/components/video-publicacion/VideoPublicacionModal';
 
 type TutorialContent = {
   titulo: string;
@@ -15,56 +15,105 @@ type TutorialContent = {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-const VIDEO_ID = 'qMyFQH5q9IM';
-const VIDEO_EMBED_URL = `https://www.youtube.com/embed/${VIDEO_ID}?autoplay=1&mute=1&controls=1&rel=0`;
+const contenidoDefault: TutorialContent = {
+  titulo: 'Antes de publicar tu propiedad',
+  mensaje:
+    'Mira este video y conoce qué necesitas tener listo para crear tu publicación de forma exitosa.',
+  videoUrl: '',
+  thumbnailUrl: null,
+  subtitlesUrl: null,
+  checkboxLabel: 'Sí entiendo qué necesito para publicar una propiedad',
+};
+
+const getToken = () => {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('token');
+};
+
+const getUsuarioKey = () => {
+  const token = getToken();
+
+  if (!token) return 'sin-token';
+
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+
+    return (
+      payload.id ||
+      payload.userId ||
+      payload.usuarioId ||
+      payload.sub ||
+      payload.email ||
+      payload.correo ||
+      token
+    );
+  } catch {
+    return token;
+  }
+};
+
+const getTutorialKey = () => {
+  return `propbol-tutorial-publicacion-visto-${getUsuarioKey()}`;
+};
 
 export default function VideoPublicacionPage() {
   const router = useRouter();
 
   const [loading, setLoading] = useState(true);
-  const [aceptado, setAceptado] = useState(false);
   const [contenido, setContenido] = useState<TutorialContent | null>(null);
-
-  const getToken = () => localStorage.getItem('token');
 
   useEffect(() => {
     const cargarTutorial = async () => {
+      const token = getToken();
+
+      if (!token) {
+        router.replace('/sign-in');
+        return;
+      }
+
+      const tutorialKey = getTutorialKey();
+
+      if (localStorage.getItem(tutorialKey) === 'true') {
+        router.replace('/registro-inmueble');
+        return;
+      }
+
       try {
-        const token = getToken();
-
-        const [contenidoResponse, estadoResponse] = await Promise.all([
-          fetch(`${API_URL}/api/tutorial-publicacion`, {
+        const estadoResponse = await fetch(
+          `${API_URL}/api/tutorial-publicacion/estado`,
+          {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }),
-          fetch(`${API_URL}/api/tutorial-publicacion/estado`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }),
-        ]);
+          }
+        );
 
-        const contenidoResult = await contenidoResponse.json();
-        const estadoResult = await estadoResponse.json();
+        const estadoResult = await estadoResponse.json().catch(() => null);
 
-        if (!contenidoResponse.ok || !estadoResponse.ok) {
+        if (
+          estadoResponse.ok &&
+          estadoResult?.data?.debeMostrarTutorial === false
+        ) {
+          localStorage.setItem(tutorialKey, 'true');
           router.replace('/registro-inmueble');
           return;
         }
 
-        if (!estadoResult.data?.debeMostrarTutorial) {
-          router.replace('/registro-inmueble');
-          return;
-        }
+        const contenidoResponse = await fetch(
+          `${API_URL}/api/tutorial-publicacion`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-        setContenido({
-          ...contenidoResult.data,
-          videoUrl: VIDEO_EMBED_URL,
-        });
+        const contenidoResult = await contenidoResponse.json().catch(() => null);
+
+        setContenido(contenidoResult?.data || contenidoDefault);
       } catch (error) {
         console.error('Error al cargar tutorial:', error);
-        router.replace('/registro-inmueble');
+        setContenido(contenidoDefault);
       } finally {
         setLoading(false);
       }
@@ -74,20 +123,29 @@ export default function VideoPublicacionPage() {
   }, [router]);
 
   const continuar = async () => {
-    try {
-      const token = getToken();
+    const token = getToken();
+    const tutorialKey = getTutorialKey();
 
-      await fetch(`${API_URL}/api/tutorial-publicacion/confirmar`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+    localStorage.setItem(tutorialKey, 'true');
+
+    try {
+      if (token) {
+        await fetch(`${API_URL}/api/tutorial-publicacion/confirmar`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      }
     } catch (error) {
       console.error('Error al confirmar tutorial:', error);
     } finally {
       router.replace('/registro-inmueble');
     }
+  };
+
+  const cerrar = () => {
+    router.replace('/registro-inmueble');
   };
 
   if (loading) {
@@ -98,71 +156,15 @@ export default function VideoPublicacionPage() {
     );
   }
 
-  if (!contenido) {
-    return null;
-  }
-
   return (
     <main className="min-h-screen bg-gray-100">
-      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 px-4">
-        <section className="relative w-full max-w-[700px] rounded-2xl bg-white px-7 py-8 shadow-2xl">
-          <button
-            type="button"
-            onClick={() => router.replace('/registro-inmueble')}
-            className="absolute right-5 top-5 text-gray-500 transition hover:text-gray-800"
-            aria-label="Cerrar tutorial"
-          >
-            <X size={24} />
-          </button>
-
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900">
-              {contenido.titulo}
-            </h1>
-
-            <p className="mx-auto mt-2 max-w-[560px] text-sm leading-6 text-gray-500">
-              {contenido.mensaje}
-            </p>
-
-            <p className="mt-5 text-sm font-semibold text-gray-900">
-              Video explicativo
-            </p>
-          </div>
-
-          <div className="mt-4 overflow-hidden rounded-xl bg-black">
-            <iframe
-              className="h-[315px] w-full"
-              src={contenido.videoUrl}
-              title="Video tutorial de publicación de inmueble"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-            />
-          </div>
-
-          <label className="mt-5 flex cursor-pointer items-center gap-3 text-sm text-gray-600">
-            <input
-              type="checkbox"
-              checked={aceptado}
-              onChange={(e) => setAceptado(e.target.checked)}
-              className="h-5 w-5 rounded border-orange-500 accent-orange-500"
-            />
-            {contenido.checkboxLabel}
-          </label>
-
-          <button
-            type="button"
-            disabled={!aceptado}
-            onClick={continuar}
-            className={`mt-5 w-full rounded-lg py-3 text-sm font-semibold text-white transition ${
-              aceptado
-                ? 'bg-orange-400 hover:bg-orange-500'
-                : 'cursor-not-allowed bg-orange-300 opacity-70'
-            }`}
-          >
-            Continuar
-          </button>
-        </section>
-      </div>
+      {contenido && (
+        <VideoPublicacionModal
+          contenido={contenido}
+          onClose={cerrar}
+          onContinue={continuar}
+        />
+      )}
     </main>
   );
 }
