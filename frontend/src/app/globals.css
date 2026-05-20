@@ -600,9 +600,21 @@ html.dark body :where([class*="border-gray"],
   --tw-ring-shadow: 0 0 #0000 !important;
 }
 
-html.dark body :where([class*="shadow"],
-  [class*="drop-shadow"]) {
+/* Solo box-shadow (cards); no drop-shadow (filtro de texto en banner, etc.) */
+html.dark body :where([class*="shadow"]):not([class*="drop-shadow"]) {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75) !important;
+}
+
+/* Banner home: texto sobre imagen sin fondo ni sombra de caja */
+html.dark #tour-banner h1,
+html.dark #tour-banner p {
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+}
+
+html.dark #tour-banner p {
+  color: #e7e5e4 !important;
 }
 
 /* Botones principales naranjas (excluye variantes con opacidad, ej. hover:bg-[#E68B25]/10) */
