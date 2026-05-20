@@ -7,60 +7,37 @@ import VideoPublicacionModal from '@/components/video-publicacion/VideoPublicaci
 type TutorialContent = {
   titulo: string;
   mensaje: string;
+  requisitos?: string[];
   videoUrl: string;
   thumbnailUrl: string | null;
   subtitlesUrl: string | null;
   checkboxLabel: string;
 };
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '');
 
 const contenidoDefault: TutorialContent = {
   titulo: 'Antes de publicar tu propiedad',
   mensaje:
     'Mira este video y conoce qué necesitas tener listo para crear tu publicación de forma exitosa.',
+  requisitos: [
+    'Tipo de inmueble que deseas publicar.',
+    'Ubicación o dirección referencial de la propiedad.',
+    'Precio de venta, alquiler o anticrético.',
+    'Fotografías o recursos multimedia claros de la propiedad.',
+  ],
   videoUrl: '',
   thumbnailUrl: null,
   subtitlesUrl: null,
   checkboxLabel: 'Sí entiendo qué necesito para publicar una propiedad',
 };
 
-const getToken = () => {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('token');
-};
-
-const getUsuarioKey = () => {
-  const token = getToken();
-
-  if (!token) return 'sin-token';
-
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-
-    return (
-      payload.id ||
-      payload.userId ||
-      payload.usuarioId ||
-      payload.sub ||
-      payload.email ||
-      payload.correo ||
-      token
-    );
-  } catch {
-    return token;
-  }
-};
-
-const getTutorialKey = () => {
-  return `propbol-tutorial-publicacion-visto-${getUsuarioKey()}`;
-};
-
 export default function VideoPublicacionPage() {
   const router = useRouter();
-
   const [loading, setLoading] = useState(true);
   const [contenido, setContenido] = useState<TutorialContent | null>(null);
+
+  const getToken = () => localStorage.getItem('token');
 
   useEffect(() => {
     const cargarTutorial = async () => {
@@ -71,17 +48,11 @@ export default function VideoPublicacionPage() {
         return;
       }
 
-      const tutorialKey = getTutorialKey();
-
-      if (localStorage.getItem(tutorialKey) === 'true') {
-        router.replace('/registro-inmueble');
-        return;
-      }
-
       try {
         const estadoResponse = await fetch(
-          `${API_URL}/api/tutorial-publicacion/estado`,
+          `${API_URL}/api/publicaciones/tutorial/estado`,
           {
+            method: 'GET',
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -90,18 +61,15 @@ export default function VideoPublicacionPage() {
 
         const estadoResult = await estadoResponse.json().catch(() => null);
 
-        if (
-          estadoResponse.ok &&
-          estadoResult?.data?.debeMostrarTutorial === false
-        ) {
-          localStorage.setItem(tutorialKey, 'true');
+        if (estadoResponse.ok && estadoResult?.data?.debeMostrarTutorial === false) {
           router.replace('/registro-inmueble');
           return;
         }
 
         const contenidoResponse = await fetch(
-          `${API_URL}/api/tutorial-publicacion`,
+          `${API_URL}/api/publicaciones/tutorial`,
           {
+            method: 'GET',
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -124,28 +92,24 @@ export default function VideoPublicacionPage() {
 
   const continuar = async () => {
     const token = getToken();
-    const tutorialKey = getTutorialKey();
 
-    localStorage.setItem(tutorialKey, 'true');
+    if (!token) {
+      router.replace('/sign-in');
+      return;
+    }
 
     try {
-      if (token) {
-        await fetch(`${API_URL}/api/tutorial-publicacion/confirmar`, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-      }
+      await fetch(`${API_URL}/api/publicaciones/tutorial/confirmar`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
     } catch (error) {
       console.error('Error al confirmar tutorial:', error);
     } finally {
       router.replace('/registro-inmueble');
     }
-  };
-
-  const cerrar = () => {
-    router.replace('/registro-inmueble');
   };
 
   if (loading) {
@@ -161,7 +125,7 @@ export default function VideoPublicacionPage() {
       {contenido && (
         <VideoPublicacionModal
           contenido={contenido}
-          onClose={cerrar}
+          onClose={() => router.replace('/registro-inmueble')}
           onContinue={continuar}
         />
       )}
