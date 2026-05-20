@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { X, Loader2, BarChart2, Info } from 'lucide-react';
 import { useCompareStore } from '@/hooks/useCompareStore';
+import ContactButton from '../galeria/ContactButton';
+import ComoLlegarButton from '../galeria/ComoLlegarButton';
+import ActionButton from '../galeria/ActionButton';
 
 // 1. Ampliamos la interfaz con la estructura exacta que envía Prisma
 interface PropertyData {
@@ -17,6 +20,14 @@ interface PropertyData {
   publicaciones?: { multimedia?: { url: string }[] }[];
   inmueble_etiqueta?: { etiqueta: { nombre: string } }[];
   inmueble_amenidad?: { amenidad: { nombre: string } }[]; 
+  ubicacion?: {
+    latitud?: number | string;
+    longitud?: number | string;
+  };
+  propietario?: { 
+    telefono?: string;
+    usuario?: { telefono?: string }; 
+  };
 }
 
 interface ComparatorModalProps {
@@ -80,7 +91,7 @@ export default function ComparatorModal({ isOpen, onClose }: ComparatorModalProp
     //  Modal superpuesto oscureciendo el fondo
     <div className="fixed inset-0 z-[9999] bg-stone-900/60 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200">
-        
+       
         {/* Header del Modal */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200">
           <div className="flex items-center gap-2">
@@ -134,7 +145,7 @@ export default function ComparatorModal({ isOpen, onClose }: ComparatorModalProp
                 <tbody className="divide-y divide-stone-200 bg-white">
                   <tr>
                     <td className="sticky left-0 z-20 bg-white border-r border-stone-200 p-4 text-sm font-semibold text-stone-600 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Precio</td>
-                    {properties.map(prop => <td key={prop.id} className="p-4 text-lg font-bold text-[#ea580c]">$ {prop.precio}</td>)}
+                    {properties.map(prop => <td key={prop.id} className="p-4 text-lg font-bold text-[#ea580c]">$ {prop.precio?.toLocaleString('en-US')}</td>)}
                   </tr>
                   <tr>
                     <td className="sticky left-0 z-20 bg-white border-r border-stone-200 p-4 text-sm font-semibold text-stone-600 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Tipo</td>
@@ -177,9 +188,7 @@ export default function ComparatorModal({ isOpen, onClose }: ComparatorModalProp
                       )
                     })}
                   </tr>
-
-                  {/* 👇 NUEVA FILA 2: AMENIDADES */}
-                  <tr className="hover:bg-stone-50/50 transition-colors">
+                  <tr>
                     <td className="sticky left-0 z-20 bg-white border-r border-stone-200 p-4 text-sm font-semibold text-slate-600 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">Amenidades</td>
                     {properties.map(prop => {
                       // Ya podemos mapear inmueble_amenidad sin que TS se queje
@@ -200,6 +209,34 @@ export default function ComparatorModal({ isOpen, onClose }: ComparatorModalProp
                         </td>
                       )
                     })}
+                  </tr>
+
+                  {/* SECCIÓN FINAL: BOTONES DE ACCIÓN */}
+                  <tr className="bg-stone-50/80 dark:bg-transparent">
+                    <td className="sticky left-0 z-20 bg-stone-50/80 dark:bg-[#0a0a0a] border-r border-t border-stone-200 dark:border-stone-800 p-4 text-sm font-bold text-stone-800 dark:text-stone-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] dark:shadow-none">
+                      Acciones
+                    </td>
+                    {properties.map(prop => (
+                      <td key={prop.id} className="p-4 border-t border-stone-200 dark:border-stone-800 align-top">
+                        <div className="flex flex-col gap-2.5">
+                          <ContactButton 
+                            type="whatsapp" 
+                            variant="grid" 
+                            phoneNumber={prop.propietario?.telefono || prop.propietario?.usuario?.telefono} 
+                          />
+                          <ComoLlegarButton 
+                            lat={Number(prop.ubicacion?.latitud)} 
+                            lng={Number(prop.ubicacion?.longitud)} 
+                            variant="grid" 
+                          />
+                          <ActionButton 
+                            variant="grid" 
+                            label="Ver detalles" 
+                            onClick={() => window.open(`/detalle-propiedad/${prop.id}`, '_blank')} 
+                          />
+                        </div>
+                      </td>
+                    ))}
                   </tr>
 
                 </tbody>
