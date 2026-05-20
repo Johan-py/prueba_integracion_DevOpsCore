@@ -83,7 +83,7 @@ export default async function BlogDetailPage({
     .slice(0, 4);
 
   return (
-    <article className="min-h-screen overflow-x-hidden bg-[linear-gradient(180deg,#fbf6ef_0%,#f8f3eb_38%,#ffffff_100%)] pb-20 transition-colors duration-300 dark:bg-none dark:bg-black">
+    <article className="min-h-screen bg-[linear-gradient(180deg,#fbf6ef_0%,#f8f3eb_38%,#ffffff_100%)] dark:bg-none dark:bg-black pb-20 transition-colors duration-300">
       <BlogDeletedRedirect blogId={params.id} />
       <header className="mx-auto max-w-5xl px-4 pt-10 sm:px-6 lg:px-8 lg:pt-14">
         <div className="max-w-4xl">
