@@ -25,7 +25,7 @@ export function useExchangeRate() {
   const [state, setState] = useState<ExchangeRateState>(initialState);
 
   useEffect(() => {
-    fetch("/api/exchange-rate", { cache: "no-store" })
+    fetch("/api/exchange-rate")
       .then((response) => response.json() as Promise<ExchangeRateData>)
       .then((data) => setState({ ...data, isLoading: false, isError: data.referentialRate === null }))
       .catch(() => setState((current) => ({ ...current, isLoading: false, isError: true })));

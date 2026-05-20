@@ -301,6 +301,7 @@ function BusquedaMapaContent() {
   const [isDrawingMode, setIsDrawingMode] = useState(false)
   const [currentPolygonPoints, setCurrentPolygonPoints] = useState<[number, number][]>([])
   const [drawnPolygons, setDrawnPolygons] = useState<[number, number][][]>([])
+  const [selectedDrawnPolygonIndex, setSelectedDrawnPolygonIndex] = useState<number | null>(null)
   const [drawingError, setDrawingError] = useState(false)
 
   const resetEditingZone = useCallback(() => {
@@ -314,6 +315,7 @@ function BusquedaMapaContent() {
     setIsDrawingMode(false)
     setCurrentPolygonPoints([])
     setDrawnPolygons([])
+    setSelectedDrawnPolygonIndex(null)
     setDrawingError(false)
     setIsCreatingCustomZone(false)
   }
@@ -647,14 +649,19 @@ function BusquedaMapaContent() {
   )
 
   // === 3. LÓGICA MATEMÁTICA HU8 (Filtro por polígono) ===
+  const selectedDrawnPolygon =
+    selectedDrawnPolygonIndex !== null ? drawnPolygons[selectedDrawnPolygonIndex] : null
+
   const displayedProperties = useMemo(() => {
     if (!properties) return []
-    if (drawnPolygons.length > 0) {
+    if (selectedDrawnPolygon && selectedDrawnPolygon.length >= 3) {
+      const polygonsToUse = [selectedDrawnPolygon]
+
       try {
         return properties.filter((p: any) => {
           if (p.lat == null || p.lng == null) return false
           const pt = point([p.lng, p.lat])
-          return drawnPolygons.some((polyPoints) => {
+          return polygonsToUse.some((polyPoints) => {
             if (polyPoints.length < 3) return false
             const turfCoords = [...polyPoints, polyPoints[0]].map((p) => [p[1], p[0]])
             const drawPoly = polygon([turfCoords])
@@ -677,8 +684,25 @@ function BusquedaMapaContent() {
         )
       }
     }
+    if (drawnPolygons.length > 0) {
+      try {
+        return properties.filter((p: any) => {
+          if (p.lat == null || p.lng == null) return false
+          const pt = point([p.lng, p.lat])
+          return drawnPolygons.some((polyPoints) => {
+            if (polyPoints.length < 3) return false
+            const turfCoords = [...polyPoints, polyPoints[0]].map((p) => [p[1], p[0]])
+            const drawPoly = polygon([turfCoords])
+            return booleanPointInPolygon(pt, drawPoly)
+          })
+        })
+      } catch (err) {
+        console.error('Error en validación geométrica:', err)
+        return properties
+      }
+    }
     return properties
-  }, [properties, drawnPolygons, selectedZoneId, zonasCombinadas])
+  }, [properties, drawnPolygons, selectedDrawnPolygon, selectedZoneId, zonasCombinadas])
 
   // === 4. ORDENAMIENTO (Usando resultados filtrados) ===
   const { ordenActual, cambiarOrden, inmueblesOrdenados } = useOrdenamiento({
@@ -837,11 +861,34 @@ function BusquedaMapaContent() {
   )
 
   const handleZoneSelect = (id: number | null) => {
+    if (id !== null) {
+      setSelectedDrawnPolygonIndex(null)
+    }
     setSelectedZoneId(id)
     setIsClusterView(false)
     setActiveClusterIds([])
     setClusterProperties([])
   }
+
+  const handleDrawnPolygonSelect = useCallback(
+    (index: number | null) => {
+      setSelectedDrawnPolygonIndex(index)
+      if (index !== null) {
+        setSelectedZoneId(null)
+      }
+      setIsClusterView(false)
+      setActiveClusterIds([])
+      setClusterProperties([])
+    },
+    []
+  )
+
+  useEffect(() => {
+    if (selectedDrawnPolygonIndex === null) return
+    if (!drawnPolygons[selectedDrawnPolygonIndex]) {
+      setSelectedDrawnPolygonIndex(null)
+    }
+  }, [drawnPolygons, selectedDrawnPolygonIndex])
 
   // HU4 - Abre el detalle de la propiedad en una nueva pestaña.
   // Se usa property.id porque en filtros corresponde al inmuebleId.
@@ -1078,6 +1125,8 @@ function BusquedaMapaContent() {
                   selectedZoneId={selectedZoneId}
                   onZoneSelect={handleZoneSelect}
                   onZoneCycle={handleZoneCycle}
+                  selectedDrawnPolygonIndex={selectedDrawnPolygonIndex}
+                  onDrawnPolygonSelect={handleDrawnPolygonSelect}
                   onSelect={handleMapSelect}
                   isLoading={isLoading}
                   error={error}
@@ -1164,6 +1213,8 @@ function BusquedaMapaContent() {
               selectedZoneId={selectedZoneId}
               onZoneSelect={handleZoneSelect}
               onZoneCycle={handleZoneCycle}
+              selectedDrawnPolygonIndex={selectedDrawnPolygonIndex}
+              onDrawnPolygonSelect={handleDrawnPolygonSelect}
               onSelect={handleMapSelect}
               isLoading={isLoading}
               error={error}
@@ -1207,24 +1258,12 @@ function BusquedaMapaContent() {
           </div>
 
           {/* ── BOTONES FLOTANTES DE ZONAS (portrait móvil) ──
-              z-[35] para quedar siempre sobre el bottom sheet (z-[30])
+              z-[25] para quedar detrás del bottom sheet (z-[30]) cuando este se expande
               Alineados a la derecha en la parte superior del mapa para no solapar el zoom */}
-          <div className="absolute top-3 right-4 z-[35] flex flex-col items-end gap-2 pointer-events-none">
-            {/* Estado normal: Mis zonas + Dibujar zona */}
+          <div className="absolute top-3 right-4 z-[25] flex flex-col items-end gap-2 pointer-events-none">
+            {/* Estado normal: Dibujar zona + Mis zonas */}
             {!isDrawingMode && !editingZoneId && (
               <div className="flex flex-row gap-2 pointer-events-auto">
-                <button
-                  onClick={() => {
-                    if (!isAuthenticated) {
-                      router.push('/sign-in')
-                    } else {
-                      setIsMisZonasOpen(true)
-                    }
-                  }}
-                  className="bg-white text-stone-700 px-4 py-2.5 rounded-lg shadow-md border border-stone-200 hover:bg-stone-50 active:bg-stone-100 transition-all text-sm font-semibold"
-                >
-                  Mis zonas
-                </button>
                 {drawnPolygons.length === 0 && (
                   <button
                     onClick={() => {
@@ -1239,6 +1278,18 @@ function BusquedaMapaContent() {
                     Dibujar zona
                   </button>
                 )}
+                <button
+                  onClick={() => {
+                    if (!isAuthenticated) {
+                      router.push('/sign-in')
+                    } else {
+                      setIsMisZonasOpen(true)
+                    }
+                  }}
+                  className="bg-white text-stone-700 px-4 py-2.5 rounded-lg shadow-md border border-stone-200 hover:bg-stone-50 active:bg-stone-100 transition-all text-sm font-semibold"
+                >
+                  Mis zonas
+                </button>
               </div>
             )}
 
@@ -2182,6 +2233,8 @@ function BusquedaMapaContent() {
               selectedZoneId={selectedZoneId}
               onZoneSelect={handleZoneSelect}
               onZoneCycle={handleZoneCycle}
+              selectedDrawnPolygonIndex={selectedDrawnPolygonIndex}
+              onDrawnPolygonSelect={handleDrawnPolygonSelect}
               isDrawingMode={isDrawingMode}
               polygonPoints={currentPolygonPoints}
               isPolygonClosed={false}

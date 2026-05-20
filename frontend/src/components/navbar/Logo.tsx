@@ -58,9 +58,9 @@ export default function Logo({
     >
       <LogoMark className={iconClassName} size={iconSize} />
       <span
-        className={`font-heading text-[1.2rem] font-bold leading-none tracking-[-0.03em] text-stone-900 ${textClassName}`}
+        className={`font-heading text-[1.2rem] font-bold leading-none tracking-[-0.03em] text-stone-900 dark:text-white ${textClassName}`}
       >
-        Prop<span className="text-amber-600">Bol</span>
+        Prop<span className="propbol-logo-bol">Bol</span>
       </span>
     </Link>
   )

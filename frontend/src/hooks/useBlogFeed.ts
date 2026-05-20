@@ -2,9 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { getPublishedBlogs, getBlogCategories } from "@/services/blogs.service";
+import { createPlainTextExcerpt } from "@/lib/blogMarkdown";
 import { BlogCategory, PublicBlogCard } from "@/types/publicBlog";
+import { socket } from "@/lib/socket";
 
 const INITIAL_VISIBLE_CARDS = 3;
+const API_URL = (
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000"
+).replace(/\/$/, "");
 
 const sortByPublishedDate = (a: PublicBlogCard, b: PublicBlogCard) =>
   new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
@@ -46,6 +51,53 @@ export const useBlogFeed = () => {
       }
     };
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    const handleNewPublishedBlog = (blog: any) => {
+      const mappedBlog: PublicBlogCard = {
+        id: String(blog.id),
+        title: blog.titulo,
+        excerpt: blog.resumen || blog.contenido,
+        imageUrl: blog.imagen,
+        category: blog.categoria?.nombre || "General",
+        categoryLabel: blog.categoria?.nombre || "General",
+
+        authorName:
+          `${blog.usuario?.nombre || ""} ${blog.usuario?.apellido || ""}`.trim(),
+
+        publishedAt:
+          blog.fecha_publicacion ||
+          blog.fecha_creacion ||
+          new Date().toISOString(),
+
+        isFeatured: blog.destacado ?? false,
+      };
+
+      setBlogs((prev) => {
+        const exists = prev.some((b) => b.id === mappedBlog.id);
+
+        if (exists) return prev;
+
+        return orderBlogs([mappedBlog, ...prev]);
+      });
+    };
+
+    const handleDeletedBlog = (payload: any) => {
+      const blogId = payload?.id ?? payload?.blogId ?? payload;
+
+      if (!blogId) return;
+
+      setBlogs((prev) => prev.filter((blog) => blog.id !== String(blogId)));
+    };
+
+    socket.on("blog:publicado_global", handleNewPublishedBlog);
+    socket.on("blog:eliminado_global", handleDeletedBlog);
+
+    return () => {
+      socket.off("blog:publicado_global", handleNewPublishedBlog);
+      socket.off("blog:eliminado_global", handleDeletedBlog);
+    };
   }, []);
 
   // RESTAURAR CATEGORÍA
