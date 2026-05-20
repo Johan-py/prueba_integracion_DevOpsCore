@@ -43,7 +43,11 @@ export const useCompareStore = create<CompareState>()(
     }),
     {
       name: 'propbol-compare-storage',
-      partialize: (state) => ({ selectedIds: state.selectedIds }), // Solo persistimos los IDs
+      // FIX: Ahora persistimos tanto los IDs como el estado visual del modo comparar
+      partialize: (state) => ({ 
+        selectedIds: state.selectedIds,
+        isCompareMode: state.isCompareMode 
+      }), 
     }
   )
 )
