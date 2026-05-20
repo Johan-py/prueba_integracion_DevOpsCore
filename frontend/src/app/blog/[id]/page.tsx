@@ -125,11 +125,13 @@ export default async function BlogDetailPage({
         </div>
       </header>
 
-      <main className="mx-auto mt-12 max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="blog-grid-container grid gap-12 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start xl:grid-cols-[minmax(0,1fr)_360px]">
-          <div className="space-y-12">
-            <div className="rounded-[36px] bg-white/90 dark:bg-[#111111] dark:border dark:border-stone-800 p-6 shadow-[0_24px_80px_-50px_rgba(41,37,36,0.45)] dark:shadow-none sm:p-8 lg:p-10 transition-colors duration-300">
-              <MarkdownRenderer content={articleContent} />
+      <main className="mx-auto mt-12 w-full max-w-6xl overflow-x-hidden px-4 sm:px-6 lg:px-8">
+        <div className="grid w-full min-w-0 grid-cols-1 gap-8 lg:gap-12 xl:grid-cols-[minmax(0,1fr)_340px] xl:items-start">
+          <div className="min-w-0 space-y-8 lg:space-y-12">
+            <div className="w-full max-w-full overflow-hidden rounded-[28px] bg-white/90 p-5 shadow-[0_24px_80px_-50px_rgba(41,37,36,0.45)] transition-colors duration-300 dark:border dark:border-stone-800 dark:bg-[#111111] dark:shadow-none sm:rounded-[36px] sm:p-8 lg:p-10">
+              <div className="min-w-0 max-w-full break-words [overflow-wrap:anywhere] [&_*]:max-w-full [&_img]:h-auto [&_pre]:overflow-x-auto [&_table]:block [&_table]:overflow-x-auto">
+                <MarkdownRenderer content={articleContent} />
+              </div>
             </div>
 
             <div className="no-capture">
@@ -142,7 +144,7 @@ export default async function BlogDetailPage({
               />
             </div>
 
-            <div className="no-capture">
+            <div className="no-capture w-full max-w-full overflow-hidden">
               <BlogCommentsSection blogId={params.id} />
             </div>
 
@@ -151,7 +153,7 @@ export default async function BlogDetailPage({
             </div>
           </div>
 
-          <div className="no-capture">
+          <div className="no-capture min-w-0">
             <BlogDetailSidebar recommendations={recommendedBlogs} />
           </div>
         </div>

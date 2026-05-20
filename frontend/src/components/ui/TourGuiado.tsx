@@ -32,6 +32,7 @@ export default function TourGuiado() {
   const [tooltipH, setTooltipH] = useState(0);
   const [isDark, setIsDark] = useState(false);
 
+  // Detectar modo oscuro
   useEffect(() => {
     const check = () =>
       setIsDark(document.documentElement.classList.contains("dark"));
@@ -43,6 +44,25 @@ export default function TourGuiado() {
     });
     return () => observer.disconnect();
   }, []);
+
+  // fix(tour): suspender filtro de accesibilidad mientras el tour está activo.
+  // Los filtros CSS en <html> crean un nuevo stacking context que rompe
+  // position: fixed del overlay y el tooltip.
+  useEffect(() => {
+    if (!showTour) return;
+
+    const root = document.documentElement;
+    const prevFilter = root.getAttribute("data-accessibility");
+    root.setAttribute("data-accessibility", "none");
+
+    return () => {
+      if (prevFilter) {
+        root.setAttribute("data-accessibility", prevFilter);
+      } else {
+        root.removeAttribute("data-accessibility");
+      }
+    };
+  }, [showTour]);
 
   const prevStepRef = useRef<number>(-1);
 
@@ -115,6 +135,7 @@ export default function TourGuiado() {
     return () => window.removeEventListener("propbol:session-changed", handleSessionChanged);
   }, []);
 
+  // Bloquear scroll mientras el tour está activo
   useEffect(() => {
     if (showTour) {
       document.body.style.overflow = "hidden";
@@ -127,6 +148,7 @@ export default function TourGuiado() {
     };
   }, [showTour]);
 
+  // Navegación por teclado
   useEffect(() => {
     if (!showTour) return;
     const handleKey = (e: KeyboardEvent) => {
@@ -144,6 +166,7 @@ export default function TourGuiado() {
     return () => window.removeEventListener("keydown", handleKey);
   }, [showTour, currentStep]);
 
+  // Evento externo para iniciar el tour
   useEffect(() => {
     const handleIniciarTour = () => {
       setHighlight(null);
@@ -156,6 +179,7 @@ export default function TourGuiado() {
       window.removeEventListener("propbol:iniciar-tour", handleIniciarTour);
   }, []);
 
+  // Recalcular posición en resize/scroll
   useEffect(() => {
     if (!showTour) return;
 
