@@ -50,9 +50,9 @@ export default function BlogSidebar({
         <div className="flex items-center justify-between pt-2">
           <span className="text-sm font-medium text-[#78716C] dark:text-[#999]">Estado</span>
           <span className={`inline-flex items-center rounded-lg px-3 py-1 text-[10px] font-bold ${
-            isPendiente ? "bg-amber-100 text-amber-700" :
-            isRechazado ? "bg-red-100 text-red-600" :
-            statusLabel === "PUBLICADO" ? "bg-green-100 text-green-700" :
+            isPendiente ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:!text-amber-300" :
+            isRechazado ? "bg-red-100 text-red-600 dark:bg-red-900/30 dark:!text-red-300" :
+            statusLabel === "PUBLICADO" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:!text-green-300" :
             "bg-[#E7E5E4] text-[#44403C] dark:text-[#999]"
           }`}>
             {statusLabel ?? "BORRADOR"}

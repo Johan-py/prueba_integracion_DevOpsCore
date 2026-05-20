@@ -108,10 +108,10 @@ export default function BlogCreateForm({
           )}
 
           {statusLabel === "RECHAZADO" && rejectionReason && (
-            <div className="rounded-2xl bg-red-50 border border-red-200 p-4 sm:p-6 shadow-sm">
-              <h3 className="text-sm font-bold text-red-700 uppercase tracking-wider mb-2">Motivo de rechazo</h3>
-              <p className="text-red-700 leading-relaxed break-all">{rejectionReason}</p>
-              <p className="text-xs text-red-600 mt-3 italic opacity-80">Corrige los puntos mencionados y vuelve a enviarlo para revisión.</p>
+            <div className="rounded-[16px] bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800/50 p-4 sm:p-6 shadow-sm">
+              <h3 className="text-sm font-bold text-red-700 dark:!text-red-400 uppercase tracking-wider mb-2">Motivo de rechazo</h3>
+              <p className="text-red-700 dark:!text-red-300 leading-relaxed break-all">{rejectionReason}</p>
+              <p className="text-xs text-red-600 dark:!text-red-400 mt-3 italic opacity-80">Corrige los puntos mencionados y vuelve a enviarlo para revisión.</p>
             </div>
           )}
 
