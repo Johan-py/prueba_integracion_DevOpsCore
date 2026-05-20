@@ -43,6 +43,9 @@ import { useSearchFilters, BusquedaModo } from '@/hooks/useSearchFilters'
 import { useFiltrosActivos } from '@/hooks/useFiltrosActivos'
 import { ActiveFilterTags } from '@/components/filters/ActiveFilterTags'
 import CompareFooter from '@/components/busqueda/CompareFooter'
+import MobileMapHeader from '@/components/filters/MobileMapHeader'
+import MobileFilterDrawer from '@/components/filters/MobileFilterDrawer'
+import AdvancedFiltersModal from '@/components/filters/AdvancedFiltersModal'
 
 // Carga dinámica del mapa (sin SSR)
 const MapView = nextDynamic(() => import('./MapView'), {
@@ -152,6 +155,9 @@ function BusquedaMapaContent() {
   const searchParams = useSearchParams()
   const isRecomendadosActive = searchParams.get('orden') === 'recomendados'
   const filterResetKey = searchParams.toString()
+
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false)
+  const [isAdvancedFiltersOpen, setIsAdvancedFiltersOpen] = useState(false)
 
   const { getBusquedaModo, cambiarAModoGeneral, clearAllFilters } = useSearchFilters()
   const filtrosActivos = useFiltrosActivos()
@@ -1186,19 +1192,56 @@ function BusquedaMapaContent() {
     // RENDER PORTRAIT MÓVIL — Bottom Sheet
     // ────────────────────────────────────────────────────────────────────────────
     return (
-      <div className="flex flex-col overflow-hidden bg-white" style={{ height: '100dvh' }}>
-        <div className="shrink-0 overflow-x-auto relative z-40">
-          <div className="min-w-max">
-            <FilterBar
-              variant="map"
-              onSearch={(f) => console.log('🔍 Filtros:', f)}
-              onOpenSuperficieFilter={() => {
-                setIsSidebarOpen(true)
-                setActiveSidebarView('superficie')
-              }}
-            />
-          </div>
-        </div>
+  <div className="flex flex-col overflow-hidden bg-white" style={{ height: '100dvh' }}>
+    
+    <div className="shrink-0 relative z-40">
+       <MobileMapHeader onOpenMenu={() => setIsMobileDrawerOpen(true)} />
+    </div>
+
+    <MobileFilterDrawer 
+       isOpen={isMobileDrawerOpen}
+       onClose={() => setIsMobileDrawerOpen(false)}
+       onOpenZona={() => {
+         setIsPriceFilterOpen(false);
+         setIsSidebarOpen(true);
+         setActiveSidebarView('ubicacion');
+       }}
+       onOpenPrice={() => {
+         setIsPriceFilterOpen(true);
+         setIsSidebarOpen(true);
+         setActiveSidebarView('results');
+       }}
+       onOpenSuperficie={() => {
+         setIsPriceFilterOpen(false);
+         setIsSidebarOpen(true);
+         setActiveSidebarView('superficie');
+       }}
+       onOpenEtiquetas={() => {
+         setIsPriceFilterOpen(false);
+         setIsSidebarOpen(true);
+         setActiveSidebarView('etiquetas');
+       }}
+       onOpenAdvanced={() => setIsAdvancedFiltersOpen(true)}
+       isCapacidadActive={activeSidebarView === 'capacidad' && isSidebarOpen}
+       onToggleCapacidad={toggleCapacidad}
+       isOfertaActive={isOfertaOpen}
+       onToggleOferta={toggleOferta}
+    />
+
+    {/* Este modal ya existe en tu FilterBar pero lo necesitamos aquí también para el Drawer */}
+    <AdvancedFiltersModal
+        isOpen={isAdvancedFiltersOpen}
+        onClose={() => setIsAdvancedFiltersOpen(false)}
+        onApply={(amenities, labels) => {
+            const params = new URLSearchParams(searchParams?.toString() || '')
+            if (amenities.length > 0) params.set('amenities', amenities.join(','))
+            else params.delete('amenities')
+            if (labels.length > 0) params.set('labels', labels.join(','))
+            else params.delete('labels')
+            router.push(`/busqueda_mapa${params.toString() ? `?${params.toString()}` : ''}`)
+            setIsAdvancedFiltersOpen(false)
+        }}
+    />
         <div className="flex-1 relative overflow-hidden">
           {/* Mapa de fondo */}
           <div className="absolute inset-0">

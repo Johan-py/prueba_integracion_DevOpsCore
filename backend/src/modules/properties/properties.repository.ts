@@ -286,23 +286,16 @@ export const propertiesRepository = {
       ];
     }
 
-    // Filtros por Etiquetas (Lógica AND)
+    // Filtros por Etiquetas (Lógica OR)
     if (filtros.labels && filtros.labels.length > 0) {
-      where.AND = [
-        ...(where.AND || []),
-        ...filtros.labels.map((labelId) => ({
-          publicaciones: {
-            some: {
-              estado: 'ACTIVA' as const,
-              publicacion_tag: {
-                some: {
-                  tag_id: labelId
-                }
-              }
-            }
+      where.publicaciones = {
+        some: {
+          estado: 'ACTIVA' as const,
+          publicacion_tag: {
+            some: { tag_id: { in: filtros.labels } }
           }
-        }))
-      ]
+        }
+      }
     }
 
     // HU6 - Filtro solo ofertas
