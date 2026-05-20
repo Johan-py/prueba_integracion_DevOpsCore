@@ -124,12 +124,18 @@ export default function HistorialPagosPage() {
                       </span>
                     </div>
                     <div className="text-right">
-                      <p className="text-lg font-bold font-montserrat text-stone-900">
-                        Bs. {t.total.toFixed(2)}
-                      </p>
-                      {isUsdt && (
-                        <p className="text-xs text-blue-600 font-medium">
-                          ≈ {(t.total / BOB_PER_USDT).toFixed(4)} USDT
+                      {isUsdt ? (
+                        <>
+                          <p className="text-lg font-bold font-montserrat text-blue-700">
+                            {(t.total / BOB_PER_USDT).toFixed(4)} USDT
+                          </p>
+                          <p className="text-xs text-stone-400 font-medium">
+                            ≈ Bs. {t.total.toFixed(2)}
+                          </p>
+                        </>
+                      ) : (
+                        <p className="text-lg font-bold font-montserrat text-stone-900">
+                          Bs. {t.total.toFixed(2)}
                         </p>
                       )}
                       {t.monto_descuento > 0 && (

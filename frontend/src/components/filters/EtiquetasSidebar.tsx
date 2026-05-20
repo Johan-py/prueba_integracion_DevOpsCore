@@ -8,7 +8,7 @@ export interface Etiqueta {
   id: string
   nombre: string
   color?: string
-  cantidad?: number 
+  cantidad?: number
 }
 
 type EtiquetaApi = {
@@ -35,6 +35,26 @@ const getFallbackColor = (nombre: string) => {
   return DEFAULT_COLORS[Math.abs(hash) % DEFAULT_COLORS.length]
 }
 
+const CONTEXTUAL_FILTER_KEYS = [
+  'minPrice',
+  'maxPrice',
+  'minSuperficie',
+  'maxSuperficie',
+  'dormitoriosMin',
+  'dormitoriosMax',
+  'banosMin',
+  'banosMax',
+  'tipoInmueble',
+  'modoInmueble',
+  'currency',
+  'departamentoId',
+  'provinciaId',
+  'municipioId',
+  'zonaId',
+  'barrioId',
+  'labels',
+]
+
 export default function EtiquetasSidebar({ isOpen, onClose }: EtiquetasSidebarProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -51,8 +71,14 @@ export default function EtiquetasSidebar({ isOpen, onClose }: EtiquetasSidebarPr
       setIsLoading(true)
       try {
         const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '')
-        const res = await fetch(`${API_URL}/api/tags`, { cache: 'no-store' })
-        if (!res.ok) throw new Error(`Error ${res.status}`)     
+        const hasContextFilters = CONTEXTUAL_FILTER_KEYS.some((key) => searchParams.get(key))
+
+        const endpoint = hasContextFilters
+          ? `${API_URL}/api/tags/counts?${searchParams.toString()}`
+          : `${API_URL}/api/tags`
+
+        const res = await fetch(endpoint, { cache: 'no-store' })
+        if (!res.ok) throw new Error(`Error ${res.status}`)
         const json = await res.json()
 
         const etiquetas: Etiqueta[] = (json.data || []).map((item: EtiquetaApi) => ({
@@ -68,10 +94,8 @@ export default function EtiquetasSidebar({ isOpen, onClose }: EtiquetasSidebarPr
         etiquetas.forEach((e) => {
           nombresMap[e.id] = e.nombre
         })
-        sessionStorage.setItem(
-          'propbol_etiquetas_nombres',
-          JSON.stringify(nombresMap)
-        )
+
+        sessionStorage.setItem('propbol_etiquetas_nombres', JSON.stringify(nombresMap))
       } catch (error) {
         console.error('Error cargando etiquetas:', error)
       } finally {
@@ -79,7 +103,7 @@ export default function EtiquetasSidebar({ isOpen, onClose }: EtiquetasSidebarPr
       }
     }
     fetchEtiquetas()
-  }, [isOpen])
+  }, [isOpen, searchParams])
 
   useEffect(() => {
     if (isOpen) {
@@ -89,9 +113,8 @@ export default function EtiquetasSidebar({ isOpen, onClose }: EtiquetasSidebarPr
     }
   }, [isOpen, searchParams])
 
-  // Seleccionadas: etiquetas con datos completos
   const selectedEtiquetas = useMemo(
-    () => etiquetasDB.filter(e => selectedIds.includes(e.id)),
+    () => etiquetasDB.filter((e) => selectedIds.includes(e.id)),
     [etiquetasDB, selectedIds]
   )
 
@@ -100,7 +123,7 @@ export default function EtiquetasSidebar({ isOpen, onClose }: EtiquetasSidebarPr
     const query = searchQuery.trim().toLowerCase()
 
     if (!query) {
-      return sinSeleccionadas.filter(e => e.cantidad === undefined || e.cantidad > 0)
+      return sinSeleccionadas.filter((e) => (e.cantidad ?? 0) > 0)
     }
     return sinSeleccionadas.filter((e) => e.nombre.toLowerCase().includes(query))
   }, [etiquetasDB, selectedIds, searchQuery])
@@ -108,7 +131,9 @@ export default function EtiquetasSidebar({ isOpen, onClose }: EtiquetasSidebarPr
   if (!isOpen) return null
 
   const toggleSelection = (id: string) => {
-    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id])
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    )
   }
 
   const handleApply = () => {
@@ -133,8 +158,6 @@ export default function EtiquetasSidebar({ isOpen, onClose }: EtiquetasSidebarPr
 
   return (
     <div className="flex flex-col h-full min-h-0 bg-white dark:bg-slate-900 border-r border-stone-200 dark:border-slate-800">
-
-      {/* HEADER */}
       <div className="shrink-0 p-4 pb-3 border-b border-stone-100 dark:border-slate-800">
         <div className="w-full flex items-center justify-center relative mb-1">
           <h3 className="font-bold text-sm text-stone-800 dark:text-slate-100 uppercase tracking-wide text-center">
@@ -156,16 +179,12 @@ export default function EtiquetasSidebar({ isOpen, onClose }: EtiquetasSidebarPr
             placeholder="Buscar etiqueta..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            /* Input del buscador con soporte a modo oscuro (bordes y fondo RGB) */
             className="w-full border border-stone-200 rounded-lg pl-9 pr-3 py-2 text-sm outline-none transition-all bg-stone-50 focus:border-[rgb(217,119,6)] focus:ring-1 focus:ring-[rgb(217,119,6)] dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 dark:focus:border-[rgb(232,124,30)] dark:focus:ring-[rgb(232,124,30)]"
           />
         </div>
       </div>
 
-      {/* CONTENIDO */}
       <div className="flex-1 overflow-y-auto p-4 custom-scrollbar flex flex-col gap-5">
-
-        {/* SELECCIONADAS */}
         <div>
           <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] font-bold text-stone-400 uppercase tracking-widest">
@@ -188,7 +207,7 @@ export default function EtiquetasSidebar({ isOpen, onClose }: EtiquetasSidebarPr
             </div>
           ) : (
             <div className="flex flex-wrap gap-2">
-              {selectedEtiquetas.map(etiqueta => (
+              {selectedEtiquetas.map((etiqueta) => (
                 <span
                   key={etiqueta.id}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-stone-200 shadow-sm text-sm font-medium text-stone-700 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
@@ -207,7 +226,6 @@ export default function EtiquetasSidebar({ isOpen, onClose }: EtiquetasSidebarPr
           )}
         </div>
 
-        {/* DISPONIBLES */}
         <div>
           <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] font-bold text-stone-400 uppercase tracking-widest">
@@ -229,7 +247,7 @@ export default function EtiquetasSidebar({ isOpen, onClose }: EtiquetasSidebarPr
             </div>
           ) : (
             <div className="flex flex-wrap gap-2">
-              {availableEtiquetas.map(etiqueta => (
+              {availableEtiquetas.map((etiqueta) => (
                 <button
                   key={etiqueta.id}
                   onClick={() => toggleSelection(etiqueta.id)}
@@ -249,29 +267,24 @@ export default function EtiquetasSidebar({ isOpen, onClose }: EtiquetasSidebarPr
         </div>
       </div>
 
-      {/* FOOTER */}
       <div className="shrink-0 px-6 pb-6 pt-4 border-t border-stone-100 bg-white flex flex-col gap-3 dark:border-slate-800 dark:bg-slate-900">
-        
-        {/* Notificación sutil cuando presiona Aplicar sin selección */}
         {showEmptyWarning && (
           <p className="text-xs text-[rgb(217,119,6)] dark:text-[rgb(232,124,30)] text-center animate-pulse">
             Selecciona al menos una etiqueta para filtrar
           </p>
         )}
 
-        {/* Letras blancas puras y subrayado en modo oscuro */}
         <button
           type="button"
           onClick={handleClear}
-          className="text-sm text-stone-400 hover:text-[rgb(217,119,6)] transition-colors underline text-center w-full dark:!text-white dark:hover:!text-[rgb(232,124,30)]"
+          className="text-sm text-stone-400 hover:text-[rgb(217,119,6)] transition-colors underline text-center w-full dark:text-stone-300 dark:hover:text-[#e87c1e]"
         >
           Limpiar filtro
         </button>
 
-        {/* Hack RGB y rounded-[12px] para evadir a globals.css */}
         <button
           onClick={handleApply}
-          className="w-full !bg-[rgb(217,119,6)] hover:!bg-[rgb(185,94,0)] !text-white rounded-[12px] border-none font-bold py-3 px-4 transition-all active:scale-95 shadow-md dark:!bg-[rgb(232,124,30)] dark:hover:!bg-[rgb(217,119,6)]"
+          className="w-full bg-[#d97706] hover:bg-[#b95e00] text-white rounded-xl font-bold py-3 px-4 transition-all active:scale-95 shadow-md dark:bg-[#e87c1e] dark:hover:bg-[#d97706]"
         >
           Aplicar
         </button>
