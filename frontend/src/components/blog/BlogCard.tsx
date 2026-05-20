@@ -61,7 +61,7 @@ export default function BlogCard({
         <div className="flex flex-1 flex-col p-6 sm:p-8">
           {/* Categoría Pill */}
           <div className="mb-4">
-            <span className="inline-block rounded-full border border-[#D97706]/20 bg-[#D97706]/5 px-4 py-1 text-[10px] font-bold uppercase tracking-widest text-[#D97706] dark:text-[#D97706]/80">  /* Cambia el color del texto para modo oscuro */
+            <span className="inline-block rounded-full border border-[#D97706]/20 bg-[#D97706]/5 px-4 py-1 text-[10px] font-bold uppercase tracking-widest text-[#D97706] dark:text-[#D97706]/80">
               {categoryLabel ?? category}
             </span>
           </div>

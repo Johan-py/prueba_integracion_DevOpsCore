@@ -467,9 +467,9 @@ html.dark body :where([class*="bg-white"],
   [class*="bg-stone"],
   [class*="bg-card"],
   [class*="bg-muted"],
-  [class*="bg-amber-50"],
+  [class*="bg-amber-50"]:not([class*="bg-amber-5"]):not([class*="bg-amber-6"]):not([class*="bg-amber-7"]),
   [class*="bg-yellow-50"],
-  [class*="bg-orange-50"],
+  [class*="bg-orange-50"]:not([class*="bg-orange-5"]):not([class*="bg-orange-6"]),
   [class*="bg-[#0"],
   [class*="bg-[#1"],
   [class*="bg-[#2"],
@@ -484,7 +484,7 @@ html.dark body :where([class*="bg-white"],
   [class*="bg-[#f5"],
   [class*="bg-[#F5"],
   [class*="bg-[#f8"],
-  [class*="bg-[#F8"]):not([class*="/"]) {
+  [class*="bg-[#F8"]):not([class*="/"]):not([class*="bg-[#D97706]"]):not([class*="bg-[#d97706]"]) {
   background: var(--pb-surface) !important;
   background-image: none !important;
   color: var(--pb-text) !important;
@@ -562,6 +562,13 @@ html.dark body :where(h1,
   color: var(--pb-text) !important;
 }
 
+/* Logo header: solo "Bol" en naranja */
+html.dark body #tour-logo .propbol-logo-bol,
+html.dark body a[id="tour-logo"] .propbol-logo-bol,
+.propbol-logo-bol {
+  color: #e68b25 !important;
+}
+
 /* Textos secundarios */
 html.dark body :where(small,
   input::placeholder,
@@ -593,20 +600,36 @@ html.dark body :where([class*="border-gray"],
   --tw-ring-shadow: 0 0 #0000 !important;
 }
 
-html.dark body :where([class*="shadow"],
-  [class*="drop-shadow"]) {
+/* Solo box-shadow (cards); no drop-shadow (filtro de texto en banner, etc.) */
+html.dark body :where([class*="shadow"]):not([class*="drop-shadow"]) {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75) !important;
 }
 
-/* Botones principales naranjas */
+/* Banner home: texto sobre imagen sin fondo ni sombra de caja */
+html.dark #tour-banner h1,
+html.dark #tour-banner p {
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+}
+
+html.dark #tour-banner p {
+  color: #e7e5e4 !important;
+}
+
+/* Botones principales naranjas (excluye variantes con opacidad, ej. hover:bg-[#E68B25]/10) */
 html.dark body :where([class*="bg-amber-500"],
   [class*="bg-amber-600"],
   [class*="bg-orange-500"],
   [class*="bg-orange-600"],
+  [class*="bg-[#D97706]"],
+  [class*="bg-[#d97706]"],
   [class*="bg-[#E68B25]"],
   [class*="bg-[#e68b25]"],
   [class*="bg-[#E8962F]"],
-  [class*="bg-[#e8962f]"]) {
+  [class*="bg-[#e8962f]"],
+  [class*="bg-[#E87C1E]"],
+  [class*="bg-[#e87c1e]"]):not([class*="/"]) {
   background: var(--pb-accent) !important;
   color: #ffffff !important;
   border-color: var(--pb-accent) !important;
@@ -626,9 +649,9 @@ html.dark body button:disabled {
   opacity: 0.8 !important;
 }
 
-/* panel superior de mis publicaciones */
-html.dark .rounded-2xl,
-html.dark .rounded-xl,
+/* panel superior de mis publicaciones (no aplica a botones/enlaces naranjas) */
+html.dark .rounded-2xl:not([class*="bg-amber"]):not([class*="bg-orange"]):not([class*="bg-[#E68B25]"]):not([class*="bg-[#e68b25]"]):not([class*="bg-[#D97706]"]):not([class*="bg-[#d97706]"]),
+html.dark .rounded-xl:not([class*="bg-amber"]):not([class*="bg-orange"]):not([class*="bg-[#E68B25]"]):not([class*="bg-[#e68b25]"]):not([class*="bg-[#D97706]"]):not([class*="bg-[#d97706]"]),
 html.dark [class*="from-white"],
 html.dark [class*="from-gray"],
 html.dark [class*="to-white"],
@@ -637,6 +660,26 @@ html.dark [class*="to-gray"] {
   background-image: none !important;
   color: #ffffff !important;
   border-color: #222222 !important;
+}
+
+/* Botones naranjas con rounded (prioridad sobre regla de cards) */
+html.dark body :where(
+  button[class*="bg-amber-5"],
+  button[class*="bg-amber-6"],
+  button[class*="bg-amber-7"],
+  button[class*="bg-orange-5"],
+  button[class*="bg-orange-6"],
+  a[class*="bg-amber-5"],
+  a[class*="bg-amber-6"],
+  a[class*="bg-orange-5"],
+  a[class*="bg-orange-6"],
+  a[class*="bg-[#D97706]"],
+  a[class*="bg-[#d97706]"],
+  a[class*="bg-[#E68B25]"],
+  a[class*="bg-[#e68b25]"]):not([class*="/"]) {
+  background: var(--pb-accent) !important;
+  color: #ffffff !important;
+  border-color: var(--pb-accent) !important;
 }
 
 /* Botón principal del popup de bienvenida/login */
