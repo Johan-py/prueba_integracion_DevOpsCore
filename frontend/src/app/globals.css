@@ -598,7 +598,7 @@ html.dark body :where([class*="shadow"],
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75) !important;
 }
 
-/* Botones principales naranjas */
+/* Botones principales naranjas (excluye variantes con opacidad, ej. hover:bg-[#E68B25]/10) */
 html.dark body :where([class*="bg-amber-500"],
   [class*="bg-amber-600"],
   [class*="bg-orange-500"],
@@ -606,7 +606,7 @@ html.dark body :where([class*="bg-amber-500"],
   [class*="bg-[#E68B25]"],
   [class*="bg-[#e68b25]"],
   [class*="bg-[#E8962F]"],
-  [class*="bg-[#e8962f]"]) {
+  [class*="bg-[#e8962f]"]):not([class*="/"]) {
   background: var(--pb-accent) !important;
   color: #ffffff !important;
   border-color: var(--pb-accent) !important;
