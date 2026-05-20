@@ -31,6 +31,12 @@ export const crearPlan = async (req: Request, res: Response) => {
     if (Number(precio_plan) < 0) {
       return res.status(400).json({ error: 'El precio no puede ser negativo' })
     }
+    const duplicado = await prisma.plan_suscripcion.findFirst({
+      where: { nombre_plan: { equals: nombre_plan, mode: 'insensitive' } },
+    })
+    if (duplicado) {
+      return res.status(409).json({ error: `Ya existe un plan con el nombre "${nombre_plan}"` })
+    }
     const plan = await prisma.plan_suscripcion.create({
       data: { nombre_plan, descripcion_plan, precio_plan, duracion_plan_dias, nro_publicaciones_plan, imagen_gr_url },
     })
@@ -55,6 +61,14 @@ export const actualizarPlan = async (req: Request, res: Response) => {
     const { nombre_plan, descripcion_plan, precio_plan, duracion_plan_dias, nro_publicaciones_plan, imagen_gr_url } = req.body
     if (precio_plan !== undefined && Number(precio_plan) < 0) {
       return res.status(400).json({ error: 'El precio no puede ser negativo' })
+    }
+    if (nombre_plan) {
+      const duplicado = await prisma.plan_suscripcion.findFirst({
+        where: { nombre_plan: { equals: nombre_plan, mode: 'insensitive' }, NOT: { id } },
+      })
+      if (duplicado) {
+        return res.status(409).json({ error: `Ya existe un plan con el nombre "${nombre_plan}"` })
+      }
     }
     const plan = await prisma.plan_suscripcion.update({
       where: { id },
