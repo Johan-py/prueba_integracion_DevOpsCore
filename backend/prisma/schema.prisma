@@ -397,6 +397,7 @@ model plan_suscripcion {
   duracion_plan_dias     Int?
   nro_publicaciones_plan Int?
   imagen_gr_url          String?                 @db.VarChar(255)
+  eliminado_en           DateTime?               @db.Timestamptz(6)
   bitacora_pagos         bitacora_pagos[]
   suscripciones_activas  suscripciones_activas[]
   transacciones          transacciones[]
