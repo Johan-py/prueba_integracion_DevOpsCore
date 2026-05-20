@@ -1,6 +1,6 @@
 'use client'
 import { OfertaButton } from '../busqueda/ofertas/OfertaButton'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useRef } from 'react'
 import { CapacidadButton } from '../busqueda/capacidad/CapacidadButton'
 import {
   Home,
@@ -185,6 +185,8 @@ export default function FilterBar({ onSearch, variant = 'home', onOpenPriceFilte
       setUbicacionTexto('')
     }
   }, [searchParams, propertyTypes])
+
+
 
   // =======================================================================
   // 1. GENERADOR DINÁMICO DE FILTROS ACTIVOS (Fila inferior removible)
@@ -418,6 +420,23 @@ export default function FilterBar({ onSearch, variant = 'home', onOpenPriceFilte
     router.push(targetUrl)
     if (onSearch) onSearch(nuevosFiltros)
   }
+
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    if (variant !== 'map') return;
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      handleSearch();
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
+  }, [modosSeleccionados, tipoInmueble]);
+
   // Helper para manejar el cambio de location de forma uniforme
   const handleLocationChange = (val: LocationValue) => {
     if (typeof val === 'object' && val !== null) {
@@ -592,8 +611,8 @@ export default function FilterBar({ onSearch, variant = 'home', onOpenPriceFilte
 
 
               className={`h-[38px] flex items-center gap-2 px-4 rounded-full border text-sm font-medium shadow-sm transition-all focus:outline-none shrink-0 ${searchParams?.get('orden') === 'recomendados'
-                  ? 'bg-[#d97706] text-white border-[#d97706] dark:bg-[#E87C1E] dark:border-[#E87C1E]'
-                  : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-[#d97706] dark:hover:border-[#E87C1E] dark:hover:bg-stone-700'
+                ? 'bg-[#d97706] text-white border-[#d97706] dark:bg-[#E87C1E] dark:border-[#E87C1E]'
+                : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-[#d97706] dark:hover:border-[#E87C1E] dark:hover:bg-stone-700'
                 }`}
             >
               <Award className={`w-4 h-4 ${searchParams?.get('orden') === 'recomendados' ? 'text-white' : 'text-stone-500'}`} />
