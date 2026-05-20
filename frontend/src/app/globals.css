@@ -484,7 +484,7 @@ html.dark body :where([class*="bg-white"],
   [class*="bg-[#f5"],
   [class*="bg-[#F5"],
   [class*="bg-[#f8"],
-  [class*="bg-[#F8"]):not([class*="/"]):not([class*="bg-[#D97706]"]):not([class*="bg-[#d97706]"]) {
+  [class*="bg-[#F8"]):not([class*="/"]):not([class*="bg-[#D97706]"]):not([class*="bg-[#d97706]"]):not([aria-pressed="true"]) {
   background: var(--pb-surface) !important;
   background-image: none !important;
   color: var(--pb-text) !important;
@@ -888,4 +888,31 @@ html:not(.dark):not(.propbol-theme-dark) .pb-map-popup-dark-fix {
 html.dark .pb-map-label-container > .pb-map-label,
 html.propbol-theme-dark .pb-map-label-container > .pb-map-label {
   text-shadow: 0 1px 3px rgba(0,0,0,0.95), 0 -1px 3px rgba(0,0,0,0.95), 1px 0 3px rgba(0,0,0,0.95), -1px 0 3px rgba(0,0,0,0.95) !important;
+}
+
+/* Blogs: chip activo con relleno amber completo en modo oscuro */
+html.dark .blog-filter-chips button[aria-pressed="true"],
+html.propbol-theme-dark .blog-filter-chips button[aria-pressed="true"] {
+  background-color: #d97706 !important;
+  background: #d97706 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  border-color: #d97706 !important;
+}
+
+html.dark .blog-filter-chips button[aria-pressed="false"],
+html.propbol-theme-dark .blog-filter-chips button[aria-pressed="false"] {
+  background-color: transparent !important;
+  background: transparent !important;
+  background-image: none !important;
+  color: var(--pb-muted) !important;
+  border-color: var(--pb-border) !important;
+}
+
+html.dark .blog-filter-chips button[aria-pressed="true"]:hover,
+html.propbol-theme-dark .blog-filter-chips button[aria-pressed="true"]:hover {
+  background-color: #b45309 !important;
+  background: #b45309 !important;
+  border-color: #b45309 !important;
+  color: #ffffff !important;
 }
