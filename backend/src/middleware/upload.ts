@@ -1,7 +1,7 @@
-import multer from 'multer'
-import path from 'path'
-import fs from 'fs'
-import type { Request } from 'express'
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+import type { Request } from "express";
 
 // Configurar almacenamiento
 const storage = multer.diskStorage({

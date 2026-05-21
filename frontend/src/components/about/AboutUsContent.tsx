@@ -1,11 +1,11 @@
-import AboutUsImage from "@/components/about/AboutUsImage";
-import AboutUsSectionBlock from "@/components/about/AboutUsSectionBlock";
+import AboutUsImage from '@/components/about/AboutUsImage'
+import AboutUsSectionBlock from '@/components/about/AboutUsSectionBlock'
 import {
   aboutImages,
   introSections,
   peopleSection,
-  presenceSections,
-} from "@/components/about/about.constants";
+  presenceSections
+} from '@/components/about/about.constants'
 
 function AboutUsHeader() {
   return (
@@ -13,16 +13,16 @@ function AboutUsHeader() {
       <p className="text-sm font-medium uppercase tracking-[0.28em] text-amber-600">
         Sobre Nosotros
       </p>
-      <h1 className="font-heading text-4xl font-bold tracking-tight text-stone-900 sm:text-5xl">
+      <h1 className="font-heading text-4xl font-bold tracking-tight text-stone-900 dark:text-stone-100 sm:text-5xl">
         QUIENES SOMOS
       </h1>
     </header>
-  );
+  )
 }
 
 function AboutUsIntroCard() {
   return (
-    <article className="grid gap-6 rounded-[28px] bg-stone-100 p-4 sm:p-6 xl:grid-cols-[1.05fr_1fr] xl:items-stretch xl:p-8">
+    <article className="grid gap-6 rounded-[28px] bg-stone-100 dark:bg-stone-800 p-4 sm:p-6 xl:grid-cols-[1.05fr_1fr] xl:items-stretch xl:p-8">
       <AboutUsImage
         src={aboutImages.familyHome}
         alt="Propiedad residencial destacada de PropBol"
@@ -34,33 +34,30 @@ function AboutUsIntroCard() {
         ))}
       </div>
     </article>
-  );
+  )
 }
 
 function AboutUsPeopleCard() {
   return (
-    <article className="rounded-[28px] bg-stone-100 p-4 sm:p-6">
+    <article className="rounded-[28px] bg-stone-100 dark:bg-stone-800 p-4 sm:p-6">
       <div className="space-y-4">
-        <h2 className="font-heading max-w-xs text-3xl font-bold leading-tight text-stone-900">
-          {peopleSection.title}{" "}
-          <span className="text-amber-600">{peopleSection.accent}</span>
+        <h2 className="font-heading max-w-xs text-3xl font-bold leading-tight text-stone-900 dark:text-stone-100">
+          {peopleSection.title} <span className="text-amber-600">{peopleSection.accent}</span>
         </h2>
         <AboutUsImage
           src={peopleSection.imageSrc}
           alt={peopleSection.imageAlt}
           className="aspect-[16/10] w-full rounded-[24px] shadow-sm"
         />
-        <p className="text-base leading-7 text-stone-600">
-          {peopleSection.description}
-        </p>
+        <p className="text-base leading-7 text-stone-600 dark:text-stone-400">{peopleSection.description}</p>
       </div>
     </article>
-  );
+  )
 }
 
 function AboutUsPresenceCard() {
   return (
-    <article className="rounded-[28px] bg-stone-100 p-4 sm:p-6">
+    <article className="rounded-[28px] bg-stone-100 dark:bg-stone-800 p-4 sm:p-6">
       <div className="grid gap-6 xl:grid-cols-[1fr_0.76fr] xl:items-end">
         <div className="space-y-6">
           {presenceSections.map((section) => (
@@ -74,7 +71,7 @@ function AboutUsPresenceCard() {
         />
       </div>
     </article>
-  );
+  )
 }
 
 export default function AboutUsContent() {
@@ -87,5 +84,5 @@ export default function AboutUsContent() {
         <AboutUsPresenceCard />
       </div>
     </section>
-  );
+  )
 }

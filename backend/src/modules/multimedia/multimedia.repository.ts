@@ -1,5 +1,5 @@
-import type { TipoMultimedia } from '@prisma/client'
-import { prisma } from '../../lib/prisma.config.js'
+import type { TipoMultimedia } from "@prisma/client";
+import { prisma } from "../../lib/prisma.client.js";
 import type {
   MultimediaRecord,
   MultimediaType,

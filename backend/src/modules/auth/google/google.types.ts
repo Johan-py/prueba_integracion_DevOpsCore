@@ -9,6 +9,7 @@ export type GoogleTokenResponse = {
 };
 
 export type GoogleUserInfo = {
+  sub?: string;
   email?: string;
   given_name?: string;
   family_name?: string;
@@ -16,6 +17,21 @@ export type GoogleUserInfo = {
   picture?: string;
   email_verified?: boolean;
 };
+
+export type GoogleLinkSuccess = {
+  message: string;
+  provider: "google";
+  linkedEmail: string | null;
+};
+
+export type GoogleStatePayload =
+  | {
+      mode: "login" | "register";
+    }
+  | {
+      mode: "link";
+      sessionToken: string;
+    };
 
 export type GoogleLoginSuccess = {
   message: string;
@@ -25,18 +41,20 @@ export type GoogleLoginSuccess = {
     correo: string;
     nombre: string;
     apellido: string;
+    avatar?: string | null;
   };
 };
 
+export type GoogleAuthErrorCode =
+  | "GOOGLE_AUTH_FAILED"
+  | "ACCOUNT_NOT_REGISTERED"
+  | "ACCOUNT_ALREADY_REGISTERED";
+
 export class GoogleAuthError extends Error {
-  code: "GOOGLE_AUTH_FAILED" | "ACCOUNT_NOT_REGISTERED";
+  code: GoogleAuthErrorCode;
   statusCode: number;
 
-  constructor(
-    message: string,
-    code: "GOOGLE_AUTH_FAILED" | "ACCOUNT_NOT_REGISTERED",
-    statusCode = 400,
-  ) {
+  constructor(message: string, code: GoogleAuthErrorCode, statusCode = 400) {
     super(message);
     this.name = "GoogleAuthError";
     this.code = code;

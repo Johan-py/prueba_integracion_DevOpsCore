@@ -38,4 +38,19 @@ export const propertyValidationRules = [
     .withMessage(
       "La descripción solo puede contener caracteres alfanuméricos y básicos",
     ),
+
+  body("latitud")
+    .optional()
+    .isFloat()
+    .withMessage("Latitud debe ser un número"),
+
+  body("longitud")
+    .optional()
+    .isFloat()
+    .withMessage("Longitud debe ser un número"),
+
+  body("verticesDifuminado")
+    .optional()
+    .isArray({ min: 3 })
+    .withMessage("La zona difuminada debe tener al menos 3 vértices"),
 ];

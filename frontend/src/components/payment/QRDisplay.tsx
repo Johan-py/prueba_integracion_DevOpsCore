@@ -1,27 +1,39 @@
-"use client";
+'use client'
 
-import React from "react";
-import { QRCodeSVG } from "qrcode.react";
+import React from 'react'
+import Image from 'next/image'
+import { QRCodeSVG } from 'qrcode.react'
 
 interface QRDisplayProps {
-  value: string;
-  size?: number; // si se define, tamaño fijo en px
-  id?: string;
-  className?: string; // clase para el contenedor exterior
+  value: string
+  imageSrc?: string
+  size?: number
+  id?: string
+  className?: string
 }
 
-export function QRDisplay({ value, size, id, className = "" }: QRDisplayProps) {
-  if (!value) {
+export function QRDisplay({ value, imageSrc, size = 250, id, className = '' }: QRDisplayProps) {
+  if (!value && !imageSrc) {
     return (
       <div className="flex justify-center">
         <div className="bg-red-50 p-4 rounded-xl text-center text-red-600">
           Error: QR sin contenido
         </div>
       </div>
-    );
+    )
   }
 
-  const qrElement = size ? (
+  const qrElement = imageSrc ? (
+    <Image
+      src={imageSrc}
+      alt="QR de pago"
+      width={size}
+      height={size}
+      className="rounded-lg"
+      priority
+      unoptimized
+    />
+  ) : (
     <QRCodeSVG
       value={value}
       size={size}
@@ -30,27 +42,18 @@ export function QRDisplay({ value, size, id, className = "" }: QRDisplayProps) {
       level="L"
       includeMargin={false}
     />
-  ) : (
-    <QRCodeSVG
-      value={value}
-      bgColor="#ffffff"
-      fgColor="#000000"
-      level="L"
-      includeMargin={false}
-      style={{ width: "100%", height: "auto" }}
-    />
-  );
+  )
 
   return (
     <div className={`flex flex-col items-center w-full ${className}`}>
-      <div className="bg-white p-4 rounded-xl shadow-inner border border-stone-200 dark:border-stone-700">
+      <div className="bg-white p-3 rounded-xl shadow-inner border border-stone-200">
         {qrElement}
       </div>
       {id && (
-        <p className="text-xs text-center text-stone-500 dark:text-stone-400 mt-2">
+        <p className="text-xs text-center text-stone-500 mt-2">
           {id} · Escanea este código desde tu aplicación bancaria
         </p>
       )}
     </div>
-  );
+  )
 }

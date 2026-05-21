@@ -1,5 +1,4 @@
-import { prisma } from '../lib/prisma.config.js'
-
+import { prisma } from "../lib/prisma.client.js";
 
 const USE_MOCK = true;
 

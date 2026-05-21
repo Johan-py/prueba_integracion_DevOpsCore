@@ -1,6 +1,20 @@
-import type { Request, Response } from 'express'
-import { validationResult } from 'express-validator'
-import propertyService from '../registro-publicacion/publicacion.service.js'
+import type { Request, Response } from "express";
+import { validationResult } from "express-validator";
+import propertyService from "../registro-publicacion/publicacion.service.js";
+
+interface AuthenticatedRequest extends Request {
+  user?: {
+    id: number;
+    correo: string;
+  };
+}
+
+interface AuthenticatedRequest extends Request {
+  user?: {
+    id: number
+    correo: string
+  }
+}
 
 export const createProperty = async (req: Request, res: Response) => {
   const errors = validationResult(req);
@@ -15,14 +29,15 @@ export const createProperty = async (req: Request, res: Response) => {
   }
 
   try {
-    // const userId = (req as any).user?.id;
+    const userId = req.user?.id;
 
-    // if (!userId) {
-    // return res.status(401).json({
-    // mensaje: 'Usuario no autenticado'
-    // });
-    // }
-    const userId = 4;
+    if (!userId) {
+      return res.status(401).json({
+        message: "NOT_AUTHENTICATED",
+        mensaje: "Usuario no autenticado",
+      });
+    }
+
     const property = await propertyService.createProperty(req.body, userId);
 
     return res.status(201).json({
@@ -31,6 +46,20 @@ export const createProperty = async (req: Request, res: Response) => {
     });
   } catch (error: unknown) {
     console.error("Error al registrar la propiedad:", error);
+
+    if (error instanceof Error && error.message === "LIMIT_REACHED") {
+      return res.status(403).json({
+        message: "LIMIT_REACHED",
+        mensaje: "Has alcanzado el límite de publicaciones gratuitas.",
+      });
+    }
+
+    if (error instanceof Error && error.message === 'LIMIT_REACHED') {
+      return res.status(403).json({
+        message: 'LIMIT_REACHED',
+        mensaje: 'Has alcanzado el límite de publicaciones gratuitas.'
+      })
+    }
 
     return res.status(500).json({
       mensaje: "Error al registrar la propiedad",

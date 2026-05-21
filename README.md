@@ -2,26 +2,14 @@
 
 ## 📌 Descripción General
 
-<<<<<<< HEAD
+**PropBol** es una plataforma web enfocada en la **compra, venta y gestión de inmuebles** en Bolivia.
 
-- Frontend y Backend en **Next.js + TSX** (App Router)
-- API REST simple (`/api/calculator`)
-- Tests con **Bun**
-- Docker para contenedores
-  <<<<<<< HEAD
-- # Scripts de desarrollo y CI/CD listos para pipelines
-  **PropBol** es una plataforma web enfocada en la **compra, venta y gestión de inmuebles** en Bolivia.
-  > > > > > > > # 84448d89714560d514d37a9cf4fa1f046e2ebab1
-- Scripts de desarrollo y CI/CD listos para pipelines
-  **PropBol** es una plataforma web enfocada en la **compra, venta y gestión de inmuebles** en Bolivia.
-  > > > > > > > b68a39aab8d9cda89a4ae3b8e3d1069c14f8933f
+Permite a los usuarios:
 
-Permite a usuarios:
-
-- Publicar propiedades (casas, departamentos, terrenos)
-- Explorar listados disponibles
-- Gestionar información de usuarios
-- Autenticarse y operar de forma segura
+* Publicar propiedades (casas, departamentos, terrenos)
+* Explorar listados disponibles
+* Gestionar información de usuarios
+* Autenticarse y operar de forma segura
 
 El sistema está diseñado bajo una arquitectura moderna, escalable y desacoplada.
 
@@ -31,83 +19,13 @@ El sistema está diseñado bajo una arquitectura moderna, escalable y desacoplad
 
 El proyecto sigue un enfoque **monorepo** con separación clara por capas:
 
-- **Frontend** → Next.js (App Router + TypeScript)
-- **Backend** → API REST (Node.js + TypeScript)
-- **Infraestructura** → Docker + CI/CD (GitHub Actions)
+* **Frontend** → Next.js (App Router + TypeScript)
+* **Backend** → API REST (Node.js + TypeScript)
+* **Infraestructura** → Docker + CI/CD (GitHub Actions)
 
 ---
-
-<<<<<<< HEAD
-
-## ⚡ Requisitos
-
-- **Bun** (v1.3+) → [https://bun.sh](https://bun.sh)
-- Git
-- Docker (opcional para pruebas de despliegue)
-
-> No necesitas Node.js, Bun reemplaza todo.
-
----
-
-## 🚀 Comandos principales
-
-| Acción                | Comando Bun         |
-| --------------------- | ------------------- |
-| Levantar dev server   | `bun run dev`       |
-| Build de producción   | `bun run build`     |
-| Start de producción   | `bun run start`     |
-| Correr tests          | `bun test`          |
-| Instalar dependencias | `bun install`       |
-| Agregar dependencia   | `bun add <package>` |
-
----
-
-## 🧪 API Example
-
-**Sumar 2 números**:
-
-```
-GET /api/calculator?a=10&b=2&op=add
-```
-
-**Respuesta:**
-
-```json
-{ "result": 12 }
-```
-
-**División:**
-
-```
-GET /api/calculator?a=10&b=2&op=divide
-```
-
-> Maneja errores: divide por 0 o números inválidos → status 400
-
----
-
-## 🛠 Estructura de pruebas para DevOps
-
-- **DevOps 1**: Infraestructura y Docker, simular despliegues y caídas de servicios
-- **DevOps 2**: Pipelines y tests, inyectar tests rotos o builds fallidos
-- **DevOps 3**: Repositorio y monitoreo, crear PR con conflictos y revisar alertas
-
----
-
-## 🐳 Docker
-
-<<<<<<< HEAD
-
-# Levantar contenedor de desarrollo:
-
-=======
-Levantar contenedor de desarrollo:
-
-> > > > > > > b68a39aab8d9cda89a4ae3b8e3d1069c14f8933f
 
 ## 📂 Estructura del Proyecto
-
-> > > > > > > 84448d89714560d514d37a9cf4fa1f046e2ebab1
 
 ```bash
 .
@@ -118,43 +36,20 @@ Levantar contenedor de desarrollo:
 └── .github/      # pipelines CI/CD
 ```
 
-<<<<<<< HEAD
-
-- Acceder a `http://localhost:3000/`
-- API: `http://localhost:3000/api/calculator`
-
-=======
-
-> > > > > > > 84448d89714560d514d37a9cf4fa1f046e2ebab1
-
 ---
 
 ## ⚙️ Requisitos
 
-<<<<<<< HEAD
-<<<<<<< HEAD
+* Node.js >= 18
+* pnpm
+* Git
+* Docker (opcional)
 
-=======
+Instalar pnpm:
 
-> > > > > > > b68a39aab8d9cda89a4ae3b8e3d1069c14f8933f
-
-- Usa `bun test` para todos los tests; no es necesario configurar Jest manualmente
-- Toda la lógica de API está en `app/api/calculator/route.ts`
-- Layout obligatorio en `app/layout.tsx` para evitar errores de Next.js con App Router
-
-<<<<<<< HEAD
-
-> # Este repositorio sirve como **base para construir escenarios de estrés realistas para el equipo de DevOps**.
->
-> =======
-> Este repositorio sirve como **base para construir escenarios de estrés realistas para el equipo de DevOps**.
->
-> > > > > > > b68a39aab8d9cda89a4ae3b8e3d1069c14f8933f
-> > > > > > > Asegúrate de tener instalado:
-
-- Bun >= 1.x
-- Node.js >= 18
-- Docker (opcional)
+```bash
+npm install -g pnpm
+```
 
 ---
 
@@ -172,7 +67,7 @@ cd <repo>
 ### 2. Instalar dependencias
 
 ```bash
-bun install
+pnpm install
 ```
 
 ---
@@ -190,6 +85,7 @@ Ejemplo:
 ```env
 PORT=5000
 JWT_SECRET=your_secret_key
+DATABASE_URL=your_database_url
 ```
 
 ---
@@ -197,8 +93,7 @@ JWT_SECRET=your_secret_key
 ### 4. Ejecutar Backend
 
 ```bash
-cd backend
-bun run dev
+pnpm --filter backend dev
 ```
 
 Disponible en:
@@ -214,34 +109,52 @@ http://localhost:5000
 En otra terminal:
 
 ```bash
-cd frontend
-bun run dev
-```
-
-### 6. Ejecucion general (back y front)
-
-En la raiz del proyecto:
-
-```bash
-bun run dev
+pnpm --filter frontend dev
 ```
 
 Disponible en:
 
 ```bash
-## frontend
 http://localhost:3000
-## backend
-http://localhost:5000
-
 ```
+
+---
+
+### 6. Ejecutar todo (monorepo)
+
+```bash
+pnpm dev
+```
+
+---
+
+## 🐳 Docker
+
+Levantar contenedor de desarrollo:
+
+```bash
+docker-compose up --build
+```
+
+---
+
+## 🔄 Scripts principales
+
+| Acción           | Comando                      |
+| ---------------- | ---------------------------- |
+| Instalar deps    | `pnpm install`               |
+| Dev (todo)       | `pnpm dev`                   |
+| Backend dev      | `pnpm --filter backend dev`  |
+| Frontend dev     | `pnpm --filter frontend dev` |
+| Build            | `pnpm build`                 |
+| Start producción | `pnpm start`                 |
 
 ---
 
 ## 🌿 Flujo de Trabajo
 
-- `main` → producción
-- `develop` → integración
+* `main` → producción
+* `develop` → integración
 
 ### Convención de commits
 
@@ -255,21 +168,19 @@ chore: tareas internas
 
 ## 📦 Buenas Prácticas
 
-- No subir archivos `.env`
-- No modificar configuraciones críticas sin aprobación
-- Mantener commits pequeños:
-  - máximo permitido: 250 líneas
-
-- Seguir arquitectura por capas en backend
-- Separar lógica y UI en frontend
+* No subir archivos `.env`
+* No modificar configuraciones críticas sin aprobación
+* Mantener commits pequeños (máx. ~250 líneas)
+* Seguir arquitectura por capas en backend
+* Separar lógica y UI en frontend
 
 ---
 
 ## 🔐 Seguridad
 
-- No hardcodear credenciales
-- Uso obligatorio de variables de entorno
-- Revisar scripts antes de ejecutarlos (`/scripts`)
+* No hardcodear credenciales
+* Uso obligatorio de variables de entorno
+* Revisar scripts antes de ejecutarlos (`/scripts`)
 
 ---
 
@@ -283,19 +194,18 @@ En desarrollo activo.
 
 Construir una plataforma robusta y escalable que facilite el mercado inmobiliario en Bolivia, permitiendo:
 
-- Mayor visibilidad de propiedades
-- Gestión eficiente de usuarios
-- Experiencia moderna y rápida
+* Mayor visibilidad de propiedades
+* Gestión eficiente de usuarios
+* Experiencia moderna y rápida
 
 ---
 
 ## 👥 Contribución
 
-Para contribuir:
-
-1. Crear una rama desde `develop` feature/nombre_HU o feature
-2. Implementar cambios siguiendo los estándares
-3. Abrir un Pull Request a su lead de equipo
+1. Crear una rama desde `develop`
+   `feature/nombre_HU`
+2. Implementar cambios siguiendo estándares
+3. Abrir un Pull Request
 
 ---
 
@@ -303,4 +213,3 @@ Para contribuir:
 
 Pendiente de definición.
 
-> > > > > > > 84448d89714560d514d37a9cf4fa1f046e2ebab1

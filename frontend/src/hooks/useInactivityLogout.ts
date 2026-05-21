@@ -3,7 +3,7 @@
 import { useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
-const INACTIVITY_LIMIT_MS = 20 * 60 * 1000;
+const INACTIVITY_LIMIT_MS = 3 * 60 * 1000;
 const WARNING_BEFORE_MS = 1 * 60 * 1000;
 
 const TOKEN_STORAGE_KEY = "token";
@@ -53,6 +53,10 @@ export function useInactivityLogout({
   const logout = useCallback(() => {
     clearTimers();
     clearSession();
+    sessionStorage.setItem(
+      "authMessage",
+      "Tu sesión expiró por inactividad. Inicia sesión nuevamente.",
+    );
     onLogout?.();
     router.replace("/sign-in?reason=inactivity");
   }, [clearSession, clearTimers, onLogout, router]);

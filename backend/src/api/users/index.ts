@@ -1,6 +1,9 @@
-import express from 'express'
-import cors from 'cors'
-import { registerController, loginController } from '../../modules/auth/auth.controller.js'
+import express from "express";
+import cors from "cors";
+import {
+  registerController,
+  loginController,
+} from "../../modules/auth/auth.controller.js";
 
 const app = express();
 
