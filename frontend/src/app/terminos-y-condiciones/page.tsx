@@ -72,30 +72,24 @@ const termsSections: TermsSection[] = [
 export default function TermsAndConditionsPage() {
   return (
     <div
-      className="min-h-screen py-10"
+      className="min-h-screen py-10 w-[100vw] -ml-[calc(50vw-50%)] bg-cover bg-center bg-no-repeat bg-fixed"
       style={{
-        width: '100vw',
-        marginLeft: 'calc(-50vw + 50%)',
         backgroundImage:
-          "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('/icons/fondoTerminos.jpg')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed'
+          "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('/icons/fondoTerminos.jpg')"
       }}
     >
       <section className="w-full min-h-screen flex justify-center py-2 sm:py-4">
-        <div className="w-full max-w-5xl rounded-[28px] border border-stone-200 bg-stone-50 p-4 shadow-sm sm:p-6 lg:p-8">
-          <div className="rounded-[24px] bg-white p-5 sm:p-8 lg:p-10">
-            <header className="space-y-4 border-b border-amber-200 pb-6">
+        <div className="w-full max-w-5xl rounded-[28px] border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 p-4 shadow-sm sm:p-6 lg:p-8">
+          <div className="rounded-[24px] bg-white dark:bg-stone-900 p-5 sm:p-8 lg:p-10">
+            <header className="space-y-4 border-b border-amber-200 dark:border-amber-700 pb-6">
               <p className="text-sm font-medium uppercase tracking-[0.28em] text-amber-600">
                 PropBol
               </p>
               <div className="space-y-3">
-                <h1 className="font-heading text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">
+                <h1 className="font-heading text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-100 sm:text-4xl">
                   TÉRMINOS Y CONDICIONES
                 </h1>
-                <p className="max-w-3xl text-sm leading-7 text-stone-600 sm:text-base">
+                <p className="max-w-3xl text-sm leading-7 text-stone-600 dark:text-stone-400 sm:text-base">
                   Este documento establece las condiciones generales de uso del portal inmobiliario
                   de PropBol. Su lectura permite comprender el alcance del servicio, las
                   responsabilidades del usuario y los criterios bajo los cuales se presenta la
@@ -107,16 +101,16 @@ export default function TermsAndConditionsPage() {
             <div className="space-y-8 pt-6 sm:space-y-10 sm:pt-8">
               {termsSections.map((section) => (
                 <section key={section.title} className="space-y-3">
-                  <h2 className="font-heading text-xl font-bold text-stone-900 sm:text-2xl">
+                  <h2 className="font-heading text-xl font-bold text-stone-900 dark:text-stone-100 sm:text-2xl">
                     {section.title}
                   </h2>
                   {section.paragraphs.map((paragraph) => (
-                    <p key={paragraph} className="text-sm leading-7 text-stone-600 sm:text-base">
+                    <p key={paragraph} className="text-sm leading-7 text-stone-600 dark:text-stone-400 sm:text-base">
                       {paragraph}
                     </p>
                   ))}
                   {section.bullets ? (
-                    <ul className="space-y-2 pl-5 text-sm leading-7 text-stone-600 sm:text-base">
+                    <ul className="space-y-2 pl-5 text-sm leading-7 text-stone-600 dark:text-stone-400 sm:text-base">
                       {section.bullets.map((bullet) => (
                         <li key={bullet} className="list-disc marker:text-amber-600">
                           {bullet}

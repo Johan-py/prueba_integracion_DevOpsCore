@@ -57,7 +57,7 @@ export const getPlanById = async (req: Request, res: Response) => {
     if (isNaN(id)) return res.status(400).json({ error: 'ID inválido' })
 
     const plan = await prisma.plan_suscripcion.findUnique({ where: { id } })
-    if (!plan) return res.status(404).json({ error: 'Plan no encontrado' })
+    if (!plan || plan.eliminado_en) return res.status(404).json({ error: 'Plan no encontrado' })
 
     return res.json({
       id: plan.id,

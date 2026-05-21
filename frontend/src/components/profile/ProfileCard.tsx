@@ -39,6 +39,15 @@ const PAISES_DEFAULT: PaisAPI[] = [
   { nombre: 'Perú', codigo: '+51', flag: '🇵🇪', digitos: 9 }
 ]
 
+// Diccionario de Regex exclusivo para Sudamérica
+const phoneValidators: Record<string, RegExp> = {
+  'Bolivia': /^[67]\d{7}$/,
+  'Argentina': /^[123]\d{9}$/,
+  'Chile': /^9\d{8}$/,
+  'Perú': /^9\d{8}$/,
+  'Colombia': /^3\d{9}$/
+}
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
 
 const ofuscarEmail = (email: string) => {
@@ -943,10 +952,43 @@ function ProfileCardContent() {
                   setErrorNombre('')
                 }
 
+                // VALIDACIÓN DE TELÉFONOS (Incluye reglas para Bolivia y Regex Regional)
+                let telefonoInvalido = false;
                 if (!telefonos[0].numero.trim()) {
                   setErrorTelefono('Debes registrar al menos un número de teléfono')
                   hasError = true
+                  telefonoInvalido = true;
                 } else {
+                  for (let i = 0; i < telefonos.length; i++) {
+                    const tel = telefonos[i];
+                    if (tel.numero.trim()) {
+                      
+                      
+                      // 2. Regla Regex para Sudamérica
+                      const regex = phoneValidators[tel.pais];
+                      if (regex) {
+                        if (!regex.test(tel.numero)) {
+                          setErrorTelefono(`El número telefónico no corresponde al formato válido para ${tel.pais}`);
+                          hasError = true;
+                          telefonoInvalido = true;
+                          break;
+                        }
+                      } else {
+                        // 3. Regla general para el resto del mundo (validar cantidad exacta de dígitos)
+                        const configPais = paisesOptions.find((p) => p.nombre === tel.pais) || PAISES_DEFAULT.find((p) => p.nombre === tel.pais);
+                        const maxDigitos = configPais?.digitos || 15;
+                        if (tel.numero.length !== maxDigitos) {
+                          setErrorTelefono(`El número debe tener exactamente ${maxDigitos} dígitos para ${tel.pais}`);
+                          hasError = true;
+                          telefonoInvalido = true;
+                          break;
+                        }
+                      }
+                    }
+                  }
+                }
+                
+                if (!telefonoInvalido) {
                   setErrorTelefono('')
                 }
 
@@ -968,7 +1010,6 @@ function ProfileCardContent() {
                   setErrorFechaNacimiento('')
                 }
 
-                // ✅ CRITERIO 1: Dirección (Opcional, pero sin espacios en blanco y < 250 chars)
                 if (direccion.length > 0 && !direccion.trim()) {
                   setErrorDireccion('La dirección no puede contener solo espacios en blanco')
                   hasError = true

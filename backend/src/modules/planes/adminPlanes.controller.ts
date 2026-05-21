@@ -5,7 +5,7 @@ const toMessage = (e: unknown) => (e instanceof Error ? e.message : 'Error inter
 
 export const listarPlanes = async (_req: Request, res: Response) => {
   try {
-    const planes = await prisma.plan_suscripcion.findMany({ orderBy: { id: 'asc' } })
+    const planes = await prisma.plan_suscripcion.findMany({ where: { eliminado_en: null }, orderBy: { id: 'asc' } })
     return res.json(
       planes.map((p) => ({
         id: p.id,
@@ -31,6 +31,12 @@ export const crearPlan = async (req: Request, res: Response) => {
     if (Number(precio_plan) < 0) {
       return res.status(400).json({ error: 'El precio no puede ser negativo' })
     }
+    const duplicado = await prisma.plan_suscripcion.findFirst({
+      where: { nombre_plan: { equals: nombre_plan, mode: 'insensitive' }, eliminado_en: null },
+    })
+    if (duplicado) {
+      return res.status(409).json({ error: `Ya existe un plan con el nombre "${nombre_plan}"` })
+    }
     const plan = await prisma.plan_suscripcion.create({
       data: { nombre_plan, descripcion_plan, precio_plan, duracion_plan_dias, nro_publicaciones_plan, imagen_gr_url },
     })
@@ -55,6 +61,14 @@ export const actualizarPlan = async (req: Request, res: Response) => {
     const { nombre_plan, descripcion_plan, precio_plan, duracion_plan_dias, nro_publicaciones_plan, imagen_gr_url } = req.body
     if (precio_plan !== undefined && Number(precio_plan) < 0) {
       return res.status(400).json({ error: 'El precio no puede ser negativo' })
+    }
+    if (nombre_plan) {
+      const duplicado = await prisma.plan_suscripcion.findFirst({
+        where: { nombre_plan: { equals: nombre_plan, mode: 'insensitive' }, eliminado_en: null, NOT: { id } },
+      })
+      if (duplicado) {
+        return res.status(409).json({ error: `Ya existe un plan con el nombre "${nombre_plan}"` })
+      }
     }
     const plan = await prisma.plan_suscripcion.update({
       where: { id },
@@ -86,7 +100,7 @@ export const eliminarPlan = async (req: Request, res: Response) => {
       return res.status(409).json({ error: 'No se puede eliminar: el plan tiene suscripciones activas' })
     }
 
-    await prisma.plan_suscripcion.delete({ where: { id } })
+    await prisma.plan_suscripcion.update({ where: { id }, data: { eliminado_en: new Date() } })
     return res.json({ ok: true })
   } catch (e) {
     return res.status(500).json({ error: toMessage(e) })

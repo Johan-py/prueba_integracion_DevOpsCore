@@ -159,8 +159,14 @@ export const ResultadosBusqueda = () => {
         <div className="grid grid-cols-1 gap-4">
           {inmueblesOrdenados.map((item: unknown, index: number) => {
             const inmueble = item as Inmueble
-            return <TarjetaInmueble key={inmueble.id} inmueble={inmueble} posicion={index + 1} />
-          })}
+       return (
+        <TarjetaInmueble 
+        key={inmueble.id} 
+        inmueble={inmueble} 
+        posicion={index + 1}
+        esRecomendadoIA={searchParams.get('orden') === 'recomendados'}
+       />
+     )  })}
         </div>
       ) : (
         <div className="text-center py-12">

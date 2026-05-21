@@ -239,7 +239,7 @@ export default function PriceFilterSidebar({ isOpen, onClose, totalResultados = 
       </div>
 
       {/* 3. FOOTER (Fijo al fondo) */}
-      <div className="shrink-0 px-6 pb-6 pt-4 border-t border-stone-100 bg-white dark:border-slate-800 dark:bg-slate-900 relative">
+      <div className="shrink-0 px-6 pb-6 pt-4 border-t border-stone-100 bg-white dark:border-stone-800 dark:bg-stone-900 relative">
         
         <style dangerouslySetInnerHTML={{__html: `
           html body #btn-aplicar-precio {
@@ -266,7 +266,7 @@ export default function PriceFilterSidebar({ isOpen, onClose, totalResultados = 
             params.delete('currency')
             router.push(`/busqueda_mapa?${params.toString()}`)
           }}
-          className="text-xs text-stone-400 hover:text-[#d97706] dark:text-slate-400 dark:hover:text-[#E87C1E] transition-colors underline text-center w-full mb-3"
+          className="text-xs text-stone-400 hover:text-[#d97706] dark:text-stone-400 dark:hover:text-[#E87C1E] transition-colors underline text-center w-full mb-3"
         >
           Limpiar filtro
         </button>
