@@ -10,6 +10,7 @@ import {
   enviarCodigoActivacionCuenta,
 } from "../../lib/email.service.js";
 import { generateToken, type JwtPayload } from "../../utils/jwt.js";
+import { comparePassword, hashPassword } from "../../utils/password.js";
 import { sendMagicLinkEmail } from "./magic-link-email.service.js";
 import { cache } from "../../lib/cache.service.js";
 import {
@@ -429,7 +430,7 @@ export const loginService = async (payload: LoginDTO) => {
     );
   }
 
-  const isValidPassword = user.password === password;
+  const isValidPassword = await comparePassword(password, user.password);
 
   if (!isValidPassword) {
     const attemptStatus = registerFailedAttempt(correo);
@@ -1321,7 +1322,7 @@ export const resetPasswordService = async (payload: ResetPasswordDTO) => {
   }
 
   // Validar que la nueva contraseña sea diferente a la actual
-  if (user.password === password) {
+  if (await comparePassword(password, user.password)) {
     throw new AuthError(
       "La nueva contraseña debe ser diferente a la contraseña actual",
       400,
@@ -1335,7 +1336,7 @@ export const resetPasswordService = async (payload: ResetPasswordDTO) => {
     }),
     prisma.usuario.update({
       where: { id: recovery.usuarioId },
-      data: { password },
+      data: { password: await hashPassword(password) },
     }),
     prisma.sesion.updateMany({
       where: { usuarioId: recovery.usuarioId, estado: true },

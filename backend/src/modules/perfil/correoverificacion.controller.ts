@@ -4,6 +4,7 @@ import { prisma } from "../../lib/prisma.client.js";
 import { enviarCodigoCambioEmail, enviarAvisoCambioPassword } from "../../lib/email.service.js";
 import { notificarCambioPassword } from "../whatsapp/whatsapp.notifications.js";
 import { invalidateOtherUserSessions } from "../auth/auth.repository.js";
+import { comparePassword, hashPassword } from "../../utils/password.js";
 
 interface AuthRequest extends Request {
   usuario?: {
@@ -167,7 +168,7 @@ export const cambiarPassword = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    const passwordIncorrecta = usuario.password !== passwordActualNormalizada;
+    const passwordIncorrecta = !(await comparePassword(passwordActualNormalizada, usuario.password));
 
     if (passwordIncorrecta) {
       const nuevosIntentos = Math.min(
@@ -214,7 +215,7 @@ export const cambiarPassword = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    if (usuario.password === nuevaPasswordNormalizada) {
+    if (await comparePassword(nuevaPasswordNormalizada, usuario.password)) {
       return res.status(400).json({
         ok: false,
         msg: "La nueva contraseña no puede ser igual a la actual",
@@ -228,9 +229,9 @@ export const cambiarPassword = async (req: AuthRequest, res: Response) => {
       select: { passwordHash: true },
     });
 
-    const esPasswordReciente = historialReciente.some(
-      (h) => h.passwordHash === nuevaPasswordNormalizada
-    );
+    const esPasswordReciente = await Promise.all(
+      historialReciente.map((h) => comparePassword(nuevaPasswordNormalizada, h.passwordHash))
+    ).then((results) => results.some((match) => match));
 
     if (esPasswordReciente) {
       return res.status(400).json({
@@ -251,28 +252,32 @@ export const cambiarPassword = async (req: AuthRequest, res: Response) => {
       });
     }
 
+    const hashedPassword = await hashPassword(nuevaPasswordNormalizada);
+
     const cambioRealizado = await prisma.$transaction(async (tx) => {
-    const resultadoActualizacion = await tx.usuario.updateMany({
-      where: {
-        id: usuarioId,
-        password: passwordActualNormalizada,
-      },
+    const usuarioActual = await tx.usuario.findUnique({
+      where: { id: usuarioId },
+      select: { password: true }
+    });
+
+    if (!usuarioActual || !(await comparePassword(passwordActualNormalizada, usuarioActual.password))) {
+      return false;
+    }
+
+    await tx.usuario.update({
+      where: { id: usuarioId },
       data: {
-        password: nuevaPasswordNormalizada,
+        password: hashedPassword,
         intentos_fallidos_cambio_password: 0,
         bloqueo_cambio_password_hasta: null,
         password_actualizado_en: new Date(),
       },
     });
 
-    if (resultadoActualizacion.count !== 1) {
-      return false;
-    }
-
     await tx.historial_password.create({
       data: {
         usuarioId,
-        passwordHash: passwordActualNormalizada,
+        passwordHash: usuarioActual.password,
       },
     });
 
@@ -378,7 +383,7 @@ export const verificarPassword = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    const validPassword = passwordActualNormalizada === usuario.password;
+    const validPassword = await comparePassword(passwordActualNormalizada, usuario.password);
 
     if (!validPassword) {
       const nuevosIntentos = Math.min(

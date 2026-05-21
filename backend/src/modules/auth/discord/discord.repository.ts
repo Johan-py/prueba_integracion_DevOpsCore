@@ -8,6 +8,7 @@ import {
   findSocialLinkByUserAndProvider,
   findUserByActiveSessionTokenForSocialLink
 } from '../auth.repository.js'
+import { hashPassword } from '../../../utils/password.js'
 
 type CreateDiscordUserInput = {
   nombre: string
@@ -43,11 +44,13 @@ export const createDiscordUser = async (
   discordId: string,
   correoProveedor: string
 ) => {
+  const hashedPassword = await hashPassword(data.password)
+
   const user = await createUser({
     nombre: data.nombre,
     apellido: data.apellido,
     correo: data.correo,
-    password: data.password
+    password: hashedPassword
   })
 
   await createSocialLink({

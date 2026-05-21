@@ -6,6 +6,7 @@ import {
   enviarCodigoDesactivacionCuenta,
   enviarCodigoActivacion2FA,
 } from "../../lib/email.service.js";
+import { comparePassword } from "../../utils/password.js";
 
 import {
   deactivateUserAccountRepository,
@@ -214,7 +215,7 @@ export const validateCurrentPasswordService = async (
     throw new SecurityError("El usuario no tiene contraseña registrada.", 400);
   }
 
-  const isValidPassword = user.password === trimmedPassword;
+  const isValidPassword = await comparePassword(trimmedPassword, user.password);
 
   if (!isValidPassword) {
     const attemptStatus = registerFailedAttempt(userId);

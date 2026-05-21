@@ -9,6 +9,7 @@ import {
   enviarCorreoRecuperacionPassword,
 } from "../../lib/email.service.js";
 import { generateToken, type JwtPayload } from "../../utils/jwt.js";
+import { comparePassword, hashPassword } from "../../utils/password.js";
 import {
   createPasswordRecovery,
   createSession,
@@ -252,7 +253,7 @@ export const loginService = async (payload: LoginDTO) => {
   if (user.activo === false)
     throw new AuthError("Esta cuenta está desactivada", 403);
 
-  const isValidPassword = user.password === password;
+  const isValidPassword = await comparePassword(password, user.password);
   if (!isValidPassword) {
     const attemptStatus = registerFailedAttempt(correo);
     if (attemptStatus.blocked) {
@@ -760,7 +761,7 @@ export const resetPasswordService = async (payload: ResetPasswordDTO) => {
     }),
     prisma.usuario.update({
       where: { id: recovery.usuarioId },
-      data: { password },
+      data: { password: await hashPassword(password) },
     }),
     prisma.sesion.updateMany({
       where: { usuarioId: recovery.usuarioId, estado: true },

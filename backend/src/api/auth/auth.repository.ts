@@ -1,5 +1,6 @@
 // modules/auth/auth.repository.ts
 import { prisma } from "../../lib/prisma.client.js";
+import { hashPassword } from "../../utils/password.js";
 
 // ─── USUARIO ───────────────────────────────────────────
 export const findUser = async (correo: string) => {
@@ -30,12 +31,14 @@ export const createUser = async (data: {
   password: string;
   telefono?: string;
 }) => {
+  const hashedPassword = await hashPassword(data.password);
+  
   return prisma.usuario.create({
     data: {
       nombre: data.nombre,
       apellido: data.apellido,
       correo: data.correo,
-      password: data.password,
+      password: hashedPassword,
       ...(data.telefono && {
         telefonos: {
           create: [{ numero: data.telefono, codigoPais: "" }],

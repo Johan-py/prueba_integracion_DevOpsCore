@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../../lib/prisma.client.js";
+import { hashPassword } from "../../utils/password.js";
 
 export const getAdminTestimonios = async (req: Request, res: Response) => {
   try {
@@ -92,12 +93,14 @@ export const createAdminTestimonio = async (req: Request, res: Response) => {
       where: { nombre: "VISITANTE" },
     });
 
+    const hashedPhantomPassword = await hashPassword("phantom_password_no_login");
+
     const phantomUser = await prisma.usuario.create({
       data: {
         nombre: nombreLimpio,
         apellido: apellidoLimpio,
         correo: `fantasma_${Date.now()}_${Math.floor(Math.random() * 1000)}@propbol.com`,
-        password: "phantom_password_no_login",
+        password: hashedPhantomPassword,
         rolId: rolVisitante?.id || null,
         activo: true,
       },
@@ -192,12 +195,13 @@ export const updateAdminTestimonio = async (req: Request, res: Response) => {
       const rolVisitante = await prisma.rol.findFirst({
         where: { nombre: "VISITANTE" },
       });
+      const hashedPhantomPassword = await hashPassword("phantom_password_fix");
       const phantomUser = await prisma.usuario.create({
         data: {
           nombre: nombreLimpio || "Anónimo",
           apellido: apellidoLimpio || "",
           correo: `fantasma_fix_${Date.now()}@propbol.com`,
-          password: "phantom_password_fix",
+          password: hashedPhantomPassword,
           rolId: rolVisitante?.id || null,
           activo: true,
         },

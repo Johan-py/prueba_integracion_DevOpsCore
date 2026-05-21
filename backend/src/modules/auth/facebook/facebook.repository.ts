@@ -7,6 +7,7 @@ import {
   findSocialLinkByUserAndProvider,
   findUserByActiveSessionTokenForSocialLink
 } from '../auth.repository.js'
+import { hashPassword } from '../../../utils/password.js'
 
 type CreateFacebookUserInput = {
   nombre: string
@@ -39,11 +40,13 @@ export const createFacebookUser = async (
   facebookId: string,
   correoProveedor: string
 ) => {
+  const hashedPassword = await hashPassword(data.password)
+
   const user = await createUser({
     nombre: data.nombre,
     apellido: data.apellido,
     correo: data.correo,
-    password: data.password
+    password: hashedPassword
   })
 
   await prisma.autenticacion_social.create({

@@ -1,5 +1,6 @@
 import { RolNombre } from "@prisma/client";
 import { prisma } from "../../lib/prisma.client.js";
+import { hashPassword } from "../../utils/password.js";
 
 interface CreateUserInput {
   nombre: string;
@@ -53,12 +54,14 @@ export const createUser = async (data: CreateUserInput) => {
   const rol = await ensureVisitorRole();
 
   try {
+    const hashedPassword = await hashPassword(data.password);
+    
     return await prisma.usuario.create({
       data: {
         nombre: data.nombre,
         apellido: data.apellido,
         correo: data.correo,
-        password: data.password,
+        password: hashedPassword,
         rolId: rol.id,
         telefonos: data.telefono
           ? {

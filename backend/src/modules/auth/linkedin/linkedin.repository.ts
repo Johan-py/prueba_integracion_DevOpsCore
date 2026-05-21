@@ -7,6 +7,7 @@ import {
   findUserByActiveSessionTokenForSocialLink,
   findUserByCorreo
 } from '../auth.repository.js'
+import { hashPassword } from '../../../utils/password.js'
 
 type CreateLinkedInUserInput = {
   nombre: string
@@ -44,6 +45,8 @@ export const createLinkedInUser = async (
   correoProveedor: string,
   tokenStorage: LinkedInTokenStorageInput
 ) => {
+  const hashedPassword = await hashPassword(data.password)
+
   return await prisma.$transaction(async (tx) => {
     const rol = await tx.rol.upsert({
       where: { nombre: 'VISITANTE' },
@@ -56,7 +59,7 @@ export const createLinkedInUser = async (
         nombre: data.nombre,
         apellido: data.apellido,
         correo: data.correo,
-        password: data.password,
+        password: hashedPassword,
         rolId: rol.id,
         avatar: data.avatar ?? null
       }
