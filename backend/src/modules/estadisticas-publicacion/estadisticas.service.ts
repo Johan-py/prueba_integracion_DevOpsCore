@@ -417,4 +417,62 @@ export class EstadisticasPublicacionService {
       };
     });
   }
+    static async obtenerResumenEstadisticasPublicas(publicacionesIds: number[]) {
+    const idsUnicos = Array.from(
+      new Set(
+        publicacionesIds.filter(
+          (id) => Number.isInteger(id) && id > 0,
+        ),
+      ),
+    );
+
+    if (idsUnicos.length === 0) {
+      return {};
+    }
+
+    const estadisticas = await prisma.publicacion_estadistica.findMany({
+      where: {
+        publicacion_id: {
+          in: idsUnicos,
+        },
+      },
+      select: {
+        publicacion_id: true,
+        total_visualizaciones: true,
+        total_compartidos: true,
+      },
+    });
+
+    const estadisticasPorPublicacion = new Map<
+      number,
+      {
+        totalVisualizaciones: number;
+        totalCompartidos: number;
+      }
+    >();
+
+    estadisticas.forEach((estadistica) => {
+      estadisticasPorPublicacion.set(estadistica.publicacion_id, {
+        totalVisualizaciones: estadistica.total_visualizaciones,
+        totalCompartidos: estadistica.total_compartidos,
+      });
+    });
+
+    return idsUnicos.reduce<
+      Record<
+        number,
+        {
+          totalVisualizaciones: number;
+          totalCompartidos: number;
+        }
+      >
+    >((acc, publicacionId) => {
+      acc[publicacionId] = estadisticasPorPublicacion.get(publicacionId) ?? {
+        totalVisualizaciones: 0,
+        totalCompartidos: 0,
+      };
+
+      return acc;
+    }, {});
+  }
 }
