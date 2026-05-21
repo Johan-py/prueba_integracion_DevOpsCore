@@ -122,9 +122,11 @@ export default function TagsPropiedad({
   };
 
   const handleGuardar = () => {
+    if (tags.length === 0) {
+      setError("Agrega al menos un tag antes de guardar");
+      return;
+    }
     onGuardar?.(tags);
-    setMensajeExito("✓ Tags guardados correctamente");
-    setTimeout(() => setMensajeExito(""), 2000);
   };
 
   return (
