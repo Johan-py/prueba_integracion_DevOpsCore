@@ -201,6 +201,18 @@ export default function NotificationDetailPage() {
               </button>
             </div>
           )}
+
+          {notification.tipo === 'PAGO_PENDIENTE' && (
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => router.push('/admin/pagos')}
+                className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-amber-700"
+              >
+                Ir al panel de pagos
+              </button>
+            </div>
+          )}
         </div>
       </article>
     </section>

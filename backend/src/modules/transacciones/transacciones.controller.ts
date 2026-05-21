@@ -370,6 +370,7 @@ export const notificarAdmin = async (req: AuthRequest, res: Response) => {
           correo: a.correo,
           titulo: 'Nuevo pago pendiente de verificación',
           mensaje: `${nombreUsuario} indica haber realizado el pago REF-${id} del plan ${planNombre}. Monto: ${monto} · Método: ${metodo} · Fecha: ${fechaHora}. Revisa el panel de pagos.`,
+          tipo: 'PAGO_PENDIENTE',
         })
       )
     )
