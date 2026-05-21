@@ -106,15 +106,31 @@ export default function DetallePropiedadPage() {
   return (
     <main className="min-h-screen bg-[#ede7dc]">
       <div className="mx-auto w-full max-w-[1120px] px-4 py-8">
-        <div className="mb-4 flex justify-end">
+        <div className="mb-4 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => window.close()}
+            className="rounded-full px-3 py-2 text-sm font-semibold text-[#d67a00] transition hover:bg-[#f3ece2]"
+          >
+            ← Volver
+          </button>
+
           <button
             type="button"
             onClick={toggleFavorite}
             disabled={isLoadingStatus || isSubmitting}
-            className={`flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold transition ${isFavorite ? 'bg-[#fff0f6] text-[#E68B25]' : 'text-[#d67a00] hover:bg-[#f3ece2]'
-              } ${isLoadingStatus || isSubmitting ? 'cursor-not-allowed opacity-70' : ''}`}
+            className={`flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold transition ${
+              isFavorite
+                ? 'bg-[#fff0f6] text-[#E68B25]'
+                : 'text-[#d67a00] hover:bg-[#f3ece2]'
+            } ${isLoadingStatus || isSubmitting ? 'cursor-not-allowed opacity-70' : ''}`}
           >
-            <Heart className={`h-4 w-4 ${isFavorite ? 'fill-[#E68B25] text-[#E68B25]' : ''}`} />
+            <Heart
+              className={`h-4 w-4 ${
+                isFavorite ? 'fill-[#E68B25] text-[#E68B25]' : ''
+              }`}
+            />
+
             {isLoadingStatus || isSubmitting
               ? 'Procesando...'
               : isFavorite

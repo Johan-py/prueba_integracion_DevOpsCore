@@ -285,6 +285,49 @@ export class EstadisticasPublicacionController {
     }
   }
 
+    static async obtenerResumenEstadisticasPublicas(req: Request, res: Response) {
+    try {
+      const { publicacionesIds } = req.body as {
+        publicacionesIds?: Array<number | string>;
+      };
+
+      if (!Array.isArray(publicacionesIds)) {
+        return res.status(400).json({
+          ok: false,
+          mensaje: "Debe enviar una lista de publicacionesIds.",
+        });
+      }
+
+      const idsValidos = publicacionesIds
+        .map((id) => Number(id))
+        .filter((id) => Number.isInteger(id) && id > 0);
+
+      if (idsValidos.length === 0) {
+        return res.status(400).json({
+          ok: false,
+          mensaje: "Debe enviar al menos un id de publicación válido.",
+        });
+      }
+
+      const estadisticas =
+        await EstadisticasPublicacionService.obtenerResumenEstadisticasPublicas(
+          idsValidos,
+        );
+
+      return res.status(200).json({
+        ok: true,
+        data: estadisticas,
+      });
+    } catch (error) {
+      console.error("Error al obtener estadísticas públicas:", error);
+
+      return res.status(500).json({
+        ok: false,
+        mensaje: "Error al obtener estadísticas públicas.",
+      });
+    }
+  }
+
   static async obtenerMisPropiedadesVistas(req: AuthRequest, res: Response) {
     try {
       const usuarioId = req.user?.id;

@@ -90,8 +90,8 @@ export default function MiPlanPage() {
                   <div className="flex items-center gap-2 mb-1">
                     {expirado ? (
                       <>
-                        <AlertCircle className="h-5 w-5 text-stone-400" />
-                        <span className="text-xs font-semibold uppercase tracking-wide text-stone-500">Expirado</span>
+                        <AlertCircle className="h-5 w-5 text-red-500" />
+                        <span className="text-xs font-semibold uppercase tracking-wide text-red-600">Expirado</span>
                       </>
                     ) : (
                       <>

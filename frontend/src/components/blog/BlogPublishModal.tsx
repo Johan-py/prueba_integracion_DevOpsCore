@@ -26,25 +26,25 @@ export default function BlogPublishModal({
       />
 
       {/* Contenido del Modal */}
-      <div className="relative w-full max-w-lg overflow-hidden rounded-[40px] bg-white shadow-2xl transition-all">
+      <div className="relative w-full max-w-lg overflow-hidden rounded-[40px] bg-white dark:bg-[#111] shadow-2xl transition-all">
         {/* Fondo decorativo con degradado sutil */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(217,119,6,0.05),transparent_70%)]" />
 
         <div className="relative flex flex-col items-center px-8 py-12 text-center sm:px-12">
           {/* Icono decorativo */}
-          <div className="relative mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-stone-50">
+          <div className="relative mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-stone-50 dark:bg-[#222]">
             <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(217,119,6,0.1)_0%,transparent_70%)] animate-pulse" />
-            <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm">
-              <Mail className="h-8 w-8 text-[#a56400]" />
+            <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-white dark:bg-[#111] shadow-sm">
+              <Mail className="h-8 w-8 text-[#a56400] dark:text-[#a56400]" />
               <div className="absolute -bottom-1 -right-1 h-3 w-3 rounded-full bg-amber-500 border-2 border-white" />
             </div>
           </div>
 
           {/* Textos */}
-          <h2 className="mb-4 font-heading text-3xl font-bold tracking-tight text-stone-900">
+          <h2 className="mb-4 font-heading text-3xl font-bold tracking-tight text-stone-900 dark:text-white">
             Enviar para Publicación
           </h2>
-          <p className="mb-10 text-base leading-relaxed text-stone-600">
+          <p className="mb-10 text-base leading-relaxed text-stone-600 dark:text-[#999]">
             Tu artículo será revisado por el administrador para su publicación y puedes revisar el estado en el apartado de blogs.
           </p>
 
@@ -54,7 +54,7 @@ export default function BlogPublishModal({
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="min-h-[52px] rounded-full border border-stone-200 px-10 text-xs font-bold uppercase tracking-widest text-stone-500 transition-all hover:bg-stone-50 disabled:opacity-50"
+              className="min-h-[52px] rounded-full border border-stone-200 dark:border-[#333] px-10 text-xs font-bold uppercase tracking-widest text-stone-500 dark:text-[#999] transition-all hover:bg-stone-50 dark:hover:bg-[#222] disabled:opacity-50"
             >
               CANCELAR
             </button>

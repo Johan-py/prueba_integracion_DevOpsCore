@@ -29,6 +29,11 @@ router.post(
   EstadisticasPublicacionController.registrarCompartidoPorInmueble,
 );
 
+router.post(
+  "/publicaciones/estadisticas-publicas/resumen",
+  EstadisticasPublicacionController.obtenerResumenEstadisticasPublicas,
+);
+
 router.get(
   "/publicaciones/:publicacionId/estadisticas",
   requireAuth,

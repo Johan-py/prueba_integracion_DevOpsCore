@@ -21,12 +21,12 @@ export default function BlogEditorSection({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between px-1">
-        <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#A8A29E]">
+        <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#A8A29E] dark:text-[#999]">
           Contenido del artículo(Editor Visual)
         </span>
       </div>
 
-      <div className="flex flex-col rounded-[32px] bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 overflow-hidden transition-all duration-300">
+      <div className="flex flex-col rounded-[32px] bg-white dark:bg-[#111] shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 dark:ring-white/10 overflow-hidden transition-all duration-300">
         <BlogRichTextEditor
           contenido={contenido}
           setContenido={setContenido}

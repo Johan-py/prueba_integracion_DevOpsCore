@@ -43,6 +43,7 @@ export const upsertTutorialConfirmadoRepository = async (
     },
     update: {
       confirmado: true,
+      confirmado_en: now,
     },
     select: {
       id: true,

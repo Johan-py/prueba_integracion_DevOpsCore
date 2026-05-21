@@ -185,16 +185,26 @@ export default function NotificationsPage() {
                       if (notification.status === 'no leida' && isOnline) {
                         void markAsRead(notification.id)
                       }
-
-                      router.push(`/notificaciones/${notification.id}`)
+                      if (notification.tipo === 'BLOG_APROBADO' && notification.blogId) {
+                        router.push(`/blog/${notification.blogId}`)
+                      } else if (notification.tipo === 'BLOG_RECHAZADO' && notification.blogId) {
+                        router.push(`/blog/${notification.blogId}/edit`)
+                      } else {
+                        router.push(`/notificaciones/${notification.id}`)
+                      }
                     }}
                     onKeyDown={(event) => {
                       if (event.key === 'Enter' || event.key === ' ') {
                         if (notification.status === 'no leida' && isOnline) {
                           void markAsRead(notification.id)
                         }
-
-                        router.push(`/notificaciones/${notification.id}`)
+                        if (notification.tipo === 'BLOG_APROBADO' && notification.blogId) {
+                          router.push(`/blog/${notification.blogId}`)
+                        } else if (notification.tipo === 'BLOG_RECHAZADO' && notification.blogId) {
+                          router.push(`/blog/${notification.blogId}/edit`)
+                        } else {
+                          router.push(`/notificaciones/${notification.id}`)
+                        }
                       }
                     }}
                     role="button"
@@ -210,7 +220,7 @@ export default function NotificationsPage() {
                           {notification.title?.trim() || '(Sin título)'}
                         </h2>
 
-                        <p className="mt-1 break-words text-sm text-stone-600">
+                        <p className={`mt-1 line-clamp-2 text-sm ${notification.tipo === 'BLOG_RECHAZADO' ? 'text-red-600' : 'text-stone-600'}`}>
                           {notification.description?.trim() || '(Sin descripción disponible)'}
                         </p>
                       </div>

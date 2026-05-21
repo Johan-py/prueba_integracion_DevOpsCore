@@ -49,6 +49,23 @@ const pinIcon = L.divIcon({
   iconAnchor: [10, 20]
 })
 
+const poiIcon = L.divIcon({
+  className: '',
+  html: `
+    <div style="
+      width: 14px;
+      height: 14px;
+      background: #3b82f6;
+      border-radius: 50%;
+      border: 2px solid white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      cursor: grab;
+    "></div>
+  `,
+  iconSize: [14, 14],
+  iconAnchor: [7, 7]
+})
+
 type Props = {
   pinCoords: { lat: number; lng: number } | null
   setPinCoords: (v: { lat: number; lng: number } | null) => void
@@ -307,11 +324,11 @@ export default function MapaPinSelector({
   setPoiSeleccionado
 }: Props) {
 const offsets = [
-    [0, -40],
-    [40, 0],
-    [0, 40],
-    [-40, 0]
-  ]
+  [0, -50], //arriba     
+  [70, 0],  //derecha    
+  [0, 40],  //abajo 
+  [-70, 0], //izquierda
+]
   const [mensajeLimite, setMensajeLimite] = useState(false)
  
   return (
@@ -346,22 +363,28 @@ const offsets = [
 )}
 
 {pois.map((poi, i) => (
-  <CircleMarker
+  <Marker
     key={poi.id}
-    center={[poi.lat, poi.lng]}
-    radius={1}
-    opacity={0}
-    fillOpacity={0}
+    position={[poi.lat, poi.lng]}
+    icon={poiIcon}
+    draggable={true}
+    eventHandlers={{
+      dragend: (e) => {
+        const marker = e.target
+        const position = marker.getLatLng()
+        const nuevosPois = [...pois]
+        nuevosPois[i].lat = position.lat
+        nuevosPois[i].lng = position.lng
+        setPois(nuevosPois)
+      }
+    }}
   >
     <Tooltip
       permanent
       interactive={true}
       sticky={false}
-      direction="center"
-      offset={[
-        offsets[i % 4][0] + Math.floor(i / 4) * 15,
-        offsets[i % 4][1] + Math.floor(i / 4) * 15
-      ] as [number, number]}
+      direction="top"
+      offset={[0, -5]}
       opacity={1}
       className="!bg-transparent !border-0 !shadow-none"
     >
@@ -395,7 +418,7 @@ const offsets = [
               `}
                 />
              </Tooltip>
-          </CircleMarker>
+          </Marker>
              ))}
 
            {vertices.length >= 3 && (

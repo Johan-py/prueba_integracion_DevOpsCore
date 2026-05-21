@@ -298,16 +298,38 @@ export function CapacidadSidebar({ isOpen, onClose, onApply }: CapacidadSidebarP
       </div>
 
       {/* 3. FOOTER (Fijo al fondo) */}
-      <div className="shrink-0 px-4 pb-4 pt-2 bg-white border-t border-stone-100 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10">
+      <div className="shrink-0 px-6 pb-6 pt-4 border-t border-stone-100 bg-white dark:border-slate-800 dark:bg-slate-900 relative">
+        
+        <style dangerouslySetInnerHTML={{__html: `
+          html body #btn-aplicar-capacidad {
+            background-color: #d97706 !important;
+            color: #ffffff !important;
+          }
+          html body #btn-aplicar-capacidad:hover {
+            background-color: #b95e00 !important;
+          }
+          html.dark body #btn-aplicar-capacidad {
+            background-color: #E87C1E !important;
+          }
+          html.dark body #btn-aplicar-capacidad:hover {
+            background-color: #d97706 !important;
+          }
+        `}} />
+
         <button
-          onClick={handleClear}
-          className="w-full mb-3 text-gray-700 text-xs underline underline-offset-4 hover:text-gray-900 transition-colors"
+          type="button"
+          /* Asegúrate de dejar el onClick que ya tenías para limpiar */
+          onClick={handleClear} 
+          className="text-xs text-stone-400 hover:text-[#d97706] dark:text-slate-400 dark:hover:text-[#E87C1E] transition-colors underline text-center w-full mb-3"
         >
-          Limpiar Filtros
+          Limpiar filtro
         </button>
+
         <button
-          onClick={handleApply}
-          className="w-full py-2.5 text-white bg-[#d97706] rounded-lg hover:bg-[#b95e00] transition-colors font-medium shadow-md active:scale-95"
+          id="btn-aplicar-capacidad"
+          /* Asegúrate de dejar el onClick que ya tenías para aplicar */
+          onClick={handleApply} 
+          className="rounded-[12px] font-bold py-3 px-4 w-full transition-all active:scale-95 shadow-md border-none"
         >
           Aplicar
         </button>

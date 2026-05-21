@@ -94,16 +94,24 @@ export default function BlogCreateForm({
 
   return (
     <div className="mx-auto max-w-6xl">
-      <div className="grid gap-12 lg:grid-cols-[1fr_320px]">
+      <div className="grid gap-6 lg:gap-12 lg:grid-cols-[1fr_320px]">
         {/* Main Content Area */}
-        <div className="space-y-8">
+        <div className="space-y-8 min-w-0 overflow-hidden">
           <BlogFormHeader mode={mode} />
 
+          {statusLabel === "PENDIENTE" && (
+            <div className="rounded-[24px] bg-amber-50 border border-amber-200 p-6 shadow-sm">
+              <h3 className="text-sm font-bold text-amber-700 uppercase tracking-wider mb-2">En revisión</h3>
+              <p className="text-amber-700 leading-relaxed">Tu blog está siendo revisado por el equipo de moderación.</p>
+              <p className="text-xs text-amber-600/80 mt-3 italic">No es posible editar ni reenviar mientras esté en revisión.</p>
+            </div>
+          )}
+
           {statusLabel === "RECHAZADO" && rejectionReason && (
-            <div className="rounded-[24px] bg-[#FDECEC] border border-[#F3BABA] p-6 shadow-sm">
-              <h3 className="text-sm font-bold text-[#D94848] uppercase tracking-wider mb-2">Motivo de rechazo</h3>
-              <p className="text-[#D94848] leading-relaxed">{rejectionReason}</p>
-              <p className="text-xs text-[#D94848]/80 mt-3 italic">Corrige los puntos mencionados y vuelve a enviarlo para revisión.</p>
+            <div className="rounded-[16px] bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800/50 p-4 sm:p-6 shadow-sm">
+              <h3 className="text-sm font-bold text-red-700 dark:!text-red-400 uppercase tracking-wider mb-2">Motivo de rechazo</h3>
+              <p className="text-red-700 dark:!text-red-300 leading-relaxed break-all">{rejectionReason}</p>
+              <p className="text-xs text-red-600 dark:!text-red-400 mt-3 italic opacity-80">Corrige los puntos mencionados y vuelve a enviarlo para revisión.</p>
             </div>
           )}
 
