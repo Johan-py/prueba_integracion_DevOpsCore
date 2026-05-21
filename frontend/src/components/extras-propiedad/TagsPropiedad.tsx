@@ -151,14 +151,14 @@ export default function TagsPropiedad({
             value={nuevoTag}
             maxLength={MAX_CARACTERES}
             onChange={(e) => {
-                setNuevoTag(e.target.value);
-                if (error) setError("");
+              setNuevoTag(e.target.value);
+              if (error) setError("");
             }}
             onKeyDown={(e) => {
-                if (e.key === "Enter") {
+              if (e.key === "Enter") {
                 e.preventDefault();
                 agregarTag(nuevoTag);
-                }
+              }
             }}
             placeholder="Ej: piscina, garaje, terraza"
             className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 outline-none focus:border-orange-400"
@@ -180,9 +180,9 @@ export default function TagsPropiedad({
                 >
                   <span className="font-semibold">{t.nombre}</span>
                 </button>
-                ))}
+              ))}
             </div>
-            )}
+          )}
 
           {sugerenciasFiltradas.length === 0 && nuevoTag.trim().length >= 2 && (
             <p className="mt-1 text-xs text-neutral-500">Sin sugerencias</p>
