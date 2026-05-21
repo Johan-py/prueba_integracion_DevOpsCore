@@ -179,9 +179,15 @@ function ParametrosPageContent() {
 
       const data = await response.json().catch(() => null);
       if (!response.ok) throw new Error(data?.mensaje || "No se pudieron guardar los tags.");
+      const sinCambios = 
+        tags.length === tagsGuardados.length &&
+        tags.every((t) => tagsGuardados.includes(t));
+
+      if (sinCambios) return;
+
       setTagsGuardados(tags);
       setMostrarExitoTags(true);
-      setTimeout(() => setMostrarExitoTags(false), 5000);
+      setTimeout(() => setMostrarExitoTags(false), 2000);
     } catch (error) {
       setMensaje(error instanceof Error ? error.message : "Error al guardar tags.");
     }
