@@ -83,7 +83,7 @@ export default function TagsPropiedad({
     setNuevoTag("");
     setError("");
     setMensajeExito("¡Excelente! El tag fue agregado.");
-    //onGuardar?.(nuevos);
+    onGuardar?.(nuevos);
 
     setTimeout(() => setMensajeExito(""), 2000);
   };
@@ -93,7 +93,7 @@ export default function TagsPropiedad({
     setTags(actualizados);
     setError("");
     setMensajeExito("");
-    //onGuardar?.(actualizados);
+    onGuardar?.(actualizados);
   };
 
     return (
