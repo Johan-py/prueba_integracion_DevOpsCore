@@ -189,7 +189,11 @@ function ParametrosPageContent() {
       setMostrarExitoTags(true);
       setTimeout(() => setMostrarExitoTags(false), 2000);
     } catch (error) {
-      setMensaje(error instanceof Error ? error.message : "Error al guardar tags.");
+      const esSinConexion = error instanceof TypeError && error.message === "Failed to fetch";
+      setMensaje(esSinConexion
+        ? "No se pudo guardar. Verifique su conexión a internet."
+        : error instanceof Error ? error.message : "Error al guardar tags."
+      );
     }
   };
   
