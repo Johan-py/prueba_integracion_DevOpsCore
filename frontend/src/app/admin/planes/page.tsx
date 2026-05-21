@@ -337,7 +337,7 @@ export default function AdminPlanesPage() {
               <AlertTriangle className="h-10 w-10 text-red-500 mx-auto" />
               <h2 className="text-lg font-bold font-montserrat text-stone-900">¿Eliminar plan?</h2>
               <p className="text-sm text-stone-500">
-                El plan se eliminará permanentemente. Los usuarios con suscripciones activas conservarán su plan hasta la fecha de vencimiento. No se puede eliminar si hay suscripciones activas vigentes.
+                La eliminación es lógica: el plan dejará de ofrecerse a nuevos usuarios, pero quienes tengan una suscripción activa la conservarán hasta su vencimiento.
               </p>
               <div className="flex gap-3">
                 <button
