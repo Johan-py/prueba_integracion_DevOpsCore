@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { publicacionService } from '@/services/publicacionn.service'
 
 interface Plan {
   id: number
@@ -44,7 +45,7 @@ export default function PromocionarModal({
   onConfirmar,
   onCancelar,
 }: PromocionarModalProps) {
-  const [paso, setPaso] = useState<'planes' | 'procesando'>('planes')
+  const [paso, setPaso] = useState<'planes' | 'procesando'| 'error'>('planes')
   const [planSeleccionado, setPlanSeleccionado] = useState<Plan>(planes[0])
   const [error, setError] = useState('')
 
@@ -54,12 +55,21 @@ export default function PromocionarModal({
     setPaso('procesando')
     setError('')
     try {
-      await onConfirmar(propiedadId, planSeleccionado.id, planSeleccionado.precio)
-      setPaso('planes')
+      const response = await publicacionService.crearPagoPublicidad(
+        propiedadId,
+        planSeleccionado.id,
+        planSeleccionado.precio
+      )
+      if (response.checkoutUrl) {
+        window.location.href = response.checkoutUrl
+      } else {
+        await onConfirmar(propiedadId, planSeleccionado.id, planSeleccionado.precio)
+        setPaso('planes')
+      }
     } catch (err) {
       console.error(err)
       setError('Error al procesar el pago. Intenta nuevamente.')
-      setPaso('planes')
+      setPaso('error')
     }
   }
 
@@ -67,6 +77,10 @@ export default function PromocionarModal({
     setPaso('planes')
     setError('')
     onCancelar()
+  }
+   const handleReintentar = () => {
+    setPaso('planes')
+    setError('')
   }
 
   return (
@@ -136,7 +150,7 @@ export default function PromocionarModal({
               </div>
             </div>
           </>
-        ) : (
+        ) : paso === 'procesando' ? (
           <div className="px-6 pt-8 pb-4 text-center">
             <div className="mb-4 flex justify-center">
               <div className="h-12 w-12 animate-spin rounded-full border-4 border-orange-500 border-t-transparent"></div>
@@ -144,6 +158,26 @@ export default function PromocionarModal({
             <h3 className="text-lg font-semibold text-gray-800">Procesando pago</h3>
             <p className="text-sm text-gray-500 mt-1">Validando tu transacción...</p>
             <p className="text-xs text-gray-400 mt-4">Por favor, no cierres esta ventana</p>
+          </div>
+        ) : (
+          <div className="px-6 pt-6 pb-6 text-center">
+            <div className="text-5xl mb-3">❌</div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">Error en el pago</h3>
+            <p className="text-sm text-gray-600 mb-6">{error}</p>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={handleReintentar}
+                className="w-full rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 py-3 text-sm font-semibold text-white transition hover:from-orange-600 hover:to-orange-700"
+              >
+                Reintentar
+              </button>
+              <button
+                onClick={handleCancelar}
+                className="w-full rounded-lg border border-gray-300 bg-white py-3 text-sm font-medium text-gray-600 transition hover:bg-gray-50"
+              >
+                Cancelar
+              </button>
+            </div>
           </div>
         )}
       </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Bath, BedDouble, Eye, Heart, Mail, MapPin, Plus, Share2, Square, Sparkles, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { publicacionService } from '@/services/publicacionn.service'
@@ -9,7 +9,7 @@ import ConfirmDeleteModal from './ConfirmDeleteModal'
 import DeleteSuccessModal from './DeleteSuccessModal'
 import DeleteErrorModal from './DeleteErrorModal'
 import PromocionarModal from './PromocionarModal'
-import CancelPromocionModal from './CancelPromocionModal'  // <--- CORREGIDO
+import CancelPromocionModal from './CancelPromocionModal'  
 interface Props {
   publicacion: MisPublicacionesItem
   onDeleted: (id: number) => void
@@ -42,6 +42,33 @@ export default function PublicacionCard({
   const [modalPromocionAbierto, setModalPromocionAbierto] = useState(false)
   const [modalCancelPromocionAbierto, setModalCancelPromocionAbierto] = useState(false)
   const [canceling, setCanceling] = useState(false)
+
+  useEffect(() => {
+
+    if (publicacion.promoted) return
+
+    let interval: NodeJS.Timeout
+
+    const checkEstadoPublicidad = async () => {
+      try {
+        const estado = await publicacionService.obtenerEstadoPublicidad(publicacion.id)
+        if (estado.promoted) {
+          onPromocionChange?.(publicacion.id, true)
+          clearInterval(interval)
+        }
+      } catch (error) {
+        console.error('Error al verificar estado:', error)
+      }
+    }
+
+    interval = setInterval(checkEstadoPublicidad, 5000)
+
+    return () => {
+      if (interval) clearInterval(interval)
+    }
+  }, [publicacion.id, publicacion.promoted, onPromocionChange])
+
+
 
   const handleToggle = async () => {
     const nuevoEstado = !activa
@@ -85,21 +112,9 @@ export default function PublicacionCard({
   }
 
   const handlePromocionar = async (propiedadId: number, planId: number, precio: number) => {
-    try {
-      // Simulación de pago - aquí se integraría con pasarela real
-      const paymentIntentId = `simulado_${Date.now()}_${planId}`
-      
-      // Llamar al servicio de confirmar publicidad
-      await publicacionService.confirmarPublicidad(propiedadId, paymentIntentId, planId)
-      
-      // Notificar al padre que la propiedad ahora está promocionada
-      onPromocionChange?.(propiedadId, true)
-      
-      setModalPromocionAbierto(false)
-    } catch (err) {
-      console.error('Error al promocionar:', err)
-      throw err
-    }
+  
+    console.log('Publicidad solicitada para propiedad:', propiedadId, 'Plan:', planId, 'Precio:', precio)
+    setModalPromocionAbierto(false)
   }
 
   const handleCancelarPromocion = async () => {
@@ -175,7 +190,6 @@ export default function PublicacionCard({
             </div>
           )}
 
-          {/* Badge Destacada - HU-11 */}
           {publicacion.promoted && (
             <div className="absolute top-2 right-2">
               <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 px-2 py-1 text-xs font-bold text-white shadow-md">
@@ -334,7 +348,6 @@ export default function PublicacionCard({
               </button>
             </div>
 
-            {/* Botón Publicitar propiedad - HU-11 (solo en activas) */}
             {showPromoteButton && !publicacion.promoted && (
               <button
                 type="button"
@@ -346,7 +359,6 @@ export default function PublicacionCard({
               </button>
             )}
 
-            {/* Botón Cancelar publicidad - HU-11 (solo en publicidad) */}
             {showCancelPromoteButton && publicacion.promoted && (
               <button
                 type="button"
@@ -386,7 +398,6 @@ export default function PublicacionCard({
         onAceptar={cerrarError}
       />
 
-      {/* Modales HU-11 */}
       <PromocionarModal
         abierto={modalPromocionAbierto}
         propiedadNombre={publicacion.titulo}
