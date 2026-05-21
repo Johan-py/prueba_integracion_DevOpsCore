@@ -39,7 +39,8 @@ export type TipoNotificacion =
   | "GENERAL"
   | "BLOG_APROBADO"
   | "BLOG_RECHAZADO"
-  | "BLOG_PENDIENTE";
+  | "BLOG_PENDIENTE"
+  | "PAGO_APROBADO";
 
 type CreateNotificationParams = {
   usuarioId: number;

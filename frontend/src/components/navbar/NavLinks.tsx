@@ -31,7 +31,7 @@ export default function NavLinks() {
     "hover:text-[#E68B25] hover:bg-[#E68B25]/10 px-3 py-2 rounded-md transition";
 
   return (
-    <div className="hidden md:flex items-center gap-6 text-[15px] font-medium text-gray-700 dark:text-gray-300">
+    <div className="hidden lg:flex items-center gap-6 text-[15px] font-medium text-gray-700 dark:text-gray-300">
       <div id="tour-propiedades" className="relative" ref={dropdownRef}>
         <button
           type="button"

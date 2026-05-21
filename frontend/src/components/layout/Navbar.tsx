@@ -471,13 +471,13 @@ export default function Navbar() {
                 id="tour-publicar-home"
                 type="button"
                 onClick={handlePublicarInmueble}
-                className="hidden md:block rounded-md bg-[#E68B25] px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-amber-700"
+                className="hidden lg:block rounded-md bg-[#E68B25] px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-amber-700"
               >
                 Publica tu inmueble
               </button>
 
               {/* HU13: botón general para alternar modo claro/oscuro */}
-              <div className="hidden md:block">
+              <div className="hidden lg:block">
                 <ThemeToggleButton />
               </div>
 
@@ -780,7 +780,7 @@ export default function Navbar() {
                 id="tour-menu-mobile"
                 type="button"
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="rounded-full p-2 transition duration-200 hover:bg-black/5 hover:shadow-sm md:hidden"
+                className="rounded-full p-2 transition duration-200 hover:bg-black/5 hover:shadow-sm lg:hidden"
                 aria-label="Abrir menú de navegación"
               >
                 <Menu className="h-6 w-6 text-stone-600" />
@@ -805,7 +805,7 @@ export default function Navbar() {
 
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 z-[9999] bg-black/40 md:hidden"
+          className="fixed inset-0 z-[9999] bg-black/40 lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
           aria-modal="true"
           role="dialog"

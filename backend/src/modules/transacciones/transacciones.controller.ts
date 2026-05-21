@@ -223,7 +223,8 @@ export const confirmarPago = async (req: Request, res: Response) => {
       await createNotificationService({
         correo: transaccion.usuario.correo,
         titulo: '¡Tu pago fue confirmado!',
-        mensaje: `Tu pago del plan ${transaccion.plan_suscripcion?.nombre_plan ?? '—'} (REF-${transaccionId}) fue aprobado el ${fechaAprobacion}. Tu suscripción ya está activa y vence el ${fechaVencimiento}.`,
+        mensaje: `Plan ${transaccion.plan_suscripcion?.nombre_plan ?? '—'} activado. Tu pago (REF-${transaccionId}) fue aprobado el ${fechaAprobacion}. Tu suscripción ya está activa y vence el ${fechaVencimiento}.`,
+        tipo: 'PAGO_APROBADO',
       })
     } catch { /* no bloquea el flujo */ }
 
