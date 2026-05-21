@@ -514,7 +514,9 @@ export const verifyPasswordService = async ({
 
   const user = await findUserById(userId);
   if (!user) throw new AuthError("Usuario no encontrado", 404);
-  if (user.password !== trimmed)
+  
+  const isValidPassword = await comparePassword(trimmed, user.password);
+  if (!isValidPassword)
     throw new AuthError("Contraseña incorrecta", 401);
 
   return { valid: true };
@@ -529,7 +531,9 @@ export const activate2FAService = async ({
 
   const user = await findUserById(userId);
   if (!user) throw new AuthError("Usuario no encontrado", 404);
-  if (user.password !== trimmed)
+  
+  const isValidPassword = await comparePassword(trimmed, user.password);
+  if (!isValidPassword)
     throw new AuthError("Contraseña incorrecta", 401);
 
   await activate2FAByUserId(userId);

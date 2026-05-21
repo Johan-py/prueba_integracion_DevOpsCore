@@ -78,7 +78,8 @@ export const activateAccountByPasswordService = async (
     throw new AuthError("Esta cuenta ya está activa", 400);
   }
 
-  if (user.password !== password) {
+  const isValidPassword = await comparePassword(password, user.password);
+  if (!isValidPassword) {
     throw new AuthError("Contraseña incorrecta", 401);
   }
 
@@ -789,7 +790,8 @@ export const verifyPasswordService = async ({
     throw new AuthError("Usuario no encontrado", 404);
   }
 
-  if (user.password !== trimmed) {
+  const isValidPassword = await comparePassword(trimmed, user.password);
+  if (!isValidPassword) {
     throw new AuthError("Contraseña incorrecta", 401);
   }
 
@@ -812,7 +814,8 @@ export const activate2FAService = async ({
     throw new AuthError("Usuario no encontrado", 404);
   }
 
-  if (user.password !== trimmed) {
+  const isValidPassword = await comparePassword(trimmed, user.password);
+  if (!isValidPassword) {
     throw new AuthError("Contraseña incorrecta", 401);
   }
 
