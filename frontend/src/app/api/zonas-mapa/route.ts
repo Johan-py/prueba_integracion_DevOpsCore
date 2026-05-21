@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server'
 
-// Proxy al endpoint de zonas predefinidas con coordenadas (para el mapa)
-const BACKEND = process.env.BACKEND_INTERNAL_URL || 'http://localhost:5000'
+// Usa URL de producción en Vercel, o localhost en desarrollo
+const BACKEND = process.env.NODE_ENV === 'production'
+  ? (process.env.NEXT_PUBLIC_API_URL || 'https://propbol-all-services.onrender.com')
+  : (process.env.BACKEND_INTERNAL_URL || 'http://localhost:5000')
 
 export async function GET() {
   try {

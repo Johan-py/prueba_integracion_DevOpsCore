@@ -39,8 +39,8 @@ export default function Stepper({ onBackClick }: StepperProps = {}) {
           isCurrent
             ? 'bg-green-500 text-white'
             : isPast
-              ? 'bg-green-100 text-green-700 hover:bg-green-200 hover:shadow-sm'
-              : 'bg-gray-200 text-gray-500 cursor-not-allowed opacity-70'
+              ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50 hover:shadow-sm'
+              : 'bg-gray-200 dark:bg-[#333] text-gray-500 dark:text-[#666] cursor-not-allowed opacity-70'
         }`
 
         return (
@@ -66,14 +66,14 @@ export default function Stepper({ onBackClick }: StepperProps = {}) {
             {/* Etiqueta de texto (Nombre del paso) */}
             <span
               className={`ml-2 ${
-                isCurrent ? 'font-bold text-green-600' : 'text-gray-500'
+                isCurrent ? 'font-bold text-green-600' : 'text-gray-500 dark:text-[#999]'
               } ${isFuture ? 'opacity-50' : ''}`}
             >
               {step.name}
             </span>
             
             {/* Flecha separadora */}
-            {idx < steps.length - 1 && <span className="mx-2 text-gray-300">→</span>}
+            {idx < steps.length - 1 && <span className="mx-2 text-gray-300 dark:text-[#555]">→</span>}
           </div>
         )
       })}

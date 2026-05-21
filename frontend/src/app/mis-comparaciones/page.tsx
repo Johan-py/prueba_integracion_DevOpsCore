@@ -199,9 +199,16 @@ export default function MisComparacionesPage() {
                         return comparacionesList.map((comp) => (
                             <section key={comp.id} className="rounded-3xl border p-6 bg-white shadow-sm flex flex-col">
                                 <div className="flex justify-between items-center mb-6">
-                                    <h2 className="font-bold text-gray-800">
-                                        {comp.nombre || `Comparación de ${getCategoriaNombre(categoria)}`}
-                                    </h2>
+<h2 className="font-bold text-gray-800">
+    {comp.nombre 
+        ? comp.nombre
+            .replace(/Comparación/g, '') // Quita "Comparación"
+            .replace(/[\d/]+/g, '')      // Quita la fecha (números y barras)
+            .replace(/^\s*de\s+/i, '')   // Quita el "de " si quedó al principio
+            .trim() || getCategoriaNombre(categoria)
+        : getCategoriaNombre(categoria)
+    }
+</h2>
                                     <span className="text-xs text-gray-400">{formatFecha(comp.fecha)}</span>
                                 </div>
 

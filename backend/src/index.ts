@@ -1,4 +1,4 @@
-import path from "path";
+﻿import path from "path";
 import http from "http";
 import "dotenv/config";
 import express from "express";
@@ -146,6 +146,7 @@ import whatsappRoutes from "./modules/whatsapp/whatsapp.routes.js";
 import adminTestimoniosRoutes from "./modules/testimonios/adminTestimonios.routes.js";
 import adminPlanesRoutes from "./modules/planes/adminPlanes.routes.js";
 import sesionRoutes from "./modules/perfil/sesion.routes.js";
+import poisRoutes from "./modules/pois/pois.routes.js";
 
 import "./jobs/suscripcion.job.js";
 import { initSocket } from "./services/socket.service.js";
@@ -234,7 +235,6 @@ app.use("/api/perfil/usuario", perfilRoutes);
 app.use("/api/perfil/zonas", zonaRoutes);
 app.use("/api/perfil/historial", historialRoutes);
 app.use("/api/perfil/historial-busqueda", historialBusquedaRoutes);
-app.use("/api/sesion", sesionRoutes);
 app.use("/api", router);
 app.use("/api", parametrosRoutes);
 app.use("/api/security", securityRoutes);
@@ -245,7 +245,7 @@ app.use("/api/blogs", blogsRoutes);
 app.use("/api/testimonios", testimoniosRoutes);
 app.use("/api/telemetria", telemetriaRouter);
 app.use("/api/comparaciones", comparacionRoutes);
-app.use("/api/sesiones", sesionRoutes);
+app.use("/api/sesion", sesionRoutes);
 app.use('/api/ml', mlRoutes)
 app.use("/api/transacciones", transaccionesRoutes);
 app.use("/api/suscripciones", suscripcionesRoutes);
@@ -377,6 +377,7 @@ app.post('/api/publicaciones', (req, res) => {
 // --------------------
 app.use("/api/admin", adminTestimoniosRoutes);
 app.use("/api/admin", adminPlanesRoutes);
+app.use("/api/pois", poisRoutes);
 
 // --------------------
 // LEVANTAR SERVIDOR
@@ -431,7 +432,6 @@ server.listen(PORT, async () => {
     console.error('ÔØî Error al inicializar planes:', error)
   }
 
-   
 
   try {
     await verifyEmailTransport()

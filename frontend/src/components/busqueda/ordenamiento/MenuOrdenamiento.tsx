@@ -53,8 +53,8 @@ function Dropdown({ label, isOpen, onToggle, disabled = false, children }: Dropd
           border rounded-lg shadow-sm transition-colors duration-150 w-[120px] truncate
           ${
             disabled
-              ? 'bg-gray-50 border-gray-100 text-gray-300 cursor-not-allowed opacity-60'
-              : 'bg-white border-gray-200 text-gray-700 hover:border-orange-300 hover:text-orange-500'
+              ? 'bg-gray-50 dark:bg-stone-800 border-gray-100 dark:border-stone-700 text-gray-300 dark:text-stone-500 cursor-not-allowed opacity-60'
+              : 'bg-white dark:bg-stone-800 border-gray-200 dark:border-stone-700 text-gray-700 dark:text-stone-300 hover:border-orange-300 hover:text-orange-500 dark:hover:border-orange-500 dark:hover:text-orange-400'
           }`}
       >
         {label}
@@ -66,8 +66,8 @@ function Dropdown({ label, isOpen, onToggle, disabled = false, children }: Dropd
 
       {isOpen && !disabled && (
         <div
-          className="absolute left-0 top-full mt-1.5 z-50 bg-white rounded-lg shadow-lg
-                     border border-gray-100 min-w-[120px] py-1
+          className="absolute left-0 top-full mt-1.5 z-50 bg-white dark:bg-stone-800 rounded-lg shadow-lg
+                     border border-gray-100 dark:border-stone-700 min-w-[120px] py-1
                      animate-in fade-in-0 zoom-in-95 duration-100"
         >
           {children}
@@ -86,7 +86,7 @@ function DropdownItem({ label, isSelected, onClick }: DropdownItemProps) {
         ${
           isSelected
             ? 'bg-orange-500 text-white font-medium'
-            : 'text-gray-700 hover:bg-orange-50 hover:text-orange-500'
+            : 'text-gray-700 dark:text-stone-300 hover:bg-orange-50 dark:hover:bg-stone-700 hover:text-orange-500 dark:hover:text-orange-400'
         }`}
     >
       {label}
@@ -99,7 +99,7 @@ function SeccionMetrica({ titulo, valor, onChange, isActive }: SeccionMetricaPro
     <div className="px-3 py-2">
       <p
         className={`text-xs font-medium uppercase tracking-wide mb-1.5
-        ${isActive ? 'text-gray-400' : 'text-gray-300'}`}
+        ${isActive ? 'text-gray-400 dark:text-stone-400' : 'text-gray-300 dark:text-stone-600'}`}
       >
         {titulo}
       </p>
@@ -112,10 +112,10 @@ function SeccionMetrica({ titulo, valor, onChange, isActive }: SeccionMetricaPro
             className={`w-full text-left text-xs py-1.5 px-2 rounded transition-colors duration-150 whitespace-nowrap
               ${
                 isActive && valor === opt.value
-                  ? 'text-orange-500 font-medium bg-orange-50'
+                  ? 'text-orange-500 font-medium bg-orange-50 dark:bg-stone-700'
                   : isActive
-                    ? 'text-gray-700 hover:text-orange-500 hover:bg-orange-50'
-                    : 'text-gray-300 hover:text-orange-400 hover:bg-orange-50'
+                    ? 'text-gray-700 dark:text-stone-300 hover:text-orange-500 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-stone-700'
+                    : 'text-gray-300 dark:text-stone-600 hover:text-orange-400 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-stone-700'
               }`}
           >
             {opt.label}
@@ -229,10 +229,10 @@ export function MenuOrdenamiento({
       >
         {/* Título: Ordenar por (Se oculta al hacer scroll) */}
         <div
-          className={`flex items-center gap-2 transition-all duration-300 overflow-hidden ${isCompact ? 'max-h-0 opacity-0 m-0' : 'max-h-10 opacity-100'}`}
+          className={`flex items-center gap-1.5 min-w-max transition-all duration-300 overflow-hidden ${isCompact ? 'max-h-0 opacity-0 m-0' : 'max-h-10 opacity-100'}`}
         >
-          <ArrowUpDown className="w-4 h-4 text-gray-400" strokeWidth={2} />
-          <span className="text-sm font-semibold text-gray-600">Ordenar por:</span>
+          <ArrowUpDown className="w-4 h-4 text-gray-400 dark:text-stone-400" strokeWidth={2} />
+          <span className="text-sm font-semibold text-gray-600 dark:text-stone-300">Ordenar por:</span>
         </div>
 
         <div className="flex flex-row flex-wrap gap-3 items-end">
@@ -243,7 +243,7 @@ export function MenuOrdenamiento({
             <div
               className={`transition-all duration-300 overflow-hidden ${isCompact ? 'max-h-0 opacity-0' : 'max-h-6 opacity-100'}`}
             >
-              <span className="text-xs text-gray-400 font-medium">Más:</span>
+              <span className="text-xs text-gray-400 dark:text-stone-400 font-medium">Más:</span>
             </div>
             <Dropdown
               label={labelFecha}
@@ -269,7 +269,7 @@ export function MenuOrdenamiento({
             <div
               className={`transition-all duration-300 overflow-hidden ${isCompact ? 'max-h-0 opacity-0' : 'max-h-6 opacity-100'}`}
             >
-              <span className="text-xs text-gray-400 font-medium">Métricas:</span>
+              <span className="text-xs text-gray-400 dark:text-stone-400 font-medium">Métricas:</span>
             </div>
             <Dropdown
               label={labelMetricas}
@@ -283,7 +283,9 @@ export function MenuOrdenamiento({
                 onChange={seleccionarPrecio}
                 isActive={criterioActivo !== 'superficie'}
               />
-              <div className="border-t border-gray-100 my-1" />
+              <div className="px-3 py-1">
+                <div className="border-t border-gray-100 dark:border-stone-700 my-1" />
+              </div>
               <SeccionMetrica
                 titulo="Superficie"
                 valor={orden.superficie}
@@ -303,7 +305,7 @@ export function MenuOrdenamiento({
             aplicar(ORDENAMIENTO_DEFAULT)
             setDropdownAbierto(null)
           }}
-          className={`self-start text-xs text-gray-400 hover:text-orange-500 underline underline-offset-2 transition-all duration-300 overflow-hidden ${isCompact ? 'max-h-0 opacity-0 m-0' : 'max-h-6 opacity-100'}`}
+          className={`self-start text-xs text-gray-400 dark:text-stone-500 hover:text-orange-500 dark:hover:text-orange-400 underline underline-offset-2 transition-all duration-300 overflow-hidden ${isCompact ? 'max-h-0 opacity-0 m-0' : 'max-h-6 opacity-100'}`}
         >
           Limpiar ordenamiento
         </button>

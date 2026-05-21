@@ -402,7 +402,9 @@ export default function LoginForm() {
     setShowMagicLinkForm(false);
   };
 
-  const handleMagicLinkSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleMagicLinkSubmit = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
     event.preventDefault();
 
     if (isLoadingMagicLink) {
@@ -1009,135 +1011,14 @@ export default function LoginForm() {
       }
 
       setSuccessMessage(
-        data.message || "Cuenta activada correctamente. Ahora puedes iniciar sesión.",
+        data.message ||
+          "Cuenta activada correctamente. Ahora puedes iniciar sesión.",
       );
       setErrorMessage("");
       setPassword("");
       closeActivationModal();
       router.push("/sign-in");
-    } catch {
-      setActivationError(ACTIVATION_CONNECTION_ERROR_MESSAGE);
-    } finally {
-      window.clearTimeout(timeoutId);
-      setIsActivating(false);
-    }
-  };
-
-  const handleRequestActivationCode = async () => {
-    if (!activationEmail) {
-      setActivationError("No se encontró el correo de la cuenta.");
-      return;
-    }
-
-    if (isActivating) {
-      return;
-    }
-
-    if (!navigator.onLine) {
-      setActivationError(ACTIVATION_CONNECTION_ERROR_MESSAGE);
-      return;
-    }
-
-    const controller = new AbortController();
-    const timeoutId = window.setTimeout(() => {
-      controller.abort();
-    }, ACTIVATION_REQUEST_TIMEOUT_MS);
-
-    setActivationError("");
-    setIsActivating(true);
-
-    try {
-      const response = await fetch(`${API_URL}/api/auth/request-activation-code`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ correo: activationEmail }),
-        signal: controller.signal,
-      });
-
-      const data = await response.json().catch(() => ({}));
-
-      if (response.status >= 500) {
-        setActivationError(ACTIVATION_CONNECTION_ERROR_MESSAGE);
-        return;
-      }
-
-      if (!response.ok) {
-        setActivationError(data.message || "Error al enviar el código");
-        return;
-      }
-
-      setActivationStep("code");
-      setActivationCode("");
-      setTimeLeft(60);
-    } catch {
-      setActivationError(ACTIVATION_CONNECTION_ERROR_MESSAGE);
-    } finally {
-      window.clearTimeout(timeoutId);
-      setIsActivating(false);
-    }
-  };
-
-  const handleActivateByCode = async () => {
-    const trimmedCode = activationCode.trim();
-
-    if (!trimmedCode) {
-      setActivationError("El código es obligatorio");
-      return;
-    }
-
-    if (!/^\d{6}$/.test(trimmedCode)) {
-      setActivationError("El código debe tener exactamente 6 dígitos numéricos");
-      return;
-    }
-
-    if (isActivating) {
-      return;
-    }
-
-    if (!navigator.onLine) {
-      setActivationError(ACTIVATION_CONNECTION_ERROR_MESSAGE);
-      return;
-    }
-
-    const controller = new AbortController();
-    const timeoutId = window.setTimeout(() => {
-      controller.abort();
-    }, ACTIVATION_REQUEST_TIMEOUT_MS);
-
-    setActivationError("");
-    setIsActivating(true);
-
-    try {
-      const response = await fetch(`${API_URL}/api/auth/activate-by-code`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          correo: activationEmail,
-          codigo: trimmedCode,
-        }),
-        signal: controller.signal,
-      });
-
-      const data = await response.json().catch(() => ({}));
-
-      if (response.status >= 500) {
-        setActivationError(ACTIVATION_CONNECTION_ERROR_MESSAGE);
-        return;
-      }
-
-      if (!response.ok) {
-        setActivationError(data.message || "Error al activar la cuenta");
-        return;
-      }
-
-      setSuccessMessage(
-        data.message || "Cuenta activada correctamente. Ahora puedes iniciar sesión.",
-      );
-      setErrorMessage("");
-      setPassword("");
-      closeActivationModal();
-      router.push("/sign-in");
-    } catch {
+    } catch (error) {
       setActivationError(ACTIVATION_CONNECTION_ERROR_MESSAGE);
     } finally {
       window.clearTimeout(timeoutId);
@@ -1205,6 +1086,122 @@ export default function LoginForm() {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [showActivationModal, activationStep, isActivating]);
+
+  const handleRequestActivationCode = async () => {
+    setActivationError("");
+    setIsActivating(true);
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/auth/request-activation-code`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ correo: activationEmail }),
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setActivationError(data.message || "Error al enviar el código");
+        return;
+      }
+
+      setActivationStep("code");
+      setTimeLeft(60);
+    } catch (error) {
+      setActivationError(
+        error instanceof Error
+          ? error.message
+          : "Error al conectar con el servidor",
+      );
+    } finally {
+      setIsActivating(false);
+    }
+  };
+
+  const handleActivateByCode = async () => {
+    if (!navigator.onLine) {
+      setActivationError(ACTIVATION_CONNECTION_ERROR_MESSAGE);
+      return;
+    }
+
+    const trimmedCode = activationCode.trim();
+
+    if (!trimmedCode) {
+      setActivationError("El código es obligatorio");
+      return;
+    }
+
+    if (!/^\d{6}$/.test(trimmedCode)) {
+      setActivationError("El código de verificación tiene 6 dígitos");
+      return;
+    }
+
+    if (isActivating) {
+      return;
+    }
+
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => {
+      controller.abort();
+    }, ACTIVATION_REQUEST_TIMEOUT_MS);
+
+    setActivationError("");
+    setIsActivating(true);
+
+    try {
+      const response = await fetch(`${API_URL}/api/auth/activate-by-code`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          correo: activationEmail,
+          codigo: trimmedCode,
+        }),
+        signal: controller.signal,
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (response.status >= 500) {
+        setActivationError(ACTIVATION_CONNECTION_ERROR_MESSAGE);
+        return;
+      }
+
+      if (!response.ok) {
+        setActivationError(data.message || "Error al activar la cuenta");
+        return;
+      }
+
+      setSuccessMessage(
+        data.message ||
+          "Cuenta activada correctamente. Ahora puedes iniciar sesión.",
+      );
+      setErrorMessage("");
+      setPassword("");
+      closeActivationModal();
+      router.push("/sign-in");
+    } catch (error) {
+      if (
+        !navigator.onLine ||
+        (error instanceof Error &&
+          error.name === "AbortError" &&
+          !navigator.onLine)
+      ) {
+        setActivationError(ACTIVATION_CONNECTION_ERROR_MESSAGE);
+      } else if (error instanceof Error && error.name === "AbortError") {
+        setActivationError(
+          "La solicitud tardó demasiado. Por favor intenta nuevamente.",
+        );
+      } else {
+        setActivationError(ACTIVATION_CONNECTION_ERROR_MESSAGE);
+      }
+    } finally {
+      window.clearTimeout(timeoutId);
+      setIsActivating(false);
+    }
+  };
 
   const maskEmail = (email: string) => {
     const [name, domain] = email.split("@");
@@ -1946,7 +1943,7 @@ export default function LoginForm() {
                 <button
                   type="button"
                   onClick={handleActivateByPassword}
-                  disabled={isActivating || !activationPassword.trim()}
+                  disabled={isActivating}
                   className="rounded-md bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:bg-orange-300"
                 >
                   {isActivating ? "Activando..." : "Confirmar"}
@@ -2064,10 +2061,7 @@ export default function LoginForm() {
                 <button
                   type="button"
                   onClick={handleActivateByCode}
-                  disabled={
-                    isActivating ||
-                    activationCode.length !== ACTIVATION_CODE_LENGTH
-                  }
+                  disabled={isActivating}
                   className="rounded-md bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:bg-orange-300"
                 >
                   {isActivating ? "Activando..." : "Confirmar"}

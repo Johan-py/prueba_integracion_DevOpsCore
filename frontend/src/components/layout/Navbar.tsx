@@ -458,7 +458,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="sticky top-0 z-[999] w-full border-b border-stone-200 bg-[#F9F6EE] shadow-sm">
+      <nav className="sticky top-0 z-[999] w-full border-b border-stone-200 dark:border-stone-700 bg-[#F9F6EE] dark:bg-stone-900 shadow-sm">
         <div className="mx-auto max-w-[1440px] px-4 py-1.5 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-10">
@@ -811,7 +811,7 @@ export default function Navbar() {
           role="dialog"
         >
           <div
-            className="fixed right-0 top-0 h-full w-4/5 max-w-xs bg-[#F9F6EE] p-6 shadow-xl overflow-y-auto"
+            className="fixed right-0 top-0 h-full w-4/5 max-w-xs bg-[#F9F6EE] dark:bg-stone-900 p-6 shadow-xl overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
@@ -827,6 +827,13 @@ export default function Navbar() {
             </div>
 
             <nav className="mt-10 flex flex-col gap-2">
+              {/* HU13: botón modo claro/oscuro - vistoso, alineado derecha */}
+              <div className="px-3 py-3 flex justify-end">
+                <div className="bg-orange-100/80 dark:bg-stone-700/80 rounded-full px-4 py-2 shadow-sm border border-orange-200 dark:border-stone-600">
+                  <ThemeToggleButton />
+                </div>
+              </div>
+
               {/* FIX: agregado id="tour-publicar-home-mobile" que faltaba.
                   Sin este id, el tour no podía encontrar el elemento al
                   retroceder desde "tour-notificaciones" al paso anterior. */}
@@ -840,15 +847,10 @@ export default function Navbar() {
                 Publica tu inmueble
               </button>
 
-              {/* HU13: botón general para alternar modo claro/oscuro en menú móvil */}
-              <div className="px-3 py-2">
-                <ThemeToggleButton />
-              </div>
-
               <div id="tour-propiedades-mobile" className="flex flex-col">
                 <button
                   onClick={() => setIsPropiedadesOpen(!isPropiedadesOpen)}
-                  className="flex w-full items-center justify-between rounded-md px-3 py-2 text-lg font-medium text-gray-700 hover:bg-[#E68B25]/10 hover:text-[#E68B25]"
+                  className="flex w-full items-center justify-between rounded-md px-3 py-2 text-lg font-medium text-gray-700 dark:text-stone-300 hover:bg-[#E68B25]/10 hover:text-[#E68B25]"
                 >
                   <span>Propiedades</span>
                   <ChevronDown
@@ -902,7 +904,7 @@ export default function Navbar() {
                         if (tipoFinal) params.set("tipoInmueble", tipoFinal);
                         router.push(`/busqueda_mapa?${params.toString()}`);
                       }}
-                      className="pl-8 py-2 text-base text-gray-600 hover:text-[#E68B25] text-left w-full"
+                      className="pl-8 py-2 text-base text-gray-600 dark:text-stone-400 hover:text-[#E68B25] text-left w-full"
                     >
                       {item}
                     </button>
@@ -914,7 +916,7 @@ export default function Navbar() {
                 id="tour-blogs-mobile"
                 href="/blogs"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="rounded-md px-3 py-2 text-lg font-medium text-gray-700 hover:bg-[#E68B25]/10 hover:text-[#E68B25]"
+                className="rounded-md px-3 py-2 text-lg font-medium text-gray-700 dark:text-stone-300 hover:bg-[#E68B25]/10 hover:text-[#E68B25]"
               >
                 Blogs
               </Link>
@@ -923,7 +925,7 @@ export default function Navbar() {
                 id="tour-planes-mobile"
                 href="/cobros-suscripciones"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="rounded-md px-3 py-2 text-lg font-medium text-gray-700 hover:bg-[#E68B25]/10 hover:text-[#E68B25]"
+                className="rounded-md px-3 py-2 text-lg font-medium text-gray-700 dark:text-stone-300 hover:bg-[#E68B25]/10 hover:text-[#E68B25]"
               >
                 Planes de membresía
               </Link>
@@ -932,7 +934,7 @@ export default function Navbar() {
                 id="tour-ayuda-mobile"
                 type="button"
                 onClick={handleIniciarTour}
-                className="w-full text-left rounded-md px-3 py-2 text-lg font-medium text-gray-700 hover:bg-[#E68B25]/10 hover:text-[#E68B25]"
+                className="w-full text-left rounded-md px-3 py-2 text-lg font-medium text-gray-700 dark:text-stone-300 hover:bg-[#E68B25]/10 hover:text-[#E68B25]"
               >
                 Ayuda
               </button>

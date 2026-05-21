@@ -160,21 +160,21 @@ export default function SuperficieFilterSidebar({ onClose }: SuperficieFilterSid
   }
 
   return (
-    <div className="flex flex-col h-full min-h-0 bg-white dark:bg-slate-900 w-full border-r border-stone-200 dark:border-slate-800">
+    <div className="flex flex-col h-full min-h-0 bg-white dark:bg-stone-900 w-full border-r border-stone-200 dark:border-stone-800">
       {/* 1. HEADER (Fijo) */}
       <div className="shrink-0 p-4 pb-2 relative flex flex-col items-center justify-center">
         <div className="w-full flex items-center justify-center relative mb-1">
-          <h3 className="font-bold text-sm text-stone-800 dark:text-slate-100 uppercase tracking-wide text-center">
+          <h3 className="font-bold text-sm text-stone-800 dark:text-stone-100 uppercase tracking-wide text-center">
             Filtrar por Superficie
           </h3>
           <button
             onClick={onClose}
-            className="absolute right-0 p-1 hover:bg-stone-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+            className="absolute right-0 p-1 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-full transition-colors"
           >
-            <X size={20} className="text-stone-500 dark:text-slate-400" />
+            <X size={20} className="text-stone-500 dark:text-stone-400" />
           </button>
         </div>
-        <p className="text-sm text-stone-500 dark:text-slate-400 mb-2 text-center">Ingrese el MÍN y MÁX:</p>
+        <p className="text-sm text-stone-500 dark:text-stone-400 mb-2 text-center">Ingrese el MÍN y MÁX:</p>
       </div>
 
       {/* 2. CONTENIDO (Con Scroll) */}
@@ -182,7 +182,7 @@ export default function SuperficieFilterSidebar({ onClose }: SuperficieFilterSid
         {/* Campo Desde */}
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-3">
-            <span className="text-sm text-stone-600 dark:text-slate-300 w-12">Desde:</span>
+            <span className="text-sm text-stone-600 dark:text-stone-300 w-12">Desde:</span>
             <input
               type="text"
               inputMode="decimal"
@@ -192,10 +192,10 @@ export default function SuperficieFilterSidebar({ onClose }: SuperficieFilterSid
               onPaste={(e) => handlePaste(e, 'desde')}
               onChange={handleDesde}
               onBlur={() => handleBlur(desde, setDesde, setErrorDesde)}
-              className={`border rounded-lg px-3 py-2 text-sm w-full outline-none transition-all dark:bg-slate-800 dark:text-slate-200 ${
+              className={`border rounded-lg px-3 py-2 text-sm w-full outline-none transition-all dark:bg-stone-800 dark:text-stone-200 ${
                 errorDesde
                   ? 'border-red-400 focus:border-red-400 focus:ring-1 focus:ring-red-300 dark:border-red-500'
-                  : 'border-stone-300 focus:border-[rgb(217,119,6)] focus:ring-1 focus:ring-[rgb(217,119,6)] dark:border-slate-600 dark:focus:border-[rgb(232,124,30)] dark:focus:ring-[rgb(232,124,30)]'
+                  : 'border-stone-300 focus:border-[rgb(217,119,6)] focus:ring-1 focus:ring-[rgb(217,119,6)] dark:border-stone-600 dark:focus:border-[rgb(232,124,30)] dark:focus:ring-[rgb(232,124,30)]'
               }`}
             />
           </div>
@@ -205,7 +205,7 @@ export default function SuperficieFilterSidebar({ onClose }: SuperficieFilterSid
         {/* Campo Hasta */}
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-3">
-            <span className="text-sm text-stone-600 dark:text-slate-300 w-12">Hasta:</span>
+            <span className="text-sm text-stone-600 dark:text-stone-300 w-12">Hasta:</span>
             <input
               type="text"
               inputMode="decimal"
@@ -215,10 +215,10 @@ export default function SuperficieFilterSidebar({ onClose }: SuperficieFilterSid
               onPaste={(e) => handlePaste(e, 'hasta')}
               onChange={handleHasta}
               onBlur={() => handleBlur(hasta, setHasta, setErrorHasta)}
-              className={`border rounded-lg px-3 py-2 text-sm w-full outline-none transition-all dark:bg-slate-800 dark:text-slate-200 ${
+              className={`border rounded-lg px-3 py-2 text-sm w-full outline-none transition-all dark:bg-stone-800 dark:text-stone-200 ${
                 errorHasta
                   ? 'border-red-400 focus:border-red-400 focus:ring-1 focus:ring-red-300 dark:border-red-500'
-                  : 'border-stone-300 focus:border-[rgb(217,119,6)] focus:ring-1 focus:ring-[rgb(217,119,6)] dark:border-slate-600 dark:focus:border-[rgb(232,124,30)] dark:focus:ring-[rgb(232,124,30)]'
+                  : 'border-stone-300 focus:border-[rgb(217,119,6)] focus:ring-1 focus:ring-[rgb(217,119,6)] dark:border-stone-600 dark:focus:border-[rgb(232,124,30)] dark:focus:ring-[rgb(232,124,30)]'
               }`}
             />
           </div>
@@ -233,7 +233,7 @@ export default function SuperficieFilterSidebar({ onClose }: SuperficieFilterSid
       </div>
 
       {/* 3. FOOTER (Fijo al fondo) */}
-      <div className="shrink-0 px-6 pb-6 pt-4 border-t border-stone-100 dark:border-slate-800 bg-white dark:bg-slate-900">
+      <div className="shrink-0 px-6 pb-6 pt-4 border-t border-stone-100 dark:border-stone-800 bg-white dark:bg-stone-900">
         {(desde || hasta) ? (
           <button
             type="button"
@@ -253,7 +253,7 @@ export default function SuperficieFilterSidebar({ onClose }: SuperficieFilterSid
           /* Hack RGB y rounded-[12px] para evadir a globals.css */
           className={`rounded-[12px] font-bold py-3 px-4 w-full transition-all active:scale-95 shadow-md border-none ${
             hayErrores
-              ? 'bg-stone-200 text-stone-400 cursor-not-allowed dark:!bg-slate-800 dark:!text-slate-500'
+              ? 'bg-stone-200 text-stone-400 cursor-not-allowed dark:!bg-stone-800 dark:!text-stone-500'
               : '!bg-[rgb(217,119,6)] hover:!bg-[rgb(185,94,0)] !text-white dark:!bg-[rgb(232,124,30)] dark:hover:!bg-[rgb(217,119,6)]'
           }`}
         >

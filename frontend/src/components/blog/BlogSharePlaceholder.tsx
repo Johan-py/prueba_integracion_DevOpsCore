@@ -20,10 +20,19 @@ export default function BlogSharePlaceholder({
 }: BlogShareProps) {
   const [isDownloadOpen, setIsDownloadOpen] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [showToast, setShowToast] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
   const getUrl = () => typeof window !== 'undefined' ? window.location.href : '';
   const getTitle = () => title || (typeof document !== 'undefined' ? document.title : 'Blog PropBol');
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(getUrl());
+    setShowToast(true);
+    setTimeout(() => {
+      setShowToast(false);
+    }, 3000);
+  };
 
   const handleDownloadPDF = async () => {
     setIsGenerating(true);
@@ -133,8 +142,7 @@ export default function BlogSharePlaceholder({
       }
     } else {
       // Fallback: copiar al portapapeles
-      navigator.clipboard.writeText(getUrl());
-      alert('¡Enlace copiado al portapapeles!');
+      handleCopyLink();
     }
   };
 
@@ -150,13 +158,13 @@ export default function BlogSharePlaceholder({
   }, [])
 
   return (
-    <div className="mt-8 w-full rounded-2xl bg-white p-6 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-stone-100 min-h-[120px] transition-all duration-300">
-      <div className="flex flex-col gap-6">
+    <div className="mt-8 w-full min-w-0 rounded-2xl bg-white dark:bg-[#111111] p-6 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none border border-stone-100 dark:border-stone-800 min-h-[120px] transition-all duration-300">
+      <div className="flex flex-col gap-6 min-w-0 w-full">
         <h3 className="text-xs font-bold uppercase tracking-[0.24em] text-[#a56400]">
           Compartir
         </h3>
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between w-full gap-5">
-          <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto w-full lg:w-auto pr-2 lg:pr-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between w-full min-w-0 gap-5">
+          <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto w-full lg:flex-1 min-w-0 pr-2 lg:pr-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             <button onClick={shareToGmail} className="flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-stone-100 hover:bg-stone-200 transition-colors duration-200 group shrink-0" title="Compartir por Gmail">
               <img
                 src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg"
@@ -178,11 +186,11 @@ export default function BlogSharePlaceholder({
                 className="w-6 h-6 sm:w-7 sm:h-7 opacity-90 group-hover:opacity-100 transition-opacity"
               />
             </button>
-            <button onClick={shareToX} className="flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-stone-100 hover:bg-stone-200 transition-colors duration-200 group shrink-0" title="Compartir en X (Twitter)">
+            <button onClick={shareToX} className="flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 transition-colors duration-200 group shrink-0" title="Compartir en X (Twitter)">
               <img
                 src="https://upload.wikimedia.org/wikipedia/commons/c/ce/X_logo_2023.svg"
                 alt="X"
-                className="w-5 h-5 sm:w-6 sm:h-6 opacity-90 group-hover:opacity-100 transition-opacity"
+                className="w-5 h-5 sm:w-6 sm:h-6 opacity-90 group-hover:opacity-100 transition-opacity dark:invert"
               />
             </button>
             <button onClick={shareToLinkedIn} className="flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-stone-100 hover:bg-stone-200 transition-colors duration-200 group shrink-0" title="Compartir en LinkedIn">
@@ -193,14 +201,11 @@ export default function BlogSharePlaceholder({
               />
             </button>
             <button
-              onClick={() => {
-                navigator.clipboard.writeText(getUrl());
-                alert('¡Enlace copiado al portapapeles!');
-              }}
+              onClick={handleCopyLink}
               className="flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-stone-100 hover:bg-stone-200 transition-colors duration-200 group shrink-0"
               title="Copiar enlace"
             >
-              <svg viewBox="0 0 24 24" className="w-5 h-5 opacity-90 group-hover:opacity-100 transition-opacity text-[#433527]" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <svg viewBox="0 0 24 24" className="w-5 h-5 opacity-90 group-hover:opacity-100 transition-opacity text-[#433527] dark:text-stone-300" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <rect width="14" height="14" x="8" y="8" rx="2.5" ry="2.5"></rect>
                 <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
               </svg>
@@ -210,7 +215,7 @@ export default function BlogSharePlaceholder({
               className="flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-stone-100 hover:bg-stone-200 transition-colors duration-200 group shrink-0"
               title="Más opciones de compartido"
             >
-              <svg viewBox="0 0 24 24" className="w-5 h-5 opacity-90 group-hover:opacity-100 transition-opacity text-[#433527]" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg viewBox="0 0 24 24" className="w-5 h-5 opacity-90 group-hover:opacity-100 transition-opacity text-[#433527] dark:text-stone-300" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="1.5"></circle>
                 <circle cx="19" cy="12" r="1.5"></circle>
                 <circle cx="5" cy="12" r="1.5"></circle>
@@ -225,7 +230,7 @@ export default function BlogSharePlaceholder({
               disabled={isGenerating}
               className={`flex items-center justify-between gap-3 h-11 px-4 sm:h-12 sm:px-5 w-full lg:w-auto rounded-xl border transition-all duration-300 group whitespace-nowrap ${isDownloadOpen
                 ? 'bg-stone-900 border-stone-900 text-white shadow-lg shadow-stone-200'
-                : 'border-stone-200 hover:border-stone-400 hover:bg-stone-50 text-[#433527]'
+                : 'border-stone-200 dark:border-stone-700 hover:border-stone-400 dark:hover:border-stone-500 hover:bg-stone-50 dark:hover:bg-stone-800 text-[#433527] dark:text-stone-300'
                 } ${isGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
 
@@ -233,7 +238,7 @@ export default function BlogSharePlaceholder({
                 {isGenerating ? (
                   <div className="w-4 h-4 border-2 border-stone-300 border-t-stone-100 rounded-full animate-spin" />
                 ) : (
-                  <svg viewBox="0 0 24 24" className={`w-[18px] h-[18px] ${isDownloadOpen ? 'text-stone-100' : 'text-[#433527]'}`} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg viewBox="0 0 24 24" className={`w-[18px] h-[18px] ${isDownloadOpen ? 'text-stone-100' : 'text-[#433527] dark:text-stone-300'}`} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                     <polyline points="7 10 12 15 17 10"></polyline>
                     <line x1="12" y1="15" x2="12" y2="3"></line>
@@ -250,9 +255,9 @@ export default function BlogSharePlaceholder({
 
             {/* DROPDOWN */}
             {isDownloadOpen && (
-              <div className="absolute right-0 top-full mt-2.5 w-full bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.12)] border border-stone-100 p-2 z-50 animate-in fade-in zoom-in slide-in-from-top-2 duration-300 origin-top">
+              <div className="absolute right-0 top-full mt-2.5 min-w-[210px] bg-white dark:bg-[#111111] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.12)] dark:shadow-none border border-stone-100 dark:border-stone-800 p-2 z-50 animate-in fade-in zoom-in slide-in-from-top-2 duration-300 origin-top">
                 <button
-                  className="flex items-center w-full gap-3 px-3 py-3 rounded-xl hover:bg-stone-50 text-stone-700 transition-colors group"
+                  className="flex items-center w-full gap-3 px-3 py-3 rounded-xl hover:bg-stone-50 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-300 transition-colors group"
                   onClick={handleDownloadPDF}
                 >
                   <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-red-50 group-hover:bg-red-100 transition-colors shrink-0">
@@ -266,7 +271,7 @@ export default function BlogSharePlaceholder({
                 </button>
 
                 <button
-                  className="flex items-center w-full gap-3 px-3 py-3 rounded-xl hover:bg-stone-50 text-stone-700 transition-colors group"
+                  className="flex items-center w-full gap-3 px-3 py-3 rounded-xl hover:bg-stone-50 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-300 transition-colors group"
                   onClick={async () => {
                     setIsDownloadOpen(false);
                     setIsGenerating(true);
@@ -334,6 +339,18 @@ export default function BlogSharePlaceholder({
           </div>
         </div>
       </div>
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="fixed bottom-6 right-6 sm:bottom-10 sm:right-10 bg-white dark:bg-[#111111] text-stone-800 dark:text-white border border-stone-200 dark:border-stone-800 px-4 py-3 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-none z-[100] flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className="flex items-center justify-center w-6 h-6 rounded-full bg-green-50 dark:bg-green-500/20 text-green-600 dark:text-green-500 shrink-0">
+            <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <span className="text-sm font-semibold tracking-wide">¡Enlace copiado al portapapeles!</span>
+        </div>
+      )}
     </div>
   )
 }

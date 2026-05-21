@@ -187,7 +187,7 @@ function ParametrosPageContent() {
 
       setTagsGuardados(tags);
       setMostrarExitoTags(true);
-      setTimeout(() => setMostrarExitoTags(false), 2000);
+      setTimeout(() => setMostrarExitoTags(false), 5000);
     } catch (error) {
       const esSinConexion = error instanceof TypeError && error.message === "Failed to fetch";
       setMensaje(esSinConexion
