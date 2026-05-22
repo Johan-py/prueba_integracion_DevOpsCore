@@ -18,7 +18,7 @@ export default function TransactionModeFilter({
     <div className="flex gap-6">
       {modos.map((modo) => {
         const isSelected = modoSeleccionado.includes(modo.id);
-        
+
         return (
           <label
             key={modo.id}
@@ -54,7 +54,7 @@ export default function TransactionModeFilter({
                   className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[11px] h-[11px] pointer-events-none text-white"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="currentColor" 
+                  stroke="currentColor"
                   strokeWidth="3"
                   strokeLinecap="square"
                   strokeLinejoin="miter"

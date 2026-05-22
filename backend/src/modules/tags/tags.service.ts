@@ -5,8 +5,8 @@ const MAX_TAGS = 15
 const TASA_CAMBIO_BOB = 6.96
 
 type TagsContextFilters = {
-  tipoInmueble?: string
-  modoInmueble?: string
+  tipoInmueble?: string | string[]
+  modoInmueble?: string | string[]
   minPrice?: number | null
   maxPrice?: number | null
   currency?: string | null
@@ -47,19 +47,23 @@ const buildInmuebleWhereFromFilters = (filtros: TagsContextFilters): Prisma.Inmu
     estado: 'ACTIVO'
   }
 
-  if (filtros.tipoInmueble && filtros.tipoInmueble !== 'CUALQUIER TIPO') {
-    const tipoNormalizado = filtros.tipoInmueble.toUpperCase().trim()
-    if (esCategoriaValida(tipoNormalizado)) {
-      where.categoria = tipoNormalizado
+  if (filtros.tipoInmueble) {
+    const tipos = Array.isArray(filtros.tipoInmueble) ? filtros.tipoInmueble : [filtros.tipoInmueble]
+    const tiposValidos = tipos.map(t => t.toUpperCase().trim()).filter(t => t !== 'CUALQUIER TIPO' && esCategoriaValida(t))
+    if (tiposValidos.length > 0) {
+      where.categoria = { in: tiposValidos }
     }
   }
 
   if (filtros.modoInmueble) {
-    const modoNormalizado = filtros.modoInmueble.toUpperCase().trim()
-    const modoFinal = modoNormalizado.includes('ANTICR') ? 'ANTICRETO' : modoNormalizado
+    const modos = Array.isArray(filtros.modoInmueble) ? filtros.modoInmueble : [filtros.modoInmueble]
+    const modosValidos = modos.map(m => {
+      const norm = m.toUpperCase().trim()
+      return norm.includes('ANTICR') ? 'ANTICRETO' : norm
+    }).filter(esTipoAccionValido)
 
-    if (esTipoAccionValido(modoFinal)) {
-      where.tipoAccion = modoFinal
+    if (modosValidos.length > 0) {
+      where.tipoAccion = { in: modosValidos }
     }
   }
 
