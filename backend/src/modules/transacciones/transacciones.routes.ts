@@ -14,6 +14,7 @@ import {
   notificarAdmin,
   subirComprobante,
 } from './transacciones.controller.js'
+import { crearSesionPublicidad } from './publicidad.controller.js'
 import { requireAuth } from '../../middleware/auth.middleware.js'
 
 const router = Router()
@@ -26,6 +27,7 @@ const uploadComprobante = multer({
 router.get('/admin', requireAuth, listarTransaccionesAdmin)
 router.get('/mis-transacciones', requireAuth, listarMisTransacciones)
 router.post('/', requireAuth, generarPagoQr)
+router.post('/publicidad/crear-sesion', requireAuth, crearSesionPublicidad)
 router.get('/pendiente/:userId', obtenerPagoPendiente)
 router.patch('/:id/confirmar', requireAuth, confirmarPago)
 router.patch('/:id/rechazar', requireAuth, rechazarPago)
