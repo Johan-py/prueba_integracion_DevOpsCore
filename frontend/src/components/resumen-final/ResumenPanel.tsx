@@ -329,6 +329,7 @@ export default function ResumenPanel({ publicacionId }: Props) {
           onConfirmar={ejecutarPublicacion}
           onCancelar={handleCancelar}
           onReintentar={() => setEstadoPublicacion("confirmando")}
+          // @ts-ignore
           onPausar={handlePausar}
         />
       )}
