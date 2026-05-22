@@ -9,6 +9,7 @@ import {
 } from 'react-leaflet'
 import L from 'leaflet'
 import type { LatLngExpression } from 'leaflet'
+// @ts-ignore
 import 'leaflet/dist/leaflet.css'
 import type { ZonaPredefinida } from '@/types/zona'
 import type { TipoOperacion, ZonaSeleccionada } from '../page'
