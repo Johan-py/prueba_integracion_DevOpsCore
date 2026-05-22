@@ -87,18 +87,52 @@ export default function MapaSeleccionZona({
   const [zonaHover, setZonaHover] = useState<number | null>(null)
   const [centroMapa, setCentroMapa] = useState<LatLngExpression | null>(null)
 
-  // Carga zonas desde /api/zonas (coordenadas ya en [lat, lng] para Leaflet)
+  // Carga zonas desde /api/zonas (MOCK para Code Freeze con coordenadas de polígonos)
   useEffect(() => {
-    fetch('/api/zonas-mapa')
-      .then((r) => r.json())
-      .then((json) => {
-        const data: ZonaPredefinida[] = json.data ?? []
-        const validas = data.filter(
-          (z) => Array.isArray(z.coordenadas) && z.coordenadas.length >= 3
-        )
-        setZonas(validas)
-      })
-      .catch(() => { })
+    const MOCK_ZONAS = [
+      {
+        id: 1,
+        nombre: 'Cala Cala',
+        coordenadas: [[-17.375, -66.165], [-17.375, -66.155], [-17.365, -66.155], [-17.365, -66.165]]
+      },
+      {
+        id: 2,
+        nombre: 'Queru Queru',
+        coordenadas: [[-17.370, -66.150], [-17.370, -66.140], [-17.360, -66.140], [-17.360, -66.150]]
+      },
+      {
+        id: 3,
+        nombre: 'Muyurina',
+        coordenadas: [[-17.385, -66.145], [-17.385, -66.135], [-17.375, -66.135], [-17.375, -66.145]]
+      },
+      {
+        id: 4,
+        nombre: 'Sacaba',
+        coordenadas: [[-17.380, -66.050], [-17.380, -66.030], [-17.400, -66.030], [-17.400, -66.050]]
+      },
+      {
+        id: 5,
+        nombre: 'Quillacollo',
+        coordenadas: [[-17.390, -66.280], [-17.390, -66.260], [-17.410, -66.260], [-17.410, -66.280]]
+      },
+      {
+        id: 6,
+        nombre: 'Punata',
+        coordenadas: [[-17.530, -65.840], [-17.530, -65.820], [-17.550, -65.820], [-17.550, -65.840]]
+      },
+      {
+        id: 7,
+        nombre: 'Cliza',
+        coordenadas: [[-17.570, -65.940], [-17.570, -65.920], [-17.590, -65.920], [-17.590, -65.940]]
+      },
+      {
+        id: 8,
+        nombre: 'Tarata',
+        coordenadas: [[-17.600, -66.030], [-17.600, -66.010], [-17.620, -66.010], [-17.620, -66.030]]
+      }
+    ];
+    // Forzamos el tipado para que Leaflet acepte nuestras coordenadas simuladas
+    setZonas(MOCK_ZONAS as any);
   }, [])
 
   const handleClickZona = (zona: ZonaPredefinida) => {

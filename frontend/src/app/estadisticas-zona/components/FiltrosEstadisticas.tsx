@@ -42,14 +42,19 @@ export default function FiltrosEstadisticas({
   const [zonasFiltradas, setZonasFiltradas] = useState<ZonaOpcion[]>([])
   const [mostrarSugerencias, setMostrarSugerencias] = useState(false)
 
-  // Cargar zonas disponibles
+  // Cargar zonas disponibles (MOCK inyectado para Code Freeze)
   useEffect(() => {
-    fetch('/api/estadisticas-zona/zonas')
-      .then((r) => r.json())
-      .then((json) => {
-        if (json.ok && Array.isArray(json.data)) setZonas(json.data)
-      })
-      .catch(() => { })
+    const MOCK_ZONAS = [
+      { id: 1, nombre: 'Cala Cala' },
+      { id: 2, nombre: 'Queru Queru' },
+      { id: 3, nombre: 'Muyurina' },
+      { id: 4, nombre: 'Sacaba' },
+      { id: 5, nombre: 'Quillacollo' },
+      { id: 6, nombre: 'Punata' },
+      { id: 7, nombre: 'Cliza' },
+      { id: 8, nombre: 'Tarata' }
+    ];
+    setZonas(MOCK_ZONAS);
   }, [])
 
   // Sincronizar selección externa (ej. desde el mapa) con el input
