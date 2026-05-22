@@ -6,6 +6,8 @@ import { crearTransaccion } from './servicios/transaccion.service.js'
 import { emitirComprobante } from './servicios/comprobanteService.js'
 import { suscripcionesService } from '../suscripciones/suscripciones.service.js'
 import { createNotificationService } from '../notificaciones/notificaciones.service.js'
+import { confirmarPublicidadService } from '../publicacion/publicacion.service.js'
+import { METODO_PUBLICIDAD, obtenerDatosPublicidad } from './publicidad.service.js'
 
 interface AuthRequest extends Request {
   user?: { id: number }
@@ -182,6 +184,56 @@ export const confirmarPago = async (req: Request, res: Response) => {
       return res.status(409).json({ error: 'La transacción ya fue confirmada' })
     }
 
+    // Publicidad (HU-11): si la transacción es una orden de publicidad, activamos
+    // la promoción de la publicación en vez de crear una suscripción. Llamamos al
+    // service de Publicaciones en proceso (mismo backend) pasando el dueño real
+    // (transaccion.id_usuario), por lo que no aplica el chequeo de propietario.
+    if (transaccion.metodo_pago === METODO_PUBLICIDAD) {
+      const datos = await obtenerDatosPublicidad(transaccionId)
+      if (!datos) {
+        return res.status(409).json({
+          error: 'No se encontraron los datos de publicidad de la transacción',
+        })
+      }
+
+      const ahora = new Date()
+      await confirmarPublicidadService(
+        datos.publicacionId,
+        transaccion.id_usuario!,
+        `REF-${transaccionId}`,
+        datos.planId,
+      )
+
+      await prisma.transacciones.update({
+        where: { id: transaccionId },
+        data: { estado: 'COMPLETADO', fecha_completado: ahora },
+      })
+
+      await prisma.bitacora_pagos.create({
+        data: {
+          id_usuario: transaccion.id_usuario,
+          id_transaccion: transaccionId,
+          evento: 'PUBLICIDAD_ACTIVADA',
+          mensaje: `Publicidad activada para publicación ${datos.publicacionId} (plan ${datos.planId})`,
+        },
+      })
+
+      try {
+        await createNotificationService({
+          correo: transaccion.usuario.correo,
+          titulo: '¡Tu publicación ya está destacada!',
+          mensaje: `Tu pago (REF-${transaccionId}) fue aprobado y tu publicación ahora aparece destacada en la portada.`,
+          tipo: 'PAGO_APROBADO',
+        })
+      } catch (error) {
+        console.error(`Error al notificar publicidad activada (transacción ${transaccionId}):`, error)
+      }
+
+      return res.status(200).json({
+        mensaje: 'Pago de publicidad confirmado y promoción activada',
+      })
+    }
+
     const suscripcionVigente = await suscripcionesService.obtenerSuscripcionActiva(
       transaccion.id_usuario!
     )
@@ -299,7 +351,9 @@ export const listarTransaccionesAdmin = async (_req: Request, res: Response) => 
         monto: Number(t.total),
         fecha: t.fecha_intento,
         estado: t.estado ?? 'PENDIENTE',
-        plan: t.plan_suscripcion?.nombre_plan ?? null,
+        plan: t.metodo_pago === METODO_PUBLICIDAD
+          ? 'Publicidad de publicación'
+          : t.plan_suscripcion?.nombre_plan ?? null,
       }))
     )
   } catch (error) {
