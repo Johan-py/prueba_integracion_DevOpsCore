@@ -631,9 +631,9 @@ useEffect(() => {
     const spaceAbove = highlight.top - vOffsetTop;
 
     top =
-      spaceBelow >= H + GAP || spaceBelow > spaceAbove
-        ? highlight.bottom + GAP
-        : highlight.top - H - GAP;
+      spaceAbove >= H + GAP || spaceAbove >= spaceBelow
+        ? highlight.top - H - GAP
+        : highlight.bottom + GAP;
 
     const clampedH = Math.min(H, vh - 20);
     top = Math.max(vOffsetTop + 10, Math.min(top, vOffsetTop + vh - clampedH - 10));
