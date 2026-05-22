@@ -6,6 +6,7 @@ import BlogCommentsSection from "@/components/blog/BlogCommentsSection";
 import MarkdownRenderer from "@/components/blog/MarkdownRenderer";
 import BlogSharePlaceholder from "@/components/blog/BlogSharePlaceholder";
 import { MOCK_USER_BLOGS } from "@/lib/mock/blogs.mock";
+import BlogRealtimeRefresh from "@/components/blog/BlogRealtimeRefresh";
 import {
   getPublishedBlogById,
   getPublishedBlogs,
@@ -85,6 +86,7 @@ export default async function BlogDetailPage({
   return (
     <article className="min-h-screen bg-[linear-gradient(180deg,#fbf6ef_0%,#f8f3eb_38%,#ffffff_100%)] dark:bg-none dark:bg-black pb-20 transition-colors duration-300">
       <BlogDeletedRedirect blogId={params.id} />
+      <BlogRealtimeRefresh blogId={params.id} />
       <header className="mx-auto max-w-5xl px-4 pt-10 sm:px-6 lg:px-8 lg:pt-14">
         <div className="max-w-4xl">
           <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#a56400]">
