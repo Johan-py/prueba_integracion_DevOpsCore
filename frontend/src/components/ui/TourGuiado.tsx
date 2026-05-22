@@ -189,7 +189,7 @@ export default function TourGuiado() {
       }
       const step = TOUR_STEPS[currentStep] as TourStep;
       const isMobileNav =
-        (window.visualViewport?.width ?? window.innerWidth) < 768;
+        (window.visualViewport?.width ?? window.innerWidth) < 1024;
       const id = isMobileNav && step.mobileId ? step.mobileId : step.id;
       const el = document.getElementById(id);
       if (el) {
@@ -275,7 +275,7 @@ export default function TourGuiado() {
 
     const step = TOUR_STEPS[currentStep] as TourStep;
     const isMobileNav =
-      (window.visualViewport?.width ?? window.innerWidth) < 768;
+      (window.visualViewport?.width ?? window.innerWidth) < 1024;
 
     const needsMobileMenu = isMobileNav && !!step.requiresMobileMenu;
 
@@ -448,7 +448,7 @@ export default function TourGuiado() {
         style={{
           position: "fixed",
           inset: 0,
-          zIndex: 9998,
+          zIndex: 99998,
           pointerEvents: "all",
         }}
       >
@@ -491,7 +491,7 @@ export default function TourGuiado() {
           top,
           left,
           width: tooltipW,
-          zIndex: 9999,
+          zIndex: 99999,
           background: theme.bg,
           color: theme.text,
           borderRadius: 12,
