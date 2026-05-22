@@ -93,13 +93,8 @@ export const eliminarPlan = async (req: Request, res: Response) => {
     const id = parseInt(String(req.params.id))
     if (isNaN(id)) return res.status(400).json({ error: 'ID inválido' })
 
-    const activas = await prisma.suscripciones_activas.count({
-      where: { id_suscripcion: id, estado: 'ACTIVA' },
-    })
-    if (activas > 0) {
-      return res.status(409).json({ error: 'No se puede eliminar: el plan tiene suscripciones activas' })
-    }
-
+    // Soft delete: el plan deja de ofrecerse a nuevos usuarios, pero las
+    // suscripciones activas conservan su referencia y siguen vigentes hasta vencer.
     await prisma.plan_suscripcion.update({ where: { id }, data: { eliminado_en: new Date() } })
     return res.json({ ok: true })
   } catch (e) {

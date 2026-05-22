@@ -36,6 +36,7 @@ type CreateNotificationParams = {
   correo: string;
   titulo: string;
   mensaje: string;
+  tipo?: TipoNotificacion;
 };
 
 const DEFAULT_LIMIT = 20;
@@ -164,6 +165,7 @@ export const createNotificationService = async ({
   correo,
   titulo,
   mensaje,
+  tipo,
 }: CreateNotificationParams) => {
   const normalizedCorreo = correo.trim().toLowerCase();
   const normalizedTitle = titulo.trim();
@@ -191,6 +193,7 @@ export const createNotificationService = async ({
     usuarioId: user.id,
     titulo: normalizedTitle,
     mensaje: normalizedMessage,
+    tipo,
   });
 
   emitNotificationEvent(user.id, "created", notification.id);

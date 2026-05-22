@@ -1,0 +1,39 @@
+name: Security & Quality Gates
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+    branches: [develop, main]
+
+jobs:
+  gitleaks:
+    name: Secret Scanning (Gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Para buscar secretos viejos en el historial
+
+      - name: Detectar Secretos y Tokens
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  trivy:
+    name: Dependency Scanning (Trivy)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Código
+        uses: actions/checkout@v4
+
+      - name: Escanear Vulnerabilidades en Dependencias
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'table'
+          exit-code: '1' # El pipeline fallará si encuentra vulnerabilidades
+          ignore-unfixed: true # Ignora las que aún no tienen solución de parche
+          severity: 'CRITICAL,HIGH' # Bloquea el merge solo ante amenazas Altas o Críticas
