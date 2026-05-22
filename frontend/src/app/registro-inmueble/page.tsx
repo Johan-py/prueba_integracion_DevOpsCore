@@ -1059,8 +1059,8 @@ const [poiSeleccionado, setPoiSeleccionado] = useState<number | null>(null)
                             poi.lat === pinCoords.lat &&
                             poi.lng === pinCoords.lng
                         )
-if (pois.length >= 12) {
-  alert('Máximo 12 referencias')
+if (pois.length >= 4) {
+  alert('Máximo 4 referencias')
   return
 }
 if (referenciasEnEsePunto.length >= 4) {
