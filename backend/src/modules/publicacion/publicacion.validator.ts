@@ -40,13 +40,15 @@ export const propertyValidationRules = [
     .isInt({ gt: 0 })
     .withMessage("El número de habitaciones debe ser positivo"),
 
-  body("direccion").notEmpty().withMessage("La dirección es obligatoria"),
+  body("direccion")
+    .notEmpty()
+    .withMessage("La dirección es obligatoria"),
 
   body("descripcion")
     .isLength({ min: 50, max: 300 })
     .withMessage("La descripción debe tener entre 50 y 300 caracteres")
     .matches(/^[a-zA-Z0-9\s.,;:()]+$/)
     .withMessage(
-      "La descripción solo puede contener caracteres alfanuméricos y básicos",
+      "La descripción solo puede contener caracteres alfanuméricos y básicos"
     ),
 ];

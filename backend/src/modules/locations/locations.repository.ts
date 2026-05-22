@@ -10,48 +10,71 @@ export class LocationsRepository {
       .replace(/[oó]/gi, "[oó]")
       .replace(/[uú]/gi, "[uú]");
   }
+
   async findByName(query: string) {
     try {
       const cleanQuery = query.trim();
       // Si la query es muy corta, devolvemos vacío para evitar carga innecesaria
-      if (!cleanQuery || query.length < 2) return [];
+      if (!cleanQuery || cleanQuery.length < 2) return [];
 
-      return await prisma.ubicacion_maestra.findMany({
-        where: {
-          OR: [
-            // 'nombre' es la ZONA en tu base de datos
-            { nombre: { contains: query, mode: "insensitive" } },
-            { municipio: { contains: query, mode: "insensitive" } },
-            { departamento: { contains: query, mode: "insensitive" } },
-          ],
+      // 1. Buscamos coincidencias en Municipios (Ej: "Cochabamba")
+      const municipios = await prisma.municipio.findMany({
+        where: { nombre: { contains: cleanQuery, mode: "insensitive" } },
+        include: {
+          provincia: { include: { departamento: true } }
         },
-        select: {
-          id: true,
-          nombre: true,
-          municipio: true,
-          departamento: true,
-        },
-        orderBy: { popularidad: "desc" },
-        take: 5,
+        take: 3,
       });
+
+      // 2. Buscamos coincidencias en Barrios (Ej: "Queru Queru")
+      const barrios = await prisma.barrio.findMany({
+        where: { nombre: { contains: cleanQuery, mode: "insensitive" } },
+        include: {
+          zona: {
+            include: {
+              municipio: {
+                include: { provincia: { include: { departamento: true } } }
+              }
+            }
+          }
+        },
+        take: 4,
+      });
+
+      // 3. Mapeamos Municipios al formato que el Frontend espera
+      const resultadosMunicipios = municipios.map((m) => ({
+        id: m.id + 10000, 
+        nombre: m.nombre, 
+        municipio: m.nombre,
+        // Usamos ?. para evitar el error y ?? para poner un valor por defecto
+        departamento: m.provincia?.departamento.nombre ?? "Cochabamba", 
+        tipo: "Municipio" 
+      }));
+
+      // 4. Mapeamos Barrios al formato que el Frontend espera
+      const resultadosBarrios = barrios.map((b) => ({
+        id: b.id,
+        nombre: b.nombre,
+        municipio: b.zona.municipio.nombre,
+        departamento: b.zona.municipio.provincia?.departamento.nombre ?? "Cochabamba", 
+        tipo: "Barrio"
+      }));
+
+      // 5. Unimos los resultados (Priorizando Municipios, luego Barrios)
+      return [...resultadosMunicipios, ...resultadosBarrios].slice(0, 5);
+
     } catch (error) {
       console.error("❌ Error en LocationsRepository.findByName:", error);
-      // Devolvemos un array vacío para que el frontend no reciba el 500
       return [];
     }
   }
 
   /**
-   * Incrementa la popularidad de una zona cuando el usuario la selecciona.
+   * Incrementa la popularidad de una zona.
    */
   async incrementPopularity(id: number) {
     try {
-      return await prisma.ubicacion_maestra.update({
-        where: { id: id },
-        data: {
-          popularidad: { increment: 1 },
-        },
-      });
+      return null;
     } catch (error) {
       console.error("❌ Error al incrementar popularidad:", error);
       return null;

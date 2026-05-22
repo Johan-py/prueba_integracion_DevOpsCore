@@ -1,8 +1,10 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Trash2, Pencil, Check, X, Loader2, MapPin, Plus, Eye, EyeOff } from 'lucide-react'
+import { Trash2, Pencil, Check, X, Loader2, MapPin, Plus, Eye, EyeOff, BarChart2 } from 'lucide-react'
+import Link from 'next/link'
 import nextDynamic from 'next/dynamic'
+import { useRouter } from 'next/navigation'
 
 const MapaZonas = nextDynamic(() => import('./MapaZonas'), {
   ssr: false,
@@ -26,6 +28,7 @@ interface Zona {
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
 
 export default function MisZonas() {
+  const router = useRouter()
   const [zonas, setZonas] = useState<Zona[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [editandoId, setEditandoId] = useState<number | null>(null)
@@ -33,7 +36,8 @@ export default function MisZonas() {
   const [referenciaEditada, setReferenciaEditada] = useState('')
   const [confirmandoEliminarId, setConfirmandoEliminarId] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
-
+  const [zonaSeleccionadaId, setZonaSeleccionadaId] = useState<number | null>(null)
+ 
   const getToken = () => localStorage.getItem('token')
 
   // Extraer coordenadas del centro del polígono real
@@ -68,8 +72,7 @@ export default function MisZonas() {
     try {
       const token = getToken()
       if (!token) {
-        setError('No autenticado. Por favor inicia sesión.')
-        setIsLoading(false)
+        router.replace('/sign-in')
         return
       }
 
@@ -111,6 +114,7 @@ export default function MisZonas() {
 
   const toggleMostrarPropiedades = (zonaId: number, event: React.MouseEvent) => {
     event.stopPropagation()
+    setZonaSeleccionadaId(zonaId)
     setZonas(prev => prev.map(zona =>
       zona.id === zonaId
         ? { ...zona, mostrarPropiedades: !zona.mostrarPropiedades }
@@ -227,11 +231,21 @@ export default function MisZonas() {
 
   return (
     <div className="px-4 py-6 max-w-7xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-stone-900">Mis Zonas</h1>
-        <p className="text-sm text-stone-500 mt-1">
-          Todas tus zonas se muestran en el mapa. Activa el checkbox para ver las propiedades dentro de cada zona.
-        </p>
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-stone-900">Mis Zonas</h1>
+          <p className="text-sm text-stone-500 mt-1">
+            Todas tus zonas se muestran en el mapa. Activa el checkbox para ver las propiedades dentro de cada zona.
+          </p>
+        </div>
+        <Link
+          href="/estadisticas-zona"
+          id="btn-estadisticas-propiedades"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#E07B2A] text-white text-sm font-semibold hover:bg-[#c96a1d] transition-colors shadow-sm whitespace-nowrap self-start"
+        >
+          <BarChart2 size={16} />
+          Estadísticas de propiedades
+        </Link>
       </div>
 
       {error && (
@@ -259,6 +273,7 @@ export default function MisZonas() {
             <MapaZonas
               zonas={zonas}
               zonasConPropiedades={zonasConPropiedades}
+              zonaSeleccionadaId={zonaSeleccionadaId}
             />
           </div>
         </div>

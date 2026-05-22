@@ -1,4 +1,4 @@
-"use client";
+import Link from "next/link";
 
 type BlogCardProps = {
   id: string;
@@ -9,7 +9,7 @@ type BlogCardProps = {
   categoryLabel?: string;
   authorName: string;
   publishedAt: string;
-  onClick?: (id: string) => void;
+  href?: string;
 };
 
 export default function BlogCard({
@@ -21,78 +21,80 @@ export default function BlogCard({
   categoryLabel,
   authorName,
   publishedAt,
-  onClick,
+  href,
 }: BlogCardProps) {
-  const handleClick = () => {
-    onClick?.(id);
-  };
+  const cardHref = href || `/blog/${id}`;
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
-    if (event.key === "Enter") {
-      handleClick();
-    }
+  // Trunca el excerpt a una longitud fija y añade tres puntos suspensivos
+  const truncateExcerpt = (text: string, max = 140) => {
+    if (!text) return '';
+    const t = text.replace(/\s+/g, ' ').trim();
+    if (t.length <= max) return t;
+    return t.slice(0, max).trimEnd() + '...';
   };
 
   return (
-    <article
-      onClick={onClick ? handleClick : undefined}
-      onKeyDown={onClick ? handleKeyDown : undefined}
-      role={onClick ? "button" : undefined}
-      tabIndex={onClick ? 0 : undefined}
-      aria-label={onClick ? `Abrir blog: ${title}` : undefined}
-      className={`
-        group
-        overflow-hidden
-        rounded-[28px]
-        border
-        border-stone-200
-        bg-white
-        shadow-[0_16px_60px_-40px_rgba(41,37,36,0.45)]
-        transition-all
-        duration-300
-        ${
-          onClick
-            ? "cursor-pointer hover:-translate-y-1 hover:border-stone-300 hover:shadow-[0_20px_70px_-38px_rgba(41,37,36,0.5)] focus:outline-none focus:ring-2 focus:ring-amber-500"
-            : ""
-        }
-      `}
-    >
-      <div className="overflow-hidden">
-        <img
-          src={imageUrl}
-          alt={title}
-          className="h-52 w-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-      </div>
-
-      <div className="space-y-4 p-5">
-        {/* Categoría */}
-        <div className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-400">
-          <span className="text-amber-700">
-            {categoryLabel ?? category}
-          </span>
+    <Link href={cardHref} className="block group">
+      <article
+        className={`
+          flex
+          flex-col
+          overflow-hidden
+          rounded-[32px]
+          bg-white dark:bg-stone-800
+          transition-all
+          duration-500
+          group-hover:shadow-[0_24px_80px_-15px_rgba(41,37,36,0.15)]
+          h-full
+        `}
+      >
+        {/* Imagen */}
+        <div className="relative aspect-[16/10] overflow-hidden">
+          <img
+            src={imageUrl || "/placeholder-blog.jpg"}
+            alt={title}
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-black/5 transition-opacity duration-500 group-hover:opacity-0" />
         </div>
 
-        {/* Título */}
-        <h2 className="font-heading line-clamp-2 text-xl font-bold leading-snug text-stone-900">
-          {title}
-        </h2>
+        <div className="flex flex-1 flex-col p-6 sm:p-8">
+          {/* Categoría Pill */}
+          <div className="mb-4">
+            <span className="inline-block rounded-full border border-[#D97706]/20 bg-[#D97706]/5 px-4 py-1 text-[10px] font-bold uppercase tracking-widest text-[#D97706] dark:text-[#D97706]/80">
+              {categoryLabel ?? category}
+            </span>
+          </div>
 
-        {/* Resumen */}
-        <p className="line-clamp-3 text-sm leading-6 text-stone-600">
-          {excerpt}
-        </p>
+          {/* Título */}
+          <h2 className="font-['Montserrat'] mb-3 line-clamp-2 text-xl font-bold leading-tight text-stone-900 dark:text-stone-100 transition-colors group-hover:text-[#D97706] sm:text-2xl">
+            {title}
+          </h2>
 
-        {/* Footer */}
-        <div className="flex items-center justify-between pt-2 text-xs text-stone-500">
-          <span className="font-semibold uppercase tracking-[0.16em] text-stone-700">
-            {authorName}
-          </span>
-          <span>
-            {new Date(publishedAt).toLocaleDateString()}
-          </span>
+          {/* Resumen */}
+          <p className="font-['Inter'] mb-6 line-clamp-3 text-sm leading-relaxed text-stone-600 dark:text-stone-400 sm:text-base">
+            {truncateExcerpt(excerpt)}
+          </p>
+
+          {/* Botón y Metadata */}
+          <div className="mt-auto flex items-center justify-between">
+            <div
+              className="rounded-full bg-[#D97706] px-5 py-2 text-[10px] font-bold uppercase tracking-wider text-white transition-all group-hover:bg-[#D97706]/90 group-hover:shadow-lg group-hover:shadow-[#D97706]/20"
+            >
+              Leer Más
+            </div>
+
+            <div className="text-right">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400 dark:text-stone-500">
+                {authorName}
+              </p>
+              <p className="text-[9px] text-stone-400 dark:text-stone-500">
+                {new Date(publishedAt).toLocaleDateString('es-ES', { month: 'short', day: 'numeric', year: 'numeric' })}
+              </p>
+            </div>
+          </div>
         </div>
-      </div>
-    </article>
+      </article>
+    </Link>
   );
 }

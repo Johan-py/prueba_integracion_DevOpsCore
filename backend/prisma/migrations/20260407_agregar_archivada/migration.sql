@@ -1,1 +1,0 @@
-ALTER TABLE "notificacion" ADD COLUMN "archivada" BOOLEAN NOT NULL DEFAULT false;

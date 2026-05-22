@@ -20,7 +20,8 @@ export function usePaymentStatus(
     const checkStatus = async () => {
       try {
         // Preguntamos al backend el estado de este ID específico
-        const response = await fetch(`http://localhost:5000/api/transacciones/${paymentId}/estado`)
+        const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+        const response = await fetch(`${API}/api/transacciones/${paymentId}/estado`)
 
         if (!response.ok) throw new Error('Error al consultar estado')
 

@@ -1,6 +1,17 @@
+import crypto from "node:crypto";
+import jwt from "jsonwebtoken";
+import { env } from "../../config/env.js";
+import { prisma } from "../../lib/prisma.client.js";
+import {
+  enviarCodigoDesactivacionCuenta,
+  enviarCodigoActivacion2FA,
+} from "../../lib/email.service.js";
+
 import {
   deactivateUserAccountRepository,
   findUserPasswordByIdRepository,
+  findSecurityUserByIdRepository,
+  findUserGoogleAuthRepository,
 } from "./security.repository.js";
 
 export class SecurityError extends Error {
@@ -18,9 +29,20 @@ type AttemptState = {
   blockedUntil: number | null;
 };
 
+type PendingDeactivationPayload = {
+  purpose: "account-deactivation";
+  userId: number;
+  correo: string;
+  nonce: string;
+  codeSignature: string;
+};
+
 const MAX_FAILED_ATTEMPTS = 3;
 const BLOCK_TIME_MS = 15 * 60 * 1000;
 const MAX_PASSWORD_LENGTH = 255;
+
+const DEACTIVATION_CODE_TTL_MINUTES = 5;
+const DEACTIVATION_CODE_TTL_SECONDS = DEACTIVATION_CODE_TTL_MINUTES * 60;
 
 const attemptsStore = new Map<number, AttemptState>();
 
@@ -80,6 +102,67 @@ const registerFailedAttempt = (userId: number) => {
     attemptsLeft: MAX_FAILED_ATTEMPTS - state.failedAttempts,
     retryAfterSeconds: 0,
   };
+};
+
+const generateDeactivationCode = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+const signDeactivationCode = ({
+  codigo,
+  correo,
+  userId,
+  nonce,
+}: {
+  codigo: string;
+  correo: string;
+  userId: number;
+  nonce: string;
+}) => {
+  return crypto
+    .createHmac("sha256", env.JWT_SECRET)
+    .update(`${codigo}:${correo}:${userId}:${nonce}:account-deactivation`)
+    .digest("hex");
+};
+
+const isMatchingCodeSignature = (
+  expectedSignature: string,
+  currentSignature: string,
+) => {
+  const expectedBuffer = Buffer.from(expectedSignature, "utf8");
+  const currentBuffer = Buffer.from(currentSignature, "utf8");
+
+  if (expectedBuffer.length !== currentBuffer.length) {
+    return false;
+  }
+
+  return crypto.timingSafeEqual(expectedBuffer, currentBuffer);
+};
+
+const generatePendingDeactivationToken = (
+  payload: PendingDeactivationPayload,
+) => {
+  return jwt.sign(payload, env.JWT_SECRET, {
+    expiresIn: DEACTIVATION_CODE_TTL_SECONDS,
+  });
+};
+
+const verifyPendingDeactivationToken = (token: string) => {
+  try {
+    const decoded = jwt.verify(token, env.JWT_SECRET) as jwt.JwtPayload &
+      PendingDeactivationPayload;
+
+    if (decoded.purpose !== "account-deactivation") {
+      throw new Error("Token inválido");
+    }
+
+    return decoded;
+  } catch {
+    throw new SecurityError(
+      "El código expiró o ya no es válido. Solicita uno nuevo.",
+      400,
+    );
+  }
 };
 
 const clearAttemptState = (userId: number) => {
@@ -163,4 +246,334 @@ export const deactivateAccountService = async (
   await deactivateUserAccountRepository(userId);
 
   return { message: "Tu cuenta ha sido desactivada correctamente." };
+};
+export const sendDeactivateAccountCodeService = async (userId: number) => {
+  if (!Number.isInteger(userId) || userId <= 0) {
+    throw new SecurityError("Usuario no autorizado.", 401);
+  }
+
+  const user = await findSecurityUserByIdRepository(userId);
+
+  if (!user) {
+    throw new SecurityError("Usuario no encontrado.", 404);
+  }
+
+  const codigo = generateDeactivationCode();
+  const nonce = crypto.randomUUID();
+
+  const verificationToken = generatePendingDeactivationToken({
+    purpose: "account-deactivation",
+    userId: user.id,
+    correo: user.correo,
+    nonce,
+    codeSignature: signDeactivationCode({
+      codigo,
+      correo: user.correo,
+      userId: user.id,
+      nonce,
+    }),
+  });
+
+  const emailResult = await enviarCodigoDesactivacionCuenta({
+    emailDestino: user.correo,
+    codigo,
+    nombreUsuario: user.nombre,
+  });
+  if (!emailResult.success) {
+    throw new SecurityError(
+      "No se pudo enviar el código de verificación. Intenta nuevamente.",
+      500,
+    );
+  }
+
+  return {
+    message: "Código enviado correctamente.",
+    verificationToken,
+    expiresInMinutes: DEACTIVATION_CODE_TTL_MINUTES,
+  };
+};
+
+export const verifyDeactivateAccountCodeService = async ({
+  userId,
+  codigo,
+  verificationToken,
+}: {
+  userId: number;
+  codigo: string;
+  verificationToken: string;
+}) => {
+  if (!Number.isInteger(userId) || userId <= 0) {
+    throw new SecurityError("Usuario no autorizado.", 401);
+  }
+
+  const normalizedCode = codigo?.trim();
+  const normalizedToken = verificationToken?.trim();
+
+  if (!normalizedCode || !normalizedToken) {
+    throw new SecurityError(
+      "El código y el token de verificación son obligatorios.",
+      400,
+    );
+  }
+
+  if (!/^\d{6}$/.test(normalizedCode)) {
+    throw new SecurityError(
+      "El código debe tener exactamente 6 dígitos numéricos.",
+      400,
+    );
+  }
+
+  const decoded = verifyPendingDeactivationToken(normalizedToken);
+
+  if (decoded.userId !== userId) {
+    throw new SecurityError("Token inválido para este usuario.", 403);
+  }
+
+  const expectedSignature = signDeactivationCode({
+    codigo: normalizedCode,
+    correo: decoded.correo,
+    userId: decoded.userId,
+    nonce: decoded.nonce,
+  });
+
+  if (!isMatchingCodeSignature(expectedSignature, decoded.codeSignature)) {
+    throw new SecurityError("El código ingresado no es válido.", 400);
+  }
+
+  await deactivateUserAccountRepository(userId);
+
+  return { message: "Tu cuenta ha sido desactivada correctamente." };
+};
+
+export const activate2FAService = async (userId: number, password?: string) => {
+  if (!Number.isInteger(userId) || userId <= 0) {
+    throw new SecurityError("Usuario no autorizado.", 401);
+  }
+
+  const isGoogleUser = await findUserGoogleAuthRepository(userId);
+
+  if (isGoogleUser) {
+    const updatedUser = await prisma.usuario.update({
+      where: { id: userId },
+      data: {
+        two_factor_activo: true,
+        two_factor_activado_en: new Date(),
+        two_factor_metodo: "email",
+      },
+      select: {
+        two_factor_activo: true,
+      },
+    });
+    return {
+      message: "Verificación en dos pasos activada correctamente.",
+      two_factor_activo: updatedUser.two_factor_activo,
+    };
+  }
+
+  await validateCurrentPasswordService(userId, password ?? "");
+
+  const updatedUser = await prisma.usuario.update({
+    where: { id: userId },
+    data: {
+      two_factor_activo: true,
+      two_factor_activado_en: new Date(),
+      two_factor_metodo: "email",
+    },
+    select: {
+      two_factor_activo: true,
+    },
+  });
+
+  return {
+    message: "Verificación en dos pasos activada correctamente.",
+    two_factor_activo: updatedUser.two_factor_activo,
+  };
+};
+
+export const get2FAStatusService = async (userId: number) => {
+  if (!Number.isInteger(userId) || userId <= 0) {
+    throw new SecurityError("Usuario no autorizado.", 401);
+  }
+
+  const user = await findUserPasswordByIdRepository(userId);
+  if (!user) throw new SecurityError("Usuario no encontrado.", 404);
+
+  const isGoogleUser = await findUserGoogleAuthRepository(userId);
+
+  return {
+    two_factor_activo: user.two_factor_activo ?? false,
+    isGoogleUser,
+  };
+};
+
+// ── ACTIVAR 2FA POR CORREO ────────────────────────────────────────────────────
+
+type PendingActivate2FAPayload = {
+  purpose: "activate-2fa";
+  userId: number;
+  correo: string;
+  nonce: string;
+  codeSignature: string;
+};
+
+const ACTIVATE_2FA_CODE_TTL_MINUTES = 5;
+const ACTIVATE_2FA_CODE_TTL_SECONDS = ACTIVATE_2FA_CODE_TTL_MINUTES * 60;
+
+const signActivate2FACode = ({
+  codigo,
+  correo,
+  userId,
+  nonce,
+}: {
+  codigo: string;
+  correo: string;
+  userId: number;
+  nonce: string;
+}) => {
+  return crypto
+    .createHmac("sha256", env.JWT_SECRET)
+    .update(`${codigo}:${correo}:${userId}:${nonce}:activate-2fa`)
+    .digest("hex");
+};
+
+const generatePendingActivate2FAToken = (
+  payload: PendingActivate2FAPayload,
+) => {
+  return jwt.sign(payload, env.JWT_SECRET, {
+    expiresIn: ACTIVATE_2FA_CODE_TTL_SECONDS,
+  });
+};
+
+const verifyPendingActivate2FAToken = (token: string) => {
+  try {
+    const decoded = jwt.verify(token, env.JWT_SECRET) as jwt.JwtPayload &
+      PendingActivate2FAPayload;
+
+    if (decoded.purpose !== "activate-2fa") {
+      throw new Error("Token inválido");
+    }
+
+    return decoded;
+  } catch {
+    throw new SecurityError(
+      "El código expiró o ya no es válido. Solicita uno nuevo.",
+      400,
+    );
+  }
+};
+
+export const sendActivate2FACodeService = async (userId: number) => {
+  if (!Number.isInteger(userId) || userId <= 0) {
+    throw new SecurityError("Usuario no autorizado.", 401);
+  }
+
+  const user = await findSecurityUserByIdRepository(userId);
+  if (!user) {
+    throw new SecurityError("Usuario no encontrado.", 404);
+  }
+
+  const userRecord = await findUserPasswordByIdRepository(userId);
+  if (userRecord?.two_factor_activo) {
+    throw new SecurityError(
+      "La verificación en dos pasos ya está activada.",
+      400,
+    );
+  }
+
+  const codigo = generateDeactivationCode();
+  const nonce = crypto.randomUUID();
+
+  const verificationToken = generatePendingActivate2FAToken({
+    purpose: "activate-2fa",
+    userId: user.id,
+    correo: user.correo,
+    nonce,
+    codeSignature: signActivate2FACode({
+      codigo,
+      correo: user.correo,
+      userId: user.id,
+      nonce,
+    }),
+  });
+
+  const emailResult = await enviarCodigoActivacion2FA({
+    emailDestino: user.correo,
+    codigo,
+    nombreUsuario: user.nombre,
+  });
+
+  if (!emailResult.success) {
+    throw new SecurityError(
+      "No se pudo enviar el código de verificación. Intenta nuevamente.",
+      500,
+    );
+  }
+
+  return {
+    message: "Código enviado correctamente.",
+    verificationToken,
+    expiresInMinutes: ACTIVATE_2FA_CODE_TTL_MINUTES,
+  };
+};
+
+export const verifyActivate2FACodeService = async ({
+  userId,
+  codigo,
+  verificationToken,
+}: {
+  userId: number;
+  codigo: string;
+  verificationToken: string;
+}) => {
+  if (!Number.isInteger(userId) || userId <= 0) {
+    throw new SecurityError("Usuario no autorizado.", 401);
+  }
+
+  const normalizedCode = codigo?.trim();
+  const normalizedToken = verificationToken?.trim();
+
+  if (!normalizedCode || !normalizedToken) {
+    throw new SecurityError(
+      "El código y el token de verificación son obligatorios.",
+      400,
+    );
+  }
+
+  if (!/^\d{6}$/.test(normalizedCode)) {
+    throw new SecurityError(
+      "El código debe tener exactamente 6 dígitos numéricos.",
+      400,
+    );
+  }
+
+  const decoded = verifyPendingActivate2FAToken(normalizedToken);
+
+  if (decoded.userId !== userId) {
+    throw new SecurityError("Token inválido para este usuario.", 403);
+  }
+
+  const expectedSignature = signActivate2FACode({
+    codigo: normalizedCode,
+    correo: decoded.correo,
+    userId: decoded.userId,
+    nonce: decoded.nonce,
+  });
+
+  if (!isMatchingCodeSignature(expectedSignature, decoded.codeSignature)) {
+    throw new SecurityError("El código ingresado no es válido.", 400);
+  }
+
+  await prisma.usuario.update({
+    where: { id: userId },
+    data: {
+      two_factor_activo: true,
+      two_factor_activado_en: new Date(),
+      two_factor_metodo: "email",
+    },
+  });
+
+  return {
+    message: "Verificación en dos pasos activada correctamente.",
+    two_factor_activo: true,
+  };
 };

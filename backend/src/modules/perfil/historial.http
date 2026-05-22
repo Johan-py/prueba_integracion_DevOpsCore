@@ -1,0 +1,3 @@
+### Probar Historial de Vistas
+GET http://localhost:5000/api/perfil/historial/vistas
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiY29ycmVvIjoiZmVybmRwZXJlaXJhMzIxQGdtYWlsLmNvbSIsImp0aSI6IjNhMWM0NDNhLWZlZjctNDJiNC04ZjcyLTcwNWU3YzQ2ZWM2YiIsImlhdCI6MTc3NjgwMDExNiwiZXhwIjoxNzc2ODAzNzE2fQ.kV9Y1F38Eyp2PgwLZKLaQDMQAxc-kZTIwj8JwFzpO5o

@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
 const TOKEN_KEY = "token";
+const AUTH_MESSAGE_KEY = "authMessage";
 const POLL_INTERVAL_MS = 15 * 1000;
+
+const SESSION_EXPIRED_MESSAGE = "Tu sesión expiró. Inicia sesión nuevamente.";
 
 const clearClientSession = () => {
   localStorage.removeItem(TOKEN_KEY);
@@ -21,7 +24,13 @@ const clearClientSession = () => {
 
 export function useAccountStatus() {
   const router = useRouter();
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const intervalRef = useRef<number | null>(null);
+
+  const redirectToLoginWithMessage = useCallback(() => {
+    clearClientSession();
+    sessionStorage.setItem(AUTH_MESSAGE_KEY, SESSION_EXPIRED_MESSAGE);
+    router.replace("/sign-in");
+  }, [router]);
 
   const checkAccountStatus = useCallback(async () => {
     const token = localStorage.getItem(TOKEN_KEY);
@@ -36,28 +45,28 @@ export function useAccountStatus() {
         },
       });
 
-      // 403 = cuenta desactivada
-      // 401 = sesión expirada o inválida
-      if (response.status === 403 || response.status === 401) {
-        clearClientSession();
-        router.replace("/");
+      if (response.status === 401) {
+        redirectToLoginWithMessage();
         return;
       }
+
+      if (response.status === 403) {
+        clearClientSession();
+        router.replace("/sign-in");
+      }
     } catch {}
-  }, [router]);
+  }, [redirectToLoginWithMessage, router]);
 
   useEffect(() => {
-    // Verificación inmediata al montar
     void checkAccountStatus();
 
-    // Polling cada 15 segundos
-    intervalRef.current = setInterval(() => {
+    intervalRef.current = window.setInterval(() => {
       void checkAccountStatus();
     }, POLL_INTERVAL_MS);
 
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+      if (intervalRef.current !== null) {
+        window.clearInterval(intervalRef.current);
       }
     };
   }, [checkAccountStatus]);

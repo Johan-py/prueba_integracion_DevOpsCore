@@ -232,3 +232,319 @@ export const eliminarLogicamentePublicacionRepository = async (
     }),
   ]);
 };
+
+export const buscarDetallePublicacionPorIdRepository = async (
+  publicacionId: number,
+) => {
+  return prisma.publicacion.findUnique({
+    where: { id: publicacionId },
+    select: {
+      id: true,
+      titulo: true,
+      descripcion: true,
+      estado: true,
+      fechaPublicacion: true,
+      usuarioId: true,
+      inmuebleId: true,
+      usuario: {
+        select: {
+          id: true,
+          nombre: true,
+          apellido: true,
+          correo: true,
+          telefonos: {
+            select: {
+              codigoPais: true,
+              numero: true,
+              principal: true,
+            },
+          },
+        },
+      },
+      inmueble: {
+        select: {
+          id: true,
+          titulo: true,
+          tipoAccion: true,
+          categoria: true,
+          precio: true,
+          superficieM2: true,
+          nroCuartos: true,
+          nroBanos: true,
+          descripcion: true,
+          estado: true,
+          ubicacion: {
+            select: {
+              direccion: true,
+              latitud: true,
+              longitud: true,
+              inmuebleId: true,
+              ubicacionMaestraId: true,
+            },
+          },
+          inmueble_etiqueta: {
+            select: {
+              etiqueta: {
+                select: {
+                  id: true,
+                  nombre: true,
+                },
+              },
+            },
+          },
+        },
+      },
+      multimedia: {
+        select: {
+          id: true,
+          url: true,
+          tipo: true,
+          pesoMb: true,
+        },
+        orderBy: {
+          id: "asc",
+        },
+      },
+    },
+  });
+};
+
+export const buscarDetallePublicacionPorInmuebleIdRepository = async (
+  inmuebleId: number,
+) => {
+  return prisma.publicacion.findFirst({
+    where: {
+      inmuebleId,
+      estado: {
+        not: "ELIMINADA",
+      },
+    },
+    select: {
+      id: true,
+      titulo: true,
+      descripcion: true,
+      estado: true,
+      fechaPublicacion: true,
+      usuarioId: true,
+      inmuebleId: true,
+      usuario: {
+        select: {
+          id: true,
+          nombre: true,
+          apellido: true,
+          correo: true,
+          telefonos: {
+            select: {
+              codigoPais: true,
+              numero: true,
+              principal: true,
+            },
+          },
+        },
+      },
+      inmueble: {
+        select: {
+          id: true,
+          titulo: true,
+          tipoAccion: true,
+          categoria: true,
+          precio: true,
+          precio_anterior: true,
+          superficieM2: true,
+          nroCuartos: true,
+          nroBanos: true,
+          descripcion: true,
+          estado: true,
+          ubicacion: {
+            select: {
+              direccion: true,
+              latitud: true,
+              longitud: true,
+            },
+          },
+          puntosDeInteres: {
+            select: {
+              id: true,
+              nombre: true,
+              latitud: true,
+              longitud: true,
+            },
+          },
+          inmueble_etiqueta: {
+            select: {
+              etiqueta: {
+                select: {
+                  id: true,
+                  nombre: true,
+                },
+              },
+            },
+          },
+        },
+      },
+      multimedia: {
+        select: {
+          id: true,
+          url: true,
+          tipo: true,
+          pesoMb: true,
+        },
+        orderBy: {
+          id: "asc",
+        },
+      },
+    },
+  });
+};
+
+export const confirmarPublicacionRepository = async (publicacionId: number) => {
+  return prisma.publicacion.update({
+    where: { id: publicacionId },
+    data: {
+      estado: "ACTIVA",
+    },
+    include: {
+      multimedia: true,
+      inmueble: {
+        include: {
+          ubicacion: true,
+        },
+      },
+    },
+  });
+};
+
+type NuevaMultimediaInput = {
+  url: string;
+  tipo: "IMAGEN" | "VIDEO";
+  pesoMb?: number | null;
+  publicacionId: number;
+};
+
+export const eliminarMultimediaPorIdsRepository = async (
+  publicacionId: number,
+  multimediaIds: number[],
+) => {
+  if (multimediaIds.length === 0) return { count: 0 };
+
+  return prisma.multimedia.deleteMany({
+    where: {
+      id: {
+        in: multimediaIds,
+      },
+      publicacionId,
+    },
+  });
+};
+
+export const eliminarVideosDePublicacionRepository = async (
+  publicacionId: number,
+) => {
+  return prisma.multimedia.deleteMany({
+    where: {
+      publicacionId,
+      tipo: "VIDEO",
+    },
+  });
+};
+
+export const crearMultimediaRepository = async (
+  data: NuevaMultimediaInput[],
+) => {
+  if (data.length === 0) return { count: 0 };
+
+  return prisma.multimedia.createMany({
+    data,
+  });
+};
+
+export const buscarMultimediaPublicacionRepository = async (
+  publicacionId: number,
+) => {
+  return prisma.multimedia.findMany({
+    where: {
+      publicacionId,
+    },
+    orderBy: {
+      id: "asc",
+    },
+  });
+};
+// ==================== NUEVOS REPOSITORIOS PARA HU-11 ====================
+// PUBLICIDAD DE PROPIEDADES
+
+export const activarPublicidadRepository = async (
+  publicacionId: number,
+  usuarioId: number,
+  paymentIntentId: string,
+  duracionDias: number = 30
+) => {
+  const fechaInicio = new Date();
+  const fechaExpiracion = new Date();
+  fechaExpiracion.setDate(fechaExpiracion.getDate() + duracionDias);
+
+  return prisma.publicacion.update({
+    where: {
+      id: publicacionId,
+      usuarioId: usuarioId,
+    },
+    data: {
+      promoted: true,
+      promotedAt: fechaInicio,
+      promotedExpiresAt: fechaExpiracion,
+      paymentIntentId: paymentIntentId,
+    },
+  });
+};
+
+export const cancelarPublicidadRepository = async (
+  publicacionId: number,
+  usuarioId: number
+) => {
+  return prisma.publicacion.update({
+    where: {
+      id: publicacionId,
+      usuarioId: usuarioId,
+    },
+    data: {
+      promoted: false,
+      promotedAt: null,
+      promotedExpiresAt: null,
+      paymentIntentId: null,
+    },
+  });
+};
+
+export const buscarPublicacionPorIdSimpleRepository = async (
+  publicacionId: number
+) => {
+  return prisma.publicacion.findUnique({
+    where: { id: publicacionId },
+    select: {
+      id: true,
+      promoted: true,
+      promotedAt: true,
+      promotedExpiresAt: true,
+    },
+  });
+};
+
+export const verificarPublicidadActivaRepository = async (
+  publicacionId: number
+) => {
+  const publicacion = await prisma.publicacion.findUnique({
+    where: { id: publicacionId },
+    select: {
+      promoted: true,
+      promotedExpiresAt: true,
+    },
+  });
+
+  if (!publicacion) return false;
+
+  return (
+    publicacion.promoted === true &&
+    publicacion.promotedExpiresAt !== null &&
+    new Date(publicacion.promotedExpiresAt) > new Date()
+  );
+};

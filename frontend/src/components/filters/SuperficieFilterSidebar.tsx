@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchFilters } from '@/hooks/useSearchFilters'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { X } from 'lucide-react'
 
 interface SuperficieFilterSidebarProps {
   onClose: () => void
@@ -159,17 +160,29 @@ export default function SuperficieFilterSidebar({ onClose }: SuperficieFilterSid
   }
 
   return (
-    <div className="flex flex-col gap-6 p-6 w-full max-w-[350px] bg-white h-full border-r border-stone-200">
-      {/* Título */}
-      <div>
-        <h3 className="font-bold text-sm text-stone-800 uppercase tracking-wide mb-1">
-          Filtrar por Superficie
-        </h3>
-        <p className="text-sm text-stone-500 mb-4">Ingrese el MIN Y MAX:</p>
+    <div className="flex flex-col h-full min-h-0 bg-white dark:bg-stone-900 w-full border-r border-stone-200 dark:border-stone-800">
+      {/* 1. HEADER (Fijo) */}
+      <div className="shrink-0 p-4 pb-2 relative flex flex-col items-center justify-center">
+        <div className="w-full flex items-center justify-center relative mb-1">
+          <h3 className="font-bold text-sm text-stone-800 dark:text-stone-100 uppercase tracking-wide text-center">
+            Filtrar por Superficie
+          </h3>
+          <button
+            onClick={onClose}
+            className="absolute right-0 p-1 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-full transition-colors"
+          >
+            <X size={20} className="text-stone-500 dark:text-stone-400" />
+          </button>
+        </div>
+        <p className="text-sm text-stone-500 dark:text-stone-400 mb-2 text-center">Ingrese el MÍN y MÁX:</p>
+      </div>
+
+      {/* 2. CONTENIDO (Con Scroll) */}
+      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6 custom-scrollbar">
         {/* Campo Desde */}
-        <div className="flex flex-col gap-1 mb-3">
+        <div className="flex flex-col gap-1">
           <div className="flex items-center gap-3">
-            <span className="text-sm text-stone-600 w-12">Desde:</span>
+            <span className="text-sm text-stone-600 dark:text-stone-300 w-12">Desde:</span>
             <input
               type="text"
               inputMode="decimal"
@@ -179,22 +192,20 @@ export default function SuperficieFilterSidebar({ onClose }: SuperficieFilterSid
               onPaste={(e) => handlePaste(e, 'desde')}
               onChange={handleDesde}
               onBlur={() => handleBlur(desde, setDesde, setErrorDesde)}
-              className={`border rounded-lg px-3 py-2 text-sm w-full outline-none transition-all
-                ${errorDesde
-                  ? 'border-red-400 focus:border-red-400 focus:ring-1 focus:ring-red-300'
-                  : 'border-stone-300 focus:border-[#d97706] focus:ring-1 focus:ring-[#d97706]'
-                }`}
+              className={`border rounded-lg px-3 py-2 text-sm w-full outline-none transition-all dark:bg-stone-800 dark:text-stone-200 ${
+                errorDesde
+                  ? 'border-red-400 focus:border-red-400 focus:ring-1 focus:ring-red-300 dark:border-red-500'
+                  : 'border-stone-300 focus:border-[rgb(217,119,6)] focus:ring-1 focus:ring-[rgb(217,119,6)] dark:border-stone-600 dark:focus:border-[rgb(232,124,30)] dark:focus:ring-[rgb(232,124,30)]'
+              }`}
             />
           </div>
-          {errorDesde && (
-            <p className="text-xs text-red-500 ml-16">{errorDesde}</p>
-          )}
+          {errorDesde && <p className="text-xs text-red-500 ml-16">{errorDesde}</p>}
         </div>
 
         {/* Campo Hasta */}
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-3">
-            <span className="text-sm text-stone-600 w-12">Hasta:</span>
+            <span className="text-sm text-stone-600 dark:text-stone-300 w-12">Hasta:</span>
             <input
               type="text"
               inputMode="decimal"
@@ -204,42 +215,47 @@ export default function SuperficieFilterSidebar({ onClose }: SuperficieFilterSid
               onPaste={(e) => handlePaste(e, 'hasta')}
               onChange={handleHasta}
               onBlur={() => handleBlur(hasta, setHasta, setErrorHasta)}
-              className={`border rounded-lg px-3 py-2 text-sm w-full outline-none transition-all
-                ${errorHasta
-                  ? 'border-red-400 focus:border-red-400 focus:ring-1 focus:ring-red-300'
-                  : 'border-stone-300 focus:border-[#d97706] focus:ring-1 focus:ring-[#d97706]'
-                }`}
+              className={`border rounded-lg px-3 py-2 text-sm w-full outline-none transition-all dark:bg-stone-800 dark:text-stone-200 ${
+                errorHasta
+                  ? 'border-red-400 focus:border-red-400 focus:ring-1 focus:ring-red-300 dark:border-red-500'
+                  : 'border-stone-300 focus:border-[rgb(217,119,6)] focus:ring-1 focus:ring-[rgb(217,119,6)] dark:border-stone-600 dark:focus:border-[rgb(232,124,30)] dark:focus:ring-[rgb(232,124,30)]'
+              }`}
             />
           </div>
-          {errorHasta && (
-            <p className="text-xs text-red-500 ml-16">{errorHasta}</p>
-          )}
+          {errorHasta && <p className="text-xs text-red-500 ml-16">{errorHasta}</p>}
         </div>
+
         {errorRango && (
-          <p className="text-xs text-red-500 mt-3 text-center bg-red-50 py-2 px-3 rounded-lg">⚠️ {errorRango}
-</p>
+          <p className="text-xs text-red-500 mt-3 text-center bg-red-50 dark:bg-red-500/20 py-2 px-3 rounded-lg">
+            {errorRango}
+          </p>
         )}
       </div>
-      {/* Botones */}
-      <div className="flex flex-col gap-2 mt-6">
-        {(desde || hasta) && (
+
+      {/* 3. FOOTER (Fijo al fondo) */}
+      <div className="shrink-0 px-6 pb-6 pt-4 border-t border-stone-100 dark:border-stone-800 bg-white dark:bg-stone-900">
+        {(desde || hasta) ? (
           <button
             type="button"
             onClick={handleLimpiar}
-            className="text-sm text-stone-400 hover:text-amber-600 transition-colors underline text-center"
+            /* Subrayado y blanco en dark mode */
+            className="text-xs text-stone-400 hover:text-[rgb(217,119,6)] transition-colors underline text-center w-full mb-3 dark:!text-white dark:hover:!text-[rgb(232,124,30)]"
           >
             Limpiar filtro
           </button>
+        ) : (
+          <div className="h-7 mb-3"></div> // Espaciador para mantener la altura cuando no hay botón
         )}
         <button
           type="button"
           disabled={hayErrores}
           onClick={handleApply}
-          className={`rounded-xl font-bold py-3 px-4 w-full transition-all active:scale-95 shadow-md
-            ${hayErrores
-              ? 'bg-stone-200 text-stone-400 cursor-not-allowed'
-              : 'bg-[#d97706] hover:bg-[#b95e00] text-white'
-            }`}
+          /* Hack RGB y rounded-[12px] para evadir a globals.css */
+          className={`rounded-[12px] font-bold py-3 px-4 w-full transition-all active:scale-95 shadow-md border-none ${
+            hayErrores
+              ? 'bg-stone-200 text-stone-400 cursor-not-allowed dark:!bg-stone-800 dark:!text-stone-500'
+              : '!bg-[rgb(217,119,6)] hover:!bg-[rgb(185,94,0)] !text-white dark:!bg-[rgb(232,124,30)] dark:hover:!bg-[rgb(217,119,6)]'
+          }`}
         >
           Aplicar
         </button>

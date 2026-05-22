@@ -62,45 +62,51 @@ export const ResultadosBusqueda = () => {
   const { ordenActual, cambiarOrden, inmueblesOrdenados } = useOrdenamiento({
     inmuebles: inmueblesRaw as unknown as any[]
   })
-  useEffect(() => {
-    // Función reutilizable para hacer el fetch con filtros
-    const fetchInmuebles = async () => {
-      setCargando(true)
-      setError(false)
-      try {
-        const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
-
-        // Construimos la query string usando directamente lo que Next.js lee de la URL
-        const queryStr = searchParams.toString() ? `?${searchParams.toString()}` : ''
-        const url = `${API_BASE}/api/properties/inmuebles${queryStr}`
-
-        const res = await fetch(url)
-        if (!res.ok) throw new Error('Error de red al conectar con el servidor')
-
-        const data = await res.json()
-
-        if (data && data.ok === true && Array.isArray(data.data)) {
-          console.log('✅ Datos recibidos con éxito:', data.data.length)
-          // BUG-02-01 FIX: Actualiza con los nuevos datos (si es 0, setea [] y limpia la pantalla)
-          setInmueblesRaw(data.data)
-        } else {
-          console.error('❌ Formato de datos inesperado:', data)
-          // Limpiamos los datos anteriores para no mostrar fantasmas
-          setInmueblesRaw([])
-          setError(true)
+ useEffect(() => {
+  console.log('🔄 searchParams:', searchParams.toString()) // temporal
+  const fetchInmuebles = async () => {
+    setCargando(true)
+    setError(false)
+    try {
+      // Verificar si hay recomendaciones guardadas (viene del botón FilterBar)
+      const orden = searchParams.get('orden')
+      if (orden === 'recomendados') {
+        const cached = sessionStorage.getItem('recomendaciones_resultado')
+        if (cached) {
+          setInmueblesRaw(JSON.parse(cached))
+          sessionStorage.removeItem('recomendaciones_resultado')
+          setCargando(false)
+          return
         }
-      } catch (err) {
-        console.error('Error en fetchInmuebles:', err)
-        // Limpiamos el array si el servidor explota o la conexión falla
+      }
+
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const queryStr = searchParams.toString() ? `?${searchParams.toString()}` : ''
+      const url = `${API_BASE}/api/properties/inmuebles${queryStr}`
+
+      const res = await fetch(url)
+      if (!res.ok) throw new Error('Error de red al conectar con el servidor')
+
+      const data = await res.json()
+
+      if (data && data.ok === true && Array.isArray(data.data)) {
+        console.log('✅ Datos recibidos con éxito:', data.data.length)
+        setInmueblesRaw(data.data)
+      } else {
+        console.error('❌ Formato de datos inesperado:', data)
         setInmueblesRaw([])
         setError(true)
-      } finally {
-        setCargando(false)
       }
+    } catch (err) {
+      console.error('Error en fetchInmuebles:', err)
+      setInmueblesRaw([])
+      setError(true)
+    } finally {
+      setCargando(false)
     }
-    fetchInmuebles()
-  }, [searchParams])
-
+  }
+  fetchInmuebles()
+}, [searchParams.toString()])
   // ── Render ──────────────────────────────────────────────────────────────────
 
   if (cargando) return <p className="p-8 text-gray-500">Cargando propiedades...</p>
@@ -111,20 +117,56 @@ export const ResultadosBusqueda = () => {
         No se pudieron cargar las propiedades. Intenta recargar la página.
       </p>
     )
+  const handleOrdenChange = async (nuevoOrden: any) => {
+  if (nuevoOrden.criterioActivo === 'recomendados') {
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+      if (!token) {
+        cambiarOrden(nuevoOrden)
+        return
+      }
 
+      const ids = inmueblesRaw.map((i: any) => i.id)
+      const res = await fetch('/api/recomendaciones/ordenar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ inmuebleIds: ids })
+      })
+
+      const data = await res.json()
+      if (data.success && data.data.length > 0) {
+        setInmueblesRaw(data.data)
+      }
+    } catch (error) {
+      console.error('Error ordenando por afinidad:', error)
+      cambiarOrden(nuevoOrden)
+    }
+  } else {
+    cambiarOrden(nuevoOrden)
+  }
+}
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <MenuOrdenamiento
         ordenActual={ordenActual}
-        onOrdenChange={cambiarOrden}
+        onOrdenChange={handleOrdenChange}
         totalResultados={inmueblesOrdenados.length}
       />
       {inmueblesOrdenados.length > 0 ? (
         <div className="grid grid-cols-1 gap-4">
-          {inmueblesOrdenados.map((item: unknown) => {
+          {inmueblesOrdenados.map((item: unknown, index: number) => {
             const inmueble = item as Inmueble
-            return <TarjetaInmueble key={inmueble.id} inmueble={inmueble} />
-          })}
+       return (
+        <TarjetaInmueble 
+        key={inmueble.id} 
+        inmueble={inmueble} 
+        posicion={index + 1}
+        esRecomendadoIA={searchParams.get('orden') === 'recomendados'}
+       />
+     )  })}
         </div>
       ) : (
         <div className="text-center py-12">

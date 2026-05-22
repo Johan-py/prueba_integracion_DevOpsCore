@@ -47,16 +47,20 @@ export default function Logo({
   textClassName = ''
 }: LogoProps) {
   return (
+     // HU-05: ID de referencia para el tour guiado - Paso "Inicio"
+    // Este enlace será resaltado por el tour para indicar cómo volver al home
     <Link
       href="/"
+        id="tour-logo"
+        
       onClick={onClick}
       className={`flex items-center gap-2 p-0.5 transition hover:opacity-80 ${className}`}
     >
       <LogoMark className={iconClassName} size={iconSize} />
       <span
-        className={`font-heading text-[1.2rem] font-bold leading-none tracking-[-0.03em] text-stone-900 ${textClassName}`}
+        className={`font-heading text-[1.2rem] font-bold leading-none tracking-[-0.03em] text-stone-900 dark:text-white ${textClassName}`}
       >
-        Prop<span className="text-amber-600">Bol</span>
+        Prop<span className="propbol-logo-bol">Bol</span>
       </span>
     </Link>
   )

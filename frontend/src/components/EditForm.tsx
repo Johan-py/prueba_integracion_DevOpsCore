@@ -37,6 +37,16 @@ export default function EditForm({
   toast,
   globalError,
 }: EditFormProps) {
+
+  // Función auxiliar para cumplir con el Criterio 12 (Solo números/decimales en precio)
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Permite solo números y un punto decimal
+    if (value === "" || /^\d*\.?\d*$/.test(value)) {
+      onChange("price", value);
+    }
+  };
+
   return (
     <div className="w-full">
       <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
@@ -47,8 +57,9 @@ export default function EditForm({
         Información de la publicación
       </p>
 
+      {/* Notificaciones de éxito/error */}
       {toast && (
-        <div className="mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+        <div className="mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 animate-pulse">
           {toast}
         </div>
       )}
@@ -60,15 +71,19 @@ export default function EditForm({
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        
+        {/* Título - Criterio 13 y 22 */}
         <div>
-          <label className="block text-[11px] font-semibold tracking-[0.14em] text-gray-600 uppercase mb-2">
+          <label htmlFor="title" className="block text-[11px] font-semibold tracking-[0.14em] text-gray-600 uppercase mb-2">
             Título Propiedad
           </label>
           <input
+            id="title"
             type="text"
+            maxLength={100} // Criterio 22
             className={`w-full rounded-xl border px-4 py-3 text-gray-800 outline-none transition ${
               fieldErrors.title
-                ? "border-red-400 focus:ring-2 focus:ring-red-200"
+                ? "border-red-400 ring-2 ring-red-100"
                 : "border-gray-200 bg-gray-100 focus:border-gray-300 focus:ring-2 focus:ring-gray-200"
             }`}
             value={formData.title}
@@ -76,19 +91,22 @@ export default function EditForm({
             placeholder="Residencia Moderna"
           />
           {fieldErrors.title && (
-            <p className="mt-1 text-sm text-red-500">{fieldErrors.title}</p>
+            <p className="mt-1 text-[12px] font-medium text-red-500">{fieldErrors.title}</p>
           )}
         </div>
 
+        {/* Detalles - Criterio 22 */}
         <div>
-          <label className="block text-[11px] font-semibold tracking-[0.14em] text-gray-600 uppercase mb-2">
+          <label htmlFor="details" className="block text-[11px] font-semibold tracking-[0.14em] text-gray-600 uppercase mb-2">
             Detalles de la Propiedad
           </label>
-          <input
-            type="text"
-            className={`w-full rounded-xl border px-4 py-3 text-gray-800 outline-none transition ${
+          <textarea
+            id="details"
+            rows={1}
+            maxLength={500} // Criterio 22
+            className={`w-full rounded-xl border px-4 py-3 text-gray-800 outline-none transition resize-none ${
               fieldErrors.details
-                ? "border-red-400 focus:ring-2 focus:ring-red-200"
+                ? "border-red-400 ring-2 ring-red-100"
                 : "border-gray-200 bg-gray-100 focus:border-gray-300 focus:ring-2 focus:ring-gray-200"
             }`}
             value={formData.details}
@@ -96,18 +114,20 @@ export default function EditForm({
             placeholder="Descripción de la propiedad"
           />
           {fieldErrors.details && (
-            <p className="mt-1 text-sm text-red-500">{fieldErrors.details}</p>
+            <p className="mt-1 text-[12px] font-medium text-red-500">{fieldErrors.details}</p>
           )}
         </div>
 
+        {/* Tipo Operación */}
         <div>
-          <label className="block text-[11px] font-semibold tracking-[0.14em] text-gray-600 uppercase mb-2">
+          <label htmlFor="operationType" className="block text-[11px] font-semibold tracking-[0.14em] text-gray-600 uppercase mb-2">
             Tipo Operación
           </label>
           <select
+            id="operationType"
             className={`w-full rounded-xl border px-4 py-3 text-gray-800 outline-none transition ${
               fieldErrors.operationType
-                ? "border-red-400 focus:ring-2 focus:ring-red-200"
+                ? "border-red-400 ring-2 ring-red-100"
                 : "border-gray-200 bg-gray-100 focus:border-gray-300 focus:ring-2 focus:ring-gray-200"
             }`}
             value={formData.operationType}
@@ -121,19 +141,21 @@ export default function EditForm({
             ))}
           </select>
           {fieldErrors.operationType && (
-            <p className="mt-1 text-sm text-red-500">{fieldErrors.operationType}</p>
+            <p className="mt-1 text-[12px] font-medium text-red-500">{fieldErrors.operationType}</p>
           )}
         </div>
 
+        {/* Ubicación */}
         <div>
-          <label className="block text-[11px] font-semibold tracking-[0.14em] text-gray-600 uppercase mb-2">
+          <label htmlFor="location" className="block text-[11px] font-semibold tracking-[0.14em] text-gray-600 uppercase mb-2">
             Ubicación
           </label>
           <input
+            id="location"
             type="text"
             className={`w-full rounded-xl border px-4 py-3 text-gray-800 outline-none transition ${
               fieldErrors.location
-                ? "border-red-400 focus:ring-2 focus:ring-red-200"
+                ? "border-red-400 ring-2 ring-red-100"
                 : "border-gray-200 bg-gray-100 focus:border-gray-300 focus:ring-2 focus:ring-gray-200"
             }`}
             value={formData.location}
@@ -141,41 +163,45 @@ export default function EditForm({
             placeholder="Cochabamba, Sacaba"
           />
           {fieldErrors.location && (
-            <p className="mt-1 text-sm text-red-500">{fieldErrors.location}</p>
+            <p className="mt-1 text-[12px] font-medium text-red-500">{fieldErrors.location}</p>
           )}
         </div>
 
+        {/* Precio - Criterio 12 y 18 */}
         <div className="md:col-span-1">
-          <label className="block text-[11px] font-semibold tracking-[0.14em] text-gray-600 uppercase mb-2">
-            Precio
+          <label htmlFor="price" className="block text-[11px] font-semibold tracking-[0.14em] text-gray-600 uppercase mb-2">
+            Precio (USD)
           </label>
           <input
+            id="price"
             type="text"
+            inputMode="decimal"
             className={`w-full rounded-xl border px-4 py-3 text-gray-800 outline-none transition ${
               fieldErrors.price
-                ? "border-red-400 focus:ring-2 focus:ring-red-200"
+                ? "border-red-400 ring-2 ring-red-100"
                 : "border-gray-300 bg-white focus:border-gray-400 focus:ring-2 focus:ring-gray-200"
             }`}
             value={formData.price}
-            onChange={(e) => onChange("price", e.target.value)}
-            placeholder="180000"
+            onChange={handlePriceChange}
+            placeholder="Ej: 180000.00"
           />
           {fieldErrors.price && (
-            <p className="mt-1 text-sm text-red-500">{fieldErrors.price}</p>
+            <p className="mt-1 text-[12px] font-medium text-red-500">{fieldErrors.price}</p>
           )}
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3 mt-8">
+      {/* Botones - Criterio 14 (Dimensiones consistentes) */}
+      <div className="flex flex-col sm:flex-row gap-4 mt-10">
         <button
-          className="flex-1 rounded-xl bg-[#d8891c] px-6 py-3 text-white font-semibold shadow hover:bg-[#bf7718] transition"
+          className="flex-1 rounded-xl bg-[#e67e22] px-6 py-4 text-white font-bold shadow-md hover:bg-[#d35400] transition active:scale-95"
           onClick={onSave}
         >
           GUARDAR CAMBIOS
         </button>
 
         <button
-          className="flex-1 rounded-xl border border-gray-300 bg-white px-6 py-3 text-gray-700 font-semibold hover:bg-gray-50 transition"
+          className="flex-1 rounded-xl border border-gray-300 bg-white px-6 py-4 text-gray-700 font-bold hover:bg-gray-50 transition active:scale-95"
           onClick={onCancel}
         >
           CANCELAR

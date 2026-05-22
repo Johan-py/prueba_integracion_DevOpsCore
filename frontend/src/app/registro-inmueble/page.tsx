@@ -1,8 +1,16 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import PlanModal from '../../components/ui/PlanModal'
+import dynamic from 'next/dynamic'
+import { ErrorValidacion } from "../../types/publicacion";
+import ErrorPanel from "../../components/publicacion/ErrorPanel";
+import VideoPublicacionModal from '../../components/video-publicacion/VideoPublicacionModal'
+
+const MapaPinSelector = dynamic(
+  () => import('../../components/MapaPinSelector'),
+  { ssr: false }
+)
 
 type CampoError =
   | 'titulo'
@@ -14,13 +22,14 @@ type CampoError =
   | 'precio'
   | 'area'
   | 'operacion'
+  | 'mapa'
   | null
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '')
 
 export default function MiRegistroPage() {
   const router = useRouter()
-  const [mostrarPlanModal, setMostrarPlanModal] = useState(false)
+  const [mostrarVideo, setMostrarVideo] = useState(false)
 
   const [datos, setDatos] = useState({
     titulo: '',
@@ -39,35 +48,156 @@ export default function MiRegistroPage() {
   const [estado, setEstado] = useState<'ninguno' | 'exito' | 'error'>('ninguno')
   const [mensajeError, setMensajeError] = useState('')
   const [campoError, setCampoError] = useState<CampoError>(null)
+  const [pinCoords, setPinCoords] = useState<{ lat: number; lng: number } | null>(null)
+  const [vertices, setVertices] = useState<[number, number][]>([])
+  const [modoPinActivo, setModoPinActivo] = useState(false)
+  const [modoDifuminadoActivo, setModoDifuminadoActivo] = useState(false)
+  const [pois, setPois] = useState<
+  {
+    id: number
+    nombre: string
+    lat: number
+    lng: number
+  }[]
+>([])
+const [poiSeleccionado, setPoiSeleccionado] = useState<number | null>(null)
 
-  useEffect(() => {
-    const validarFlujo = async () => {
-      const token = localStorage.getItem('token')
+  const contenidoTutorial = {
+    titulo: 'Antes de publicar tu propiedad',
+    mensaje:
+      'Mira este video y conoce qué necesitas tener listo para crear tu publicación de forma exitosa.',
+    requisitos: [
+      'Tipo de inmueble que deseas publicar.',
+      'Ubicación o dirección referencial de la propiedad.',
+      'Precio de venta, alquiler o anticrético.',
+      'Superficie y características principales del inmueble.',
+      'Fotografías o recursos multimedia claros de la propiedad.',
+    ],
+    videoUrl: '',
+    thumbnailUrl: null,
+    subtitlesUrl: null,
+    checkboxLabel: 'Sí entiendo qué necesito para publicar una propiedad',
+  }
 
-      if (!token) {
-        router.push('/sign-in') //entra al formulario solo si inicio sesion
+  const verificarTutorialPublicacion = async () => {
+    const token = localStorage.getItem('token')
+
+    if (!token) {
+      router.push('/sign-in')
+      return
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/api/publicaciones/tutorial/estado`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      const result = await response.json().catch(() => null)
+
+      if (response.ok && result?.data?.debeMostrarTutorial === true) {
+        setMostrarVideo(true)
         return
       }
 
+      setMostrarVideo(false)
+    } catch (error) {
+      console.error('Error al verificar tutorial de publicación:', error)
+      setMostrarVideo(false)
+    }
+  }
+
+  const confirmarTutorialPublicacion = async () => {
+    const token = localStorage.getItem('token')
+
+    setMostrarVideo(false)
+
+    if (!token) {
+      router.push('/sign-in')
+      return
+    }
+
+    try {
+      await fetch(`${API_URL}/api/publicaciones/tutorial/confirmar`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+    } catch (error) {
+      console.error('Error al confirmar tutorial de publicación:', error)
+    }
+  }
+
+  useEffect(() => {
+    const obtenerDireccion = async () => {
+      if (!pinCoords) return
+
       try {
-        const response = await fetch(`${API_URL}/api/publicaciones/flujo`, {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        })
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${pinCoords.lat}&lon=${pinCoords.lng}`
+        )
 
-        const result = await response.json()
+        const data = await response.json()
 
-        if (!response.ok && result.message === 'LIMIT_REACHED') {
-          setMostrarPlanModal(true)
+        let dirLimpia = data.display_name
+          ? data.display_name.split(',').slice(0, 3).join(',')
+          : ''
+
+        if (dirLimpia.length >= 80) dirLimpia = dirLimpia.substring(0, 79)
+
+        setDatos((prev) => ({
+          ...prev,
+          direccion: dirLimpia
+        }))
+
+        if (campoError === 'mapa') {
+          limpiarError()
         }
       } catch (error) {
-        console.error('Error validando flujo de publicación:', error)
+        console.error('Error al obtener dirección desde el mapa:', error)
       }
     }
 
-    validarFlujo()
+    obtenerDireccion()
+  }, [pinCoords])
+
+  const refs: Record<string, React.RefObject<any>> = {
+    titulo: useRef<HTMLInputElement>(null),
+    operacion: useRef<HTMLSelectElement>(null),
+    tipoInmueble: useRef<HTMLSelectElement>(null),
+    precio: useRef<HTMLInputElement>(null),
+    area: useRef<HTMLInputElement>(null),
+    habitaciones: useRef<HTMLInputElement>(null),
+    banos: useRef<HTMLInputElement>(null),
+    direccion: useRef<HTMLInputElement>(null),
+    zona: useRef<HTMLInputElement>(null),
+    descripcion: useRef<HTMLTextAreaElement>(null),
+  }
+
+  const erroresHU5: ErrorValidacion[] = campoError && estado === 'error' && mensajeError
+    ? [{ campo: campoError as any, seccion: "Información Básica", mensaje: mensajeError }]
+    : [];
+
+  const handleClickError = (campo: string) => {
+    const ref = refs[campo];
+    if (ref?.current) {
+      ref.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      ref.current.focus();
+    }
+  }
+
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+
+    if (!token) {
+      router.push('/sign-in')
+      return
+    }
+
+    verificarTutorialPublicacion()
   }, [router])
 
   const limpiarError = () => {
@@ -483,6 +613,26 @@ export default function MiRegistroPage() {
       return
     }
 
+    if (!pinCoords) {
+      setMensajeError('DEBES SELECCIONAR UNA UBICACIÓN EN EL MAPA')
+      setCampoError('mapa')
+      setEstado('error')
+      return
+    }
+    if (
+  pois.some(
+    (poi) =>
+      !poi.nombre.trim() ||
+      poi.nombre.trim().length < 3
+  )
+) {
+  setMensajeError(
+    'LAS REFERENCIAS DEBEN TENER MÍNIMO 3 CARACTERES'
+  )
+  setEstado('error')
+  return
+}
+
     const payload = {
       titulo: tituloLimpio,
       tipoAccion: datos.operacion,
@@ -494,7 +644,9 @@ export default function MiRegistroPage() {
       descripcion: descripcionLimpia,
       direccion: direccionLimpia,
       zona: zonaLimpia,
-      ciudad: datos.ciudad
+      ciudad: datos.ciudad,
+      latitud: pinCoords.lat,
+      longitud: pinCoords.lng
     }
 
     console.log('📤 Payload enviado al backend:', payload)
@@ -520,11 +672,9 @@ export default function MiRegistroPage() {
 
       const result = await response.json()
 
-      console.log('📥 Respuesta backend:', result)
-
       if (!response.ok) {
         if (result.message === 'LIMIT_REACHED') {
-          setMostrarPlanModal(true)
+          router.push('/Cobros-Limite')
           return
         }
 
@@ -534,7 +684,6 @@ export default function MiRegistroPage() {
           result.message ||
           'ERROR AL GUARDAR LA PROPIEDAD'
 
-        console.error('❌ Error backend:', erroresBackend)
         setMensajeError(erroresBackend)
         setCampoError(null)
         setEstado('error')
@@ -542,6 +691,34 @@ export default function MiRegistroPage() {
       }
 
       const publicacionId = result?.property?.publicacion?.id
+      const inmuebleId = result?.property?.inmueble?.id
+      for (const poi of pois) {
+  if (!poi.nombre.trim()) continue
+
+  const responsePoi = await fetch(
+    `${API_URL}/api/pois/inmueble/${inmuebleId}`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        nombre: poi.nombre,
+        latitud: poi.lat,
+        longitud: poi.lng
+      })
+    }
+  )
+  if (!responsePoi.ok) {
+  setMensajeError(
+    'ERROR AL GUARDAR REFERENCIAS'
+  )
+
+  setEstado('error')
+  return
+}
+}
 
       if (!publicacionId) {
         setMensajeError('No se recibió el ID de la publicación creada')
@@ -549,14 +726,12 @@ export default function MiRegistroPage() {
         return
       }
 
-      console.log('✅ Propiedad guardada correctamente')
-      setEstado('exito')
+      setEstado('ninguno')
       setMensajeError('')
       setCampoError(null)
 
       router.push(`/contenido-multimedia?publicacionId=${publicacionId}`)
     } catch (error) {
-      console.error('🔥 Error fetch:', error)
       setMensajeError('NO SE PUDO CONECTAR CON EL BACKEND')
       setCampoError(null)
       setEstado('error')
@@ -572,11 +747,22 @@ export default function MiRegistroPage() {
   const errorPrecio = campoError === 'precio'
   const errorArea = campoError === 'area'
   const errorOperacion = campoError === 'operacion'
+  const errorMapa = campoError === 'mapa'
 
   return (
+     <>
+    {mostrarVideo && (
+      <VideoPublicacionModal
+        contenido={contenidoTutorial}
+        onClose={confirmarTutorialPublicacion}
+        onContinue={confirmarTutorialPublicacion}
+      />
+    )}
     <div className="min-h-screen bg-white text-gray-900">
       <main className="max-w-6xl mx-auto p-8 md:p-12">
         <h1 className="text-2xl font-bold mb-6 text-gray-950">Registro Inmueble</h1>
+
+        <ErrorPanel errores={erroresHU5} onClickError={handleClickError} />
 
         <div className="bg-[#FAF4ED] rounded-3xl p-8 md:p-10 shadow-sm border border-gray-100">
           <div className="flex items-center gap-3 mb-6">
@@ -604,10 +790,12 @@ export default function MiRegistroPage() {
                       Título del anuncio *
                     </label>
                     <input
+                      ref={refs.titulo}
                       name="titulo"
                       value={datos.titulo}
                       onChange={manejarCambio}
                       maxLength={80}
+                      placeholder="Ej: Casa amplia en venta ubicada en zona céntrica"
                       className={`w-full p-3 rounded-xl border bg-white/70 ${
                         errorTitulo ? 'border-red-500' : 'border-gray-200'
                       }`}
@@ -622,6 +810,7 @@ export default function MiRegistroPage() {
                         Tipo de operación *
                       </label>
                       <select
+                        ref={refs.operacion}
                         name="operacion"
                         value={datos.operacion}
                         onChange={manejarCambio}
@@ -644,6 +833,7 @@ export default function MiRegistroPage() {
                         Tipo de Inmueble *
                       </label>
                       <select
+                        ref={refs.tipoInmueble}
                         name="tipoInmueble"
                         value={datos.tipoInmueble}
                         onChange={manejarCambio}
@@ -663,6 +853,7 @@ export default function MiRegistroPage() {
                       Precio USD$ *
                     </label>
                     <input
+                      ref={refs.precio}
                       name="precio"
                       type="text"
                       inputMode="numeric"
@@ -688,6 +879,7 @@ export default function MiRegistroPage() {
                   <div>
                     <label className="block text-[15px] font-bold mb-2">Área total (m²)</label>
                     <input
+                      ref={refs.area}
                       name="area"
                       type="text"
                       inputMode="numeric"
@@ -705,6 +897,7 @@ export default function MiRegistroPage() {
                   <div>
                     <label className="block text-[15px] font-bold mb-2">Habitaciones</label>
                     <input
+                      ref={refs.habitaciones}
                       name="habitaciones"
                       type="text"
                       inputMode="numeric"
@@ -720,6 +913,7 @@ export default function MiRegistroPage() {
                           }
                         } as React.ChangeEvent<HTMLInputElement>)
                       }}
+                      placeholder="Ej: 3"
                       className={`w-full p-3 rounded-xl border ${
                         errorHabitaciones ? 'border-red-500' : 'border-gray-200'
                       }`}
@@ -735,6 +929,7 @@ export default function MiRegistroPage() {
                   <div>
                     <label className="block text-[15px] font-bold mb-2">Baños</label>
                     <input
+                      ref={refs.banos}
                       name="banos"
                       type="text"
                       inputMode="numeric"
@@ -750,6 +945,7 @@ export default function MiRegistroPage() {
                           }
                         } as React.ChangeEvent<HTMLInputElement>)
                       }}
+                      placeholder="Ej: 2"
                       className={`w-full p-3 rounded-xl border ${
                         errorBanos ? 'border-red-500' : 'border-gray-200'
                       }`}
@@ -761,10 +957,12 @@ export default function MiRegistroPage() {
                   <div>
                     <label className="block text-[15px] font-bold mb-2">Dirección *</label>
                     <input
+                      ref={refs.direccion}
                       name="direccion"
                       value={datos.direccion}
                       onChange={manejarCambio}
                       maxLength={80}
+                      placeholder="Ej: Av. América #123"
                       className={`w-full p-3 rounded-xl border ${
                         errorDireccion ? 'border-red-500' : 'border-gray-200'
                       }`}
@@ -776,13 +974,15 @@ export default function MiRegistroPage() {
                   </div>
                 </div>
 
-                <div className="mt-6">
-                  <label className="block text-[15px] font-bold mb-2">Zona</label>
+                <div className="mt-4 w-full">
+                  <label className="block text-[15px] font-bold mb-2">Zona *</label>
                   <input
+                    ref={refs.zona}
                     name="zona"
                     value={datos.zona}
                     onChange={manejarCambio}
                     maxLength={80}
+                    placeholder="Ej: Cala Cala"
                     className={`w-full p-3 rounded-xl border ${
                       errorZona ? 'border-red-500' : 'border-gray-200'
                     }`}
@@ -793,17 +993,18 @@ export default function MiRegistroPage() {
               </section>
             </div>
 
-            <div className="flex flex-col h-full">
+            <div className="flex flex-col h-full min-w-0">
               <div className="flex-grow">
                 <label className="block text-[15px] font-bold text-gray-900 mb-2">
                   DESCRIPCION DETALLADA *
                 </label>
                 <textarea
+                  ref={refs.descripcion}
                   name="descripcion"
                   value={datos.descripcion}
                   onChange={manejarCambio}
                   maxLength={300}
-                  className={`w-full p-4 rounded-2xl border h-72 bg-white ${
+                  className={`w-full p-4 rounded-2xl border h-72 bg-white resize-none ${
                     errorDescripcion ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="Casa de dos plantas, amplia y moderna ubicada en una zona tranquila..."
@@ -816,19 +1017,182 @@ export default function MiRegistroPage() {
                 </p>
               </div>
 
+              <div className="mt-6">
+                <div className="flex flex-wrap items-center gap-3 mb-4">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setModoPinActivo(true)
+                        setModoDifuminadoActivo(false)
+                        setVertices([]) // Lógica de develop: borra el polígono anterior
+                      }}
+                      className={`px-4 py-2 rounded-full text-sm transition ${
+                        modoPinActivo ? 'bg-orange-500 text-white' : 'bg-gray-200'
+                      }`}
+                    >
+                      Pin
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setModoDifuminadoActivo(true)
+                        setModoPinActivo(false)
+                        setPinCoords(null) // Lógica de develop: borra el pin anterior
+                      }}
+                      className={`px-4 py-2 rounded-full text-sm transition-colors ${
+                        modoDifuminadoActivo ? 'bg-orange-500 text-white' : 'bg-gray-200'
+                      }`}
+                    >
+                      Difuminado
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={!pinCoords}
+                      onClick={() => {
+                        if (!pinCoords) return
+
+                        const referenciasEnEsePunto = pois.filter(
+                          (poi) =>
+                            poi.lat === pinCoords.lat &&
+                            poi.lng === pinCoords.lng
+                        )
+if (pois.length >= 12) {
+  alert('Máximo 12 referencias')
+  return
+}
+if (referenciasEnEsePunto.length >= 4) {
+  alert('Máximo 4 referencias por ubicación')
+  return
+}
+
+const despl = [
+                          [0.001, 0],      // Norte
+                          [0, 0.001],      // Este
+                          [-0.001, 0],     // Sur
+                          [0, -0.001]      // Oeste
+                        ];
+                        const d = despl[pois.length % 4];
+
+                        setPois([
+                          ...pois,
+                          {
+                            id: Date.now(),
+                            nombre: '',
+                            lat: pinCoords.lat + d[0],
+                            lng: pinCoords.lng + d[1]
+                          }
+                        ])
+      }}
+      className={`px-4 py-2 rounded-full text-sm ${
+        pinCoords
+          ? 'bg-orange-500 text-white'
+          : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+      }`}
+    >
+      +Referencia
+    </button>
+
+    <button
+      type="button"
+      disabled={pois.length === 0}
+      onClick={() => {
+if (pois.length === 0) return
+
+if (poiSeleccionado !== null) {
+  setPois(
+    pois.filter((poi) => poi.id !== poiSeleccionado)
+  )
+
+  setPoiSeleccionado(null)
+
+} else {
+  setPois(pois.slice(0, -1))
+}
+}}
+      className={`px-4 py-2 rounded-full text-sm ${
+        pois.length > 0
+          ? 'bg-red-500 text-white'
+          : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+      }`}
+    >
+     <span className="whitespace-nowrap">
+  -Referencia
+     </span>
+    </button>
+  </div>
+
+  <button
+    type="button"
+    disabled={!pinCoords && vertices.length === 0}
+    onClick={() => {
+      setPinCoords(null)
+      setVertices([])
+      setModoPinActivo(false)
+      setModoDifuminadoActivo(false)
+
+      setPois([])
+      setPoiSeleccionado(null)
+
+      setDatos((prev) => ({
+        ...prev,
+        direccion: ''
+      }))
+    }}
+    className={`px-4 py-2 rounded-full text-sm transition ${
+      !pinCoords && vertices.length === 0
+        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+        : 'bg-orange-500 text-white hover:bg-orange-600'
+    }`}
+  >
+    Eliminar
+  </button>
+
+</div>
+
+                <div className="relative z-0 rounded-2xl overflow-hidden border border-gray-200 max-w-full h-[320px]">
+                  <MapaPinSelector
+                    pinCoords={pinCoords}
+                    setPinCoords={setPinCoords}
+                    vertices={vertices}
+                    setVertices={setVertices}
+                    modoPinActivo={modoPinActivo}
+                    modoDifuminadoActivo={modoDifuminadoActivo}
+                    pois={pois}
+                    setPois={setPois}
+                    poiSeleccionado={poiSeleccionado}
+                    setPoiSeleccionado={setPoiSeleccionado}
+                  />
+                </div>
+
+                {errorMapa && (
+                  <p className="text-red-500 text-sm mt-2">{mensajeError}</p>
+                )}
+
+                {pinCoords && (
+                  <div className="mt-2 text-xs text-gray-500">
+                    <p>Latitud: {pinCoords.lat}</p>
+                    <p>Longitud: {pinCoords.lng}</p>
+                  </div>
+                )}
+                
+              </div>
+
               <div className="mt-12 space-y-6">
-                <div className="flex justify-center md:justify-end gap-6">
+                <div className="flex flex-col sm:flex-row justify-center md:justify-end gap-4 sm:gap-6">
                   <button
                     type="button"
                     onClick={() => router.back()}
-                    className="px-12 py-3 rounded-full border border-gray-400 bg-[#D9D9D9]"
+                    className="w-full sm:w-auto px-12 py-3 rounded-full border border-gray-400 bg-[#D9D9D9]"
                   >
                     Cancelar
                   </button>
 
                   <button
                     onClick={guardarPropiedad}
-                    className="px-12 py-3 rounded-full border-2 border-orange-400 bg-[#D9D9D9]"
+                    className="w-full sm:w-auto px-12 py-3 rounded-full border-2 border-orange-400 bg-[#D9D9D9] hover:bg-orange-100 transition"
                   >
                     Continuar
                   </button>
@@ -839,19 +1203,12 @@ export default function MiRegistroPage() {
                     {mensajeError}
                   </div>
                 )}
-
-                {estado === 'exito' && (
-                  <div className="bg-white border-2 border-green-400 rounded-2xl p-4 shadow-md max-w-md ml-auto">
-                    Publicación registrada correctamente ✅
-                  </div>
-                )}
               </div>
             </div>
           </div>
         </div>
       </main>
-
-      {mostrarPlanModal && <PlanModal onClose={() => setMostrarPlanModal(false)} />}
     </div>
+   </>
   )
 }

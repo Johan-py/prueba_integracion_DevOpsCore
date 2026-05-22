@@ -11,9 +11,14 @@ export class FiltersHomepageService {
       this.repository.getCountsByCategoria(),
     ]);
 
-    const mapToHomeFilter = (item: any) => ({
+    const mapToHomeFilter = (item: {
+      departamento: string;
+      count: number;
+      previews: Array<{ imagen: string; titulo: string }>;
+    }) => ({
       name: item.departamento || "Sin nombre",
       count: item.count,
+      previews: item.previews ?? [],
     });
 
     const requiredCategories = [
@@ -26,7 +31,10 @@ export class FiltersHomepageService {
     ];
 
     const categoriesMapped = requiredCategories.map((reqCat) => {
-      const found = categoriesRaw.find((c: any) => c.categoria === reqCat.id);
+      const found = categoriesRaw.find(
+        (c: { categoria: string | null; _count: { id: number } }) =>
+          c.categoria === reqCat.id,
+      );
       return {
         name: reqCat.label,
         count: found ? found._count.id : 0,

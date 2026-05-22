@@ -1,4 +1,6 @@
 'use client'
+
+import React, { Suspense } from 'react'
 import FilterBar from '@/components/filters/FilterBar'
 
 // Definimos exactamente lo que el FilterBar envía para que TS no llore
@@ -8,8 +10,9 @@ interface FiltrosInput {
   query: string
   updatedAt?: string
 }
-export default function FiltersPage() {
-  // Usamos la interfaz aquí para que coincida perfectamente con el componente
+
+// 1. Aislamos la lógica y el FilterBar en un componente interno
+function FiltersContent() {
   const handleSearch = (filtros: FiltrosInput) => {
     const params = new URLSearchParams()
 
@@ -20,7 +23,6 @@ export default function FiltersPage() {
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
 
-    // Usamos una función interna para el async y que no choque con el tipo 'void'
     const fetchData = async () => {
       try {
         const response = await fetch(`${API_URL}/api/properties/search?${params.toString()}`)
@@ -34,10 +36,20 @@ export default function FiltersPage() {
     fetchData()
   }
 
+  return <FilterBar onSearch={handleSearch} />
+}
+
+// 2. Exportamos la página principal envolviendo el contenido con Suspense
+export default function FiltersPage() {
   return (
     <div className="flex flex-col items-center pt-32 px-4">
-      {/* Ahora handleSearch coincide EXACTAMENTE con lo que FilterBar pide */}
-      <FilterBar onSearch={handleSearch} />
+      <Suspense fallback={
+        <div className="w-full max-w-[921px] h-[100px] animate-pulse bg-gray-200 rounded-3xl flex items-center justify-center text-gray-400">
+          Cargando buscador...
+        </div>
+      }>
+        <FiltersContent />
+      </Suspense>
     </div>
   )
 }

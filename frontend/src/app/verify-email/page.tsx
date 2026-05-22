@@ -21,6 +21,18 @@ export default function VerifyEmailPage() {
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [timeLeft, setTimeLeft] = useState(60)
+  const [canResend, setCanResend] = useState(false)
+  const [isResending, setIsResending] = useState(false)
+
+  useEffect(() => {
+    if (timeLeft > 0) {
+      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000)
+      return () => clearTimeout(timer)
+    } else {
+      setCanResend(true)
+    }
+  }, [timeLeft])
 
   useEffect(() => {
     const pendingToken = sessionStorage.getItem('pendingRegisterToken')
@@ -34,6 +46,39 @@ export default function VerifyEmailPage() {
 
     setEmail(pendingEmail)
   }, [router])
+
+  const handleResend = async () => {
+    const verificationToken = sessionStorage.getItem('pendingRegisterToken')
+    if (!verificationToken) return
+
+    setIsResending(true)
+    setError('')
+
+    try {
+      const response = await fetch(`${API_URL}/api/auth/resend-register-code`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ verificationToken })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || 'No se pudo reenviar el código')
+      }
+
+      // Actualizar el token y reiniciar temporizador
+      sessionStorage.setItem('pendingRegisterToken', data.verificationToken)
+      setTimeLeft(60)
+      setCanResend(false)
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Error al reenviar el código')
+    } finally {
+      setIsResending(false)
+    }
+  }
 
   const handleVerify = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -151,6 +196,26 @@ export default function VerifyEmailPage() {
           >
             {isSubmitting ? 'Verificando...' : 'Verificar código'}
           </button>
+
+          <div className="text-center">
+            {timeLeft > 0 ? (
+              <p className="text-sm text-[#57534e]">
+                ¿No recibiste el código? Reenviar en{' '}
+                <span className="font-mono font-bold">
+                  00:{timeLeft.toString().padStart(2, '0')}
+                </span>
+              </p>
+            ) : (
+              <button
+                type="button"
+                onClick={handleResend}
+                disabled={isResending}
+                className="text-sm font-semibold text-amber-600 hover:text-amber-700 disabled:text-amber-300"
+              >
+                {isResending ? 'Reenviando...' : 'Reenviar código'}
+              </button>
+            )}
+          </div>
 
           <button
             type="button"

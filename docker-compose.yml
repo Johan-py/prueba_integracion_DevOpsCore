@@ -1,5 +1,4 @@
 version: '3.8'
-
 services:
   db-social:
     image: postgres:15-alpine

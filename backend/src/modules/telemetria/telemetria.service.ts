@@ -19,7 +19,7 @@ export class TelemetriaService {
     return await this.repository.registrarClickInmueble(usuarioId, clickData.inmuebleId)
   }
 
-  async getRecomendados(usuarioId: number): Promise<number[]> {
+  async getRecomendados(usuarioId?: number): Promise<number[]> {
     return await this.repository.obtenerInmueblesRecomendados(usuarioId)
   }
 }

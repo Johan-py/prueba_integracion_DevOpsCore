@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["partialIndexes"]
 }
 
 datasource db {
@@ -15,47 +16,49 @@ model Rol {
 }
 
 model Usuario {
-  id                                    Int                     @id @default(autoincrement())
+  id                                    Int                           @id @default(autoincrement())
   nombre                                String
   apellido                              String
-  correo                                String                  @unique
+  correo                                String                        @unique
   password                              String
   pais                                  String?
   avatar                                String?
   genero                                Genero?
   direccion                             String?
-  activo                                Boolean?                @default(true)
-  fechaRegistro                         DateTime?               @default(now()) @db.Timestamp(6)
-  createdAt                             DateTime?               @default(now()) @db.Timestamp(6)
-  intentos_fallidos_cambio_password     Int                     @default(0)
-  bloqueo_cambio_password_hasta         DateTime?               @db.Timestamptz(6)
-  password_actualizado_en               DateTime                @default(now()) @db.Timestamptz(6)
-  two_factor_activo                     Boolean                 @default(false)
-  two_factor_metodo                     String                  @default("email") @db.VarChar(20)
-  two_factor_activado_en                DateTime?               @db.Timestamptz(6)
-  controlador                           Boolean                 @default(false)
-  fechaNacimiento                       DateTime?
-  telemetriaCompartida                  Boolean?                @default(false)
-  zonaConexion                          String?                 @db.VarChar(100)
-  notificacionWhatsapp                  Boolean?                @default(false)
+  activo                                Boolean?                      @default(true)
+  fechaRegistro                         DateTime?                     @default(now()) @db.Timestamp(6)
+  createdAt                             DateTime?                     @default(now()) @db.Timestamp(6)
+  intentos_fallidos_cambio_password     Int                           @default(0)
+  bloqueo_cambio_password_hasta         DateTime?                     @db.Timestamptz(6)
+  password_actualizado_en               DateTime                      @default(now()) @db.Timestamptz(6)
+  two_factor_activo                     Boolean                       @default(false)
+  two_factor_metodo                     String                        @default("email") @db.VarChar(20)
+  two_factor_activado_en                DateTime?                     @db.Timestamptz(6)
+  controlador                           Boolean                       @default(false)
+  notificacionWhatsapp                  Boolean?                      @default(false)
   rolId                                 Int?
-  notificacion_email                    Boolean?                @default(true)
-  notificacion_whatsapp                 Boolean?                @default(false)
-  fecha_registro                        DateTime?               @default(now()) @db.Timestamp(6)
-  updatedAt                             DateTime?               @updatedAt @db.Timestamp(6)
-  desactivado_en                        DateTime?               @db.Timestamp(6)
-  fecha_nacimiento                      DateTime?               @db.Timestamp(6)
-  telemetria_compartida                 Boolean?                @default(false)
-  zona_conexion                         String?                 @db.VarChar(100)
+  notificacion_email                    Boolean?                      @default(true)
+  notificacion_whatsapp                 Boolean?                      @default(false)
+  fecha_registro                        DateTime?                     @default(now()) @db.Timestamp(6)
+  updatedAt                             DateTime?                     @updatedAt @db.Timestamp(6)
+  desactivado_en                        DateTime?                     @db.Timestamp(6)
+  fecha_nacimiento                      DateTime?                     @db.Timestamp(6)
+  telemetria_compartida                 Boolean?                      @default(false)
+  zona_conexion                         String?                       @db.VarChar(100)
   autenticacion_social                  autenticacion_social[]
   bitacora_pagos                        bitacora_pagos[]
+  blog                                  blog[]
   cambio_email                          CambioEmail[]
   codigo_2fa                            codigo_2fa[]
+  comentario                            comentario[]
+  comentario_like                       comentario_like[]
   comparacion                           comparacion[]
+  entrenamiento_ml                      entrenamiento_ml[]
   favorito                              favorito[]
   historial_busqueda                    historial_busqueda[]
   historial_password                    historial_password[]
   inmuebles                             Inmueble[]
+  magic_link                            magic_link[]
   notificaciones                        Notificacion[]
   perfil                                Perfil?
   propiedad_vista                       propiedad_vista[]
@@ -64,9 +67,12 @@ model Usuario {
   sesiones                              Sesion[]
   suscripciones_activas                 suscripciones_activas[]
   telefonos                             Telefono[]
-  telefono_telefono_usuario_idTousuario Telefono[]              @relation("telefono_usuario_idTousuario")
+  telefono_telefono_usuario_idTousuario Telefono[]                    @relation("telefono_usuario_idTousuario")
+  testimonio                            testimonio[]
+  testimonio_like                       testimonio_like[]
   transacciones                         transacciones[]
-  rol                                   Rol?                    @relation(fields: [rolId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tutorial_publicacion_usuario          tutorial_publicacion_usuario?
+  rol                                   Rol?                          @relation(fields: [rolId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   verificacion_pago                     verificacion_pago[]
   visitor                               Visitor[]
   zona_usuario                          zona_usuario[]
@@ -99,6 +105,7 @@ model Sesion {
   fechaExpiracion DateTime  @db.Timestamp(6)
   estado          Boolean?  @default(true)
   usuarioId       Int
+  metodo_auth     String?   @default("email") @db.VarChar(30)
   usuario         Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "sesion_usuario_id_fkey")
 
   @@map("sesion")
@@ -114,8 +121,13 @@ model Notificacion {
   eliminada     Boolean   @default(false)
   archivada     Boolean   @default(false)
   usuarioId     Int
+  tipo          String    @default("GENERAL") @db.VarChar(30)
+  blog_id       Int?
+  blog          blog?     @relation(fields: [blog_id], references: [id], onUpdate: NoAction, map: "notificacion_blog_fk")
   usuario       Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "notificacion_usuario_id_fkey")
 
+  @@index([blog_id], map: "idx_notificacion_blog")
+  @@index([usuarioId, leida], map: "idx_notificacion_usuario_leida")
   @@map("notificacion")
 }
 
@@ -157,14 +169,20 @@ model Inmueble {
   createdAt           DateTime?             @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt           DateTime?             @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
   propietarioId       Int                   @map("propietario_id")
+  banoCompartido      Boolean?              @default(false)
+  precio_anterior     Decimal?              @db.Decimal(12, 2)
+  fecha_reduccion     DateTime?             @db.Timestamp(6)
   detalle_comparacion detalle_comparacion[]
+  entrenamiento_ml    entrenamiento_ml[]
   favorito            favorito[]
   propietario         Usuario               @relation(fields: [propietarioId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "inmueble_propietario_fk")
+  inmueble_amenidad   inmueble_amenidad[]
   inmueble_etiqueta   InmuebleEtiqueta[]
   marcador_mapa       MarcadorMapa[]
   propiedad_vista     propiedad_vista[]
   publicaciones       Publicacion[]
   ubicacion           UbicacionInmueble?
+  puntosDeInteres     punto_interes[]
 
   @@index([propietarioId], map: "idx_inmueble_propietario")
   @@index([estado], map: "idx_inmueble_estado")
@@ -182,7 +200,9 @@ model UbicacionInmueble {
   inmuebleId         Int                @unique @map("inmueble_id")
   ubicacionMaestraId Int?               @map("ubicacion_maestra_id")
   barrio_id          Int?
+  verticesDifuminado Json?              @map("vertices_difuminado")
   marcador_mapa      MarcadorMapa[]
+  barrio             barrio?            @relation(fields: [barrio_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   inmueble           Inmueble           @relation(fields: [inmuebleId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "ubicacion_inmueble_fk")
   ubicacion_maestra  ubicacion_maestra? @relation(fields: [ubicacionMaestraId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
@@ -201,8 +221,8 @@ model Etiqueta {
 model InmuebleEtiqueta {
   inmueble_id Int
   etiqueta_id Int
-  etiqueta    Etiqueta @relation(fields: [etiqueta_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "inmueble_etiqueta_etiqueta_fk")
-  inmueble    Inmueble @relation(fields: [inmueble_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "inmueble_etiqueta_inmueble_fk")
+  etiqueta    Etiqueta @relation(fields: [etiqueta_id], references: [id], onUpdate: NoAction, map: "inmueble_etiqueta_etiqueta_fk")
+  inmueble    Inmueble @relation(fields: [inmueble_id], references: [id], onUpdate: NoAction, map: "inmueble_etiqueta_inmueble_fk")
 
   @@id([inmueble_id, etiqueta_id])
   @@map("inmueble_etiqueta")
@@ -216,14 +236,20 @@ model Publicacion {
   fechaPublicacion      DateTime?               @default(now()) @map("fecha_publicacion") @db.Timestamp(6)
   usuarioId             Int                     @map("usuario_id")
   inmuebleId            Int                     @map("inmueble_id")
+  paymentIntentId       String?                 @map("payment_intent_id")
+  promoted              Boolean                 @default(false)
+  promotedAt            DateTime?               @map("promoted_at") @db.Timestamp(6)
+  promotedExpiresAt     DateTime?               @map("promoted_expires_at") @db.Timestamp(6)
   multimedia            Multimedia[]
   inmueble              Inmueble                @relation(fields: [inmuebleId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "publicacion_inmueble_fk")
   usuario               Usuario                 @relation(fields: [usuarioId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "publicacion_usuario_fk")
   publicacion_parametro publicacion_parametro[]
+  publicacion_tag       publicacion_tag[]
 
   @@index([estado], map: "idx_publicacion_estado")
   @@index([inmuebleId], map: "idx_publicacion_inmueble")
   @@index([usuarioId], map: "idx_publicacion_usuario")
+  @@index([promoted], map: "idx_publicacion_promoted")
   @@map("publicacion")
 }
 
@@ -310,7 +336,7 @@ model InteraccionMapa {
   @@map("interaccion_mapa")
 }
 
-model BannerHome {
+model banner_home {
   id             Int       @id @default(autoincrement())
   url_imagen     String
   orden          Int
@@ -328,6 +354,7 @@ model Visitor {
   meta_data    Json?
   fecha_visita DateTime? @default(now()) @db.Timestamp(6)
   usuario_id   Int?
+  token        String?   @unique
   usuario      Usuario?  @relation(fields: [usuario_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("visitor")
@@ -370,6 +397,7 @@ model plan_suscripcion {
   duracion_plan_dias     Int?
   nro_publicaciones_plan Int?
   imagen_gr_url          String?                 @db.VarChar(255)
+  eliminado_en           DateTime?               @db.Timestamptz(6)
   bitacora_pagos         bitacora_pagos[]
   suscripciones_activas  suscripciones_activas[]
   transacciones          transacciones[]
@@ -446,14 +474,17 @@ model audit_log {
 }
 
 model autenticacion_social {
-  id              Int       @id @default(autoincrement())
-  usuarioId       Int
-  proveedor       String    @db.VarChar(30)
-  correoProveedor String?   @db.VarChar(100)
-  idExterno       String    @db.VarChar(150)
-  vinculadoEn     DateTime? @default(now()) @db.Timestamp(6)
-  activo          Boolean?  @default(true)
-  usuario         Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id                   Int       @id @default(autoincrement())
+  usuarioId            Int
+  proveedor            String    @db.VarChar(30)
+  correoProveedor      String?   @db.VarChar(100)
+  idExterno            String    @db.VarChar(150)
+  vinculadoEn          DateTime? @default(now()) @db.Timestamp(6)
+  activo               Boolean?  @default(true)
+  token_acceso_cifrado String?
+  token_expira_en      DateTime? @db.Timestamptz(6)
+  ultimo_uso_en        DateTime? @db.Timestamptz(6)
+  usuario              Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([proveedor, idExterno], map: "autenticacion_social_proveedor_idexterno_key")
   @@unique([usuarioId, proveedor], map: "autenticacion_social_usuario_proveedor_key")
@@ -478,6 +509,7 @@ model comparacion {
   nombre              String?               @db.VarChar(100)
   creadoEn            DateTime              @default(now())
   usuarioId           Int
+  activo              Boolean               @default(true)
   usuario             Usuario               @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   detalle_comparacion detalle_comparacion[]
 }
@@ -515,12 +547,14 @@ model historial_password {
 }
 
 model propiedad_vista {
-  id         Int      @id @default(autoincrement())
-  usuarioId  Int
-  inmuebleId Int
-  vistaEn    DateTime @default(now())
-  inmueble   Inmueble @relation(fields: [inmuebleId], references: [id], onDelete: Cascade)
-  usuario    Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  id          Int      @id @default(autoincrement())
+  usuarioId   Int
+  inmuebleId  Int
+  vistaEn     DateTime @default(now())
+  veces_visto Int?     @default(1) @db.SmallInt
+  activo      Boolean? @default(true)
+  inmueble    Inmueble @relation(fields: [inmuebleId], references: [id], onDelete: Cascade)
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
   @@unique([usuarioId, inmuebleId])
   @@index([usuarioId, vistaEn])
@@ -625,6 +659,864 @@ model spatial_ref_sys {
   proj4text String? @db.VarChar(2048)
 }
 
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model amenidad {
+  id                Int                 @id @default(autoincrement())
+  nombre            String              @unique @db.VarChar(255)
+  inmueble_amenidad inmueble_amenidad[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model barrio {
+  id                 Int                 @id @default(autoincrement())
+  nombre             String              @db.VarChar(255)
+  zona_id            Int
+  zona               zona_geografica     @relation(fields: [zona_id], references: [id], onUpdate: NoAction, map: "barrio_zona_fk")
+  ubicacion_inmueble UbicacionInmueble[]
+
+  @@unique([nombre, zona_id], map: "barrio_nombre_zona_unique")
+}
+
+model blog {
+  id                Int            @id @default(autoincrement())
+  titulo            String
+  contenido         String
+  imagen            String?
+  estado            estado_blog
+  eliminado         Boolean?       @default(false)
+  fecha_creacion    DateTime?      @default(now()) @db.Timestamp(6)
+  fecha_publicacion DateTime?      @db.Timestamp(6)
+  usuario_id        Int
+  categoria_id      Int
+  categoria_blog    categoria_blog @relation(fields: [categoria_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "blog_categoria_fk")
+  usuario           Usuario        @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "blog_usuario_fk")
+  blog_rechazo      blog_rechazo[]
+  comentario        comentario[]
+  notificacion      Notificacion[]
+
+  @@index([estado])
+  @@index([usuario_id], map: "blog_usuario_idx")
+}
+
+model blog_rechazo {
+  id         Int       @id @default(autoincrement())
+  comentario String
+  fecha      DateTime? @default(now()) @db.Timestamp(6)
+  blog_id    Int
+  blog       blog      @relation(fields: [blog_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "blog_rechazo_blog_fk")
+}
+
+model categoria_blog {
+  id     Int    @id @default(autoincrement())
+  nombre String @unique @db.VarChar(100)
+  blog   blog[]
+}
+
+model comentario {
+  id                  Int               @id @default(autoincrement())
+  contenido           String
+  fecha_creacion      DateTime?         @default(now()) @db.Timestamp(6)
+  usuario_id          Int
+  blog_id             Int
+  comentario_padre_id Int?
+  blog                blog              @relation(fields: [blog_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "comentario_blog_fk")
+  comentario          comentario?       @relation("comentarioTocomentario", fields: [comentario_padre_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "comentario_padre_fk")
+  other_comentario    comentario[]      @relation("comentarioTocomentario")
+  usuario             Usuario           @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "comentario_usuario_fk")
+  comentario_like     comentario_like[]
+
+  @@index([blog_id], map: "comentario_blog_idx")
+}
+
+model comentario_like {
+  id            Int        @id @default(autoincrement())
+  usuario_id    Int
+  comentario_id Int
+  comentario    comentario @relation(fields: [comentario_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "comentario_like_comentario_fk")
+  usuario       Usuario    @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "comentario_like_usuario_fk")
+
+  @@unique([usuario_id, comentario_id], map: "comentario_like_unique")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model departamento {
+  id         Int         @id @default(autoincrement())
+  nombre     String      @unique @db.VarChar(255)
+  provincias provincia[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model inmueble_amenidad {
+  inmueble_id Int
+  amenidad_id Int
+  amenidad    amenidad @relation(fields: [amenidad_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "inmueble_amenidad_amenidad_fk")
+  inmueble    Inmueble @relation(fields: [inmueble_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "inmueble_amenidad_inmueble_fk")
+
+  @@id([inmueble_id, amenidad_id])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model municipio {
+  id           Int               @id @default(autoincrement())
+  nombre       String            @db.VarChar(255)
+  provincia_id Int?              @map("provincia")
+  provincia    provincia?        @relation(fields: [provincia_id], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  zonas        zona_geografica[]
+
+  @@unique([nombre, provincia_id], map: "municipio_nombre_provincia_unique")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model provincia {
+  id              Int          @id @default(autoincrement())
+  nombre          String       @db.VarChar(255)
+  departamento_id Int          @map("departamento")
+  municipios      municipio[]
+  departamento    departamento @relation(fields: [departamento_id], references: [id], onUpdate: NoAction)
+
+  @@unique([nombre, departamento_id], map: "provincia_nombre_departamento_unique")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model zona_geografica {
+  id           Int       @id @default(autoincrement())
+  nombre       String    @db.VarChar(255)
+  municipio_id Int       @map("municipio")
+  barrios      barrio[]
+  municipio    municipio @relation(fields: [municipio_id], references: [id], onUpdate: NoAction)
+
+  @@unique([nombre, municipio_id], map: "zona_geografica_nombre_municipio_unique")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model entrenamiento_ml {
+  id                Int      @id @default(autoincrement())
+  usuario_id        Int
+  inmueble_id       Int
+  tipo_evento       String   @default("CLICK") @db.VarChar(20)
+  score_real        Float    @default(0) @db.Real
+  retroalimentacion Int?     @db.SmallInt
+  features          Json?
+  fecha_evento      DateTime @default(now()) @db.Timestamp(6)
+  usado_en_modelo   Boolean  @default(false)
+  version_modelo    String?  @db.VarChar(20)
+  inmueble          Inmueble @relation(fields: [inmueble_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  usuario           Usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([fecha_evento(sort: Desc)], map: "idx_ml_fecha")
+  @@index([tipo_evento], map: "idx_ml_tipo_evento")
+  @@index([usuario_id, usado_en_modelo], map: "idx_ml_usuario_usado")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model magic_link {
+  id                Int       @id @default(autoincrement())
+  usuario_id        Int
+  token_hash        String    @unique @db.VarChar(64)
+  correo            String    @db.VarChar(255)
+  expira_en         DateTime  @db.Timestamptz(6)
+  usado_en          DateTime? @db.Timestamptz(6)
+  activo            Boolean?  @default(true)
+  creado_en         DateTime? @default(now()) @db.Timestamptz(6)
+  intentos_reenvio  Int?      @default(0)
+  ultimo_reenvio_en DateTime? @db.Timestamptz(6)
+  invalidado_en     DateTime? @db.Timestamptz(6)
+  usuario           Usuario   @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([token_hash], map: "idx_magic_link_token_hash")
+  @@index([usuario_id], map: "idx_magic_link_usuario")
+  @@index([usuario_id, activo], map: "idx_magic_link_usuario_activo")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model modelo_version {
+  id           Int      @id @default(autoincrement())
+  version      String   @unique @db.VarChar(20)
+  archivo_path String   @db.VarChar(255)
+  algoritmo    String   @db.VarChar(50)
+  precision    Float?   @db.Real
+  recall       Float?   @db.Real
+  datos_usados Int?
+  activo       Boolean  @unique(map: "idx_modelo_activo", where: raw("(activo = true)")) @default(false)
+  entrenado_en DateTime @default(now()) @db.Timestamp(6)
+  notas        String?
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model publicacion_compartido {
+  id             Int      @id @default(autoincrement())
+  publicacion_id Int
+  usuario_id     Int
+  medio          String?  @db.VarChar(50)
+  creado_en      DateTime @default(now()) @db.Timestamp(6)
+
+  @@index([publicacion_id], map: "idx_publicacion_compartido_publicacion")
+  @@index([usuario_id], map: "idx_publicacion_compartido_usuario")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model publicacion_estadistica {
+  id                    Int      @id @default(autoincrement())
+  publicacion_id        Int      @unique
+  total_visualizaciones Int      @default(0)
+  total_compartidos     Int      @default(0)
+  actualizado_en        DateTime @default(now()) @db.Timestamp(6)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model publicacion_vista {
+  id             Int      @id @default(autoincrement())
+  publicacion_id Int
+  usuario_id     Int?
+  visitor_id     Int?
+  ip             String?
+  user_agent     String?
+  creado_en      DateTime @default(now()) @db.Timestamp(6)
+
+  @@index([publicacion_id], map: "idx_publicacion_vista_publicacion")
+  @@index([usuario_id], map: "idx_publicacion_vista_usuario")
+  @@index([visitor_id], map: "idx_publicacion_vista_visitor")
+}
+
+model punto_interes {
+  id          Int      @id @default(autoincrement())
+  nombre      String
+  latitud     Decimal  @db.Decimal(10, 7)
+  longitud    Decimal  @db.Decimal(10, 7)
+  inmueble_id Int
+  inmueble    Inmueble @relation(fields: [inmueble_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([inmueble_id], map: "idx_punto_interes_inmueble")
+}
+
+model testimonio {
+  id              Int               @id @default(autoincrement())
+  comentario      String
+  calificacion    Int?
+  visible         Boolean?          @default(true)
+  eliminado       Boolean?          @default(false)
+  fecha_creacion  DateTime?         @default(now()) @db.Timestamp(6)
+  usuario_id      Int
+  ciudad          String?           @db.VarChar(100)
+  zona            String?           @db.VarChar(100)
+  categoria       String?           @db.VarChar(255)
+  usuario         Usuario           @relation(fields: [usuario_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  testimonio_like testimonio_like[]
+}
+
+model testimonio_like {
+  id            Int        @id @default(autoincrement())
+  testimonio_id Int
+  usuario_id    Int
+  creado_en     DateTime?  @default(now()) @db.Timestamp(6)
+  testimonio    testimonio @relation(fields: [testimonio_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  usuario       Usuario    @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([testimonio_id, usuario_id], map: "uq_testimonio_like")
+}
+
+model tutorial_publicacion_usuario {
+  id            Int       @id @default(autoincrement())
+  usuario_id    Int       @unique
+  confirmado    Boolean   @default(false)
+  visto_en      DateTime? @db.Timestamp(6)
+  confirmado_en DateTime? @db.Timestamp(6)
+  usuario       Usuario   @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model Tag {
+  id              Int               @id @default(autoincrement())
+  nombre          String            @unique @db.VarChar(30)
+  creado_en       DateTime?         @default(now()) @db.Timestamptz(6)
+  publicacion_tag publicacion_tag[]
+
+  @@map("tag")
+}
+
+model publicacion_tag {
+  publicacion_id Int
+  tag_id         Int
+  agregado_en    DateTime    @default(now()) @db.Timestamptz(6)
+  publicacion    Publicacion @relation(fields: [publicacion_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  tag            Tag         @relation(fields: [tag_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([publicacion_id, tag_id])
+  @@index([tag_id])
+  @@map("publicacion_tag")
+}
+
+model Chat {
+  id             String    @id
+  remoteJid      String    @db.VarChar(100)
+  labels         Json?
+  createdAt      DateTime? @default(now()) @db.Timestamp(6)
+  updatedAt      DateTime? @db.Timestamp(6)
+  instanceId     String
+  name           String?   @db.VarChar(100)
+  unreadMessages Int       @default(0)
+  Instance       Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+
+  @@index([instanceId])
+  @@index([remoteJid])
+}
+
+model Chatwoot {
+  id                      String    @id
+  enabled                 Boolean?  @default(true)
+  accountId               String?   @db.VarChar(100)
+  token                   String?   @db.VarChar(100)
+  url                     String?   @db.VarChar(500)
+  nameInbox               String?   @db.VarChar(100)
+  signMsg                 Boolean?  @default(false)
+  signDelimiter           String?   @db.VarChar(100)
+  number                  String?   @db.VarChar(100)
+  reopenConversation      Boolean?  @default(false)
+  conversationPending     Boolean?  @default(false)
+  mergeBrazilContacts     Boolean?  @default(false)
+  importContacts          Boolean?  @default(false)
+  importMessages          Boolean?  @default(false)
+  daysLimitImportMessages Int?
+  createdAt               DateTime? @default(now()) @db.Timestamp(6)
+  updatedAt               DateTime  @db.Timestamp(6)
+  instanceId              String    @unique
+  logo                    String?   @db.VarChar(500)
+  organization            String?   @db.VarChar(100)
+  ignoreJids              Json?
+  Instance                Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+}
+
+model Contact {
+  id            String    @id
+  remoteJid     String    @db.VarChar(100)
+  pushName      String?   @db.VarChar(100)
+  profilePicUrl String?   @db.VarChar(500)
+  createdAt     DateTime? @default(now()) @db.Timestamp(6)
+  updatedAt     DateTime? @db.Timestamp(6)
+  instanceId    String
+  Instance      Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+
+  @@unique([remoteJid, instanceId])
+  @@index([instanceId])
+  @@index([remoteJid])
+}
+
+model Dify {
+  id              String           @id
+  enabled         Boolean          @default(true)
+  botType         DifyBotType
+  apiUrl          String?          @db.VarChar(255)
+  apiKey          String?          @db.VarChar(255)
+  expire          Int?             @default(0)
+  keywordFinish   String?          @db.VarChar(100)
+  delayMessage    Int?
+  unknownMessage  String?          @db.VarChar(100)
+  listeningFromMe Boolean?         @default(false)
+  stopBotFromMe   Boolean?         @default(false)
+  keepOpen        Boolean?         @default(false)
+  debounceTime    Int?
+  ignoreJids      Json?
+  triggerType     TriggerType?
+  triggerOperator TriggerOperator?
+  triggerValue    String?
+  createdAt       DateTime?        @default(now()) @db.Timestamp(6)
+  updatedAt       DateTime         @db.Timestamp(6)
+  instanceId      String
+  description     String?          @db.VarChar(255)
+  splitMessages   Boolean?         @default(false)
+  timePerChar     Int?             @default(50)
+  Instance        Instance         @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  DifySetting     DifySetting[]
+}
+
+model DifySetting {
+  id              String    @id
+  expire          Int?      @default(0)
+  keywordFinish   String?   @db.VarChar(100)
+  delayMessage    Int?
+  unknownMessage  String?   @db.VarChar(100)
+  listeningFromMe Boolean?  @default(false)
+  stopBotFromMe   Boolean?  @default(false)
+  keepOpen        Boolean?  @default(false)
+  debounceTime    Int?
+  ignoreJids      Json?
+  createdAt       DateTime? @default(now()) @db.Timestamp(6)
+  updatedAt       DateTime  @db.Timestamp(6)
+  difyIdFallback  String?   @db.VarChar(100)
+  instanceId      String    @unique
+  splitMessages   Boolean?  @default(false)
+  timePerChar     Int?      @default(50)
+  Dify            Dify?     @relation(fields: [difyIdFallback], references: [id])
+  Instance        Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+}
+
+model EvolutionBot {
+  id                  String                @id
+  enabled             Boolean               @default(true)
+  description         String?               @db.VarChar(255)
+  apiUrl              String?               @db.VarChar(255)
+  apiKey              String?               @db.VarChar(255)
+  expire              Int?                  @default(0)
+  keywordFinish       String?               @db.VarChar(100)
+  delayMessage        Int?
+  unknownMessage      String?               @db.VarChar(100)
+  listeningFromMe     Boolean?              @default(false)
+  stopBotFromMe       Boolean?              @default(false)
+  keepOpen            Boolean?              @default(false)
+  debounceTime        Int?
+  ignoreJids          Json?
+  triggerType         TriggerType?
+  triggerOperator     TriggerOperator?
+  triggerValue        String?
+  createdAt           DateTime?             @default(now()) @db.Timestamp(6)
+  updatedAt           DateTime              @db.Timestamp(6)
+  instanceId          String
+  splitMessages       Boolean?              @default(false)
+  timePerChar         Int?                  @default(50)
+  Instance            Instance              @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  EvolutionBotSetting EvolutionBotSetting[]
+}
+
+model EvolutionBotSetting {
+  id              String        @id
+  expire          Int?          @default(0)
+  keywordFinish   String?       @db.VarChar(100)
+  delayMessage    Int?
+  unknownMessage  String?       @db.VarChar(100)
+  listeningFromMe Boolean?      @default(false)
+  stopBotFromMe   Boolean?      @default(false)
+  keepOpen        Boolean?      @default(false)
+  debounceTime    Int?
+  ignoreJids      Json?
+  createdAt       DateTime?     @default(now()) @db.Timestamp(6)
+  updatedAt       DateTime      @db.Timestamp(6)
+  botIdFallback   String?       @db.VarChar(100)
+  instanceId      String        @unique
+  splitMessages   Boolean?      @default(false)
+  timePerChar     Int?          @default(50)
+  EvolutionBot    EvolutionBot? @relation(fields: [botIdFallback], references: [id])
+  Instance        Instance      @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+}
+
+model Flowise {
+  id              String           @id
+  enabled         Boolean          @default(true)
+  description     String?          @db.VarChar(255)
+  apiUrl          String?          @db.VarChar(255)
+  apiKey          String?          @db.VarChar(255)
+  expire          Int?             @default(0)
+  keywordFinish   String?          @db.VarChar(100)
+  delayMessage    Int?
+  unknownMessage  String?          @db.VarChar(100)
+  listeningFromMe Boolean?         @default(false)
+  stopBotFromMe   Boolean?         @default(false)
+  keepOpen        Boolean?         @default(false)
+  debounceTime    Int?
+  ignoreJids      Json?
+  triggerType     TriggerType?
+  triggerOperator TriggerOperator?
+  triggerValue    String?
+  createdAt       DateTime?        @default(now()) @db.Timestamp(6)
+  updatedAt       DateTime         @db.Timestamp(6)
+  instanceId      String
+  splitMessages   Boolean?         @default(false)
+  timePerChar     Int?             @default(50)
+  Instance        Instance         @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  FlowiseSetting  FlowiseSetting[]
+}
+
+model FlowiseSetting {
+  id                String    @id
+  expire            Int?      @default(0)
+  keywordFinish     String?   @db.VarChar(100)
+  delayMessage      Int?
+  unknownMessage    String?   @db.VarChar(100)
+  listeningFromMe   Boolean?  @default(false)
+  stopBotFromMe     Boolean?  @default(false)
+  keepOpen          Boolean?  @default(false)
+  debounceTime      Int?
+  ignoreJids        Json?
+  createdAt         DateTime? @default(now()) @db.Timestamp(6)
+  updatedAt         DateTime  @db.Timestamp(6)
+  flowiseIdFallback String?   @db.VarChar(100)
+  instanceId        String    @unique
+  splitMessages     Boolean?  @default(false)
+  timePerChar       Int?      @default(50)
+  Flowise           Flowise?  @relation(fields: [flowiseIdFallback], references: [id])
+  Instance          Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+}
+
+model Instance {
+  id                      String                   @id
+  name                    String                   @unique @db.VarChar(255)
+  connectionStatus        InstanceConnectionStatus @default(open)
+  ownerJid                String?                  @db.VarChar(100)
+  profilePicUrl           String?                  @db.VarChar(500)
+  integration             String?                  @db.VarChar(100)
+  number                  String?                  @db.VarChar(100)
+  token                   String?                  @db.VarChar(255)
+  clientName              String?                  @db.VarChar(100)
+  createdAt               DateTime?                @default(now()) @db.Timestamp(6)
+  updatedAt               DateTime?                @db.Timestamp(6)
+  profileName             String?                  @db.VarChar(100)
+  businessId              String?                  @db.VarChar(100)
+  disconnectionAt         DateTime?                @db.Timestamp(6)
+  disconnectionObject     Json?
+  disconnectionReasonCode Int?
+  Chat                    Chat[]
+  Chatwoot                Chatwoot?
+  Contact                 Contact[]
+  Dify                    Dify[]
+  DifySetting             DifySetting?
+  EvolutionBot            EvolutionBot[]
+  EvolutionBotSetting     EvolutionBotSetting?
+  Flowise                 Flowise[]
+  FlowiseSetting          FlowiseSetting?
+  IntegrationSession      IntegrationSession[]
+  Label                   Label[]
+  Media                   Media[]
+  Message                 Message[]
+  MessageUpdate           MessageUpdate[]
+  OpenaiBot               OpenaiBot[]
+  OpenaiCreds             OpenaiCreds[]
+  OpenaiSetting           OpenaiSetting?
+  Proxy                   Proxy?
+  Pusher                  Pusher?
+  Rabbitmq                Rabbitmq?
+  Session                 Session?
+  Setting                 Setting?
+  Sqs                     Sqs?
+  Template                Template[]
+  Typebot                 Typebot[]
+  TypebotSetting          TypebotSetting?
+  Webhook                 Webhook?
+  Websocket               Websocket?
+}
+
+model IntegrationSession {
+  id         String        @id
+  sessionId  String        @db.VarChar(255)
+  remoteJid  String        @db.VarChar(100)
+  pushName   String?
+  status     SessionStatus
+  awaitUser  Boolean       @default(false)
+  createdAt  DateTime?     @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime      @db.Timestamp(6)
+  instanceId String
+  parameters Json?
+  context    Json?
+  botId      String?
+  type       String?       @db.VarChar(100)
+  Instance   Instance      @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  Message    Message[]
+}
+
+model IsOnWhatsapp {
+  id         String   @id
+  remoteJid  String   @unique @db.VarChar(100)
+  jidOptions String
+  createdAt  DateTime @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime @db.Timestamp(6)
+}
+
+model Label {
+  id           String    @id
+  labelId      String?   @db.VarChar(100)
+  name         String    @db.VarChar(100)
+  color        String    @db.VarChar(100)
+  predefinedId String?   @db.VarChar(100)
+  createdAt    DateTime? @default(now()) @db.Timestamp(6)
+  updatedAt    DateTime  @db.Timestamp(6)
+  instanceId   String
+  Instance     Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+
+  @@unique([labelId, instanceId])
+}
+
+model Media {
+  id         String    @id
+  fileName   String    @unique @db.VarChar(500)
+  type       String    @db.VarChar(100)
+  mimetype   String    @db.VarChar(100)
+  createdAt  DateTime? @default(now()) @db.Date
+  messageId  String    @unique
+  instanceId String
+  Instance   Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  Message    Message   @relation(fields: [messageId], references: [id], onDelete: Cascade)
+}
+
+model Message {
+  id                           String              @id
+  key                          Json
+  pushName                     String?             @db.VarChar(100)
+  participant                  String?             @db.VarChar(100)
+  messageType                  String              @db.VarChar(100)
+  message                      Json
+  contextInfo                  Json?
+  source                       DeviceMessage
+  messageTimestamp             Int
+  chatwootMessageId            Int?
+  chatwootInboxId              Int?
+  chatwootConversationId       Int?
+  chatwootContactInboxSourceId String?             @db.VarChar(100)
+  chatwootIsRead               Boolean?
+  instanceId                   String
+  webhookUrl                   String?             @db.VarChar(500)
+  sessionId                    String?
+  status                       String?             @db.VarChar(30)
+  Media                        Media?
+  Instance                     Instance            @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  IntegrationSession           IntegrationSession? @relation(fields: [sessionId], references: [id])
+  MessageUpdate                MessageUpdate[]
+
+  @@index([instanceId])
+}
+
+model MessageUpdate {
+  id          String   @id
+  keyId       String   @db.VarChar(100)
+  remoteJid   String   @db.VarChar(100)
+  fromMe      Boolean
+  participant String?  @db.VarChar(100)
+  pollUpdates Json?
+  status      String   @db.VarChar(30)
+  messageId   String
+  instanceId  String
+  Instance    Instance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  Message     Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([instanceId])
+  @@index([messageId])
+}
+
+model OpenaiBot {
+  id                String           @id
+  assistantId       String?          @db.VarChar(255)
+  model             String?          @db.VarChar(100)
+  systemMessages    Json?
+  assistantMessages Json?
+  userMessages      Json?
+  maxTokens         Int?
+  expire            Int?             @default(0)
+  keywordFinish     String?          @db.VarChar(100)
+  delayMessage      Int?
+  unknownMessage    String?          @db.VarChar(100)
+  listeningFromMe   Boolean?         @default(false)
+  stopBotFromMe     Boolean?         @default(false)
+  keepOpen          Boolean?         @default(false)
+  debounceTime      Int?
+  ignoreJids        Json?
+  triggerType       TriggerType?
+  triggerOperator   TriggerOperator?
+  triggerValue      String?
+  createdAt         DateTime?        @default(now()) @db.Timestamp(6)
+  updatedAt         DateTime         @db.Timestamp(6)
+  openaiCredsId     String
+  instanceId        String
+  enabled           Boolean          @default(true)
+  botType           OpenaiBotType
+  description       String?          @db.VarChar(255)
+  functionUrl       String?          @db.VarChar(500)
+  splitMessages     Boolean?         @default(false)
+  timePerChar       Int?             @default(50)
+  Instance          Instance         @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  OpenaiCreds       OpenaiCreds      @relation(fields: [openaiCredsId], references: [id], onDelete: Cascade)
+  OpenaiSetting     OpenaiSetting[]
+}
+
+model OpenaiCreds {
+  id            String         @id
+  apiKey        String?        @unique @db.VarChar(255)
+  createdAt     DateTime?      @default(now()) @db.Timestamp(6)
+  updatedAt     DateTime       @db.Timestamp(6)
+  instanceId    String
+  name          String?        @unique @db.VarChar(255)
+  OpenaiBot     OpenaiBot[]
+  Instance      Instance       @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  OpenaiSetting OpenaiSetting?
+}
+
+model OpenaiSetting {
+  id               String      @id
+  expire           Int?        @default(0)
+  keywordFinish    String?     @db.VarChar(100)
+  delayMessage     Int?
+  unknownMessage   String?     @db.VarChar(100)
+  listeningFromMe  Boolean?    @default(false)
+  stopBotFromMe    Boolean?    @default(false)
+  keepOpen         Boolean?    @default(false)
+  debounceTime     Int?
+  ignoreJids       Json?
+  createdAt        DateTime?   @default(now()) @db.Timestamp(6)
+  updatedAt        DateTime    @db.Timestamp(6)
+  openaiCredsId    String      @unique
+  openaiIdFallback String?     @db.VarChar(100)
+  instanceId       String      @unique
+  speechToText     Boolean?    @default(false)
+  splitMessages    Boolean?    @default(false)
+  timePerChar      Int?        @default(50)
+  Instance         Instance    @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  OpenaiCreds      OpenaiCreds @relation(fields: [openaiCredsId], references: [id])
+  OpenaiBot        OpenaiBot?  @relation(fields: [openaiIdFallback], references: [id])
+}
+
+model Proxy {
+  id         String    @id
+  enabled    Boolean   @default(false)
+  host       String    @db.VarChar(100)
+  port       String    @db.VarChar(100)
+  protocol   String    @db.VarChar(100)
+  username   String    @db.VarChar(100)
+  password   String    @db.VarChar(100)
+  createdAt  DateTime? @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime  @db.Timestamp(6)
+  instanceId String    @unique
+  Instance   Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+}
+
+model Pusher {
+  id         String    @id
+  enabled    Boolean   @default(false)
+  appId      String    @db.VarChar(100)
+  key        String    @db.VarChar(100)
+  secret     String    @db.VarChar(100)
+  cluster    String    @db.VarChar(100)
+  useTLS     Boolean   @default(false)
+  events     Json
+  createdAt  DateTime? @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime  @db.Timestamp(6)
+  instanceId String    @unique
+  Instance   Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+}
+
+model Rabbitmq {
+  id         String    @id
+  enabled    Boolean   @default(false)
+  events     Json
+  createdAt  DateTime? @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime  @db.Timestamp(6)
+  instanceId String    @unique
+  Instance   Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+}
+
+model Session {
+  id        String   @id
+  sessionId String   @unique
+  creds     String?
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  Instance  Instance @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
+
+model Setting {
+  id              String    @id
+  rejectCall      Boolean   @default(false)
+  msgCall         String?   @db.VarChar(100)
+  groupsIgnore    Boolean   @default(false)
+  alwaysOnline    Boolean   @default(false)
+  readMessages    Boolean   @default(false)
+  readStatus      Boolean   @default(false)
+  syncFullHistory Boolean   @default(false)
+  createdAt       DateTime? @default(now()) @db.Timestamp(6)
+  updatedAt       DateTime  @db.Timestamp(6)
+  instanceId      String    @unique
+  wavoipToken     String?   @db.VarChar(100)
+  Instance        Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+
+  @@index([instanceId])
+}
+
+model Sqs {
+  id         String    @id
+  enabled    Boolean   @default(false)
+  events     Json
+  createdAt  DateTime? @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime  @db.Timestamp(6)
+  instanceId String    @unique
+  Instance   Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+}
+
+model Template {
+  id         String    @id
+  templateId String    @unique @db.VarChar(255)
+  name       String    @unique @db.VarChar(255)
+  template   Json
+  createdAt  DateTime? @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime  @db.Timestamp(6)
+  instanceId String
+  webhookUrl String?   @db.VarChar(500)
+  Instance   Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+}
+
+model Typebot {
+  id              String           @id
+  enabled         Boolean          @default(true)
+  url             String           @db.VarChar(500)
+  typebot         String           @db.VarChar(100)
+  expire          Int?             @default(0)
+  keywordFinish   String?          @db.VarChar(100)
+  delayMessage    Int?
+  unknownMessage  String?          @db.VarChar(100)
+  listeningFromMe Boolean?         @default(false)
+  stopBotFromMe   Boolean?         @default(false)
+  keepOpen        Boolean?         @default(false)
+  createdAt       DateTime?        @default(now()) @db.Timestamp(6)
+  updatedAt       DateTime?        @db.Timestamp(6)
+  triggerType     TriggerType?
+  triggerOperator TriggerOperator?
+  triggerValue    String?
+  instanceId      String
+  debounceTime    Int?
+  ignoreJids      Json?
+  description     String?          @db.VarChar(255)
+  Instance        Instance         @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  TypebotSetting  TypebotSetting[]
+}
+
+model TypebotSetting {
+  id                String    @id
+  expire            Int?      @default(0)
+  keywordFinish     String?   @db.VarChar(100)
+  delayMessage      Int?
+  unknownMessage    String?   @db.VarChar(100)
+  listeningFromMe   Boolean?  @default(false)
+  stopBotFromMe     Boolean?  @default(false)
+  keepOpen          Boolean?  @default(false)
+  createdAt         DateTime? @default(now()) @db.Timestamp(6)
+  updatedAt         DateTime  @db.Timestamp(6)
+  instanceId        String    @unique
+  debounceTime      Int?
+  typebotIdFallback String?   @db.VarChar(100)
+  ignoreJids        Json?
+  Instance          Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  Typebot           Typebot?  @relation(fields: [typebotIdFallback], references: [id])
+}
+
+model Webhook {
+  id              String    @id
+  url             String    @db.VarChar(500)
+  enabled         Boolean?  @default(true)
+  events          Json?
+  webhookByEvents Boolean?  @default(false)
+  webhookBase64   Boolean?  @default(false)
+  createdAt       DateTime? @default(now()) @db.Timestamp(6)
+  updatedAt       DateTime  @db.Timestamp(6)
+  instanceId      String    @unique
+  headers         Json?
+  Instance        Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+
+  @@index([instanceId])
+}
+
+model Websocket {
+  id         String    @id
+  enabled    Boolean   @default(false)
+  events     Json
+  createdAt  DateTime? @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime  @db.Timestamp(6)
+  instanceId String    @unique
+  Instance   Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+}
+
 enum Genero {
   MASCULINO
   FEMENINO
@@ -665,6 +1557,8 @@ enum Categoria {
   DEPARTAMENTO
   TERRENO
   OFICINA
+  CUARTO
+  TERRENO_MORTUORIO
 
   @@map("categoria")
 }
@@ -705,6 +1599,8 @@ enum public_Categoria {
   DEPARTAMENTO
   TERRENO
   OFICINA
+  CUARTO
+  TERRENO_MORTUORIO
 
   @@map("Categoria")
 }
@@ -773,4 +1669,58 @@ enum public_TipoMultimedia {
   VIDEO
 
   @@map("TipoMultimedia")
+}
+
+enum estado_blog {
+  BORRADOR
+  PENDIENTE
+  PUBLICADO
+  RECHAZADO
+}
+
+enum DeviceMessage {
+  ios
+  android
+  web
+  unknown
+  desktop
+}
+
+enum DifyBotType {
+  chatBot
+  textGenerator
+  agent
+  workflow
+}
+
+enum InstanceConnectionStatus {
+  open
+  close
+  connecting
+}
+
+enum OpenaiBotType {
+  assistant
+  chatCompletion
+}
+
+enum SessionStatus {
+  opened
+  closed
+  paused
+}
+
+enum TriggerOperator {
+  contains
+  equals
+  startsWith
+  endsWith
+  regex
+}
+
+enum TriggerType {
+  all
+  keyword
+  none
+  advanced
 }

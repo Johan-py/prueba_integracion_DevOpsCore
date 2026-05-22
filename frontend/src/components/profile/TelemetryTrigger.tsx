@@ -1,33 +1,88 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import TelemetryModal from './TelemetryModal';
+import GuestTelemetryModal from './GuestTelemetryModal';
+import GuestPreferencesModal from './GuestPreferencesModal';
+import UserPreferencesModal from './UserPreferencesModal';
 
 export default function TelemetryTrigger() {
-  const [showModal, setShowModal] = useState(false);
+  const [modalState, setModalState] = useState<'none' | 'logged' | 'guestIntro' | 'guestForm' | 'userForm'>('none');
+  const pathname = usePathname();
 
   useEffect(() => {
-    // 1. Verificamos si hay sesión (Criterio QA)
     const token = localStorage.getItem('token'); 
-    const hasSeen = localStorage.getItem('has_seen_telemetry');
+    
+    // CAMBIO AQUÍ: Ahora usamos sessionStorage para que salga en cada pestaña
+    const hasSeenLogged = sessionStorage.getItem('has_seen_telemetry');
+    
+    const hasSeenGuest = sessionStorage.getItem('has_seen_guest_telemetry');
 
-    if (token && !hasSeen) {
-      // 2. Esperamos los 4 segundos que pediste
-      const timer = setTimeout(() => {
-        // 3. Captura automática de zona (Criterio QA)
-        const zona = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        console.log("HU-11: Zona capturada:", zona);
-        
-        setShowModal(true);
-      }, 10000);
+    if ((token && hasSeenLogged) || (!token && hasSeenGuest)) return;
 
-      return () => clearTimeout(timer);
-    }
-  }, []);
+    const timer = setTimeout(() => {
+      if (token && !hasSeenLogged) {
+        setModalState('logged');
+      } else if (!token && !hasSeenGuest) {
+        setModalState('guestIntro');
+      }
+    }, 4000); 
 
-  const handleClose = () => {
-    setShowModal(false);
-    localStorage.setItem('has_seen_telemetry', 'true');
+    return () => clearTimeout(timer);
+  }, [pathname]);
+
+  // --- LÓGICA: USUARIO LOGUEADO (Ahora guarda en sessionStorage) ---
+  const closeLogged = () => {
+    setModalState('none');
+    sessionStorage.setItem('has_seen_telemetry', 'true'); // <-- Cambio
   };
 
-  return <TelemetryModal isOpen={showModal} onClose={handleClose} />;
+  const openUserForm = () => {
+    setModalState('userForm'); 
+  };
+
+  const closeUserForm = () => {
+    setModalState('none');
+    sessionStorage.setItem('has_seen_telemetry', 'true'); // <-- Cambio
+  };
+
+  // --- LÓGICA: INVITADO ---
+  const closeGuestIntro = () => {
+    setModalState('none');
+    sessionStorage.setItem('has_seen_guest_telemetry', 'true');
+  };
+  
+  const openGuestForm = () => setModalState('guestForm');
+  
+  const closeGuestForm = () => {
+    setModalState('none');
+    sessionStorage.setItem('has_seen_guest_telemetry', 'true');
+  };
+
+  return (
+    <>
+      {/* Modales de Usuario Logueado */}
+      <TelemetryModal 
+        isOpen={modalState === 'logged'} 
+        onClose={closeLogged} 
+        onAccept={openUserForm} 
+      />
+      <UserPreferencesModal 
+        isOpen={modalState === 'userForm'} 
+        onClose={closeUserForm} 
+        onSuccess={closeUserForm} 
+      />
+
+      {/* Modales de Invitados */}
+      <GuestTelemetryModal 
+        isOpen={modalState === 'guestIntro'} 
+        onClose={closeGuestIntro} 
+        onAccept={openGuestForm} 
+      />
+      <GuestPreferencesModal 
+        isOpen={modalState === 'guestForm'} 
+        onClose={closeGuestForm} 
+      />
+    </>
+  );
 }

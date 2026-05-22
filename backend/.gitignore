@@ -34,3 +34,4 @@ Thumbs.db
 seed-datos_ub_maestra.ts
 .vercel
 .env*.local
+frontend/

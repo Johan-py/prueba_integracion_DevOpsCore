@@ -1,18 +1,18 @@
 'use client'
 
-import { Suspense, useRef, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import FotosSection from '@/components/contenido-multimedia/FotosSection'
 import VideosSection from '@/components/contenido-multimedia/VideosSection'
 import PublicarSection from '@/components/contenido-multimedia/PublicarSection'
-import SuccessModal from '@/components/contenido-multimedia/SuccessModal'
 import PlanModal from '@/components/contenido-multimedia/PlanModal'
 
 type ImageItem = {
   id: string
-  file: File
+  file?: File
   previewUrl: string
   name: string
+  isExisting?: boolean
 }
 
 type VideoItem = {
@@ -23,6 +23,16 @@ type VideoItem = {
   embedUrl?: string
   file?: File
   sourceUrl?: string
+}
+
+function getApiUrl() {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL
+
+  if (!apiUrl) {
+    throw new Error('Falta NEXT_PUBLIC_API_URL en el entorno')
+  }
+
+  return apiUrl
 }
 
 export default function ContenidoMultimediaPage() {
@@ -49,28 +59,91 @@ function ContenidoMultimediaPageContent() {
 
   const [isUploadingImages, setIsUploadingImages] = useState(false)
   const [isUploadingVideos, setIsUploadingVideos] = useState(false)
+  const [isPublishing, setIsPublishing] = useState(false)
 
-  const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [showPlanModal, setShowPlanModal] = useState(false)
 
   const imageInputRef = useRef<HTMLInputElement | null>(null)
   const videoInputRef = useRef<HTMLInputElement | null>(null)
 
-  const hasMultimedia = images.length > 0 || videos.length > 0
+  useEffect(() => {
+    const cargarMultimediaExistente = async () => {
+      if (!publicacionId || Number.isNaN(publicacionId)) return
+
+      try {
+        const response = await fetch(
+          `${getApiUrl()}/api/publicaciones/${publicacionId}/detalle`
+        )
+
+        const result = await response.json().catch(() => null)
+
+        if (!response.ok) {
+          throw new Error(result?.message || 'No se pudo cargar la multimedia existente.')
+        }
+
+        const imagenesBackend = result?.data?.imagenes || []
+        const videoUrlsBackend = result?.data?.videoUrls || []
+
+        const imagenesCargadas: ImageItem[] = imagenesBackend.map(
+          (imagen: { id: number; url: string }, index: number) => ({
+            id: String(imagen.id),
+            previewUrl: imagen.url,
+            name: `Imagen ${index + 1}`,
+            isExisting: true
+          })
+        )
+
+        const videosCargados: VideoItem[] = videoUrlsBackend.map(
+          (url: string, index: number) => {
+            const parsed = getYoutubeData(url)
+
+            return {
+              id: `video-existente-${index}`,
+              type: 'youtube',
+              name: `Video ${index + 1}`,
+              sourceUrl: url,
+              embedUrl: parsed?.embedUrl || url
+            }
+          }
+        )
+
+        setImages(imagenesCargadas.slice(0, 5))
+        setVideos(videosCargados.slice(0, 2))
+      } catch (error) {
+        console.error('Error al cargar multimedia existente:', error)
+      }
+    }
+
+    cargarMultimediaExistente()
+  }, [publicacionId])
+
+  const hasRequiredPhoto = images.length > 0
 
   const handleOpenImagePicker = () => {
+    setImageError('')
+    setPublishError('')
     imageInputRef.current?.click()
   }
 
   const handleOpenVideoPicker = () => {
+    setVideoError('')
+    setPublishError('')
+
+    if (!hasRequiredPhoto) {
+      setVideoError('Primero debes subir al menos una foto antes de agregar videos.')
+      return
+    }
+
     videoInputRef.current?.click()
   }
 
   const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || [])
+
     if (!files.length) return
 
     setImageError('')
+    setPublishError('')
 
     if (images.length + files.length > 5) {
       setImageError('Límite alcanzado. Solo puedes subir máximo 5 imágenes.')
@@ -87,7 +160,7 @@ function ContenidoMultimediaPageContent() {
 
     for (const file of files) {
       if (!allowedTypes.includes(file.type)) {
-        setImageError('Formato no permitido. Solo PNG o JPG')
+        setImageError('Formato no permitido. Solo PNG o JPG.')
         continue
       }
 
@@ -100,7 +173,8 @@ function ContenidoMultimediaPageContent() {
         id: `${file.name}-${Date.now()}-${Math.random()}`,
         file,
         previewUrl: URL.createObjectURL(file),
-        name: file.name
+        name: file.name,
+        isExisting: false
       })
     }
 
@@ -111,17 +185,32 @@ function ContenidoMultimediaPageContent() {
 
   const handleRemoveImage = (id: string) => {
     setImages((prev) => {
-      const target = prev.find((img) => img.id === id)
-      if (target) URL.revokeObjectURL(target.previewUrl)
-      return prev.filter((img) => img.id !== id)
+      const target = prev.find((image) => image.id === id)
+
+      if (target?.previewUrl?.startsWith('blob:')) {
+        URL.revokeObjectURL(target.previewUrl)
+      }
+
+      return prev.filter((image) => image.id !== id)
     })
+
+    setImageError('')
+    setPublishError('')
   }
 
   const handleVideoFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || [])
+
     if (!files.length) return
 
     setVideoError('')
+    setPublishError('')
+
+    if (!hasRequiredPhoto) {
+      setVideoError('Primero debes subir al menos una foto antes de agregar videos.')
+      event.target.value = ''
+      return
+    }
 
     if (videos.length + files.length > 2) {
       setVideoError('Límite alcanzado. Solo puedes subir máximo 2 videos.')
@@ -130,7 +219,7 @@ function ContenidoMultimediaPageContent() {
     }
 
     const allowedTypes = ['video/mp4', 'video/x-matroska', 'video/avi', 'video/x-msvideo']
-
+    const allowedExtensions = ['mp4', 'mkv', 'avi']
     const maxSize = 20 * 1024 * 1024
 
     setIsUploadingVideos(true)
@@ -138,11 +227,11 @@ function ContenidoMultimediaPageContent() {
     const validVideos: VideoItem[] = []
 
     for (const file of files) {
-      const extension = file.name.toLowerCase().split('.').pop()
-      const extensionAllowed = ['mp4', 'mkv', 'avi'].includes(extension || '')
+      const extension = file.name.split('.').pop()?.toLowerCase()
+      const extensionAllowed = allowedExtensions.includes(extension || '')
 
       if (!allowedTypes.includes(file.type) && !extensionAllowed) {
-        setVideoError('Formato no permitido. Solo MP4, MKV o AVI')
+        setVideoError('Formato no permitido. Solo MP4, MKV o AVI.')
         continue
       }
 
@@ -204,6 +293,12 @@ function ContenidoMultimediaPageContent() {
 
   const handleAddVideoLink = () => {
     setVideoError('')
+    setPublishError('')
+
+    if (!hasRequiredPhoto) {
+      setVideoError('Primero debes subir al menos una foto antes de agregar videos.')
+      return
+    }
 
     if (!videoUrl.trim()) {
       setVideoError('Debes ingresar un enlace de video.')
@@ -218,7 +313,7 @@ function ContenidoMultimediaPageContent() {
     const parsed = getYoutubeData(videoUrl)
 
     if (!parsed) {
-      setVideoError('Enlace de video no válido')
+      setVideoError('Enlace de video no válido.')
       return
     }
 
@@ -237,21 +332,74 @@ function ContenidoMultimediaPageContent() {
   const handleRemoveVideo = (id: string) => {
     setVideos((prev) => {
       const target = prev.find((video) => video.id === id)
-      if (target?.previewUrl) URL.revokeObjectURL(target.previewUrl)
+
+      if (target?.previewUrl?.startsWith('blob:')) {
+        URL.revokeObjectURL(target.previewUrl)
+      }
+
       return prev.filter((video) => video.id !== id)
     })
+
+    setVideoError('')
+    setPublishError('')
+  }
+
+  const uploadImages = async (token: string) => {
+    if (!images.length) {
+      throw new Error('Debes subir al menos una foto del inmueble antes de publicar.')
+    }
+
+    const formData = new FormData()
+
+    const imagenesActuales = images
+      .filter((image) => image.isExisting)
+      .map((image) => image.previewUrl)
+
+    const videoUrls = videos
+      .filter((video) => video.type === 'youtube' && video.sourceUrl)
+      .map((video) => video.sourceUrl as string)
+
+    formData.append('imagenesActuales', JSON.stringify(imagenesActuales))
+    formData.append('videoUrls', JSON.stringify(videoUrls))
+
+    images.forEach((image) => {
+      if (image.file) {
+        formData.append('imagenesNuevas', image.file)
+      }
+    })
+
+    const response = await fetch(`${getApiUrl()}/api/publicaciones/${publicacionId}/multimedia`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      body: formData
+    })
+
+    const data = await response.json().catch(() => null)
+
+    if (!response.ok) {
+      throw new Error(data?.message || 'No se pudieron registrar las imágenes.')
+    }
+  }
+
+  const uploadYoutubeLinks = async (_token: string) => {
+    return
   }
 
   const handlePublish = async () => {
     setPublishError('')
+    setImageError('')
+    setVideoError('')
 
     if (!publicacionId || Number.isNaN(publicacionId)) {
       setPublishError('No se recibió el ID de la publicación.')
       return
     }
 
-    if (!hasMultimedia) {
-      setPublishError('Debes agregar al menos una imagen o un video antes de publicar el inmueble.')
+    if (!hasRequiredPhoto) {
+      setPublishError('Debes subir al menos una foto del inmueble antes de publicar.')
+      setImageError('La foto es obligatoria. Sube mínimo una imagen del inmueble.')
       return
     }
 
@@ -260,9 +408,37 @@ function ContenidoMultimediaPageContent() {
       return
     }
 
-    // Aquí luego irá tu llamada real al backend
-    // Si todo sale bien, abrimos el modal de éxito
-    setShowSuccessModal(true)
+    const token = localStorage.getItem('token')
+
+    if (!token) {
+      setPublishError('No se encontró la sesión del usuario.')
+      return
+    }
+
+    const hasLocalVideoFiles = videos.some((video) => video.type === 'file')
+
+    if (hasLocalVideoFiles) {
+      setPublishError(
+        'Por ahora el backend solo permite registrar enlaces de video. Los videos subidos como archivo aún no están soportados.'
+      )
+      return
+    }
+
+    try {
+      setIsPublishing(true)
+
+      await uploadImages(token)
+      await uploadYoutubeLinks(token)
+
+      router.push(`/resumen-final?id=${publicacionId}`)
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Ocurrió un error al registrar el contenido multimedia.'
+
+      setPublishError(message)
+    } finally {
+      setIsPublishing(false)
+    }
   }
 
   return (
@@ -277,12 +453,38 @@ function ContenidoMultimediaPageContent() {
         <h1 style={{ fontSize: '40px', marginBottom: '8px' }}>Contenido Multimedia</h1>
 
         <p style={{ fontSize: '20px', color: '#666', marginBottom: '24px' }}>
-          Agrega hasta 5 fotos y 2 videos para mostrar mejor tu inmueble
+          Agrega mínimo 1 foto obligatoria y hasta 2 videos opcionales para mostrar mejor tu inmueble.
         </p>
 
-        <p style={{ fontSize: '14px', color: '#888', marginBottom: '18px' }}>
-          Publicación actual: #{publicacionId || 'sin id'}
-        </p>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '18px'
+          }}
+        >
+          <p style={{ fontSize: '14px', color: '#888', margin: 0 }}>
+            Publicación actual: #{publicacionId || 'sin id'}
+          </p>
+
+          <button
+            type="button"
+            onClick={() =>
+              router.push(`/propiedades/parametros?publicacionId=${publicacionId || ''}&origen=multimedia`)
+            }
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#f57c00',
+              fontSize: '16px',
+              fontWeight: 700,
+              cursor: 'pointer'
+            }}
+          >
+            + Añadir otros parámetros
+          </button>
+        </div>
 
         <input
           ref={imageInputRef}
@@ -325,16 +527,8 @@ function ContenidoMultimediaPageContent() {
           confirmed={confirmed}
           onConfirmedChange={setConfirmed}
           onPublish={handlePublish}
-          publishError={publishError}
-          canPublish={hasMultimedia}
-        />
-
-        <SuccessModal
-          open={showSuccessModal}
-          onClose={() => {
-            setShowSuccessModal(false)
-            router.push('/')
-          }}
+          publishError={isPublishing ? 'Publicando contenido multimedia...' : publishError}
+          canPublish={hasRequiredPhoto && !isPublishing}
         />
 
         <PlanModal

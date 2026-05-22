@@ -1,21 +1,29 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { PaymentData } from '@/types/payment'
 
-export function useCancelPayment() {
+export function useCancelPayment(payment?: PaymentData | null) {
   const router = useRouter()
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  // Abrir/cerrar modal
   const openModal = () => setIsModalOpen(true)
   const closeModal = () => setIsModalOpen(false)
 
-  // Confirmar cancelación: navega al inicio
-  const confirmCancel = () => {
+  const confirmCancel = async () => {
     setIsModalOpen(false)
-    router.push('/')
+
+    try {
+      if (payment?.id) {
+        await fetch(`/api/transacciones/${payment.id}/cancelar`, { method: 'PATCH' })
+      }
+    } catch {
+      // No bloqueamos la navegación si la llamada falla
+    }
+
+    localStorage.removeItem('currentPayment')
+    router.push(payment?.planId ? `/pago/resumen?planId=${payment.planId}` : '/cobros-suscripciones')
   }
 
-  // Cerrar con tecla Escape
   useEffect(() => {
     if (!isModalOpen) return
     const handleKey = (e: KeyboardEvent) => {
@@ -25,7 +33,6 @@ export function useCancelPayment() {
     return () => window.removeEventListener('keydown', handleKey)
   }, [isModalOpen])
 
-  // Bloquear scroll del body mientras el modal está abierto
   useEffect(() => {
     document.body.style.overflow = isModalOpen ? 'hidden' : ''
     return () => {

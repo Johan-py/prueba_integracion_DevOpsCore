@@ -1,5 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { Blog } from '@/types/blog'
 import { Trash2, Edit3 } from 'lucide-react'
 
@@ -8,6 +9,8 @@ interface UserBlogCardProps {
 }
 
 const UserBlogCard: React.FC<UserBlogCardProps> = ({ blog }) => {
+  const isEditable = blog.estado === 'Borrador' || blog.estado === 'Rechazado'
+
   return (
     <div className="flex items-center gap-4 p-4 bg-white border border-gray-100 rounded-xl shadow-sm">
       {/* 1. Imagen Miniatura (HU7) */}
@@ -17,6 +20,7 @@ const UserBlogCard: React.FC<UserBlogCardProps> = ({ blog }) => {
           alt={blog.titulo}
           fill
           className="object-cover"
+          unoptimized
         />
       </div>
 
@@ -42,10 +46,20 @@ const UserBlogCard: React.FC<UserBlogCardProps> = ({ blog }) => {
           </span>
 
           {/* Botón Editar (HU11) */}
-          <button className="flex items-center gap-1 text-blue-500 hover:text-blue-700 transition-colors">
-            <Edit3 size={14} />
-            <span className="text-xs font-semibold uppercase">Editar</span>
-          </button>
+          {isEditable ? (
+            <Link
+              href={`/blog/${blog.id}/edit`}
+              className="flex items-center gap-1 text-blue-500 hover:text-blue-700 transition-colors"
+            >
+              <Edit3 size={14} />
+              <span className="text-xs font-semibold uppercase">Editar</span>
+            </Link>
+          ) : (
+            <span className="flex items-center gap-1 text-gray-300">
+              <Edit3 size={14} />
+              <span className="text-xs font-semibold uppercase">Editar</span>
+            </span>
+          )}
         </div>
       </div>
     </div>

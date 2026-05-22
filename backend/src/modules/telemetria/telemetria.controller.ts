@@ -35,13 +35,10 @@ export const trackClick = async (req: Request, res: Response) => {
 
 export const getRecomendados = async (req: Request, res: Response) => {
   try {
-    const usuarioId = (req as any).usuario?.id
-    if (!usuarioId) {
-      return res.status(401).json({ success: false, error: 'Usuario no autenticado' })
-    }
-    const ids = await telemetriaService.getRecomendados(usuarioId)
-    res.status(200).json({ success: true, data: ids })
+    const usuarioId = (req as any).usuario?.id;
+    const ids = await telemetriaService.getRecomendados(usuarioId);
+    res.status(200).json({ success: true, data: ids });
   } catch (error) {
-    res.status(500).json({ success: false, error: 'Error al obtener recomendados' })
+    res.status(500).json({ success: false, error: 'Error al obtener recomendados' });
   }
-}
+};

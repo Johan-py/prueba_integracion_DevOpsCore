@@ -1,7 +1,15 @@
-export type BlogStatus = 'Aprobado' | 'Pendiente' | 'Rechazado' | 'Borrador'
+export type BlogStatus =
+  | 'Aprobado'
+  | 'Pendiente'
+  | 'Rechazado'
+  | 'Borrador'
+  | 'PUBLICADO'
+  | 'PENDIENTE'
+  | 'RECHAZADO'
+  | 'BORRADOR'
 
 export interface Blog {
-  id: string
+  id: number | string
   titulo: string
   fecha: string
   estado: BlogStatus

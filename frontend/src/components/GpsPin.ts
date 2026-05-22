@@ -43,3 +43,47 @@ export function createGpsIcon(): L.DivIcon {
     popupAnchor: [0, -74]
   })
 }
+// Marcador para búsqueda específica
+export function createSearchOriginIcon(): L.DivIcon {
+  return L.divIcon({
+    className: '',
+    html: `
+      <div style="display: flex; flex-direction:column; align-items:center;gap:4px;">
+        <div style="
+          background-color:#2563EB; 
+          color: white; 
+          font-size:11px; 
+          font-weight:700; 
+          padding:3px 8px; 
+          border-radius:12px; 
+          white-space:nowrap; 
+          box-shadow:0 2px 6px rgba(0,0,0,0.25);
+          letter-spacing:0.5px;
+        ">Centro de Búsqueda</div>
+        <div style="position:relative;width:40px;height:40px;">
+          <div style="
+            background-color:#2563EB; 
+            width:40px; 
+            height: 40px; 
+            border-radius: 50% 50% 50% 0; 
+            transform:rotate(-45deg); 
+            box-shadow:0 3px 10px rgba(0,0,0,0.3);
+          "></div>
+          <div style="
+            position:absolute; 
+            top:50%; 
+            left:50%; 
+            transform:translate(-50%,-50%); 
+            width:12px; 
+            height:12px; 
+            background:white; 
+            border-radius: 50%;
+          "></div>
+        </div>
+      </div>
+    `,
+    iconSize: [40, 64],
+    iconAnchor: [20, 64],
+    popupAnchor: [0, -66]
+  })
+}

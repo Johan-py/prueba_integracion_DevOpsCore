@@ -14,4 +14,8 @@ export const propertiesService = {
   async search(filtros: FiltrosBusqueda = {}) {
     return propertiesRepository.getAll(filtros);
   },
+  // NUEVO MÉTODO COMPARACION: obtiene propiedades por un array de IDs
+  async getForComparison(ids: number[]) {
+    return propertiesRepository.getByIds(ids);
+  },
 };

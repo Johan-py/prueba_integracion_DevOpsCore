@@ -1,65 +1,52 @@
-export const BLOG_CATEGORIES = [
-  "Tendencias",
-  "Arquitectura",
-  "Inversion",
-  "Estilo de vida",
-] as const;
+export type BlogCategory = string
 
-export type BlogCategory = (typeof BLOG_CATEGORIES)[number];
-
-export type BlogStatus =
-  | "BORRADOR"
-  | "PENDIENTE"
-  | "PUBLICADO"
-  | "RECHAZADO";
+export type BlogStatus = 'BORRADOR' | 'PENDIENTE' | 'PUBLICADO' | 'RECHAZADO'
 
 export interface CategoriaBlogRow {
-  id: number;
-  nombre: BlogCategory;
+  id: number
+  nombre: BlogCategory
 }
 
 export interface BlogAuthorRow {
-  id: number;
-  nombre: string;
-  apellido: string;
+  id: number
+  nombre: string
+  apellido: string
 }
 
 export interface BlogRow {
-  id: number;
-  titulo: string;
-  contenido: string;
-  resumen: string;
-  imagen: string;
-  estado: BlogStatus;
-  eliminado: boolean;
-  fecha_creacion: string;
-  fecha_publicacion: string | null;
-  usuario_id: number;
-  categoria_id: number;
-  categoria: CategoriaBlogRow;
-  usuario: BlogAuthorRow;
-  destacado?: boolean;
+  id: number
+  titulo: string
+  contenido: string
+  resumen: string
+  imagen: string
+  estado: BlogStatus
+  eliminado: boolean
+  fecha_creacion: string
+  fecha_publicacion: string | null
+  usuario_id: number
+  categoria_id: number
+  categoria: CategoriaBlogRow
+  usuario: BlogAuthorRow
+  destacado?: boolean
 }
 
 export interface PublicBlogCard {
-  id: string;
-  title: string;
-  excerpt: string;
-  imageUrl: string;
-  category: BlogCategory;
-  categoryLabel?: string;
-  authorName: string;
-  publishedAt: string;
-  featuredLabel?: string;
-  articleCtaLabel?: string;
-  isFeatured?: boolean;
+  id: string
+  title: string
+  excerpt: string
+  imageUrl: string
+  category: BlogCategory
+  categoryLabel?: string
+  authorName: string
+  publishedAt: string
+  featuredLabel?: string
+  articleCtaLabel?: string
+  isFeatured?: boolean
 }
 
-export const mapBlogRowToPublicBlogCard = (
-  blog: BlogRow,
-): PublicBlogCard | null => {
-  if (blog.estado !== "PUBLICADO" || blog.eliminado || !blog.fecha_publicacion) {
-    return null;
+export const mapBlogRowToPublicBlogCard = (blog: BlogRow): PublicBlogCard | null => {
+  if (blog.estado !== 'PUBLICADO' || blog.eliminado || !blog.fecha_publicacion) {
+    return null
   }
 
   return {
@@ -71,6 +58,6 @@ export const mapBlogRowToPublicBlogCard = (
     categoryLabel: blog.categoria.nombre,
     authorName: `${blog.usuario.nombre} ${blog.usuario.apellido}`,
     publishedAt: blog.fecha_publicacion,
-    isFeatured: blog.destacado ?? false,
-  };
-};
+    isFeatured: blog.destacado ?? false
+  }
+}

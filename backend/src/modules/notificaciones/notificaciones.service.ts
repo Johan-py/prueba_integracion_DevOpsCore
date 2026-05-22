@@ -8,10 +8,16 @@ import {
   markAllNotificationsAsReadRepository,
   markNotificationAsReadRepository,
   softDeleteNotificationRepository,
+  type TipoNotificacion,
 } from "../notificaciones/notificaciones.repository.js";
 import { findUserByCorreo } from "../auth/auth.repository.js";
 import { sendNotificationEmail } from "../email/notification-email.service.js";
 import { emitNotificationEvent } from "./notificaciones.events.js";
+import {
+  enviarMensajeWhatsapp,
+  formatearTelefono,
+} from "../whatsapp/whatsapp.service.js";
+import { prisma } from "../../lib/prisma.client.js";
 
 type NotificationFilter = "todas" | "leida" | "no leida" | "archivada";
 
@@ -21,10 +27,16 @@ type GetNotificationsParams = {
   offset?: number;
 };
 
+type GetNotificationByIdParams = {
+  id: number;
+  usuarioId: number;
+};
+
 type CreateNotificationParams = {
   correo: string;
   titulo: string;
   mensaje: string;
+  tipo?: TipoNotificacion;
 };
 
 const DEFAULT_LIMIT = 20;
@@ -69,22 +81,26 @@ const validateNotificationId = (id: number) => {
 };
 
 const mapNotificationToFrontend = (notification: {
-  id: number
-  titulo: string
-  mensaje: string
-  leida: boolean | null
-  archivada?: boolean | null
-  fechaCreacion?: Date | null
+  id: number;
+  titulo: string;
+  mensaje: string;
+  leida: boolean | null;
+  archivada?: boolean | null;
+  fechaCreacion?: Date | null;
+  tipo?: string | null;
+  blog_id?: number | null;
 }) => {
   return {
     id: notification.id,
     title: notification.titulo,
     description: notification.mensaje,
-    status: notification.leida === true ? 'leida' : 'no leida',
+    status: notification.leida === true ? "leida" : "no leida",
     archivada: notification.archivada === true ? true : false,
-    fechaCreacion: notification.fechaCreacion || null
-  }
-}
+    fechaCreacion: notification.fechaCreacion || null,
+    tipo: notification.tipo ?? "GENERAL",
+    blogId: notification.blog_id ?? null,
+  };
+};
 
 export const getNotificationsService = async (
   usuarioId: number,
@@ -115,6 +131,29 @@ export const getNotificationsService = async (
   };
 };
 
+export const getNotificationByIdService = async ({
+  id,
+  usuarioId,
+}: GetNotificationByIdParams) => {
+  const notification = await findNotificationByIdRepository({
+    id,
+    usuarioId,
+  });
+
+  if (!notification) return null;
+
+  return {
+    id: notification.id,
+    title: notification.titulo,
+    description: notification.mensaje,
+    status: notification.leida ? "leida" : "no leida",
+    archivada: notification.archivada,
+    fechaCreacion: notification.fechaCreacion,
+    tipo: notification.tipo ?? "GENERAL",
+    blogId: notification.blog_id ?? null,
+  };
+};
+
 export const getUnreadCountService = async (usuarioId: number) => {
   const unreadCount = await countUnreadNotificationsRepository(usuarioId);
   return {
@@ -126,6 +165,7 @@ export const createNotificationService = async ({
   correo,
   titulo,
   mensaje,
+  tipo,
 }: CreateNotificationParams) => {
   const normalizedCorreo = correo.trim().toLowerCase();
   const normalizedTitle = titulo.trim();
@@ -153,12 +193,13 @@ export const createNotificationService = async ({
     usuarioId: user.id,
     titulo: normalizedTitle,
     mensaje: normalizedMessage,
+    tipo,
   });
 
   emitNotificationEvent(user.id, "created", notification.id);
 
   try {
-    if (user.correo) {
+    if (user.correo && user.notificacion_email === true) {
       await sendNotificationEmail({
         emailDestino: user.correo,
         asunto: notification.titulo,
@@ -168,6 +209,26 @@ export const createNotificationService = async ({
     }
   } catch (error) {
     console.error("Error enviando correo de notificación:", error);
+  }
+  try {
+    if (user.notificacion_whatsapp === true) {
+      const telefonoPrincipal = await prisma.telefono.findFirst({
+        where: { usuarioId: user.id, principal: true },
+      });
+
+      if (telefonoPrincipal) {
+        const numero = formatearTelefono(
+          telefonoPrincipal.codigoPais,
+          telefonoPrincipal.numero,
+        );
+        await enviarMensajeWhatsapp({
+          telefono: numero,
+          mensaje: `*${notification.titulo}*\n\n${notification.mensaje}\n\n_PropBol - Tu plataforma inmobiliaria en Bolivia_`,
+        });
+      }
+    }
+  } catch (error) {
+    console.error("Error enviando WhatsApp de notificación:", error);
   }
 
   return {
@@ -207,11 +268,11 @@ export const markNotificationAsReadService = async (
       id: notification.id,
       title: notification.titulo,
       description: notification.mensaje,
-      status: 'leida',
-      archivada: notification.archivada === true ? true : false
-    }
-  }
-}
+      status: "leida",
+      archivada: notification.archivada === true ? true : false,
+    },
+  };
+};
 
 export const markAllNotificationsAsReadService = async (usuarioId: number) => {
   const result = await markAllNotificationsAsReadRepository({
@@ -256,6 +317,72 @@ export const deleteNotificationService = async (
   };
 };
 
+type CreateBlogNotificationParams = {
+  usuarioId: number;
+  blog_id: number;
+  blogTitulo: string;
+  tipo: Extract<TipoNotificacion, "BLOG_APROBADO" | "BLOG_RECHAZADO">;
+  razonRechazo?: string;
+};
+
+export const createBlogNotificationService = async ({
+  usuarioId,
+  blog_id,
+  blogTitulo,
+  tipo,
+  razonRechazo,
+}: CreateBlogNotificationParams) => {
+  const titulo =
+    tipo === "BLOG_APROBADO"
+      ? "¡Tu blog fue aprobado!"
+      : "Tu blog fue rechazado";
+
+  const mensaje =
+    tipo === "BLOG_APROBADO"
+      ? `Tu blog "${blogTitulo}" ha sido publicado exitosamente y ya es visible para todos.`
+      : (razonRechazo ?? "Tu blog fue rechazado por el administrador.");
+
+  const notification = await createNotificationRepository({
+    usuarioId,
+    titulo,
+    mensaje,
+    tipo,
+    blog_id,
+  });
+
+  emitNotificationEvent(usuarioId, "created", notification.id);
+
+  return notification;
+};
+
+export const createAdminBlogPendingNotificationService = async ({
+  blog_id,
+  blogTitulo,
+}: {
+  blog_id: number;
+  blogTitulo: string;
+}) => {
+  const admins = await prisma.usuario.findMany({
+    where: { rol: { nombre: "ADMIN" }, activo: true },
+    select: { id: true },
+  });
+
+  if (admins.length === 0) return;
+
+  await Promise.all(
+    admins.map(async (admin) => {
+      const notification = await createNotificationRepository({
+        usuarioId: admin.id,
+        titulo: "Blog pendiente de revisión",
+        mensaje: `El blog "${blogTitulo}" está esperando tu revisión.`,
+        tipo: "BLOG_PENDIENTE",
+        blog_id,
+      });
+      emitNotificationEvent(admin.id, "created", notification.id);
+    }),
+  );
+};
+
 export const archiveNotificationService = async (
   id: number,
   usuarioId: number,
@@ -282,7 +409,7 @@ export const archiveNotificationService = async (
   emitNotificationEvent(usuarioId, "archived", id);
 
   return {
-    message: 'Notificación archivada correctamente',
-    item: mapNotificationToFrontend({ ...notification, archivada: true })
-  }
-}
+    message: "Notificación archivada correctamente",
+    item: mapNotificationToFrontend({ ...notification, archivada: true }),
+  };
+};

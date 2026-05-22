@@ -16,17 +16,31 @@ export interface PropertyMapPin {
   lng: number
   price: number
   currency: 'USD' | 'BOB'
+  precioFormateado?: string
   type: PropertyType
   title: string
   descripcion?: string | null
+  ubicacionTexto?: string | null
+  categoriaTexto?: string | null
+  accionTexto?: string | null
   thumbnailUrl?: string
   nroCuartos?: number | null
   nroBanos?: number | null
   superficieM2?: number | null
+  score?: number
+  razones?: string[]
+   precio?: number           
+  precio_anterior?: number | null  
+  popularidad?: number  
+  publicacionId?: number | null
+  totalVisualizaciones?: number
+  totalCompartidos?: number    
 }
 
 // Respuesta esperada del endpoint real futuro:
 
 export interface PropertiesMapResponse {
   data: PropertyMapPin[]
+  totalVisualizaciones?: number
+  totalCompartidos?: number
 }
