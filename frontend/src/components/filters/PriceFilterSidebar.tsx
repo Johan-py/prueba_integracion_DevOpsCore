@@ -98,7 +98,7 @@ export default function PriceFilterSidebar({ isOpen, onClose, totalResultados = 
   }
 
   return (
-    <div className="flex flex-col h-full min-h-0 bg-white">
+    <div className="flex flex-col w-full bg-white rounded-xl border border-stone-100 shadow-sm overflow-hidden">
       {/* 1. HEADER (Fijo) */}
       <div className="shrink-0 p-4 pb-2 relative flex flex-col items-center justify-center">
         <div className="w-full flex items-center justify-center relative mb-1">
@@ -139,7 +139,7 @@ export default function PriceFilterSidebar({ isOpen, onClose, totalResultados = 
       </div>
 
       {/* 2. CONTENIDO (Con Scroll) */}
-      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6 custom-scrollbar">
+      <div className="w-full px-4 py-4 space-y-6">
         {/* Inputs Desde / Hasta */}
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-3">
@@ -239,7 +239,7 @@ export default function PriceFilterSidebar({ isOpen, onClose, totalResultados = 
       </div>
 
       {/* 3. FOOTER (Fijo al fondo) */}
-      <div className="shrink-0 px-6 pb-6 pt-4 border-t border-stone-100 bg-white dark:border-stone-800 dark:bg-stone-900 relative">
+      <div className="shrink-0 px-4 pb-4 pt-4 border-t border-stone-100 bg-white dark:border-stone-800 dark:bg-stone-900 relative">
         
         <style dangerouslySetInnerHTML={{__html: `
           html body #btn-aplicar-precio {
