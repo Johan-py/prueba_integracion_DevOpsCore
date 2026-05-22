@@ -18,7 +18,6 @@ const CITY_IMAGES: Record<string, string> = {
   default: "https://images.unsplash.com/photo-1560448075-bb485b067938?w=400&q=80",
 };
 
-// Bolivia tiene 9 departamentos — estos siempre se muestran aunque tengan 0
 const DEPARTAMENTOS_BASE = [
   "SANTA CRUZ",
   "LA PAZ",
@@ -36,7 +35,6 @@ function getCityImage(dept: string): string {
   return CITY_IMAGES[key] ?? CITY_IMAGES.default;
 }
 
-// Formato que viene del backend
 interface BackendItem {
   name: string;
   count: number;
@@ -53,7 +51,6 @@ interface FilterData {
   nombre: string;
   total: number;
   previews?: Array<{ imagen: string; titulo: string }>;
-
 }
 
 function normalizeName(name: string): string {
@@ -75,7 +72,6 @@ function mergeDepartamentos(
     };
   });
 
-  // Ordenar de mayor a menor para mostrar primero las ciudades con más inmuebles
   return result.sort((a, b) => b.total - a.total);
 }
 
@@ -96,14 +92,12 @@ export default function VisualFiltersSection() {
 
         const json: BackendResponse = await res.json();
 
-        // El backend puede envolver en { success, data } o directo
         const payload: BackendResponse =
           (json as any).data ?? json;
 
         setAlquileres(mergeDepartamentos(DEPARTAMENTOS_BASE, payload.rentals ?? []));
         setVentas(mergeDepartamentos(DEPARTAMENTOS_BASE, payload.sales ?? []));
 
-        // Tipos: mapear categories del backend
         const tiposBase = ["casa", "departamento", "cuarto", "terreno", "terreno_mortuorio"];
         const tiposMapped = tiposBase.map((base) => {
           const found = (payload.categories ?? []).find((c) =>
@@ -122,7 +116,6 @@ export default function VisualFiltersSection() {
 
       } catch (err) {
         console.warn("VisualFiltersSection: backend no disponible.", err);
-        // Sin datos reales → mostrar departamentos en 0, nunca romper la UI
         setAlquileres(mergeDepartamentos(DEPARTAMENTOS_BASE, []));
         setVentas(mergeDepartamentos(DEPARTAMENTOS_BASE, []));
         setTipos([
@@ -190,9 +183,12 @@ export default function VisualFiltersSection() {
   })).sort((a, b) => b.count - a.count);
 
   return (
-    <section id="tour-filtros-visuales" className="w-full px-4 md:px-8 py-8 flex justify-center">
+    <section className="w-full px-4 md:px-8 py-8 flex justify-center">
       <div className="w-full max-w-[1100px]">
-        <PropertyCarousel title="Alquileres" items={alquilerItems} category="alquiler" />
+        {/* El id aquí apunta solo al carrusel de Alquileres, no a toda la sección */}
+        <div id="tour-filtros-visuales">
+          <PropertyCarousel title="Alquileres" items={alquilerItems} category="alquiler" />
+        </div>
         <PropertyCarousel title="En Venta" items={ventaItems} category="venta" />
         <PropertyTypeGrid items={tipoItems} />
       </div>

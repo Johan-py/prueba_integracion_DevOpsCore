@@ -1,4 +1,19 @@
-export const TOUR_STEPS = [
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+export interface TourStep {
+  id: string;
+  mobileId?: string;
+  requiresMobileMenu?: boolean;
+  title: string;
+  description: string;
+  required: boolean;
+}
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+export const FOOTER_STEP_INDEX = 11;
+
+export const TOUR_STEPS: TourStep[] = [
   {
     id: "tour-banner",
     title: "¡Bienvenido a PropBol!",
@@ -44,6 +59,21 @@ export const TOUR_STEPS = [
     required: true,
   },
   {
+    id: "tour-buscador",
+    mobileId: "tour-buscador-mobile",
+    title: "Buscador de propiedades",
+    description:
+      "Filtra por tipo de operación (Venta, Alquiler o Anticrético), elige el tipo de inmueble y escribe una ubicación para encontrar la propiedad ideal.",
+    required: true,
+  },
+  {
+    id: "tour-filtros-visuales",
+    title: "Explora por ciudad y tipo",
+    description:
+      "Aquí puedes ver propiedades en alquiler o venta agrupadas por departamento, y también explorar por tipo de inmueble: casas, departamentos, oficinas y terrenos.",
+    required: true,
+  },
+  {
     id: "tour-publicar-home",
     mobileId: "tour-publicar-home-mobile",
     requiresMobileMenu: true,
@@ -64,22 +94,6 @@ export const TOUR_STEPS = [
     description: "Accede a tu perfil, publicaciones y configuración.",
     required: true,
   },
-  {
-    id: "tour-buscador",
-    mobileId: "tour-buscador-mobile",
-    title: "Buscador de propiedades",
-    description:
-      "Filtra por tipo de operación (Venta, Alquiler o Anticrético), elige el tipo de inmueble y escribe una ubicación para encontrar la propiedad ideal.",
-    required: true,
-  },
-  {
-    id: "tour-filtros-visuales",
-    title: "Explora por ciudad y tipo",
-    description:
-      "Aquí puedes ver propiedades en alquiler o venta agrupadas por departamento, y también explorar por tipo de inmueble: casas, departamentos, oficinas y terrenos.",
-    required: true,
-  },
-  
   {
     id: "tour-footer-logo",
     title: "PropBol",
@@ -104,7 +118,4 @@ export const TOUR_STEPS = [
     description: "Síguenos en Facebook e Instagram para estar al tanto de las novedades.",
     required: true,
   },
-] as const
-
-export const FOOTER_STEP_INDEX = 11
-export const MENU_CLOSE_TIMEOUT_MS = 600
+];
