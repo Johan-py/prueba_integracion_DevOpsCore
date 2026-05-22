@@ -1,11 +1,22 @@
 import { Router } from 'express'
 import type { NextFunction, Request, Response } from 'express'
 import multer from 'multer'
+import rateLimit from 'express-rate-limit'
 import { validarJWT } from '../../middleware/validarJWT.js'
 import { validarAdmin } from '../../middleware/validarAdmin.js'
 import { listarPlanes, crearPlan, actualizarPlan, eliminarPlan, subirQrPlan } from './adminPlanes.controller.js'
 
 const router = Router()
+
+// Rate limiting para las rutas admin de planes: protege endpoints autenticados
+// y de subida de archivos contra abuso (100 req / 15 min por IP).
+const adminPlanesLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+})
+router.use(adminPlanesLimiter)
 
 const upload = multer({
   storage: multer.memoryStorage(),
