@@ -11,6 +11,7 @@ import PublicarModal from "../publicacion/PublicarModal";
 import { EstadoPublicacion } from "../../types/publicacion";
 
 interface Props {
+  onPausar?: (p: boolean) => void;
   publicacionId: number | null;
 }
 
