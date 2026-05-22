@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "workspaces": [
-    "backend",
-    "frontend"
+    "frontend",
+    "backend"
   ],
   "scripts": {
     "install:all": "pnpm install",
