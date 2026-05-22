@@ -116,7 +116,7 @@ export default function MobileMapHeader({ onOpenMenu }: MobileMapHeaderProps) {
         <div className="flex flex-wrap gap-2.5 justify-center">
           {[
             { id: 'VENTA', label: 'Comprar' },
-            { id: 'ALQUILER', label: 'Alquilar' },
+            { id: 'ALQUILER', label: 'Alquiler' },
             { id: 'ANTICRETO', label: 'Anticrético' }
           ].map(mode => {
             const isSelected = modosSeleccionados.includes(mode.id);

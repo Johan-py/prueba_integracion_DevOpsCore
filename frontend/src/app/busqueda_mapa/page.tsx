@@ -280,7 +280,7 @@ function BusquedaMapaContent() {
   // === 1. ESTADOS COMPARTIDOS ===
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
-  const [sheetState, setSheetState] = useState<SheetState>('peek')
+  const [sheetState, setSheetState] = useState<SheetState>('hidden')
   const [pinnedProperty, setPinnedProperty] = useState<any | null>(null)
   const [isMounted, setIsMounted] = useState(false)
   const [isPriceFilterOpen, setIsPriceFilterOpen] = useState(false)
