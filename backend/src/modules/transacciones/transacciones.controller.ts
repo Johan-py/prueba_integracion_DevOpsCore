@@ -214,8 +214,9 @@ export const confirmarPago = async (req: Request, res: Response) => {
       },
     })
 
-    const comprobanteEnviado = await emitirComprobante(transaccionId)
-
+    // La notificación al usuario (HU-15) es independiente del comprobante:
+    // el pago ya quedó confirmado, así que debe enviarse aunque la emisión
+    // del comprobante falle. Por eso va antes y con su propio try/catch.
     try {
       const fechaAprobacion = ahora.toLocaleDateString('es-BO', { day: '2-digit', month: 'short', year: 'numeric' })
       const fechaVencimiento = new Date(ahora.getTime() + diasSuscripcion * 24 * 60 * 60 * 1000)
@@ -226,7 +227,16 @@ export const confirmarPago = async (req: Request, res: Response) => {
         mensaje: `Plan ${transaccion.plan_suscripcion?.nombre_plan ?? '—'} activado. Tu pago (REF-${transaccionId}) fue aprobado el ${fechaAprobacion}. Tu suscripción ya está activa y vence el ${fechaVencimiento}.`,
         tipo: 'PAGO_APROBADO',
       })
-    } catch { /* no bloquea el flujo */ }
+    } catch (error) {
+      console.error(`Error al notificar pago aprobado (transacción ${transaccionId}):`, error)
+    }
+
+    let comprobanteEnviado = false
+    try {
+      comprobanteEnviado = await emitirComprobante(transaccionId)
+    } catch (error) {
+      console.error(`Error al emitir comprobante (transacción ${transaccionId}):`, error)
+    }
 
     return res.status(200).json({
       mensaje: comprobanteEnviado
