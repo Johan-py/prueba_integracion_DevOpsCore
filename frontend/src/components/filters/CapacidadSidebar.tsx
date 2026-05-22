@@ -120,7 +120,7 @@ export function CapacidadSidebar({ isOpen, onClose, onApply }: CapacidadSidebarP
   }
 
   return (
-    <div className="flex flex-col h-full min-h-0 bg-white">
+    <div className="flex flex-col w-full bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
       {/* 1. HEADER (Fijo) */}
       <div className="shrink-0">
         <div className="p-4 relative flex items-center justify-center">
@@ -142,8 +142,8 @@ export function CapacidadSidebar({ isOpen, onClose, onApply }: CapacidadSidebarP
         </div>
       </div>
 
-      {/* 2. CONTENIDO (Con Scroll: flex-1 + overflow-y-auto) */}
-      <div className="flex-1 overflow-y-auto px-6 pt-5 space-y-6 custom-scrollbar pb-6">
+      {/* 2. CONTENIDO */}
+      <div className="w-full px-4 py-4 space-y-6">
         {/* DORMITORIOS */}
         <div>
           <div className="flex justify-between items-center mb-6">
@@ -297,8 +297,8 @@ export function CapacidadSidebar({ isOpen, onClose, onApply }: CapacidadSidebarP
         </div>
       </div>
 
-      {/* 3. FOOTER (Fijo al fondo) */}
-      <div className="shrink-0 px-6 pb-6 pt-4 border-t border-stone-100 bg-white dark:border-slate-800 dark:bg-slate-900 relative">
+      {/* 3. FOOTER */}
+      <div className="shrink-0 px-4 pb-4 pt-4 border-t border-stone-100 bg-white dark:border-slate-800 dark:bg-slate-900 relative">
         
         <style dangerouslySetInnerHTML={{__html: `
           html body #btn-aplicar-capacidad {
