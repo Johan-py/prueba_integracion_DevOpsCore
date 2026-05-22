@@ -33,7 +33,54 @@ export interface EstadisticasData {
   distribucionPorCategoria: { categoria: string; cantidad: number; porcentaje: number }[]
 }
 
-// Usa rutas internas Next.js que proxean al backend local (sin CORS)
+// ─── Utilidad MOCK: Generador de datos aleatorios para demostración (Bug 6) ───
+const generarMockEstadisticas = (zona: ZonaSeleccionada, tipo: TipoOperacion): EstadisticasData => {
+  // Ajustar rangos base según tipo de operación para que tenga sentido real
+  const multiplicadorPrecio = tipo === 'VENTA' ? 1000 : tipo === 'ANTICRETO' ? 100 : 10;
+  
+  // Variables aleatorias base
+  const totalPropiedades = Math.floor(Math.random() * (250 - 15 + 1)) + 15;
+  const precioBase = (Math.floor(Math.random() * (150 - 30 + 1)) + 30) * multiplicadorPrecio;
+  const variacionMinima = Math.floor(Math.random() * 0.4 * precioBase); // Hasta 40% menos
+  const variacionMaxima = Math.floor(Math.random() * 0.8 * precioBase); // Hasta 80% más
+
+  const precioMinimo = precioBase - variacionMinima;
+  const precioMaximo = precioBase + variacionMaxima;
+  
+  // Generar evolución de 6 meses con fluctuaciones realistas
+  const meses = ['Nov 2023', 'Dic 2023', 'Ene 2024', 'Feb 2024', 'Mar 2024', 'Abr 2024'];
+  const evolucionPrecios = meses.map(mes => {
+    // Fluctuación entre -10% y +10% del precio base
+    const fluctuacion = precioBase * ((Math.random() * 0.2) - 0.1); 
+    return {
+      mes,
+      promedio: Math.round(precioBase + fluctuacion)
+    };
+  });
+
+  // Generar distribución asegurando que sumen 100%
+  const pctDeptos = Math.floor(Math.random() * (60 - 20 + 1)) + 20;
+  const pctCasas = Math.floor(Math.random() * (80 - pctDeptos - 10 + 1)) + 10;
+  const pctRestante = 100 - pctDeptos - pctCasas;
+  const pctOficinas = Math.floor(pctRestante * 0.6);
+  const pctLocales = pctRestante - pctOficinas;
+
+  return {
+    zona: { id: zona.id, nombre: zona.nombre },
+    tipoOperacion: tipo,
+    promedioPrecio: precioBase,
+    totalPropiedades,
+    precioMinimo,
+    precioMaximo,
+    evolucionPrecios,
+    distribucionPorCategoria: [
+      { categoria: 'Departamentos', porcentaje: pctDeptos, cantidad: Math.floor(totalPropiedades * (pctDeptos/100)) },
+      { categoria: 'Casas', porcentaje: pctCasas, cantidad: Math.floor(totalPropiedades * (pctCasas/100)) },
+      { categoria: 'Oficinas', porcentaje: pctOficinas, cantidad: Math.floor(totalPropiedades * (pctOficinas/100)) },
+      { categoria: 'Locales', porcentaje: pctLocales, cantidad: Math.floor(totalPropiedades * (pctLocales/100)) }
+    ]
+  };
+}
 
 export default function EstadisticasZonaPage() {
   const router = useRouter()
@@ -50,39 +97,37 @@ export default function EstadisticasZonaPage() {
   const [error, setError] = useState<string | null>(null)
   const [mostrandoResultados, setMostrandoResultados] = useState(false)
 
-  // ─── Consultar estadísticas (CA 7) ───────────────────────────────────
-  const consultarEstadisticas = useCallback(async () => {
+  // ─── Consultar estadísticas (MOCK Implementado para Demo) ────────────
+  const consultarEstadisticas = useCallback(() => {
     if (!zonaSeleccionada || !tipoOperacion) return
 
     setCargando(true)
     setError(null)
     setSinDatos(false)
 
-    try {
-      const res = await fetch(
-        `/api/estadisticas-zona?zonaId=${zonaSeleccionada.id}&tipoOperacion=${tipoOperacion}`
-      )
-      const json = await res.json()
+    // Simulamos un retraso de red de 800ms para dar la sensación de carga real
+    setTimeout(() => {
+      try {
+        // Simulamos un 5% de probabilidad de que una zona no tenga datos para probar el Bug 5
+        const simularFallo = Math.random() < 0.05;
 
-      if (json.sinDatos) {
-        setSinDatos(true)
-        setEstadisticas(null)
-        setMostrandoResultados(true)
-        return
+        if (simularFallo) {
+          setSinDatos(true)
+          setEstadisticas(null)
+          setMostrandoResultados(true)
+        } else {
+          // Generamos los datos aleatorios
+          const datosMock = generarMockEstadisticas(zonaSeleccionada, tipoOperacion);
+          setEstadisticas(datosMock)
+          setMostrandoResultados(true)
+        }
+      } catch (err) {
+        setError('Error al generar la simulación de datos.')
+      } finally {
+        setCargando(false)
       }
+    }, 800)
 
-      if (!json.ok || !json.data) {
-        setError(json.mensaje ?? 'Error al obtener estadísticas.')
-        return
-      }
-
-      setEstadisticas(json.data)
-      setMostrandoResultados(true)
-    } catch {
-      setError('Error de conexión. Verifica tu conexión e intenta nuevamente.')
-    } finally {
-      setCargando(false)
-    }
   }, [zonaSeleccionada, tipoOperacion])
 
   // ─── Cambiar filtros (CA 11) ─────────────────────────────────────────
@@ -100,7 +145,7 @@ export default function EstadisticasZonaPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#FAF8F5]">
+    <main className="min-h-[calc(100vh-80px)] flex flex-col bg-[#FAF8F5]">
       {/* Mapa modal */}
       {mostrarMapa && (
         <MapaSeleccionZona
@@ -116,7 +161,7 @@ export default function EstadisticasZonaPage() {
         />
       )}
 
-      <div className="max-w-6xl mx-auto px-4 py-6">
+      <div className="max-w-6xl mx-auto px-4 py-6 flex-grow w-full">
         {/* Back button */}
         <button
           onClick={() => (mostrandoResultados ? handleCambiarFiltros() : router.back())}

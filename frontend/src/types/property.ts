@@ -31,11 +31,16 @@ export interface PropertyMapPin {
   razones?: string[]
    precio?: number           
   precio_anterior?: number | null  
-  popularidad?: number      
+  popularidad?: number  
+  publicacionId?: number | null
+  totalVisualizaciones?: number
+  totalCompartidos?: number    
 }
 
 // Respuesta esperada del endpoint real futuro:
 
 export interface PropertiesMapResponse {
   data: PropertyMapPin[]
+  totalVisualizaciones?: number
+  totalCompartidos?: number
 }

@@ -235,7 +235,7 @@ export function MenuOrdenamiento({
           <span className="text-sm font-semibold text-gray-600 dark:text-stone-300">Ordenar por:</span>
         </div>
 
-        <div className="flex flex-row flex-wrap gap-3 items-end">
+        <div className={`flex flex-row gap-2 items-end ${isCompact ? 'flex-nowrap' : 'flex-wrap'}`}>
           {/* Dropdown Fecha */}
           <div
             className={`flex flex-col transition-all duration-200 ${fechaApagada ? 'opacity-40 pointer-events-none' : ''} ${isCompact ? 'gap-0' : 'gap-1.5'}`}
