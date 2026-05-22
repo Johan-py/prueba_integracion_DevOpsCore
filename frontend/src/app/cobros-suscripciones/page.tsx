@@ -11,11 +11,13 @@ type Plan = {
   name: string
   price: number
   description: string
-  comment: string
+  comment?: string
   benefits: string[]
-  subscribers: number
+  popular?: boolean
 }
 
+// Fallback estático: solo se usa para visitantes no autenticados o si la API falla.
+// El catálogo real se obtiene de la BD vía /api/planes/membership-plans.
 const plansData: Plan[] = [
   {
     id: 1,
@@ -24,7 +26,6 @@ const plansData: Plan[] = [
     description: 'Ideal para comenzar',
     comment: 'Perfecto para empezar y explorar nuestras funciones esenciales sin complicaciones.',
     benefits: ['2 publicaciones activas', 'Acceso limitado', 'Soporte basico', '1 usuario'],
-    subscribers: 25
   },
   {
     id: 2,
@@ -34,7 +35,7 @@ const plansData: Plan[] = [
     comment:
       'La opcion mas elegida para empresas pequeñas: balance perfecto entre funciones y precio.',
     benefits: ['10 publicaciones activas', 'Acceso completo', 'Soporte prioritario', '5 usuarios'],
-    subscribers: 60
+    popular: true,
   },
   {
     id: 3,
@@ -44,12 +45,11 @@ const plansData: Plan[] = [
     comment:
       'Todo incluido, ideal para usuarios avanzados o empresas que buscan maximo rendimiento.',
     benefits: ['Publicaciones ilimitadas', 'Todo incluido', 'Soporte 24/7', 'Usuarios ilimitados'],
-    subscribers: 10
-  }
+  },
 ]
 
 export default function CobrosSuscripciones() {
-  const [plans] = useState(plansData)
+  const [plans, setPlans] = useState<Plan[]>(plansData)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [currentPlanId, setCurrentPlanId] = useState<number>(1)
   const router = useRouter()
@@ -59,6 +59,18 @@ export default function CobrosSuscripciones() {
 
     if (token && token !== 'undefined' && token !== 'null') {
       setIsLoggedIn(true)
+
+      // Catálogo real desde la BD (refleja crear/editar/eliminar del admin).
+      fetch(`${API_URL}/api/planes/membership-plans`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (Array.isArray(data) && data.length > 0) {
+            setPlans(data as Plan[])
+          }
+        })
+        .catch(() => {})
 
       fetch(`${API_URL}/api/suscripciones/mi-suscripcion`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -73,8 +85,7 @@ export default function CobrosSuscripciones() {
     }
   }, [])
 
-  const maxSubscribers = Math.max(...plans.map((p) => p.subscribers))
-  const mostPopularId = plans.find((p) => p.subscribers === maxSubscribers)?.id
+  const mostPopularId = plans.find((p) => p.popular)?.id
 
   const handleSubscription = (plan: Plan) => {
     const token = localStorage.getItem('token')
@@ -149,7 +160,9 @@ export default function CobrosSuscripciones() {
                 ))}
               </ul>
 
-              <p className="text-sm text-stone-500 dark:text-[#999] mb-4">{plan.comment}</p>
+              {plan.comment && (
+                <p className="text-sm text-stone-500 dark:text-[#999] mb-4">{plan.comment}</p>
+              )}
 
               <button
                 onClick={() => handleSubscription(plan)}

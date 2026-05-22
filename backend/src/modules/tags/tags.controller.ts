@@ -19,8 +19,8 @@ export const getTagsController = async (_req: Request, res: Response) => {
 export const getTagsWithCountsController = async (req: Request, res: Response) => {
   try {
     const data = await tagsService.getTagsWithCounts({
-      tipoInmueble: req.query.tipoInmueble as string | undefined,
-      modoInmueble: req.query.modoInmueble as string | undefined,
+      tipoInmueble: req.query.tipoInmueble as string | string[] | undefined,
+      modoInmueble: req.query.modoInmueble as string | string[] | undefined,
       minPrice: req.query.minPrice ? Number(req.query.minPrice) : null,
       maxPrice: req.query.maxPrice ? Number(req.query.maxPrice) : null,
       currency: req.query.currency as string | undefined,
