@@ -950,15 +950,12 @@ function BusquedaMapaContent() {
       className="relative flex-1 overflow-y-auto p-4 bg-stone-50 dark:bg-stone-950 no-scrollbar custom-scrollbar"
     >
       {isLoading && displayedProperties.length === 0 ? (
-        <div className="flex flex-col justify-center items-center h-full text-stone-400 text-sm gap-2">
+        <div className="flex flex-col justify-center items-center h-full text-stone-400 text-sm gap-2 animate-pulse min-h-[300px]">
           <div className="w-8 h-8 border-2 border-amber-600 border-t-transparent rounded-full animate-spin" />
           Actualizando...
         </div>
       ) : displayedProperties.length === 0 ? (
-        <EmptyState
-          titulo={isOfertaOpen ? 'No hay ofertas disponibles' : tieneFiltrSuperficie ? 'Sin resultados por superficie' : 'No hay propiedades existentes'}
-          mensaje={isOfertaOpen ? 'No se encontraron propiedades con descuento. Prueba desactivando el filtro "ofertas"' : tieneFiltrSuperficie ? 'No se encontraron propiedades dentro del rango de superficie seleccionado.' : 'No se encontraron propiedades con los filtros seleccionados. Intenta con otra zona o categoría.'}
-        />
+        <EmptyState titulo={isOfertaOpen ? 'No hay ofertas disponibles' : 'No hay propiedades existentes'} mensaje="..." />
       ) : (
         <div className={`gap-3 flex flex-col ${viewMode === 'list' ? 'divide-y divide-gray-100 dark:divide-stone-800 bg-white dark:bg-stone-900 border border-gray-100 dark:border-stone-800 rounded-xl shadow-sm' : ''}`}>
           {(isClusterView ? clusterProperties : paginatedProperties).map((property: any) => {
@@ -1145,7 +1142,16 @@ function BusquedaMapaContent() {
                 {MenuToggleComponent}
               </div>
               <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
-                {renderPropertyListMobile((p) => setPinnedProperty(p))}
+                {renderPropertyListMobile(
+                  (p) => { setPinnedProperty(p); setSheetState('peek') },
+                  (e) => {
+                    const scrollTop = (e.currentTarget as HTMLDivElement).scrollTop
+                    // Compactar si baja más de 45px
+                    if (!isScrolled && scrollTop > 45) setIsScrolled(true)
+                    // Expandir si sube casi al tope
+                    if (isScrolled && scrollTop <= 10) setIsScrolled(false)
+                  }
+                )}
                 {renderListPaginationFooter()}
               </div>
             </div>
@@ -1428,10 +1434,7 @@ function BusquedaMapaContent() {
           {sheetState !== 'hidden' && (
             <div
               className="absolute left-0 right-0 bottom-0 z-[30] bg-white dark:bg-stone-900 rounded-t-2xl shadow-[0_-4px_24px_rgba(0,0,0,0.12)] flex flex-col"
-              style={{
-                height: SHEET_H[sheetState],
-                transition: 'height 0.3s cubic-bezier(0.32,0.72,0,1)'
-              }}
+              style={{ height: SHEET_H[sheetState], transition: 'height 0.3s cubic-bezier(0.32,0.72,0,1)' }}
             >
               {/* Barra de control persistente superior */}
               <div 

@@ -11,6 +11,7 @@ import {
   Award,
   SlidersHorizontal,
   ChevronDown,
+  ChevronUp,
   Building,
   Bed,
   Trees,
@@ -126,6 +127,9 @@ export default function FilterBar({ onSearch, variant = 'home', onOpenPriceFilte
   const [ubicacionTexto, setUbicacionTexto] = useState('')
   const [isZonaOpen, setIsZonaOpen] = useState(false)
   const { isCompareMode, toggleCompareMode, selectedIds } = useCompareStore()
+  
+  // Estado para colapsar/expandir el filter bar
+  const [isCollapsed, setIsCollapsed] = useState(false)
 
   //Estado para almacenar las coordenadas temporalmente
   const [coords, setCoords] = useState<{ lat?: number, lng?: number }>({})
@@ -156,7 +160,7 @@ export default function FilterBar({ onSearch, variant = 'home', onOpenPriceFilte
     { label: 'Espacios Cementerio', icon: Flower2 }
   ], [])
 
-  // NUEVO: Sincronización reactiva desde la URL (Query Params)
+  // Sincronización reactiva desde la URL
   useEffect(() => {
     if (!searchParams) return
 
@@ -174,7 +178,7 @@ export default function FilterBar({ onSearch, variant = 'home', onOpenPriceFilte
     if (urlModos.length > 0) {
       setModosSeleccionados(urlModos)
     } else {
-      setModosSeleccionados(['VENTA']) // Default
+      setModosSeleccionados(['VENTA'])
     }
 
     // Restaurar Ubicación/Texto Libre
@@ -186,11 +190,7 @@ export default function FilterBar({ onSearch, variant = 'home', onOpenPriceFilte
     }
   }, [searchParams, propertyTypes])
 
-
-
-  // =======================================================================
-  // 1. GENERADOR DINÁMICO DE FILTROS ACTIVOS (Fila inferior removible)
-  // =======================================================================
+  // GENERADOR DINÁMICO DE FILTROS ACTIVOS
   const activeFilters = useMemo(() => {
     const filters: { id: string; label: string; onRemove: () => void }[] = []
     if (!searchParams) return filters
@@ -312,6 +312,7 @@ export default function FilterBar({ onSearch, variant = 'home', onOpenPriceFilte
         router.push(`/busqueda_mapa${params.toString() ? `?${params.toString()}` : ''}`)
       }
     }))
+    
     const orden = params.get('orden')
     if (orden === 'recomendados') {
       filters.push({
@@ -320,7 +321,7 @@ export default function FilterBar({ onSearch, variant = 'home', onOpenPriceFilte
         onRemove: () => {
           sessionStorage.removeItem('propbol_modo_recomendados')
           sessionStorage.removeItem('propbol_recomendados')
-          removeParam(['orden']) // Esto lo quita de la URL y recarga
+          removeParam(['orden'])
         }
       })
     }
@@ -341,20 +342,13 @@ export default function FilterBar({ onSearch, variant = 'home', onOpenPriceFilte
     const minBanos = urlParams.get('banosMin')
     const maxBanos = urlParams.get('banosMax')
     const tipoBanoVal = urlParams.get('tipoBano')
-    const banoCompartido =
-      tipoBanoVal === 'compartido' ? true : tipoBanoVal === 'privado' ? false : undefined
+    const banoCompartido = tipoBanoVal === 'compartido' ? true : tipoBanoVal === 'privado' ? false : undefined
+    
     const tipoMap: Record<string, string> = {
-      Casas: 'CASA',
-      Departamentos: 'DEPARTAMENTO',
-      Terrenos: 'TERRENO',
-      Cuartos: 'CUARTO',
-      "Espacios Cementerio": 'TERRENO_MORTUORIO'
+      Casas: 'CASA', Departamentos: 'DEPARTAMENTO', Terrenos: 'TERRENO', Cuartos: 'CUARTO', "Espacios Cementerio": 'TERRENO_MORTUORIO'
     }
 
-    const tipoFinal =
-      tipoMap[tipoInmueble] ||
-      (tipoInmueble !== 'Cualquier tipo' ? tipoInmueble.toUpperCase() : null)
-
+    const tipoFinal = tipoMap[tipoInmueble] || (tipoInmueble !== 'Cualquier tipo' ? tipoInmueble.toUpperCase() : null)
     const modosFinales = modosSeleccionados;
 
     const nuevosFiltros = {
@@ -372,6 +366,7 @@ export default function FilterBar({ onSearch, variant = 'home', onOpenPriceFilte
       banosMax: maxBanos || undefined,
       banoCompartido
     }
+    
     await trackSearchTelemetria({
       tipoInmueble: nuevosFiltros.tipoInmueble,
       modoInmueble: nuevosFiltros.modoInmueble,
@@ -387,31 +382,20 @@ export default function FilterBar({ onSearch, variant = 'home', onOpenPriceFilte
       banosMax: maxBanos,
       banoCompartido: banoCompartido === true ? true : banoCompartido === false ? false : null
     })
+    
     updateFilters(nuevosFiltros)
 
     const params = new URLSearchParams(searchParams?.toString() || '')
-    // Limpiamos solo los filtros que maneja esta barra superior para evitar duplicados
-    params.delete('modoInmueble')
-    params.delete('tipoInmueble')
-    params.delete('query')
-    params.delete('lat')
-    params.delete('lng')
-    params.delete('radius')
-    params.delete('orden')
+    params.delete('modoInmueble'); params.delete('tipoInmueble'); params.delete('query')
+    params.delete('lat'); params.delete('lng'); params.delete('radius'); params.delete('orden')
 
     modosSeleccionados.forEach((modo) => params.append('modoInmueble', modo))
     if (tipoFinal) params.set('tipoInmueble', tipoFinal)
     if (ubicacionTexto.trim() !== '') params.set('query', ubicacionTexto.trim())
     if (coords.lat && coords.lng) {
-      params.set('lat', coords.lat.toString())
-      params.set('lng', coords.lng.toString())
-      params.set('radius', '1') // Radio de 1km por defecto
-      params.delete('departamentoId')
-      params.delete('provinciaId')
-      params.delete('municipioId')
-      params.delete('zonaId')
-      params.delete('barrioId')
-      params.delete('locationId')
+      params.set('lat', coords.lat.toString()); params.set('lng', coords.lng.toString())
+      params.set('radius', '1')
+      params.delete('departamentoId'); params.delete('provinciaId'); params.delete('municipioId'); params.delete('zonaId'); params.delete('barrioId'); params.delete('locationId')
     }
 
     const queryString = params.toString()
@@ -425,15 +409,8 @@ export default function FilterBar({ onSearch, variant = 'home', onOpenPriceFilte
 
   useEffect(() => {
     if (variant !== 'map') return;
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-
-    const timeoutId = setTimeout(() => {
-      handleSearch();
-    }, 100);
-
+    if (isFirstRender.current) { isFirstRender.current = false; return; }
+    const timeoutId = setTimeout(() => { handleSearch(); }, 100);
     return () => clearTimeout(timeoutId);
   }, [modosSeleccionados, tipoInmueble]);
 
@@ -441,275 +418,251 @@ export default function FilterBar({ onSearch, variant = 'home', onOpenPriceFilte
   const handleLocationChange = (val: LocationValue) => {
     if (typeof val === 'object' && val !== null) {
       setUbicacionTexto(val.nombre)
-      if (val.locationId) {
-        // Si tenemos locationId, VACIAMOS las coordenadas para que el backend busque en toda la zona
-        setCoords({})
-      } else {
-        setCoords({ lat: val.lat, lng: val.lng })
-      }
+      if (val.locationId) setCoords({})
+      else setCoords({ lat: val.lat, lng: val.lng })
     } else {
       setUbicacionTexto(val as string)
-      setCoords({}) // Si es solo texto del historial, borramos las coordenadas
+      setCoords({})
     }
   }
   const isRecomendadosActive = searchParams?.get('orden') === 'recomendados'
 
-
-  // FIX Z-INDEX MASIVO: Agregamos z-[99999] y !overflow-visible para aplastar al mapa
+  // ESTILOS DINÁMICOS: Usamos "relative" para mantener el flujo pero garantizando que
+  // el contenedor entero se pliegue (h-0) sin ocultar el botón que sobresale (-bottom)
   const containerStyles =
     variant === 'map'
-      ? 'bg-[#faf9f6] dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 py-2 px-4 w-full flex flex-col gap-2 shadow-sm sticky top-0 z-[9999] !overflow-visible transition-colors dark:shadow-stone-900/20'
-      : 'bg-white dark:bg-stone-900 shadow-lg rounded-[30px] p-6 flex flex-col gap-6 w-full max-w-[921px] relative z-[999999] !overflow-visible transition-colors'
+      ? `relative w-full flex flex-col z-[9999] transition-all duration-300 ease-in-out bg-white dark:bg-stone-900 ${
+          isCollapsed ? 'h-[10px] border-b-0 gap-0 overflow-visible' : 'py-3 gap-3 border-b border-stone-200 dark:border-stone-800 shadow-sm'
+        }`
+      : '...'
   return (
     <form className={containerStyles} onSubmit={handleSearch}>
 
       {/* ========================================================= */}
-      {/* LAYOUT PARA MAPA (Nuevo Diseño) */}
+      {/* BOTÓN COLAPSABLE TIPO "PULL-TAB" (Solo en Mapa) */}
       {/* ========================================================= */}
       {variant === 'map' && (
-        <div className="flex flex-col gap-3 w-full max-w-screen-2xl mx-auto">
+        <button
+          type="button"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="absolute left-1/2 -translate-x-1/2 -bottom-[28px] h-[28px] px-8 bg-white dark:bg-stone-900 border-x border-b border-stone-200 dark:border-stone-800 rounded-b-2xl shadow-md flex items-center justify-center hover:bg-stone-50 transition-all z-[10000]"
+        >
+          {isCollapsed ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
+        </button>
+      )}
 
-          {/* FILA 1: Tipo | Modos (Venta/Alquiler) | Ubicación | Buscar */}
-          <div className="flex flex-wrap md:flex-nowrap items-center w-full gap-3 relative z-[100] !overflow-visible">
+      {/* ========================================================= */}
+      {/* CONTENEDOR INTERNO DE FILTROS (Se oculta al colapsar) */}
+      {/* ========================================================= */}
+      <div className={`w-full flex-col gap-3 transition-all duration-300 ${isCollapsed ? 'hidden' : 'flex animate-in fade-in slide-in-from-top-2'}`}>
+        
+        {variant === 'map' && (
+          <div className="flex flex-col gap-3 w-full max-w-screen-2xl mx-auto">
+            {/* FILA 1: Tipo | Modos (Venta/Alquiler) | Ubicación | Buscar */}
+            <div className="flex flex-wrap md:flex-nowrap items-center w-full gap-3 relative z-[100] !overflow-visible">
+              <div className="w-full md:w-48 xl:w-56 shrink-0 relative z-[100] !overflow-visible">
+                <ComboBox label="" placeholder="Cualquier tipo" icon={Home} options={propertyTypes} onChange={(val) => setTipoInmueble(val)} value={tipoInmueble} />
+              </div>
 
-            <div className="w-full md:w-48 xl:w-56 shrink-0 relative z-[100] !overflow-visible">
-              <ComboBox label="" placeholder="Cualquier tipo" icon={Home} options={propertyTypes} onChange={(val) => setTipoInmueble(val)} value={tipoInmueble} />
+              <div className="shrink-0 flex items-center h-[42px] bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl px-2 shadow-sm relative z-[90]">
+                <TransactionModeFilter modoSeleccionado={modosSeleccionados} onModoChange={setModosSeleccionados} />
+              </div>
+
+              <div className="flex-1 min-w-[200px] relative z-[90] !overflow-visible">
+                <LocationSearch value={ubicacionTexto} onChange={handleLocationChange} />
+              </div>
+
+              <div className="shrink-0 w-full md:w-auto relative z-10">
+                <button type="submit" className="w-full md:w-auto h-[42px] px-8 bg-[#d97706] hover:bg-[#b95e00] text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-md transition-all active:scale-95">
+                  <SearchIcon size={18} />
+                </button>
+              </div>
             </div>
 
-            <div className="shrink-0 flex items-center h-[42px] bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl px-2 shadow-sm relative z-[90]">
-              <TransactionModeFilter modoSeleccionado={modosSeleccionados} onModoChange={setModosSeleccionados} />
-            </div>
-
-            <div className="flex-1 min-w-[200px] relative z-[90] !overflow-visible">
-              <LocationSearch value={ubicacionTexto} onChange={handleLocationChange} />
-            </div>
-
-            <div className="shrink-0 w-full md:w-auto relative z-10">
-              <button type="submit" className="w-full md:w-auto h-[42px] px-8 bg-[#d97706] hover:bg-[#b95e00] text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-md transition-all active:scale-95">
-                <SearchIcon size={18} />
+            {/* FILA 2: Filtros Rápidos (Píldoras) */}
+            <div className="flex flex-wrap items-center gap-3 relative z-[80] justify-center md:justify-start">
+              <button type="button" onClick={(e) => { e.preventDefault(); window.dispatchEvent(new CustomEvent('abrirPanelUbicacion')); }} className={`h-[38px] flex items-center gap-2 px-4 rounded-full border text-sm font-medium shadow-sm transition-all focus:outline-none shrink-0 ${isZonaFilterActive ? 'bg-[#d97706] text-white border-[#d97706] dark:bg-[#E87C1E] dark:border-[#E87C1E]' : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-[#d97706] dark:hover:border-[#E87C1E] dark:hover:bg-stone-700'}`}>
+                <MapPin className={`w-4 h-4 ${isZonaFilterActive ? 'text-white' : 'text-stone-500 dark:text-stone-400'}`} />
+                <span>Zona</span>
               </button>
-            </div>
-          </div>
 
-          {/* FILA 2: Filtros Rápidos (Píldoras) */}
-          <div className="flex flex-wrap items-center gap-3 relative z-[80] justify-center md:justify-start">
-            <button type="button" onClick={(e) => { e.preventDefault(); window.dispatchEvent(new CustomEvent('abrirPanelUbicacion')); }} className={`h-[38px] flex items-center gap-2 px-4 rounded-full border text-sm font-medium shadow-sm transition-all focus:outline-none shrink-0 ${isZonaFilterActive ? 'bg-[#d97706] text-white border-[#d97706] dark:bg-[#E87C1E] dark:border-[#E87C1E]' : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-[#d97706] dark:hover:border-[#E87C1E] dark:hover:bg-stone-700'}`}>
-              <MapPin className={`w-4 h-4 ${isZonaFilterActive ? 'text-white' : 'text-stone-500 dark:text-stone-400'}`} />
-              <span>Zona</span>
-            </button>
+              <button type="button" onClick={(e) => { e.preventDefault(); onOpenPriceFilter?.() }} className={`h-[38px] flex items-center gap-2 px-4 rounded-full border text-sm font-medium shadow-sm transition-all focus:outline-none shrink-0 ${isPriceFilterActive ? 'bg-[#d97706] text-white border-[#d97706] dark:bg-[#E87C1E] dark:border-[#E87C1E]' : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-[#d97706] dark:hover:border-[#E87C1E] dark:hover:bg-stone-700'}`}>
+                <DollarSign className={`w-4 h-4 ${isPriceFilterActive ? 'text-white' : 'text-stone-500 dark:text-stone-400'}`} />
+                <span>Precio</span>
+                <ChevronDown className={`w-4 h-4 ${isPriceFilterActive ? 'text-white' : 'text-stone-400 dark:text-stone-400'}`} />
+              </button>
 
-            <button type="button" onClick={(e) => { e.preventDefault(); onOpenPriceFilter?.() }} className={`h-[38px] flex items-center gap-2 px-4 rounded-full border text-sm font-medium shadow-sm transition-all focus:outline-none shrink-0 ${isPriceFilterActive ? 'bg-[#d97706] text-white border-[#d97706] dark:bg-[#E87C1E] dark:border-[#E87C1E]' : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-[#d97706] dark:hover:border-[#E87C1E] dark:hover:bg-stone-700'}`}>
-              <DollarSign className={`w-4 h-4 ${isPriceFilterActive ? 'text-white' : 'text-stone-500 dark:text-stone-400'}`} />
-              <span>Precio</span>
-              <ChevronDown className={`w-4 h-4 ${isPriceFilterActive ? 'text-white' : 'text-stone-400 dark:text-stone-400'}`} />
-            </button>
+              <div className="shrink-0">
+                <CapacidadButton variant={variant} isActive={isCapacidadActive} onClick={onToggleCapacidad} />
+              </div>
 
-            <div className="shrink-0">
-              <CapacidadButton variant={variant} isActive={isCapacidadActive} onClick={onToggleCapacidad} />
-            </div>
+              <button type="button" onClick={() => onOpenSuperficieFilter?.()} className={`h-[38px] flex items-center gap-2 px-4 rounded-full border text-sm font-medium shadow-sm transition-all focus:outline-none shrink-0 ${isSuperficieFilterActive ? 'bg-[#d97706] text-white border-[#d97706] dark:bg-[#E87C1E] dark:border-[#E87C1E]' : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-[#d97706] dark:hover:border-[#E87C1E] dark:hover:bg-stone-700'}`}>
+                <Maximize className={`w-4 h-4 ${isSuperficieFilterActive ? 'text-white' : 'text-stone-500 dark:text-stone-400'}`} />
+                <span>Metros</span>
+                <ChevronDown className={`w-4 h-4 ${isSuperficieFilterActive ? 'text-white' : 'text-stone-400 dark:text-stone-400'}`} />
+              </button>
 
-            <button type="button" onClick={() => onOpenSuperficieFilter?.()} className={`h-[38px] flex items-center gap-2 px-4 rounded-full border text-sm font-medium shadow-sm transition-all focus:outline-none shrink-0 ${isSuperficieFilterActive ? 'bg-[#d97706] text-white border-[#d97706] dark:bg-[#E87C1E] dark:border-[#E87C1E]' : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-[#d97706] dark:hover:border-[#E87C1E] dark:hover:bg-stone-700'}`}>
-              <Maximize className={`w-4 h-4 ${isSuperficieFilterActive ? 'text-white' : 'text-stone-500 dark:text-stone-400'}`} />
-              <span>Metros</span>
-              <ChevronDown className={`w-4 h-4 ${isSuperficieFilterActive ? 'text-white' : 'text-stone-400 dark:text-stone-400'}`} />
-            </button>
+              <button type="button" onClick={() => onOpenEtiquetasFilter?.()} className={`h-[38px] flex items-center gap-2 px-4 rounded-full border text-sm font-medium shadow-sm transition-all focus:outline-none shrink-0 ${isEtiquetasFilterActive ? 'bg-[#d97706] text-white border-[#d97706] dark:bg-[#E87C1E] dark:border-[#E87C1E]' : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-[#d97706] dark:hover:border-[#E87C1E] dark:hover:bg-stone-700'}`}>
+                <Tag className={`w-4 h-4 ${isEtiquetasFilterActive ? 'text-white' : 'text-stone-500 dark:text-stone-400'}`} />
+                <span>Etiquetas</span>
+                <ChevronDown className={`w-4 h-4 ${isEtiquetasFilterActive ? 'text-white' : 'text-stone-400 dark:text-stone-400'}`} />
+              </button>
 
-            <button type="button" onClick={() => onOpenEtiquetasFilter?.()} className={`h-[38px] flex items-center gap-2 px-4 rounded-full border text-sm font-medium shadow-sm transition-all focus:outline-none shrink-0 ${isEtiquetasFilterActive ? 'bg-[#d97706] text-white border-[#d97706] dark:bg-[#E87C1E] dark:border-[#E87C1E]' : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-[#d97706] dark:hover:border-[#E87C1E] dark:hover:bg-stone-700'}`}>
-              <Tag className={`w-4 h-4 ${isEtiquetasFilterActive ? 'text-white' : 'text-stone-500 dark:text-stone-400'}`} />
-              <span>Etiquetas</span>
-              <ChevronDown className={`w-4 h-4 ${isEtiquetasFilterActive ? 'text-white' : 'text-stone-400 dark:text-stone-400'}`} />
-            </button>
+              <button type="button" onClick={() => setIsAdvancedFiltersOpen(true)} className="h-[38px] flex items-center gap-2 px-4 rounded-full bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 text-sm font-medium hover:border-[#d97706] dark:hover:border-[#E87C1E] dark:hover:bg-stone-700 shadow-sm transition-all focus:outline-none shrink-0">
+                <SlidersHorizontal className="w-4 h-4 text-stone-500 dark:text-stone-400" />
+                <span>Más Filtros</span>
+              </button>
 
-            {/* Modal de Filtros Avanzados */}
-            <button type="button" onClick={() => setIsAdvancedFiltersOpen(true)} className="h-[38px] flex items-center gap-2 px-4 rounded-full bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 text-sm font-medium hover:border-[#d97706] dark:hover:border-[#E87C1E] dark:hover:bg-stone-700 shadow-sm transition-all focus:outline-none shrink-0">
-              <SlidersHorizontal className="w-4 h-4 text-stone-500 dark:text-stone-400" />
-              <span>Más Filtros</span>
-            </button>
+              <OfertaButton variant={variant} isActive={isOfertaActive} onClick={onToggleOferta} />
 
-            <OfertaButton
-              variant={variant}
-              isActive={isOfertaActive}
-              onClick={onToggleOferta}
-            />
+              <button
+                type="button"
+                onClick={async (e) => {
+                  e.preventDefault()
+                  const params = new URLSearchParams(searchParams?.toString() || '')
+                  const isActive = params.get('orden') === 'recomendados'
 
-            <button
-              type="button"
-              onClick={async (e) => {
-                e.preventDefault()
+                  if (isActive) {
+                    const savedFilters = sessionStorage.getItem('propbol_filtros_respaldo')
+                    if (savedFilters) {
+                      const restoredParams = new URLSearchParams(savedFilters)
+                      restoredParams.delete('orden')
+                      restoredParams.delete('ia')
+                      router.push(`/busqueda_mapa?${restoredParams.toString()}`)
+                      sessionStorage.removeItem('propbol_filtros_respaldo')
+                    } else {
+                      params.delete('orden')
+                      params.delete('ia')
+                      router.push(`/busqueda_mapa${params.toString() ? `?${params.toString()}` : ''}`)
+                    }
+                    sessionStorage.removeItem('propbol_modo_recomendados')
+                    sessionStorage.removeItem('propbol_recomendados')
+                    return
+                  }
 
-                const params = new URLSearchParams(searchParams?.toString() || '')
-                const isActive = params.get('orden') === 'recomendados'
+                  sessionStorage.setItem('propbol_filtros_respaldo', params.toString())
+                  const cleanParams = new URLSearchParams()
+                  const modoInmueble = params.getAll('modoInmueble')
+                  modoInmueble.forEach(m => cleanParams.append('modoInmueble', m))
+                  cleanParams.set('orden', 'recomendados')
+                  cleanParams.set('ia', '1')
 
-                if (isActive) {
-                  const savedFilters = sessionStorage.getItem('propbol_filtros_respaldo')
-                  if (savedFilters) {
-                    const restoredParams = new URLSearchParams(savedFilters)
-                    restoredParams.delete('orden')
-                    restoredParams.delete('ia')
-                    router.push(`/busqueda_mapa?${restoredParams.toString()}`)
-                    sessionStorage.removeItem('propbol_filtros_respaldo')
+                  const token = localStorage.getItem('token')
+                  if (token) {
+                    try {
+                      const res = await fetch(`/api/inmuebles/recomendados?${cleanParams.toString()}`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                      })
+                      const data = await res.json()
+                      if (data.success && data.data.length > 0) {
+                        sessionStorage.setItem('propbol_recomendados', JSON.stringify(data.data))
+                        sessionStorage.setItem('propbol_modo_recomendados', 'true')
+                      }
+                    } catch (error) {
+                      console.error('Error obteniendo recomendaciones:', error)
+                    }
                   } else {
-                    params.delete('orden')
-                    params.delete('ia')
-                    router.push(`/busqueda_mapa${params.toString() ? `?${params.toString()}` : ''}`)
-                  }
-                  sessionStorage.removeItem('propbol_modo_recomendados')
-                  sessionStorage.removeItem('propbol_recomendados')
-                  return
-                }
-
-                sessionStorage.setItem('propbol_filtros_respaldo', params.toString())
-
-
-
-                const cleanParams = new URLSearchParams()
-                const modoInmueble = params.getAll('modoInmueble')
-                modoInmueble.forEach(m => cleanParams.append('modoInmueble', m))
-                cleanParams.set('orden', 'recomendados')
-                cleanParams.set('ia', '1')
-
-
-                const token = localStorage.getItem('token')
-                if (token) {
-                  try {
-                    const res = await fetch(`/api/inmuebles/recomendados?${cleanParams.toString()}`, {
-                      headers: { Authorization: `Bearer ${token}` }
-                    })
-                    const data = await res.json()
-                    if (data.success && data.data.length > 0) {
-                      sessionStorage.setItem('propbol_recomendados', JSON.stringify(data.data))
-                      sessionStorage.setItem('propbol_modo_recomendados', 'true')
+                    try {
+                      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+                      const res = await fetch(`${API_BASE}/api/properties/inmuebles?fecha=mas-populares&${cleanParams.toString()}`)
+                      const data = await res.json()
+                      if (data.ok && data.data?.length > 0) {
+                        sessionStorage.setItem('propbol_recomendados', JSON.stringify(data.data))
+                        sessionStorage.setItem('propbol_modo_recomendados', 'true')
+                      }
+                    } catch (error) {
+                      console.error('Error cargando populares para visitante:', error)
                     }
-                  } catch (error) {
-                    console.error('Error obteniendo recomendaciones:', error)
-                    // Fallback silencioso: useProperties cargará los populares
                   }
-                } else {
-                  // ── Visitante sin cuenta → más populares de su zona ────────────────
-                  // No bloqueamos ni mostramos error. useProperties detectará
-                  // propbol_modo_recomendados=true y cargará los populares.
-                  // Opcionalmente pre-cargamos los populares para más rapidez:
-                  try {
-                    const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
-                    const res = await fetch(
-                      `${API_BASE}/api/properties/inmuebles?fecha=mas-populares&${cleanParams.toString()}`
-                    )
-                    const data = await res.json()
-                    if (data.ok && data.data?.length > 0) {
-                      sessionStorage.setItem('propbol_recomendados', JSON.stringify(data.data))
-                      sessionStorage.setItem('propbol_modo_recomendados', 'true')
-                    }
-                  } catch (error) {
-                    console.error('Error cargando populares para visitante:', error)
-                    // useProperties hará la carga normal como fallback
-                  }
-                }
-
-                router.push(`/busqueda_mapa?${cleanParams.toString()}`)
-              }}
-
-
-
-              className={`h-[38px] flex items-center gap-2 px-4 rounded-full border text-sm font-medium shadow-sm transition-all focus:outline-none shrink-0 ${searchParams?.get('orden') === 'recomendados'
-                ? 'bg-[#d97706] text-white border-[#d97706] dark:bg-[#E87C1E] dark:border-[#E87C1E]'
-                : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-[#d97706] dark:hover:border-[#E87C1E] dark:hover:bg-stone-700'
-                }`}
-            >
-              <Award className={`w-4 h-4 ${searchParams?.get('orden') === 'recomendados' ? 'text-white' : 'text-stone-500'}`} />
-              <span>Recomendados</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                toggleCompareMode();
-              }}
-              className={`h-[38px] flex items-center gap-2 px-4 rounded-full border text-sm font-medium shadow-sm transition-all focus:outline-none shrink-0 ${isCompareMode
-                ? 'bg-[#d97706] text-white border-[#d97706] dark:bg-[#E87C1E] dark:border-[#E87C1E]'
-                : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-[#d97706] dark:hover:border-[#E87C1E] dark:hover:bg-stone-700'
-                }`}
-            >
-              <BarChart2 className={`w-4 h-4 ${isCompareMode ? 'text-white' : 'text-stone-500'}`} />
-              <span>Comparar {isCompareMode && selectedIds.length > 0 ? `(${selectedIds.length})` : ''}</span>
-            </button>
-          </div>
-
-          {/* FILA 3: ETIQUETAS DE FILTROS ACTIVOS (Chips Removibles) */}
-          {activeFilters.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2 bg-white/60 dark:bg-stone-950/60 backdrop-blur-sm border border-stone-200 dark:border-stone-700 rounded-xl p-2.5 w-full shadow-inner min-h-[48px]">
-              <span className="text-[11px] text-stone-500 font-bold uppercase tracking-wider ml-2 mr-1">Activos:</span>
-
-              {activeFilters.map(filter => (
-                <div key={filter.id} className="group flex items-center gap-1.5 bg-[#fdf3e7] dark:bg-orange-500/20 border border-orange-200 dark:border-orange-500/30 text-orange-800 dark:text-orange-300 px-3 py-1.5 rounded-lg text-xs font-semibold shadow-sm transition-all hover:bg-orange-100 dark:hover:bg-orange-500/40 animate-in fade-in zoom-in duration-200">
-                  <span className="max-w-[160px] truncate">{filter.label}</span>
-                  <button
-                    type="button"
-                    onClick={(e) => { e.preventDefault(); filter.onRemove() }}
-                    className="hover:bg-orange-200 rounded-full p-0.5 transition-colors focus:outline-none"
-                    title={`Quitar filtro: ${filter.label}`}
-                  >
-                    <X size={14} className="text-orange-600 group-hover:text-orange-700" />
-                  </button>
-                </div>
-              ))}
+                  router.push(`/busqueda_mapa?${cleanParams.toString()}`)
+                }}
+                className={`h-[38px] flex items-center gap-2 px-4 rounded-full border text-sm font-medium shadow-sm transition-all focus:outline-none shrink-0 ${searchParams?.get('orden') === 'recomendados' ? 'bg-[#d97706] text-white border-[#d97706] dark:bg-[#E87C1E] dark:border-[#E87C1E]' : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-[#d97706] dark:hover:border-[#E87C1E] dark:hover:bg-stone-700'}`}
+              >
+                <Award className={`w-4 h-4 ${searchParams?.get('orden') === 'recomendados' ? 'text-white' : 'text-stone-500'}`} />
+                <span>Recomendados</span>
+              </button>
 
               <button
                 type="button"
                 onClick={(e) => {
-                  e.preventDefault()
-
-                  // 1. Vaciamos todos los estados visuales por completo
-                  setTipoInmueble('Cualquier tipo')
-                  setModosSeleccionados([]) // Arreglo vacío para desmarcar todos los checkboxes
-                  setUbicacionTexto('')
-                  setCoords({})
-
-                  // 2. Limpiamos la memoria del navegador para matar los filtros "fantasma"
-                  sessionStorage.removeItem('propbol_global_filters')
-                  sessionStorage.removeItem('propbol_modo_recomendados')
-                  sessionStorage.removeItem('propbol_recomendados')
-
-                  // 3. Reseteamos la URL a su estado más puro
-                  router.push('/busqueda_mapa')
+                  e.preventDefault();
+                  toggleCompareMode();
                 }}
-                className="text-xs font-bold text-stone-400 hover:text-stone-600 underline ml-auto mr-3 transition-colors"
+                className={`h-[38px] flex items-center gap-2 px-4 rounded-full border text-sm font-medium shadow-sm transition-all focus:outline-none shrink-0 ${isCompareMode ? 'bg-[#d97706] text-white border-[#d97706] dark:bg-[#E87C1E] dark:border-[#E87C1E]' : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-[#d97706] dark:hover:border-[#E87C1E] dark:hover:bg-stone-700'}`}
               >
-                Limpiar todos
+                <BarChart2 className={`w-4 h-4 ${isCompareMode ? 'text-white' : 'text-stone-500'}`} />
+                <span>Comparar {isCompareMode && selectedIds.length > 0 ? `(${selectedIds.length})` : ''}</span>
               </button>
             </div>
-          )}
 
-        </div>
-      )}
+            {/* FILA 3: ETIQUETAS DE FILTROS ACTIVOS */}
+            {activeFilters.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2 bg-white/60 dark:bg-stone-950/60 backdrop-blur-sm border border-stone-200 dark:border-stone-700 rounded-xl p-2.5 w-full shadow-inner min-h-[48px]">
+                <span className="text-[11px] text-stone-500 font-bold uppercase tracking-wider ml-2 mr-1">Activos:</span>
 
-      {/* ===== LAYOUT PARA HOME ===== */}
-      {variant === 'home' && (
-        <div className="flex items-center w-full gap-3 relative z-[90] !overflow-visible flex-col md:flex-row flex-wrap">
-          <div className="flex w-full relative z-[100] !overflow-visible justify-center">
-            <TransactionModeFilter modoSeleccionado={modosSeleccionados} onModoChange={setModosSeleccionados} />
-          </div>
-          <div className="relative z-[100] !overflow-visible w-full md:w-64">
-            <ComboBox label="Tipo" placeholder="Cualquier tipo" icon={Home} options={propertyTypes} onChange={setTipoInmueble} value={tipoInmueble} />
-          </div>
-          <div className="relative z-[90] !overflow-visible w-full flex-1">
-            <LocationSearch value={ubicacionTexto} onChange={handleLocationChange} />
-          </div>
-          <div className="w-full md:w-auto flex justify-end relative z-10">
-            <button type="submit" className="w-full md:w-auto h-[46px] px-10 bg-[#d97706] hover:bg-[#b95e00] text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95">
-              <SearchIcon size={18} /> BUSCAR
-            </button>
-          </div>
-        </div>
-      )}
+                {activeFilters.map(filter => (
+                  <div key={filter.id} className="group flex items-center gap-1.5 bg-[#fdf3e7] dark:bg-orange-500/20 border border-orange-200 dark:border-orange-500/30 text-orange-800 dark:text-orange-300 px-3 py-1.5 rounded-lg text-xs font-semibold shadow-sm transition-all hover:bg-orange-100 dark:hover:bg-orange-500/40 animate-in fade-in zoom-in duration-200">
+                    <span className="max-w-[160px] truncate">{filter.label}</span>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.preventDefault(); filter.onRemove() }}
+                      className="hover:bg-orange-200 rounded-full p-0.5 transition-colors focus:outline-none"
+                      title={`Quitar filtro: ${filter.label}`}
+                    >
+                      <X size={14} className="text-orange-600 group-hover:text-orange-700" />
+                    </button>
+                  </div>
+                ))}
 
-      {/* ===== MODAL HU6 ===== */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    setTipoInmueble('Cualquier tipo')
+                    setModosSeleccionados([])
+                    setUbicacionTexto('')
+                    setCoords({})
+                    sessionStorage.removeItem('propbol_global_filters')
+                    sessionStorage.removeItem('propbol_modo_recomendados')
+                    sessionStorage.removeItem('propbol_recomendados')
+                    router.push('/busqueda_mapa')
+                  }}
+                  className="text-xs font-bold text-stone-400 hover:text-stone-600 underline ml-auto mr-3 transition-colors"
+                >
+                  Limpiar todos
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {variant === 'home' && (
+          <div className="flex items-center w-full gap-3 relative z-[90] !overflow-visible flex-col md:flex-row flex-wrap">
+            <div className="flex w-full relative z-[100] !overflow-visible justify-center">
+              <TransactionModeFilter modoSeleccionado={modosSeleccionados} onModoChange={setModosSeleccionados} />
+            </div>
+            <div className="relative z-[100] !overflow-visible w-full md:w-64">
+              <ComboBox label="Tipo" placeholder="Cualquier tipo" icon={Home} options={propertyTypes} onChange={setTipoInmueble} value={tipoInmueble} />
+            </div>
+            <div className="relative z-[90] !overflow-visible w-full flex-1">
+              <LocationSearch value={ubicacionTexto} onChange={handleLocationChange} />
+            </div>
+            <div className="w-full md:w-auto flex justify-end relative z-10">
+              <button type="submit" className="w-full md:w-auto h-[46px] px-10 bg-[#d97706] hover:bg-[#b95e00] text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95">
+                <SearchIcon size={18} /> BUSCAR
+              </button>
+            </div>
+          </div>
+        )}
+
+      </div>
+
+      {/* Modal no afectado por isCollapsed */}
       <AdvancedFiltersModal
         isOpen={isAdvancedFiltersOpen}
         onClose={() => setIsAdvancedFiltersOpen(false)}
         onApply={(amenities, labels) => {
           const params = new URLSearchParams(searchParams?.toString() || '')
-
           if (amenities.length > 0) params.set('amenities', amenities.join(','))
           else params.delete('amenities')
 
