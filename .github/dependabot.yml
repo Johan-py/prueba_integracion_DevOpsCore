@@ -1,0 +1,7 @@
+version: 2
+updates:
+  - package-ecosystem: "pnpm" # Aunque se use pnpm, el ecosistema base es npm
+    directory: "/"           # Raíz del monorepo
+    schedule:
+      interval: "weekly"      # Busca vulnerabilidades semanalmente
+    open-pull-requests-limit: 10
