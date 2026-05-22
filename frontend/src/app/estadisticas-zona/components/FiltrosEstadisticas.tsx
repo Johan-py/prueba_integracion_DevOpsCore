@@ -52,6 +52,15 @@ export default function FiltrosEstadisticas({
       .catch(() => { })
   }, [])
 
+  // Sincronizar selección externa (ej. desde el mapa) con el input
+  useEffect(() => {
+    if (zonaSeleccionada) {
+      setBusqueda(zonaSeleccionada.nombre)
+    } else {
+      setBusqueda('')
+    }
+  }, [zonaSeleccionada])
+
   // Filtrar por búsqueda
   useEffect(() => {
     if (!busqueda.trim()) {
@@ -145,14 +154,6 @@ export default function FiltrosEstadisticas({
                   Ver en el mapa
                   <ChevronRight size={12} />
                 </button>
-              )}
-
-              {/* Zona seleccionada */}
-              {zonaSeleccionada && (
-                <div className="mt-2 flex items-center gap-1.5 text-xs text-[#E07B2A] font-medium">
-                  <MapPin size={12} />
-                  {zonaSeleccionada.nombre}
-                </div>
               )}
             </div>
           </div>
