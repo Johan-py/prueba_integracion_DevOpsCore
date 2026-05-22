@@ -15,6 +15,7 @@ export interface Inmueble {
   estado?: string
   tipoAccion?: string
   categoria?: string | null
+  promoted?: boolean
 }
 
 export type OrdenFecha =

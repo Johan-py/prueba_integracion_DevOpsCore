@@ -310,6 +310,9 @@ export const propertiesRepository = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const orderBy: any[] = [];
 
+    // Siempre priorizamos las publicitadas (promoted = true)
+    orderBy.push({ promoted: "desc" })
+
     if (filtros.precio === "menor-a-mayor") {
       orderBy.push({ precio: "asc" });
       orderBy.push({ id: "asc" });

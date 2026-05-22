@@ -45,7 +45,7 @@ export default function PromocionarModal({
   onConfirmar,
   onCancelar,
 }: PromocionarModalProps) {
-  const [paso, setPaso] = useState<'planes' | 'procesando'| 'error'>('planes')
+  const [paso, setPaso] = useState<'planes' | 'procesando'| 'verificacion' | 'error'>('planes')
   const [planSeleccionado, setPlanSeleccionado] = useState<Plan>(planes[0])
   const [error, setError] = useState('')
 
@@ -63,8 +63,7 @@ export default function PromocionarModal({
       if (response.checkoutUrl) {
         window.location.href = response.checkoutUrl
       } else {
-        await onConfirmar(propiedadId, planSeleccionado.id, planSeleccionado.precio)
-        setPaso('planes')
+        setPaso('verificacion')
       }
     } catch (err) {
       console.error(err)
@@ -158,6 +157,28 @@ export default function PromocionarModal({
             <h3 className="text-lg font-semibold text-gray-800">Procesando pago</h3>
             <p className="text-sm text-gray-500 mt-1">Validando tu transacción...</p>
             <p className="text-xs text-gray-400 mt-4">Por favor, no cierres esta ventana</p>
+          </div>
+         ) : paso === 'verificacion' ? (
+          <div className="px-6 pt-8 pb-6 text-center">
+            <div className="text-5xl mb-3">⏳</div>
+            <h3 className="text-xl font-bold text-gray-800">Pago en verificación</h3>
+            <p className="text-sm text-gray-600 mt-2">
+              Tu solicitud para destacar <span className="font-semibold">"{propiedadNombre}"</span> está pendiente de aprobación.
+            </p>
+            <div className="bg-yellow-50 rounded-lg p-4 mt-4 text-left">
+              <p className="text-sm text-yellow-800 font-medium">📌 ¿Qué sigue?</p>
+              <ul className="text-xs text-yellow-700 mt-2 space-y-1">
+                <li>✓ El administrador revisará tu pago</li>
+                <li>✓ Una vez aprobado, la publicidad se activará automáticamente</li>
+                <li>✓ La propiedad aparecerá destacada en la pestaña "Publicidad"</li>
+              </ul>
+            </div>
+            <button
+              onClick={handleCancelar}
+              className="mt-6 w-full rounded-lg bg-orange-500 py-3 text-sm font-semibold text-white transition hover:bg-orange-600"
+            >
+              Entendido
+            </button>
           </div>
         ) : (
           <div className="px-6 pt-6 pb-6 text-center">
