@@ -1,12 +1,3 @@
-
-
-
-
-
-
-
-
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -18,7 +9,6 @@ interface Props {
   estado: "confirmando" | "publicando" | "exito" | "error_publicacion";
   progreso: number;
   onReintentar: () => void;
-  onPausar?: (pausado: boolean) => void; 
 }
 
 export default function PublicarModal({
@@ -27,10 +17,9 @@ export default function PublicarModal({
   estado,
   progreso,
   onReintentar,
-  onPausar,
 }: Props) {
   const [checked, setChecked] = useState(false);
-  const [mostrarAdvertencia, setMostrarAdvertencia] = useState(false); 
+  const [mostrarAdvertencia, setMostrarAdvertencia] = useState(false);
 
   const estaPublicando = estado === "publicando";
   const esExito = estado === "exito";
@@ -50,7 +39,6 @@ export default function PublicarModal({
   const handleCancelar = () => {
     if (estaPublicando) {
       setMostrarAdvertencia(true);
-      if (onPausar) onPausar(true); // Pausamos la barra en el padre
     } else {
       onCancelar();
     }
@@ -58,21 +46,17 @@ export default function PublicarModal({
 
   const confirmarCancelacion = () => {
     setMostrarAdvertencia(false);
-    if (onPausar) onPausar(false);
-    onCancelar(); // Dispara la orden de abortar en el padre
+    onCancelar();
   };
 
   const reanudarPublicacion = () => {
     setMostrarAdvertencia(false);
-    if (onPausar) onPausar(false); // Reanudamos la barra en el padre
   };
 
   return (
-    // Overlay oscuro
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl relative overflow-hidden">
-        
-        {/* 🟢 NUEVA VISTA: ADVERTENCIA CUSTOM */}
+
         {mostrarAdvertencia ? (
           <div className="flex flex-col items-center text-center py-2 animate-in fade-in duration-200">
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100 text-red-500">
@@ -101,14 +85,11 @@ export default function PublicarModal({
           </div>
         ) : (
           <div className="animate-in fade-in duration-200">
-            {/* VISTA ORIGINAL DEL MODAL */}
-            {/* Título */}
             <h2 className="text-xl font-bold text-gray-800">Publicar inmueble</h2>
             <p className="mb-5 text-sm text-gray-400">
               Confirma los datos y completa la publicación
             </p>
 
-            {/* Checkbox de confirmación */}
             <label className="mb-5 flex cursor-pointer items-start gap-3">
               <input
                 type="checkbox"
@@ -126,12 +107,10 @@ export default function PublicarModal({
               </span>
             </label>
 
-            {/* Barra de progreso */}
             <div className="mb-5">
               <ProgressBar progreso={progreso} />
             </div>
 
-            {/* Mensajes */}
             {esExito && (
               <div className="mb-4 rounded-lg bg-green-50 p-3 text-sm text-green-700 border border-green-200">
                 ✅ ¡Inmueble publicado exitosamente!
@@ -143,7 +122,6 @@ export default function PublicarModal({
               </div>
             )}
 
-            {/* Botones */}
             <div className="flex gap-3">
               {!esExito && (
                 <button

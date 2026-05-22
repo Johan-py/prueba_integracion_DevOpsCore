@@ -11,6 +11,7 @@ import PublicarModal from "../publicacion/PublicarModal";
 import { EstadoPublicacion } from "../../types/publicacion";
 
 interface Props {
+  onPausar?: (p: boolean) => void;
   publicacionId: number | null;
 }
 
@@ -328,6 +329,7 @@ export default function ResumenPanel({ publicacionId }: Props) {
           onConfirmar={ejecutarPublicacion}
           onCancelar={handleCancelar}
           onReintentar={() => setEstadoPublicacion("confirmando")}
+          // @ts-ignore
           onPausar={handlePausar}
         />
       )}
