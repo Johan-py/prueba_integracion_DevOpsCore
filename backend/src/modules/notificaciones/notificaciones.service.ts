@@ -167,7 +167,7 @@ export const createNotificationService = async ({
   mensaje,
   tipo,
 }: CreateNotificationParams) => {
-  const normalizedCorreo = correo.trim();
+  const normalizedCorreo = correo.trim().toLowerCase();
   const normalizedTitle = titulo.trim();
   const normalizedMessage = mensaje.trim();
 
