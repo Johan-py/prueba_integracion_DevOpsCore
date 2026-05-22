@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { MapPin, X, SlidersHorizontal } from 'lucide-react'
+import { X } from 'lucide-react'
 import {
   MapContainer,
   TileLayer,
@@ -26,12 +26,6 @@ interface Props {
   onTipoOperacionChange: (tipo: TipoOperacion) => void
   onVerEstadisticas: () => void
 }
-
-const TIPOS: { valor: TipoOperacion; label: string }[] = [
-  { valor: 'VENTA', label: 'Venta' },
-  { valor: 'ALQUILER', label: 'Alquiler' },
-  { valor: 'ANTICRETO', label: 'Anticrético' }
-]
 
 // Centra el mapa SIN animación para evitar el crash de classList en Leaflet
 function CenterMap({ center }: { center: LatLngExpression | null }) {
@@ -93,18 +87,52 @@ export default function MapaSeleccionZona({
   const [zonaHover, setZonaHover] = useState<number | null>(null)
   const [centroMapa, setCentroMapa] = useState<LatLngExpression | null>(null)
 
-  // Carga zonas desde /api/zonas (coordenadas ya en [lat, lng] para Leaflet)
+  // Carga zonas desde /api/zonas (MOCK para Code Freeze con coordenadas de polígonos)
   useEffect(() => {
-    fetch('/api/zonas-mapa')
-      .then((r) => r.json())
-      .then((json) => {
-        const data: ZonaPredefinida[] = json.data ?? []
-        const validas = data.filter(
-          (z) => Array.isArray(z.coordenadas) && z.coordenadas.length >= 3
-        )
-        setZonas(validas)
-      })
-      .catch(() => { })
+    const MOCK_ZONAS = [
+      {
+        id: 1,
+        nombre: 'Cala Cala',
+        coordenadas: [[-17.375, -66.165], [-17.375, -66.155], [-17.365, -66.155], [-17.365, -66.165]]
+      },
+      {
+        id: 2,
+        nombre: 'Queru Queru',
+        coordenadas: [[-17.370, -66.150], [-17.370, -66.140], [-17.360, -66.140], [-17.360, -66.150]]
+      },
+      {
+        id: 3,
+        nombre: 'Muyurina',
+        coordenadas: [[-17.385, -66.145], [-17.385, -66.135], [-17.375, -66.135], [-17.375, -66.145]]
+      },
+      {
+        id: 4,
+        nombre: 'Sacaba',
+        coordenadas: [[-17.380, -66.050], [-17.380, -66.030], [-17.400, -66.030], [-17.400, -66.050]]
+      },
+      {
+        id: 5,
+        nombre: 'Quillacollo',
+        coordenadas: [[-17.390, -66.280], [-17.390, -66.260], [-17.410, -66.260], [-17.410, -66.280]]
+      },
+      {
+        id: 6,
+        nombre: 'Punata',
+        coordenadas: [[-17.530, -65.840], [-17.530, -65.820], [-17.550, -65.820], [-17.550, -65.840]]
+      },
+      {
+        id: 7,
+        nombre: 'Cliza',
+        coordenadas: [[-17.570, -65.940], [-17.570, -65.920], [-17.590, -65.920], [-17.590, -65.940]]
+      },
+      {
+        id: 8,
+        nombre: 'Tarata',
+        coordenadas: [[-17.600, -66.030], [-17.600, -66.010], [-17.620, -66.010], [-17.620, -66.030]]
+      }
+    ];
+    // Forzamos el tipado para que Leaflet acepte nuestras coordenadas simuladas
+    setZonas(MOCK_ZONAS as any);
   }, [])
 
   const handleClickZona = (zona: ZonaPredefinida) => {
@@ -113,8 +141,6 @@ export default function MapaSeleccionZona({
       setCentroMapa(calcularCentro(zona.coordenadas))
     }
   }
-
-  const puedeVerEstadisticas = zonaActual !== null && zonaActual.id > 0
 
   return (
     <div
@@ -143,80 +169,8 @@ export default function MapaSeleccionZona({
 
         {/* ── Cuerpo ── */}
         <div className="flex flex-1 overflow-hidden min-h-0">
-
-          {/* Sidebar */}
-          <div className="w-64 bg-white border-r border-gray-100 flex flex-col gap-4 p-4 overflow-y-auto flex-shrink-0">
-
-            {/* Zona seleccionada */}
-            <div>
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Zona seleccionada</p>
-              {puedeVerEstadisticas ? (
-                <div className="flex items-center gap-2 p-3 bg-orange-50 rounded-xl border border-orange-200">
-                  <MapPin size={14} className="text-[#E07B2A] flex-shrink-0" />
-                  <span className="text-sm font-semibold text-gray-800 flex-1 truncate">{zonaActual.nombre}</span>
-                  <button
-                    onClick={() => onSeleccionar({ id: 0, nombre: '' })}
-                    className="text-gray-400 hover:text-red-500 transition-colors flex-shrink-0"
-                    title="Quitar selección"
-                  >
-                    <X size={14} />
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                  <MapPin size={14} className="text-gray-400" />
-                  <span className="text-sm text-gray-400">Ninguna zona seleccionada</span>
-                </div>
-              )}
-            </div>
-
-            {/* Tipo de operación */}
-            <div>
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Tipo de operación</p>
-              <div className="flex flex-col gap-2">
-                {TIPOS.map(({ valor, label }) => (
-                  <button
-                    key={valor}
-                    id={`btn-mapa-tipo-${valor.toLowerCase()}`}
-                    onClick={() => onTipoOperacionChange(valor)}
-                    className={`py-2 px-3 rounded-xl text-sm font-medium border transition-all text-left ${tipoOperacion === valor
-                      ? 'bg-[#E07B2A] text-white border-[#E07B2A] shadow-sm'
-                      : 'bg-white text-gray-700 border-gray-200 hover:border-[#E07B2A] hover:text-[#E07B2A]'}`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Info zonas */}
-            {zonas.length > 0 && (
-              <p className="text-xs text-gray-400">
-                {zonas.length} zona{zonas.length !== 1 ? 's' : ''} disponible{zonas.length !== 1 ? 's' : ''} en el mapa.
-              </p>
-            )}
-
-            {/* Botón Ver estadísticas */}
-            <div className="mt-auto">
-              <button
-                id="btn-mapa-ver-estadisticas"
-                onClick={onVerEstadisticas}
-                disabled={!puedeVerEstadisticas}
-                className={`w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all ${puedeVerEstadisticas
-                  ? 'bg-[#E07B2A] text-white hover:bg-[#c96a1d] shadow-sm'
-                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
-              >
-                <SlidersHorizontal size={15} />
-                Ver estadísticas
-              </button>
-              {!puedeVerEstadisticas && (
-                <p className="text-xs text-gray-400 text-center mt-2">Selecciona una zona primero</p>
-              )}
-            </div>
-          </div>
-
-          {/* Mapa */}
-          <div className="flex-1 relative min-w-0">
+          {/* Mapa (Ahora ocupa el 100% del espacio al eliminar el sidebar redundante) */}
+          <div className="flex-1 relative min-w-0 w-full">
             <MapContainer
               center={CENTRO_DEFAULT}
               zoom={13}

@@ -48,27 +48,29 @@ export default function DashboardResultados({
   tipoOperacion,
   onCambiarFiltros
 }: Props) {
-  // CA 4: Sin datos suficientes
+  // CA 4: Sin datos suficientes (Bug 5 resuelto con contenedor centrado y anchos máximos)
   if (sinDatos) {
     return (
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 flex flex-col items-center gap-4 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-amber-50 flex items-center justify-center">
-          <AlertCircle size={32} className="text-amber-500" />
+      <div className="flex items-center justify-center w-full min-h-[40vh]">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 md:p-12 flex flex-col items-center gap-4 text-center max-w-xl mx-auto w-full">
+          <div className="w-16 h-16 rounded-2xl bg-amber-50 flex items-center justify-center">
+            <AlertCircle size={32} className="text-amber-500" />
+          </div>
+          <div>
+            <p className="font-semibold text-gray-900 mb-1">No hay datos suficientes</p>
+            <p className="text-sm text-gray-500 max-w-sm mx-auto">
+              No se encontraron propiedades en la zona <strong>{zona?.nombre}</strong> con tipo de
+              operación <strong>{TIPO_LABELS[tipoOperacion]}</strong> para calcular estadísticas.
+            </p>
+          </div>
+          <button
+            id="btn-cambiar-filtros-sin-datos"
+            onClick={onCambiarFiltros}
+            className="mt-2 py-2 px-5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:border-[#E07B2A] hover:text-[#E07B2A] transition-colors"
+          >
+            Cambiar filtros
+          </button>
         </div>
-        <div>
-          <p className="font-semibold text-gray-900 mb-1">No hay datos suficientes</p>
-          <p className="text-sm text-gray-500 max-w-sm">
-            No se encontraron propiedades en la zona <strong>{zona?.nombre}</strong> con tipo de
-            operación <strong>{TIPO_LABELS[tipoOperacion]}</strong> para calcular estadísticas.
-          </p>
-        </div>
-        <button
-          id="btn-cambiar-filtros-sin-datos"
-          onClick={onCambiarFiltros}
-          className="mt-2 py-2 px-5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:border-[#E07B2A] hover:text-[#E07B2A] transition-colors"
-        >
-          Cambiar filtros
-        </button>
       </div>
     )
   }

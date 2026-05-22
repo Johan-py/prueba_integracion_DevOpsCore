@@ -44,7 +44,7 @@ function StatusBanner({
         Estado actual
       </p>
       <h2 className="mt-2 text-2xl font-bold font-montserrat">Artículo rechazado</h2>
-      <p className="mt-2 text-sm leading-7">
+      <p className="mt-2 text-sm leading-7 break-words">
         Comentario registrado: {rejectionComment || "Sin comentario adicional."}
       </p>
     </div>

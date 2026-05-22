@@ -251,7 +251,7 @@ export default function ResumenCliente() {
         Verifica tu pedido antes de realizar el pago
       </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
         <div>
           <div className="border border-gray-200 dark:border-[#333] rounded-lg p-6 mb-6 shadow-md dark:bg-[#1a1a1a]">
@@ -263,8 +263,10 @@ export default function ResumenCliente() {
             </div>
 
             <p className="text-gray-600 dark:text-[#999]">
-              {plan.nro_publicaciones_plan} publicaciones activas · Vigencia{' '}
-              {plan.duracion_plan_dias ?? plan.duración_plan_días} días
+              {plan.nro_publicaciones_plan >= 1_000_000
+                ? 'Publicaciones ilimitadas'
+                : `${plan.nro_publicaciones_plan} publicaciones activas`}{' '}
+              · Vigencia {plan.duracion_plan_dias ?? plan.duración_plan_días} días
             </p>
           </div>
 
