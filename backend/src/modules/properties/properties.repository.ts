@@ -100,61 +100,56 @@ export const propertiesRepository = {
       // Fallback original: Búsqueda estricta por texto
       const texto = filtros.query.trim();
 
-      where.OR = [
-        { titulo: { contains: texto, mode: "insensitive" } },
-        { descripcion: { contains: texto, mode: "insensitive" } },
-        {
-          ubicacion: {
-            OR: [
-              { direccion: { contains: texto, mode: "insensitive" } },
-              { barrio: { nombre: { contains: texto, mode: "insensitive" } } },
-              {
-                barrio: {
-                  zona: { nombre: { contains: texto, mode: "insensitive" } },
-                },
-              },
-              {
-                barrio: {
-                  zona: {
-                    municipio: {
-                      nombre: { contains: texto, mode: "insensitive" },
-                    },
-                  },
-                },
-              },
-              {
-                barrio: {
-                  zona: {
-                    municipio: {
-                      provincia: {
-                        nombre: { contains: texto, mode: "insensitive" },
-                      },
-                    },
-                  },
-                },
-              },
-              {
-                barrio: {
-                  zona: {
-                    municipio: {
-                      provincia: {
-                        departamento: {
-                          nombre: { contains: texto, mode: "insensitive" },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-              {
-                ubicacion_maestra: {
-                  nombre: { contains: texto, mode: "insensitive" },
-                },
-              },
-            ],
+      where.ubicacion = {
+        
+  OR: [
+    //{ direccion: { contains: texto, mode: "insensitive" } },
+    { barrio: { nombre: { contains: texto, mode: "insensitive" } } },
+    {
+      barrio: {
+        zona: { nombre: { contains: texto, mode: "insensitive" } },
+      },
+    },
+    {
+      barrio: {
+        zona: {
+          municipio: {
+            nombre: { contains: texto, mode: "insensitive" },
           },
         },
-      ];
+      },
+    },
+    {
+      barrio: {
+        zona: {
+          municipio: {
+            provincia: {
+              nombre: { contains: texto, mode: "insensitive" },
+            },
+          },
+        },
+      },
+    },
+    {
+      barrio: {
+        zona: {
+          municipio: {
+            provincia: {
+              departamento: {
+                nombre: { contains: texto, mode: "insensitive" },
+              },
+            },
+          },
+        },
+      },
+    },
+    {
+      ubicacion_maestra: {
+        nombre: { contains: texto, mode: "insensitive" },
+      },
+    },
+  ],
+};
     } else if (filtros.locationId) {
       // Fallback: Si no hay texto, asumimos que viene de un botón antiguo de "Ciudades Destacadas"
       where.ubicacion = { ubicacionMaestraId: Number(filtros.locationId) };
@@ -286,24 +281,30 @@ export const propertiesRepository = {
       ];
     }
 
-    // Filtros por Etiquetas (Lógica OR)
+    // Filtros por Etiquetas (Lógica AND)
     if (filtros.labels && filtros.labels.length > 0) {
-      where.publicaciones = {
-        some: {
-          estado: 'ACTIVA' as const,
-          publicacion_tag: {
-            some: { tag_id: { in: filtros.labels } }
+      where.AND = [
+        ...(where.AND || []),
+        ...filtros.labels.map((labelId) => ({
+          publicaciones: {
+            some: {
+              estado: 'ACTIVA' as const,
+              publicacion_tag: {
+                some: {
+                  tag_id: labelId
+                }
+              }
+            }
           }
-        }
-      }
+        }))
+      ]
     }
 
     // HU6 - Filtro solo ofertas
     if (filtros.soloOfertas === true) {
-      where.precio = {
-        ...((where.precio as object) ?? {}),
-        lt: prisma.inmueble.fields.precio_anterior
-      }
+      // Prisma no permite comparar directamente campos entre sí en un WHERE.
+      // Filtramos al menos por ofertas que tienen precio anterior guardado.
+      where.precio_anterior = { not: null };
     }
 
     // ── ORDER BY ───────────────────────────────────────────────────────────
@@ -364,7 +365,7 @@ export const propertiesRepository = {
       },
     });
 
-    const resultados =
+    let resultados =
       filtros.lat && filtros.lng
         ? inmuebles.filter((inmueble) => {
             const u = inmueble.ubicacion;
@@ -398,6 +399,14 @@ export const propertiesRepository = {
             return distancia <= radiusKm;
           })
         : inmuebles;
+
+    if (filtros.soloOfertas === true) {
+      resultados = resultados.filter((inmueble) => {
+        const precioAnterior = Number((inmueble as any).precio_anterior ?? 0)
+        const precioActual = Number(inmueble.precio ?? 0)
+        return precioAnterior > 0 && precioActual < precioAnterior
+      })
+    }
 
     if (filtros.fecha === "mas-populares") {
       console.log("🔥 Entrando al bloque mas-populares");

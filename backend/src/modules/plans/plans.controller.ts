@@ -1,52 +1,39 @@
 import type { Request, Response } from 'express'
 import { prisma } from '../../lib/prisma.client.js'
 
-const planes = [
-  {
-    id: 1,
-    name: 'Básico',
-    price: 0,
-    description: 'Publicaciones gratuitas limitadas',
-    tiempo: 'Por mes',
-    beneficios: ['10 publicaciones', 'Soporte básico'],
-    texto_corto: 'Ideal para empezar'
-  },
-  {
-    id: 2,
-    name: 'Estándar',
-    price: 99,
-    description: 'Más publicaciones y soporte prioritario',
-    tiempo: 'Por mes',
-    beneficios: ['50 publicaciones', 'Soporte prioritario', 'Estadísticas básicas'],
-    texto_corto: 'Para profesionales',
-    popular: true
-  },
-  {
-    id: 3,
-    name: 'Pro',
-    price: 199,
-    description: 'Publicaciones ilimitadas + estadísticas avanzadas',
-    tiempo: 'Por mes',
-    beneficios: [
-      'Publicaciones ilimitadas',
-      'Soporte 24/7',
-      'Estadísticas avanzadas',
-      'API acceso'
-    ],
-    texto_corto: 'Para empresas'
-  }
-]
-
-export const getPlanes = async (req: Request, res: Response) => {
+export const getPlanes = async (_req: Request, res: Response) => {
   try {
-    const planesValidos = planes.filter(
-      (plan) => plan.price !== null && plan.price !== undefined && plan.price >= 0
+    // Lee de la BD real, excluyendo planes eliminados lógicamente (soft delete HU-10).
+    // Así los cambios del admin (crear/editar/eliminar) se reflejan en el catálogo del usuario.
+    const planes = await prisma.plan_suscripcion.findMany({
+      where: { eliminado_en: null },
+      orderBy: { precio_plan: 'asc' },
+    })
+
+    // HU-01: no mostrar planes con precio nulo, negativo o inválido.
+    const validos = planes.filter(
+      (p) => p.precio_plan !== null && Number(p.precio_plan) >= 0 && !Number.isNaN(Number(p.precio_plan))
     )
-    res.json(planesValidos)
+
+    const data = validos.map((p, idx) => ({
+      id: p.id,
+      name: p.nombre_plan ?? 'Plan',
+      price: Number(p.precio_plan),
+      description: p.descripcion_plan ?? '',
+      benefits: [
+        p.nro_publicaciones_plan != null ? `${p.nro_publicaciones_plan} publicaciones activas` : null,
+        p.duracion_plan_dias != null ? `${p.duracion_plan_dias} días de vigencia` : null,
+      ].filter((b): b is string => Boolean(b)),
+      imagen_gr_url: p.imagen_gr_url,
+      // Marca como "más popular" al plan intermedio cuando hay 3 o más planes.
+      popular: validos.length >= 3 && idx === 1,
+    }))
+
+    res.json(data)
   } catch {
     res.status(500).json({
       error: 'Error del servidor',
-      message: 'No se pudieron cargar los planes'
+      message: 'No se pudieron cargar los planes',
     })
   }
 }
