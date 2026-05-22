@@ -89,11 +89,11 @@ export default function ComparatorModal({ isOpen, onClose }: ComparatorModalProp
 
   return (
     //  Modal superpuesto oscureciendo el fondo
-    <div className="fixed inset-0 z-[9999] bg-stone-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-[9999] bg-stone-900/60 backdrop-blur-sm flex items-end md:items-center justify-center p-0 md:p-4">
+      <div className="bg-white rounded-t-2xl md:rounded-2xl shadow-2xl w-full max-w-5xl flex flex-col h-[85vh] md:max-h-[90vh] overflow-hidden animate-in slide-in-from-bottom-4 md:zoom-in-95 duration-200">
        
         {/* Header del Modal */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200">
+        <div className="flex items-center justify-between px-4 md:px-6 py-4 border-b border-stone-200">
           <div className="flex items-center gap-2">
             <BarChart2 className="w-5 h-5 text-[#ea580c]" />
             <h2 className="text-xl font-bold text-stone-800">Comparativa de Inmuebles</h2>
@@ -111,7 +111,7 @@ export default function ComparatorModal({ isOpen, onClose }: ComparatorModalProp
               <p className="text-sm font-medium">Sincronizando parámetros...</p>
             </div>
           ) : (
-            <div className="overflow-x-auto pb-8">
+          <div className="overflow-x-auto pb-8">
               <table className="w-full text-left border-collapse min-w-max">
                 <thead>
                   <tr>
@@ -219,20 +219,20 @@ export default function ComparatorModal({ isOpen, onClose }: ComparatorModalProp
                     {properties.map(prop => (
                       <td key={prop.id} className="p-4 border-t border-stone-200 dark:border-stone-800 align-top">
                         <div className="flex flex-col gap-2.5">
-                          <ContactButton 
-                            type="whatsapp" 
-                            variant="grid" 
-                            phoneNumber={prop.propietario?.telefono || prop.propietario?.usuario?.telefono} 
+                          <ContactButton
+                            type="whatsapp"
+                            variant="grid"
+                            phoneNumber={prop.propietario?.telefono || prop.propietario?.usuario?.telefono}
                           />
-                          <ComoLlegarButton 
-                            lat={Number(prop.ubicacion?.latitud)} 
-                            lng={Number(prop.ubicacion?.longitud)} 
-                            variant="grid" 
+                          <ComoLlegarButton
+                            lat={Number(prop.ubicacion?.latitud)}
+                            lng={Number(prop.ubicacion?.longitud)}
+                            variant="grid"
                           />
-                          <ActionButton 
-                            variant="grid" 
-                            label="Ver detalles" 
-                            onClick={() => window.open(`/detalle-propiedad/${prop.id}`, '_blank')} 
+                          <ActionButton
+                            variant="grid"
+                            label="Ver detalles"
+                            onClick={() => window.open(`/detalle-propiedad/${prop.id}`, '_blank')}
                           />
                         </div>
                       </td>

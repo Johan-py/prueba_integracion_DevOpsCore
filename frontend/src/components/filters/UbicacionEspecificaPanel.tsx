@@ -15,7 +15,7 @@ export function UbicacionEspecificaPanel({ onClose, onApply }: UbicacionEspecifi
   const selectClasses = "w-full p-2.5 text-sm text-gray-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg outline-none focus:border-[#d97706] dark:focus:border-[#E87C1E] focus:ring-1 focus:ring-[#d97706] dark:focus:ring-[#E87C1E] disabled:bg-gray-50 dark:disabled:bg-slate-800/50 disabled:text-gray-400 dark:disabled:text-slate-500 disabled:cursor-not-allowed transition-colors cursor-pointer";
 
   return (
-    <div className="flex flex-col h-full min-h-0 bg-white dark:bg-slate-900 w-full animate-in slide-in-from-right-4 duration-300">
+    <div className="flex flex-col w-full bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden">
       {/* 1. HEADER (Fijo) */}
       <div className="shrink-0 p-4 pb-2 relative flex flex-col items-center justify-center border-b border-gray-100 dark:border-slate-800">
         <div className="w-full flex items-center justify-center relative mb-1">
@@ -32,8 +32,8 @@ export function UbicacionEspecificaPanel({ onClose, onApply }: UbicacionEspecifi
         <p className="text-sm text-stone-500 dark:text-slate-400 mb-2 text-center">Seleccione la ubicación:</p>
       </div>
 
-      {/* 2. CONTENIDO (Con Scroll) */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-5 custom-scrollbar">
+      {/* 2. CONTENIDO */}
+      <div className="w-full px-4 py-4 space-y-5">
         {/* 1. DEPARTAMENTO */}
         <div>
           <label className="block text-[11px] font-bold text-gray-500 uppercase mb-1.5">Departamento</label>
@@ -109,8 +109,8 @@ export function UbicacionEspecificaPanel({ onClose, onApply }: UbicacionEspecifi
         </div>
       </div>
 
-      {/* 3. FOOTER (Fijo al fondo) */}
-      <div className="shrink-0 px-6 pb-6 pt-4 border-t border-stone-100 dark:border-slate-800 bg-white dark:bg-slate-900 relative">
+      {/* 3. FOOTER */}
+      <div className="shrink-0 px-4 pb-4 pt-4 border-t border-stone-100 dark:border-slate-800 bg-white dark:bg-slate-900 relative">
         
         {/* Usamos un ID para tener la máxima prioridad en CSS (1,1,2) */}
         <style dangerouslySetInnerHTML={{__html: `
