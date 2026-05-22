@@ -94,34 +94,10 @@ export const publicacionService = {
       totalCompartidos: Number(pub.totalCompartidos ?? 0),
     }));
   },
+// ==================== NUEVOS MÉTODOS HU-11 ====================
+  // PUBLICIDAD DE PROPIEDADES
 
-  async crearPagoPublicidad(
-    publicacionId: number,
-    planId: number,
-    monto: number,
-    moneda: string = "USD"
-  ): Promise<{ checkoutUrl: string; transaccionId: number }> {
-    const response = await fetch(`${API_URL}/api/cobros/crear-pago-publicidad`, {
-      method: "POST",
-      headers: getHeaders(),
-      body: JSON.stringify({
-        publicacionId,
-        planId,
-        monto,
-        moneda,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Error al crear el pago");
-    }
-
-    return data;
-  },
-
-  
+  // Iniciar proceso de publicidad (simula pago)
   async iniciarPublicidad(publicacionId: number): Promise<{ checkoutUrl: string }> {
     const response = await fetch(`${API_URL}/api/publicaciones/${publicacionId}/publicitar`, {
       method: "POST",
@@ -137,6 +113,7 @@ export const publicacionService = {
     return data.data;
   },
 
+  // Confirmar pago y activar publicidad
   async confirmarPublicidad(
     publicacionId: number,
     paymentIntentId: string,
@@ -157,7 +134,7 @@ export const publicacionService = {
     return data;
   },
 
-
+  // Cancelar publicidad activa
   async cancelarPublicidad(publicacionId: number): Promise<{ ok: boolean; message: string }> {
     const response = await fetch(`${API_URL}/api/publicaciones/${publicacionId}/publicitar/cancelar`, {
       method: "DELETE",
@@ -172,7 +149,8 @@ export const publicacionService = {
 
     return data;
   },
-  
+
+  // Obtener estado de publicidad de una publicación
   async obtenerEstadoPublicidad(publicacionId: number): Promise<any> {
     const response = await fetch(`${API_URL}/api/publicaciones/${publicacionId}/publicitar/estado`, {
       method: "GET",

@@ -15,11 +15,6 @@ export interface Inmueble {
   estado?: string
   tipoAccion?: string
   categoria?: string | null
-  promoted?: boolean
-  publicaciones?: Array<{
-    promoted?: boolean
-    multimedia?: any[]
-}>
 }
 
 export type OrdenFecha =

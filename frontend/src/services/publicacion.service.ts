@@ -46,7 +46,7 @@ export async function obtenerMisPublicaciones(): Promise<
   }
 
   const publicaciones = Array.isArray(data.data) ? data.data : [];
-  return publicaciones.map((pub: MisPublicacionesItem) => ({
+  return publicaciones.map((pub: any) => ({
     ...pub,
     totalVisualizaciones: Number(pub.totalVisualizaciones ?? 0),
     totalCompartidos: Number(pub.totalCompartidos ?? 0),

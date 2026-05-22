@@ -1,6 +1,6 @@
 'use client'
 import { Inmueble } from '../../types/inmueble'
-import { BedDouble, Bath, Maximize, MapPin, Star, Check, TrendingUp, Sparkles } from 'lucide-react'
+import { BedDouble, Bath, Maximize, MapPin, Star, Check, TrendingUp } from 'lucide-react'
 import Image from 'next/image'
 import { useState } from 'react'
 import { useCompareStore } from '@/hooks/useCompareStore'
@@ -28,9 +28,6 @@ export const TarjetaInmueble = ({ inmueble, posicion, esRecomendadoIA }: Tarjeta
     typeof inmueble.ubicacion === 'object' && inmueble.ubicacion !== null
       ? `${inmueble.ubicacion.zona ?? ''}, ${inmueble.ubicacion.ciudad ?? ''}`
       : ''
-      
-   const estaDestacada = inmueble.publicaciones?.[0]?.promoted === true
-
 
   const handleClick = async () => {
     // Si la función comparar está activa, el clic solo selecciona la tarjeta
@@ -77,16 +74,6 @@ export const TarjetaInmueble = ({ inmueble, posicion, esRecomendadoIA }: Tarjeta
           <Check size={16} strokeWidth={3} />
         </div>
       )}
-
-       {/* ✅ NUEVO: Badge "Destacada" para propiedades publicitadas */}
-      {estaDestacada && (
-        <div className="absolute top-3 left-3 z-20 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-2.5 py-1 rounded-full flex items-center gap-1 shadow-md">
-          <Sparkles size={12} />
-          <span className="text-xs font-bold">Destacada</span>
-        </div>
-      )} 
-
-
 
       <div className="relative aspect-[4/3] w-full bg-gray-200 dark:bg-stone-800 overflow-hidden">
         <Image
