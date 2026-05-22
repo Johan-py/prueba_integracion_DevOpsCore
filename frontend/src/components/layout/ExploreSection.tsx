@@ -170,13 +170,13 @@ export default function ExploreSection() {
                     className="flex items-center gap-2.5 transition-colors duration-200 group focus:outline-none"
                   >
                     <div
-                      className={`w-7 h-7 rounded-md border shadow-sm flex items-center justify-center transition-all ${isSelected ? 'bg-amber-500 border-amber-500' : 'bg-white border-stone-300'
+                      className={`w-7 h-7 rounded-md border shadow-sm flex items-center justify-center transition-all ${isSelected ? 'bg-amber-500 border-amber-500' : 'bg-white dark:bg-transparent border-stone-300 dark:border-stone-600'
                         }`}
                     >
                       {isSelected && <span className="text-white text-sm font-bold">✓</span>}
                     </div>
                     <span
-                      className={`font-semibold font-montserrat text-lg transition-colors ${isSelected ? 'text-amber-700' : 'text-stone-900 group-hover:text-amber-600'
+                      className={`font-semibold font-montserrat text-lg transition-colors ${isSelected ? 'text-amber-700 dark:text-amber-500' : 'text-stone-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-500'
                         }`}
                     >
                       {option.name}

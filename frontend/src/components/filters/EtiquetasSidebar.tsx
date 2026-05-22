@@ -157,7 +157,7 @@ export default function EtiquetasSidebar({ isOpen, onClose }: EtiquetasSidebarPr
   }
 
   return (
-    <div className="flex flex-col h-full min-h-0 bg-white dark:bg-slate-900 border-r border-stone-200 dark:border-slate-800">
+    <div className="flex flex-col w-full bg-white dark:bg-slate-900 rounded-xl border border-stone-200 dark:border-slate-800 shadow-sm overflow-hidden">
       <div className="shrink-0 p-4 pb-3 border-b border-stone-100 dark:border-slate-800">
         <div className="w-full flex items-center justify-center relative mb-1">
           <h3 className="font-bold text-sm text-stone-800 dark:text-slate-100 uppercase tracking-wide text-center">
@@ -184,7 +184,7 @@ export default function EtiquetasSidebar({ isOpen, onClose }: EtiquetasSidebarPr
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 custom-scrollbar flex flex-col gap-5">
+      <div className="w-full p-4 flex flex-col gap-5">
         <div>
           <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] font-bold text-stone-400 uppercase tracking-widest">
@@ -267,7 +267,7 @@ export default function EtiquetasSidebar({ isOpen, onClose }: EtiquetasSidebarPr
         </div>
       </div>
 
-      <div className="shrink-0 px-6 pb-6 pt-4 border-t border-stone-100 bg-white flex flex-col gap-3 dark:border-slate-800 dark:bg-slate-900">
+      <div className="shrink-0 px-4 pb-4 pt-4 border-t border-stone-100 bg-white flex flex-col gap-3 dark:border-slate-800 dark:bg-slate-900">
         {showEmptyWarning && (
           <p className="text-xs text-[rgb(217,119,6)] dark:text-[rgb(232,124,30)] text-center animate-pulse">
             Selecciona al menos una etiqueta para filtrar
