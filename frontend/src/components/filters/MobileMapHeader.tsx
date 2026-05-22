@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo, FC } from 'react'
-import { SearchIcon, Menu, Home, Building, Bed, Trees, Flower2, LucideIcon } from 'lucide-react'
+import { SearchIcon, Menu, Home, Building, Bed, Trees, Flower2, LucideIcon, ChevronDown, ChevronUp } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { LocationSearch } from '../layout/LocationSearch'
 
@@ -22,6 +22,7 @@ export default function MobileMapHeader({ onOpenMenu }: MobileMapHeaderProps) {
   const [tipoInmuebleSeleccionado, setTipoInmuebleSeleccionado] = useState<string>('CASA')
   const [ubicacionTexto, setUbicacionTexto] = useState('')
   const [coords, setCoords] = useState<{ lat?: number, lng?: number, locationId?: number }>({})
+  const [isCollapsed, setIsCollapsed] = useState(false)
 
   const propertyTypes: PropertyTypeOption[] = useMemo(() => [
     { id: 'CASA', label: 'Casa', icon: Home },
@@ -72,8 +73,19 @@ export default function MobileMapHeader({ onOpenMenu }: MobileMapHeaderProps) {
   );
 
   return (
-    <div className="w-full flex flex-col gap-4 p-4 bg-white border-b border-stone-200 shadow-md relative z-[9999] dark:bg-stone-950 dark:border-stone-800">
+    <div className={`w-full flex flex-col relative z-[9999] transition-all duration-300 ease-in-out bg-white dark:bg-stone-950 ${isCollapsed ? 'h-[10px] border-b-0 gap-0 p-0 overflow-visible shadow-none' : 'p-4 gap-4 border-b border-stone-200 dark:border-stone-800 shadow-md'}`}>
       
+      {/* BOTÓN COLAPSABLE TIPO "PULL-TAB" */}
+      <button
+        type="button"
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        className="absolute left-1/2 -translate-x-1/2 -bottom-[28px] h-[28px] px-8 bg-white dark:bg-stone-950 border-x border-b border-stone-200 dark:border-stone-800 rounded-b-2xl shadow-md flex items-center justify-center hover:bg-stone-50 transition-all z-[10000]"
+      >
+        {isCollapsed ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
+      </button>
+
+      {/* CONTENEDOR INTERNO DE FILTROS */}
+      <div className={`flex w-full flex-col gap-4 transition-all duration-300 ${isCollapsed ? 'hidden' : 'flex animate-in fade-in slide-in-from-top-2'}`}>
       {/* SECCIÓN 1: Menú Hamburguesa (Absoluto) + Título Centrado (Relativo) */}
       <div className="flex items-center justify-center w-full relative min-h-[42px]">
         <button 
@@ -167,6 +179,7 @@ export default function MobileMapHeader({ onOpenMenu }: MobileMapHeaderProps) {
         BUSCAR
       </button>
 
+      </div>
     </div>
   )
 }
