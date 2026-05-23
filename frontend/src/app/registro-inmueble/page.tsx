@@ -25,11 +25,11 @@ type CampoError =
   | 'mapa'
   | null
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '')
 
 export default function MiRegistroPage() {
   const router = useRouter()
-  const [mostrarVideo, setMostrarVideo] = useState(true)
+  const [mostrarVideo, setMostrarVideo] = useState(false)
 
   const [datos, setDatos] = useState({
     titulo: '',
@@ -61,6 +61,75 @@ export default function MiRegistroPage() {
   }[]
 >([])
 const [poiSeleccionado, setPoiSeleccionado] = useState<number | null>(null)
+
+  const contenidoTutorial = {
+    titulo: 'Antes de publicar tu propiedad',
+    mensaje:
+      'Mira este video y conoce qué necesitas tener listo para crear tu publicación de forma exitosa.',
+    requisitos: [
+      'Tipo de inmueble que deseas publicar.',
+      'Ubicación o dirección referencial de la propiedad.',
+      'Precio de venta, alquiler o anticrético.',
+      'Superficie y características principales del inmueble.',
+      'Fotografías o recursos multimedia claros de la propiedad.',
+    ],
+    videoUrl: '',
+    thumbnailUrl: null,
+    subtitlesUrl: null,
+    checkboxLabel: 'Sí entiendo qué necesito para publicar una propiedad',
+  }
+
+  const verificarTutorialPublicacion = async () => {
+    const token = localStorage.getItem('token')
+
+    if (!token) {
+      router.push('/sign-in')
+      return
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/api/publicaciones/tutorial/estado`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      const result = await response.json().catch(() => null)
+
+      if (response.ok && result?.data?.debeMostrarTutorial === true) {
+        setMostrarVideo(true)
+        return
+      }
+
+      setMostrarVideo(false)
+    } catch (error) {
+      console.error('Error al verificar tutorial de publicación:', error)
+      setMostrarVideo(false)
+    }
+  }
+
+  const confirmarTutorialPublicacion = async () => {
+    const token = localStorage.getItem('token')
+
+    setMostrarVideo(false)
+
+    if (!token) {
+      router.push('/sign-in')
+      return
+    }
+
+    try {
+      await fetch(`${API_URL}/api/publicaciones/tutorial/confirmar`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+    } catch (error) {
+      console.error('Error al confirmar tutorial de publicación:', error)
+    }
+  }
 
   useEffect(() => {
     const obtenerDireccion = async () => {
@@ -121,12 +190,15 @@ const [poiSeleccionado, setPoiSeleccionado] = useState<number | null>(null)
   }
 
   useEffect(() => {
-  const token = localStorage.getItem('token')
+    const token = localStorage.getItem('token')
 
-  if (!token) {
-    router.push('/sign-in')
-  }
-}, [router])
+    if (!token) {
+      router.push('/sign-in')
+      return
+    }
+
+    verificarTutorialPublicacion()
+  }, [router])
 
   const limpiarError = () => {
     setMensajeError('')
@@ -681,8 +753,9 @@ const [poiSeleccionado, setPoiSeleccionado] = useState<number | null>(null)
      <>
     {mostrarVideo && (
       <VideoPublicacionModal
-        onClose={() => setMostrarVideo(false)}
-        onContinue={() => setMostrarVideo(false)}
+        contenido={contenidoTutorial}
+        onClose={confirmarTutorialPublicacion}
+        onContinue={confirmarTutorialPublicacion}
       />
     )}
     <div className="min-h-screen bg-white text-gray-900">

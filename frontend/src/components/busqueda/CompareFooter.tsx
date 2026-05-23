@@ -18,7 +18,7 @@ export default function CompareFooter({ onOpenModal }: CompareFooterProps) {
   const isReady = count >= 2;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[100] px-4 pb-6 md:pb-8 pointer-events-none">
+    <div className="fixed bottom-0 left-0 right-0 z-[100] px-4 pb-28 md:pb-8 pointer-events-none">
       <div className="max-w-md mx-auto pointer-events-auto">
         <div className="bg-stone-900/90 backdrop-blur-md border border-stone-700 p-4 rounded-2xl shadow-2xl flex items-center justify-between animate-in slide-in-from-bottom-10 duration-300">
          

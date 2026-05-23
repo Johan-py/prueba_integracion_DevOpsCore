@@ -1,0 +1,36 @@
+name: "CodeQL SAST Analysis"
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+    branches: [develop, main]
+
+jobs:
+  analyze:
+    name: Analizar Código Estático
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout Código
+        uses: actions/checkout@v4
+
+      # Inicializar las herramientas de CodeQL para JavaScript y TypeScript
+      - name: Inicializar CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+
+      # Construir el entorno para intentar resolver configuraciones del tsconfig.json
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      # Ejecutamos el análisis de patrones inseguros
+      - name: Realizar Análisis de Seguridad
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript-typescript" # Organizamos etiquetando el escaneo

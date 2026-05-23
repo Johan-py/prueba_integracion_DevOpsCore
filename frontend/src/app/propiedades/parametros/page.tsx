@@ -179,11 +179,21 @@ function ParametrosPageContent() {
 
       const data = await response.json().catch(() => null);
       if (!response.ok) throw new Error(data?.mensaje || "No se pudieron guardar los tags.");
+      const sinCambios = 
+        tags.length === tagsGuardados.length &&
+        tags.every((t) => tagsGuardados.includes(t));
+
+      if (sinCambios) return;
+
       setTagsGuardados(tags);
       setMostrarExitoTags(true);
       setTimeout(() => setMostrarExitoTags(false), 5000);
     } catch (error) {
-      setMensaje(error instanceof Error ? error.message : "Error al guardar tags.");
+      const esSinConexion = error instanceof TypeError && error.message === "Failed to fetch";
+      setMensaje(esSinConexion
+        ? "No se pudo guardar. Verifique su conexión a internet."
+        : error instanceof Error ? error.message : "Error al guardar tags."
+      );
     }
   };
   

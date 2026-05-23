@@ -340,18 +340,17 @@ export const registerWithLinkedInCodeService = async (
 
   const existingUserByEmail = await findUserByLinkedInEmail(correo)
 
-  if (existingUserByEmail) {
-    if (existingUserByEmail.activo === false) {
-      throw new LinkedInAuthError('Esta cuenta está desactivada', 'ACCOUNT_DEACTIVATED', 403)
-    }
-
-    await linkLinkedInToUser(existingUserByEmail.id, linkedinId, correo, tokenStorage)
-
-    return await buildLinkedInSessionResponse(
-      existingUserByEmail,
-      'LinkedIn vinculado e inicio de sesión exitoso'
-    )
+if (existingUserByEmail) {
+  if (existingUserByEmail.activo === false) {
+    throw new LinkedInAuthError('Esta cuenta está desactivada', 'ACCOUNT_DEACTIVATED', 403)
   }
+
+  throw new LinkedInAuthError(
+    'Este correo ya está registrado. Inicia sesión con tu método actual y vincula LinkedIn desde Seguridad.',
+    'ACCOUNT_ALREADY_REGISTERED',
+    409
+  )
+}
 
   const nombre = linkedinUser.given_name?.trim() || linkedinUser.name?.split(' ')[0] || 'Usuario'
 

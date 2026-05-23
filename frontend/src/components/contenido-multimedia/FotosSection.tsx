@@ -1,8 +1,9 @@
 type ImageItem = {
   id: string
-  file: File
+  file?: File
   previewUrl: string
   name: string
+  isExisting?: boolean
 }
 
 type FotosSectionProps = {

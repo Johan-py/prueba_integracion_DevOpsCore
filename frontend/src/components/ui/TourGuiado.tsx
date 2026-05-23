@@ -1,111 +1,30 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { TOUR_STEPS, FOOTER_STEP_INDEX, type TourStep } from "./tourSteps";
+import { TOUR_STEPS, FOOTER_STEP_INDEX } from "./tour.constants";
+import {
+  isLoggedIn,
+  isMobileMenuInDOM,
+  waitForMenuClose,
+  waitForMenuOpen,
+  getTourTheme,
+} from "./tour.utils";
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const MENU_CLOSE_TIMEOUT_MS = 600;
-
-// ─── DOM Helpers ──────────────────────────────────────────────────────────────
-
-const isLoggedIn = () => {
-  if (typeof window === "undefined") return false;
-  return !!localStorage.getItem("token");
+type TourStep = {
+  id: string;
+  title: string;
+  description: string;
+  required: boolean;
+  mobileId?: string;
+  requiresMobileMenu?: boolean;
 };
-
-const isMobileMenuInDOM = (): boolean =>
-  !!document.querySelector(".fixed.inset-0.bg-black\\/40");
-
-const waitForMenuClose = (onClosed: () => void): (() => void) => {
-  if (!isMobileMenuInDOM()) {
-    onClosed();
-    return () => {};
-  }
-
-  let done = false;
-  const resolve = () => {
-    if (done) return;
-    done = true;
-    observer.disconnect();
-    clearTimeout(fallback);
-    requestAnimationFrame(() => requestAnimationFrame(onClosed));
-  };
-
-  const observer = new MutationObserver(() => {
-    if (!isMobileMenuInDOM()) resolve();
-  });
-  observer.observe(document.body, { childList: true, subtree: true });
-  const fallback = setTimeout(resolve, MENU_CLOSE_TIMEOUT_MS);
-
-  return () => {
-    done = true;
-    observer.disconnect();
-    clearTimeout(fallback);
-  };
-};
-
-const waitForMenuOpen = (onOpened: () => void): (() => void) => {
-  if (isMobileMenuInDOM()) {
-    onOpened();
-    return () => {};
-  }
-
-  let done = false;
-  const resolve = () => {
-    if (done) return;
-    done = true;
-    observer.disconnect();
-    clearTimeout(fallback);
-    requestAnimationFrame(() => requestAnimationFrame(onOpened));
-  };
-
-  const observer = new MutationObserver(() => {
-    if (isMobileMenuInDOM()) resolve();
-  });
-  observer.observe(document.body, { childList: true, subtree: true });
-  const fallback = setTimeout(resolve, MENU_CLOSE_TIMEOUT_MS);
-
-  return () => {
-    done = true;
-    observer.disconnect();
-    clearTimeout(fallback);
-  };
-};
-
-// ─── API ──────────────────────────────────────────────────────────────────────
-
-const completeTourApi = () => {
-  const token = localStorage.getItem("token");
-  if (!token) return;
-
-  try {
-    const raw = localStorage.getItem("propbol_user");
-    if (raw) {
-      const sessionUser = JSON.parse(raw);
-      localStorage.setItem(
-        "propbol_user",
-        JSON.stringify({ ...sessionUser, controlador: true })
-      );
-    }
-  } catch {
-    // ignorar — el backend es la fuente de verdad
-  }
-
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
-  fetch(`${apiUrl}/api/auth/tour`, {
-    method: "PATCH",
-    headers: { Authorization: `Bearer ${token}` },
-  }).catch(() => {});
-};
-
-// ─── Component ────────────────────────────────────────────────────────────────
 
 export default function TourGuiado() {
   const [showTour, setShowTour] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [highlight, setHighlight] = useState<DOMRect | null>(null);
   const [tooltipH, setTooltipH] = useState(0);
+  const [isDark, setIsDark] = useState(false);
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const retryRef = useRef<NodeJS.Timeout | null>(null);
@@ -114,6 +33,38 @@ export default function TourGuiado() {
   const ioRef = useRef<IntersectionObserver | null>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const prevStepRef = useRef<number>(-1);
+
+  // Detectar modo oscuro
+  useEffect(() => {
+    const check = () =>
+      setIsDark(document.documentElement.classList.contains("dark"));
+    check();
+    const observer = new MutationObserver(check);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  // fix(tour): suspender filtro de accesibilidad mientras el tour está activo.
+  // Los filtros CSS en <html> crean un nuevo stacking context que rompe
+  // position: fixed del overlay y el tooltip.
+  useEffect(() => {
+    if (!showTour) return;
+
+    const root = document.documentElement;
+    const prevFilter = root.getAttribute("data-accessibility");
+    root.setAttribute("data-accessibility", "none");
+
+    return () => {
+      if (prevFilter) {
+        root.setAttribute("data-accessibility", prevFilter);
+      } else {
+        root.removeAttribute("data-accessibility");
+      }
+    };
+  }, [showTour]);
 
   // ─── Tour visibility logic ─────────────────────────────────────────────────
 
@@ -191,18 +142,6 @@ export default function TourGuiado() {
       window.removeEventListener("propbol:session-changed", handleSessionChanged);
   }, []);
 
-  useEffect(() => {
-    const handleIniciarTour = () => {
-      setHighlight(null);
-      prevStepRef.current = -1;
-      setCurrentStep(0);
-      setShowTour(true);
-    };
-    window.addEventListener("propbol:iniciar-tour", handleIniciarTour);
-    return () =>
-      window.removeEventListener("propbol:iniciar-tour", handleIniciarTour);
-  }, []);
-
   // ─── Scroll lock ───────────────────────────────────────────────────────────
 
   useEffect(() => {
@@ -242,7 +181,8 @@ export default function TourGuiado() {
       if (tooltipRef.current) setTooltipH(tooltipRef.current.offsetHeight);
 
       const step = TOUR_STEPS[currentStep] as TourStep;
-      const isMobileNav = (window.visualViewport?.width ?? window.innerWidth) < 768;
+      const isMobileNav =
+        (window.visualViewport?.width ?? window.innerWidth) < 1024;
       const id = isMobileNav && step.mobileId ? step.mobileId : step.id;
       const el = document.getElementById(id);
       if (!el) return;
@@ -326,7 +266,8 @@ export default function TourGuiado() {
     if (!showTour) return;
 
     const step = TOUR_STEPS[currentStep] as TourStep;
-    const isMobileNav = (window.visualViewport?.width ?? window.innerWidth) < 768;
+    const isMobileNav =
+      (window.visualViewport?.width ?? window.innerWidth) < 1024;
 
     const needsMobileMenu = isMobileNav && !!step.requiresMobileMenu;
     const prevIndex = prevStepRef.current;
@@ -415,6 +356,8 @@ export default function TourGuiado() {
 
   // ─── Render ───────────────────────────────────────────────────────────────
 
+  const theme = getTourTheme(isDark);
+
   if (!showTour) return null;
 
   const PADDING = 8;
@@ -465,8 +408,22 @@ export default function TourGuiado() {
   return (
     <>
       {/* Overlay */}
-      <div style={{ position: "fixed", inset: 0, zIndex: 9998, pointerEvents: "all" }}>
-        <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}>
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 99998,
+          pointerEvents: "all",
+        }}
+      >
+        <svg
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+          }}
+        >
           <defs>
             <mask id="tm">
               <rect width="100%" height="100%" fill="white" />
@@ -494,8 +451,9 @@ export default function TourGuiado() {
           top,
           left,
           width: tooltipW,
-          zIndex: 9999,
-          background: "#fff",
+          zIndex: 99999,
+          background: theme.bg,
+          color: theme.text,
           borderRadius: 12,
           padding: tooltipPad,
           boxShadow: "0 8px 32px rgba(0,0,0,0.18)",
@@ -530,7 +488,14 @@ export default function TourGuiado() {
         </p>
 
         {!hasValid && (
-          <p style={{ fontSize: fontMeta, color: "#9ca3af", marginBottom: 14, fontStyle: "italic" }}>
+          <p
+            style={{
+              fontSize: fontMeta,
+              color: theme.textSubtle,
+              marginBottom: 14,
+              fontStyle: "italic",
+            }}
+          >
             Esta sección no está visible en tu dispositivo actual.
           </p>
         )}

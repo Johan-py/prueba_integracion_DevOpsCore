@@ -1,23 +1,38 @@
-import Image from "next/image"
-import { notFound } from 'next/navigation'
-import { Metadata } from 'next'
-import BlogDetailSidebar from '@/components/blog/BlogDetailSidebar'
-import BlogCommentsSection from '@/components/blog/BlogCommentsSection'
-import MarkdownRenderer from '@/components/blog/MarkdownRenderer'
-import BlogSharePlaceholder from '@/components/blog/BlogSharePlaceholder'
-import { MOCK_USER_BLOGS } from '@/lib/mock/blogs.mock'
-import { getPublishedBlogById, getPublishedBlogs } from '@/services/blogs.service'
-import BackButton from "@/app/blogs/backButton"
+import Image from "next/image";
+import { redirect } from "next/navigation";
+import { Metadata } from "next";
+import BlogDetailSidebar from "@/components/blog/BlogDetailSidebar";
+import BlogCommentsSection from "@/components/blog/BlogCommentsSection";
+import MarkdownRenderer from "@/components/blog/MarkdownRenderer";
+import BlogSharePlaceholder from "@/components/blog/BlogSharePlaceholder";
+import { MOCK_USER_BLOGS } from "@/lib/mock/blogs.mock";
+import BlogRealtimeRefresh from "@/components/blog/BlogRealtimeRefresh";
+import {
+  getPublishedBlogById,
+  getPublishedBlogs,
+} from "@/services/blogs.service";
+import BackButton from "@/app/blogs/backButton";
+import BlogDeletedRedirect from "@/components/blog/BlogDeletedRedirect";
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const publicBlog = await getPublishedBlogById(params.id)
-  const userBlog = MOCK_USER_BLOGS.find((blog) => blog.id === params.id)
+export async function generateMetadata({
+  params,
+}: {
+  params: { id: string };
+}): Promise<Metadata> {
+  const publicBlog = await getPublishedBlogById(params.id);
+  const userBlog = MOCK_USER_BLOGS.find((blog) => blog.id === params.id);
 
-  if (!publicBlog && !userBlog) return {}
+  if (!publicBlog && !userBlog) {
+    return {
+      title: "Blog no disponible | PropBol Blog",
+      description: "Este blog ya no se encuentra disponible en PropBol.",
+    };
+  }
 
-  const title = publicBlog?.title ?? userBlog?.titulo ?? 'Blog PropBol'
-  const description = `${publicBlog?.excerpt ?? userBlog?.resumen ?? 'Descubre más sobre el mercado inmobiliario en PropBol.'} | Lee el artículo completo en PropBol.`
-  const imageUrl = publicBlog?.imageUrl ?? userBlog?.imagenUrl ?? '/placeholder-blog.jpg'
+  const title = publicBlog?.title ?? userBlog?.titulo ?? "Blog PropBol";
+  const description = `${publicBlog?.excerpt ?? userBlog?.resumen ?? "Descubre más sobre el mercado inmobiliario en PropBol."} | Lee el artículo completo en PropBol.`;
+  const imageUrl =
+    publicBlog?.imageUrl ?? userBlog?.imagenUrl ?? "/placeholder-blog.jpg";
 
   return {
     title: `${title} | PropBol Blog`,
@@ -26,43 +41,52 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
       title,
       description,
       images: [imageUrl],
-      type: 'article',
+      type: "article",
     },
-  }
+  };
 }
 
 const formatPublishedDate = (value: string) =>
-  new Date(value).toLocaleDateString('es-BO', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric'
-  })
+  new Date(value).toLocaleDateString("es-BO", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 
-export default async function BlogDetailPage({ params }: { params: { id: string } }) {
-  const publicBlog = await getPublishedBlogById(params.id)
-  const userBlog = MOCK_USER_BLOGS.find((blog) => blog.id === params.id)
+export default async function BlogDetailPage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const publicBlog = await getPublishedBlogById(params.id);
+  const userBlog = MOCK_USER_BLOGS.find((blog) => blog.id === params.id);
 
   if (!publicBlog && !userBlog) {
-    notFound()
+    redirect("/blogs");
   }
 
-  const title = publicBlog?.title ?? userBlog?.titulo ?? 'Blog PropBol'
-  const imageUrl = publicBlog?.imageUrl ?? userBlog?.imagenUrl ?? '/placeholder-blog.jpg'
-  const authorName = publicBlog?.authorName ?? userBlog?.autor ?? 'Usuario PropBol'
+  const title = publicBlog?.title ?? userBlog?.titulo ?? "Blog PropBol";
+  const imageUrl =
+    publicBlog?.imageUrl ?? userBlog?.imagenUrl ?? "/placeholder-blog.jpg";
+  const authorName =
+    publicBlog?.authorName ?? userBlog?.autor ?? "Usuario PropBol";
   const publishedLabel = publicBlog
     ? formatPublishedDate(publicBlog.publishedAt)
-    : userBlog?.fecha ?? 'Fecha no disponible'
+    : (userBlog?.fecha ?? "Fecha no disponible");
   const summary =
     publicBlog?.excerpt ??
     userBlog?.resumen ??
-    'Este articulo presenta una mirada clara y actual sobre el ecosistema inmobiliario y las oportunidades que aparecen cuando observamos el mercado con criterio.'
-  const articleContent = publicBlog?.content?.trim() || userBlog?.resumen?.trim() || summary
+    "Este articulo presenta una mirada clara y actual sobre el ecosistema inmobiliario y las oportunidades que aparecen cuando observamos el mercado con criterio.";
+  const articleContent =
+    publicBlog?.content?.trim() || userBlog?.resumen?.trim() || summary;
   const recommendedBlogs = (await getPublishedBlogs(8))
     .filter((blog) => blog.id !== params.id)
-    .slice(0, 4)
+    .slice(0, 4);
 
   return (
     <article className="min-h-screen bg-[linear-gradient(180deg,#fbf6ef_0%,#f8f3eb_38%,#ffffff_100%)] dark:bg-none dark:bg-black pb-20 transition-colors duration-300">
+      <BlogDeletedRedirect blogId={params.id} />
+      <BlogRealtimeRefresh blogId={params.id} />
       <header className="mx-auto max-w-5xl px-4 pt-10 sm:px-6 lg:px-8 lg:pt-14">
         <div className="max-w-4xl">
           <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#a56400]">
@@ -80,14 +104,15 @@ export default async function BlogDetailPage({ params }: { params: { id: string 
               </div>
 
               <div className="flex min-w-0 flex-col">
-                <span className="text-sm font-bold text-stone-900 dark:text-white transition-colors duration-300">{authorName}</span>
+                <span className="text-sm font-bold text-stone-900 dark:text-white transition-colors duration-300">
+                  {authorName}
+                </span>
                 <span className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">
                   {publishedLabel}
                 </span>
               </div>
             </div>
           </div>
-
         </div>
 
         <div className="mt-10 overflow-hidden rounded-[32px] bg-stone-100 dark:bg-stone-900 shadow-[0_24px_80px_-32px_rgba(41,37,36,0.35)] dark:shadow-none transition-colors duration-300">
@@ -102,24 +127,26 @@ export default async function BlogDetailPage({ params }: { params: { id: string 
         </div>
       </header>
 
-      <main className="mx-auto mt-12 max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="blog-grid-container grid gap-12 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start xl:grid-cols-[minmax(0,1fr)_360px]">
-          <div className="space-y-12">
-            <div className="rounded-[36px] bg-white/90 dark:bg-[#111111] dark:border dark:border-stone-800 p-6 shadow-[0_24px_80px_-50px_rgba(41,37,36,0.45)] dark:shadow-none sm:p-8 lg:p-10 transition-colors duration-300">
-              <MarkdownRenderer content={articleContent} />
+      <main className="mx-auto mt-12 w-full max-w-6xl overflow-x-hidden px-4 sm:px-6 lg:px-8">
+        <div className="grid w-full min-w-0 grid-cols-1 gap-8 lg:gap-12 xl:grid-cols-[minmax(0,1fr)_340px] xl:items-start">
+          <div className="min-w-0 space-y-8 lg:space-y-12">
+            <div className="w-full max-w-full overflow-hidden rounded-[28px] bg-white/90 p-5 shadow-[0_24px_80px_-50px_rgba(41,37,36,0.45)] transition-colors duration-300 dark:border dark:border-stone-800 dark:bg-[#111111] dark:shadow-none sm:rounded-[36px] sm:p-8 lg:p-10">
+              <div className="min-w-0 max-w-full break-words [overflow-wrap:anywhere] [&_*]:max-w-full [&_img]:h-auto [&_pre]:overflow-x-auto [&_table]:block [&_table]:overflow-x-auto">
+                <MarkdownRenderer content={articleContent} />
+              </div>
             </div>
 
             <div className="no-capture">
               <BlogSharePlaceholder
                 title={title}
                 author={authorName}
-                category={publicBlog?.category || 'General'}
+                category={publicBlog?.category || "General"}
                 imageUrl={imageUrl}
                 description={articleContent}
               />
             </div>
 
-            <div className="no-capture">
+            <div className="no-capture w-full max-w-full overflow-hidden">
               <BlogCommentsSection blogId={params.id} />
             </div>
 
@@ -128,11 +155,11 @@ export default async function BlogDetailPage({ params }: { params: { id: string 
             </div>
           </div>
 
-          <div className="no-capture">
+          <div className="no-capture min-w-0">
             <BlogDetailSidebar recommendations={recommendedBlogs} />
           </div>
         </div>
       </main>
     </article>
-  )
+  );
 }

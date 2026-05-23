@@ -47,6 +47,11 @@ function getFileExtension(file: Express.Multer.File) {
   return fromMimeType === "jpeg" ? "jpg" : fromMimeType || "jpg";
 }
 
+const REVISION_MARKER_PREFIX = "REVISION_OF:";
+
+function buildRevisionMarker(originalBlogId: number) {
+  return `${REVISION_MARKER_PREFIX}${originalBlogId}`;
+}
 // BLOGS PE
 
 export const blogsRepository = {
@@ -123,6 +128,138 @@ export const blogsRepository = {
         ...data,
         fecha_publicacion: data.estado === "PUBLICADO" ? new Date() : null,
       },
+    });
+  },
+
+  async createPendingRevision(
+    originalBlogId: number,
+    data: {
+      titulo: string;
+      contenido: string;
+      imagen?: string;
+      categoria_id: number;
+      usuario_id: number;
+    },
+  ) {
+    return prisma.$transaction(async (tx) => {
+      const marker = buildRevisionMarker(originalBlogId);
+
+      const existingRevisionMarkers = await tx.blog_rechazo.findMany({
+        where: {
+          comentario: marker,
+        },
+        select: {
+          blog_id: true,
+        },
+      });
+
+      const existingRevisionIds = existingRevisionMarkers.map(
+        (item) => item.blog_id,
+      );
+
+      if (existingRevisionIds.length > 0) {
+        await tx.blog.updateMany({
+          where: {
+            id: { in: existingRevisionIds },
+            estado: "PENDIENTE" as estado_blog,
+            eliminado: false,
+          },
+          data: {
+            eliminado: true,
+          },
+        });
+      }
+
+      const revision = await tx.blog.create({
+        data: {
+          ...data,
+          estado: "PENDIENTE" as estado_blog,
+          fecha_publicacion: null,
+        },
+      });
+
+      await tx.blog_rechazo.create({
+        data: {
+          blog_id: revision.id,
+          comentario: marker,
+        },
+      });
+
+      return tx.blog.findFirst({
+        where: { id: revision.id },
+        include: {
+          usuario: {
+            select: { id: true, nombre: true, apellido: true, avatar: true },
+          },
+          categoria_blog: { select: { id: true, nombre: true } },
+          blog_rechazo: { orderBy: { fecha: "desc" }, take: 1 },
+          _count: { select: { comentario: true } },
+        },
+      });
+    });
+  },
+
+  async findOriginalIdByRevisionBlogId(id: number) {
+    const marker = await prisma.blog_rechazo.findFirst({
+      where: {
+        blog_id: id,
+        comentario: {
+          startsWith: REVISION_MARKER_PREFIX,
+        },
+      },
+      orderBy: { fecha: "asc" },
+    });
+
+    if (!marker) return null;
+
+    const originalId = Number(
+      marker.comentario.replace(REVISION_MARKER_PREFIX, "").trim(),
+    );
+
+    return Number.isFinite(originalId) ? originalId : null;
+  },
+
+  async applyRevisionToOriginal(revisionId: number, originalId: number) {
+    return prisma.$transaction(async (tx) => {
+      const revision = await tx.blog.findFirst({
+        where: {
+          id: revisionId,
+          eliminado: false,
+        },
+      });
+
+      if (!revision) {
+        throw new Error("BLOG_NOT_FOUND");
+      }
+
+      const updatedOriginal = await tx.blog.update({
+        where: { id: originalId },
+        data: {
+          titulo: revision.titulo,
+          contenido: revision.contenido,
+          imagen: revision.imagen,
+          categoria_id: revision.categoria_id,
+          estado: "PUBLICADO" as estado_blog,
+          fecha_publicacion: new Date(),
+        },
+        include: {
+          usuario: {
+            select: { id: true, nombre: true, apellido: true, avatar: true },
+          },
+          categoria_blog: { select: { id: true, nombre: true } },
+          blog_rechazo: { orderBy: { fecha: "desc" }, take: 1 },
+          _count: { select: { comentario: true } },
+        },
+      });
+
+      await tx.blog.update({
+        where: { id: revisionId },
+        data: {
+          eliminado: true,
+        },
+      });
+
+      return updatedOriginal;
     });
   },
 

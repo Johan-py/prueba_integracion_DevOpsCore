@@ -1,6 +1,7 @@
 // frontend/src/components/layout/PropertyCard.tsx
+
 'use client'
-import { BedDouble, Bath, Maximize2, ImageOff, MapPin } from 'lucide-react'
+import { BedDouble, Bath, Maximize2, ImageOff, MapPin, Eye, Share2 } from 'lucide-react'
 import { normalizePropertyThumbnailUrl } from '@/lib/propertyThumbnailUrl'
 import ContactButton from '../galeria/ContactButton' // <-- Tu botón modular importado
 import ActionButton from '../galeria/ActionButton' // <-- Botón de ver detalles (opcional, lo puedes usar o no dependiendo de tu diseño)
@@ -25,6 +26,11 @@ type PropsTarjeta = {
   precio_anterior?: number
   esRecomendadoIA?: boolean 
   onViewDetails?: () => void
+
+  // Estadísticas individuales de la publicación
+  visualizaciones?: number
+  compartidos?: number
+  mostrarEstadisticas?: boolean
 }
 
 // 1. Definimos una constante para el color gris de fondo cuando no hay imagen
@@ -54,7 +60,9 @@ export default function PropertyCard({
   onViewDetails,
   precio,
   precio_anterior,
-  esRecomendadoIA
+  visualizaciones = 0,
+  compartidos = 0,
+  mostrarEstadisticas = true
 }: PropsTarjeta) {
   const [isHovered, setIsHovered] = useState(false)
 
@@ -64,7 +72,7 @@ export default function PropertyCard({
   // Calcular oferta HU6
   const precioNum = Number(precio)
   const precioAnteriorNum = Number(precio_anterior)
-  const esOferta = !isNaN(precioAnteriorNum) && precioAnteriorNum > 0 && !isNaN(precioNum) && precioNum > 0 && precioNum < precioAnteriorNum
+  const esOferta = precioAnteriorNum && precioNum && precioNum < precioAnteriorNum
   const porcentajeDescuento = esOferta
     ? Math.round(((precioAnteriorNum - precioNum) / precioAnteriorNum) * 100)
     : 0
@@ -77,6 +85,7 @@ export default function PropertyCard({
   }
 
   const metrosLabel = formatMetros(metros)
+
   return (
     <div
       className="relative h-full bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300 border border-gray-100 group flex flex-col"
@@ -88,6 +97,7 @@ export default function PropertyCard({
           <MapPin className="w-5 h-5 text-[#ea580c]" />
         </div>
       )}
+
       {/* 2. Implementación de Imagen o Cuadro Gris (Misión Día 3) */}
       <div
         className={`relative aspect-video overflow-hidden ${!imagen ? COLOR_GRIS_PLACEHOLDER : ''} flex items-center justify-center`}
@@ -97,7 +107,7 @@ export default function PropertyCard({
             src={normalizePropertyThumbnailUrl(imagen)}
             alt={descripcion}
             sizes="(max-w-7xl) 30vw"
-            className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
             onError={(e) => {
               const target = e.target as HTMLImageElement
               target.src = '/placeholder-house.jpg'
@@ -121,27 +131,37 @@ export default function PropertyCard({
             {porcentajeDescuento}% OFF
           </span>
         )}
-        {/* Badge IA */}
-       {esRecomendadoIA && (
-          <span className="absolute bottom-3 left-3 flex items-center gap-1 bg-purple-600 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-full shadow-md z-10">
-        ✨ Recomendado por IA
-      </span>
-       )}
       </div>
 
       <div className="p-3 flex flex-col gap-2 flex-1">
-        <h2 className="font-extrabold text-gray-950 tracking-tight text-xl md:text-2xl line-clamp-1 min-h-[2rem] md:min-h-[2.25rem]">
-          {esOferta ? (
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-orange-600">${formatPrice(precio)} USD</span>
-              <span className="text-lg text-gray-400 line-through">
-                ${formatPrice(precio_anterior)} USD
-              </span>
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="font-extrabold text-gray-950 tracking-tight text-xl md:text-2xl line-clamp-1 min-h-[2rem] md:min-h-[2.25rem] flex-1">
+            {esOferta ? (
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-orange-600">${formatPrice(precio)} USD</span>
+                <span className="text-sm text-gray-400 line-through">
+                  ${formatPrice(precio_anterior)} USD
+                </span>
+              </div>
+            ) : (
+              precioFormateado
+            )}
+          </h2>
+
+          {mostrarEstadisticas && (
+            <div className="flex items-center gap-4 text-black shrink-0">
+              <div className="flex items-center gap-1.5">
+                <Share2 size={22} strokeWidth={2.2} />
+                <span className="text-sm font-medium">{compartidos}</span>
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                <Eye size={23} strokeWidth={2.2} />
+                <span className="text-sm font-medium">{visualizaciones}</span>
+              </div>
             </div>
-          ) : (
-             <span className="text-orange-600">${formatPrice(precio)} USD</span>
           )}
-        </h2>
+        </div>
 
         <p className="text-sm text-gray-900 line-clamp-2 font-medium leading-snug min-h-[2.5rem]">
           {descripcion}
@@ -187,11 +207,12 @@ export default function PropertyCard({
 
         {/* 3. Botón de contacto modular */}
         <div className="mt-1 w-full min-h-[44px] flex items-center">
-          <ContactButton type="whatsapp" variant="grid" disabled={isCompareMode} />
+          <ContactButton type="whatsapp" variant="grid" />
         </div>
+
         {/* HU13 #68 #69 - Botón ¿Cómo llegar? visible sin scroll horizontal, con estado deshabilitado y tooltip */}
         <div className="mt-1 w-full min-h-[44px] flex items-center">
-          <ComoLlegarButton lat={lat} lng={lng} variant="grid" disabled={isCompareMode} />
+          <ComoLlegarButton lat={lat} lng={lng} variant="grid" />
         </div>
 
         {/* 4. Botón de ver detalles (HU4 - Nuevo botón para abrir el detalle en una nueva pestaña) */}
