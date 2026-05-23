@@ -128,6 +128,7 @@ export default function TourGuiado() {
     window.addEventListener("propbol:login", checkAndShowTour);
     return () => window.removeEventListener("propbol:login", checkAndShowTour);
   }, [checkAndShowTour]);
+
   useEffect(() => {
     const handleSessionChanged = () => {
       if (!isLoggedIn()) {
@@ -141,17 +142,18 @@ export default function TourGuiado() {
     return () =>
       window.removeEventListener("propbol:session-changed", handleSessionChanged);
   }, []);
+
   useEffect(() => {
-  const handleIniciarTour = () => {
-    setHighlight(null);
-    prevStepRef.current = -1;
-    setCurrentStep(0);
-    setShowTour(true);
-  };
-  window.addEventListener("propbol:iniciar-tour", handleIniciarTour);
-  return () =>
-    window.removeEventListener("propbol:iniciar-tour", handleIniciarTour);
-}, []);
+    const handleIniciarTour = () => {
+      setHighlight(null);
+      prevStepRef.current = -1;
+      setCurrentStep(0);
+      setShowTour(true);
+    };
+    window.addEventListener("propbol:iniciar-tour", handleIniciarTour);
+    return () =>
+      window.removeEventListener("propbol:iniciar-tour", handleIniciarTour);
+  }, []);
 
   // ─── Scroll lock ───────────────────────────────────────────────────────────
 
@@ -372,6 +374,10 @@ export default function TourGuiado() {
   if (!showTour) return null;
 
   const PADDING = 8;
+  const NAVBAR_H = (() => {
+    const nav = document.querySelector("nav") ?? document.querySelector("header");
+    return nav ? nav.getBoundingClientRect().height : 60;
+  })();
   const hasValid = highlight !== null;
 
   const vw = window.visualViewport?.width ?? window.innerWidth;
@@ -388,7 +394,7 @@ export default function TourGuiado() {
   const fontBtn = isMobile ? 12 : 13;
   const fontSkip = isMobile ? 11 : 12;
 
-  let top = vOffsetTop + 80;
+  let top = vOffsetTop + NAVBAR_H + 10;
   let left = vOffsetLeft + (vw - tooltipW) / 2;
 
   if (hasValid) {
@@ -402,8 +408,11 @@ export default function TourGuiado() {
         ? highlight.top - H - GAP
         : highlight.bottom + GAP;
 
-    const clampedH = Math.min(H, vh - 20);
-    top = Math.max(vOffsetTop + 10, Math.min(top, vOffsetTop + vh - clampedH - 10));
+    const clampedH = Math.min(H, vh - NAVBAR_H - 20);
+    top = Math.max(
+      vOffsetTop + NAVBAR_H + 10,
+      Math.min(top, vOffsetTop + vh - clampedH - 10)
+    );
 
     left = Math.max(
       vOffsetLeft + 12,
@@ -471,7 +480,7 @@ export default function TourGuiado() {
           opacity: tooltipVisible ? 1 : 0,
           pointerEvents: tooltipVisible ? "all" : "none",
           transition: "opacity 0.15s ease",
-          maxHeight: `${vh - 20}px`,
+          maxHeight: `${vh - NAVBAR_H - 20}px`,
           overflowY: "auto",
         }}
       >
