@@ -606,3 +606,4 @@ export const enviarCodigoActivacion2FA = async ({
     textContent: `${saludo}\n\nTu código para activar la verificación en dos pasos es: ${codigo}\n\nEste código expirará en 5 minutos.`,
   });
 };
+

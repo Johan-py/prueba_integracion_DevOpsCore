@@ -48,7 +48,7 @@ export class FiltersHomepageRepository {
             id: true,
             titulo: true,
             // Volvemos a tu estructura original que es la correcta para tu base de datos
-            publicacion: {
+            publicaciones: {
               take: 1,
               select: {
                 multimedia: {
@@ -84,7 +84,7 @@ export class FiltersHomepageRepository {
       const inmueble = u.inmueble;
 
       // Aquí está el truco: Navegamos de forma segura por Inmueble -> Publicaciones -> Multimedia
-      const primeraImagen = inmueble?.publicacion?.[0]?.multimedia?.[0]?.url ?? null;
+      const primeraImagen = inmueble?.publicaciones?.[0]?.multimedia?.[0]?.url ?? null;
 
       if (entry.previews.length < 6 && primeraImagen && inmueble) {
         entry.previews.push({
@@ -107,7 +107,7 @@ export class FiltersHomepageRepository {
       where: {
         estado: $Enums.EstadoInmueble.ACTIVO,
         categoria: { not: null },
-        ubicacion_inmueble: {
+        ubicacion: {
           latitud: { not: 0 },
           longitud: { not: 0 }
         }

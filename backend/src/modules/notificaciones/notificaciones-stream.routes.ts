@@ -16,13 +16,13 @@ const getNotificationStreamUserId = async (token: string) => {
     return null
   }
 
-  const usuarioId = Number(session.usuario.id)
+  const usuario_id = Number(session.usuario.id)
 
-  if (!Number.isInteger(usuarioId) || usuarioId <= 0) {
+  if (!Number.isInteger(usuario_id) || usuario_id <= 0) {
     return null
   }
 
-  return usuarioId
+  return usuario_id
 }
 
 router.get('/stream', async (req: Request, res: Response) => {
@@ -35,9 +35,9 @@ router.get('/stream', async (req: Request, res: Response) => {
       })
     }
 
-    const usuarioId = await getNotificationStreamUserId(token)
+    const usuario_id = await getNotificationStreamUserId(token)
 
-    if (!usuarioId) {
+    if (!usuario_id) {
       return res.status(401).json({
         message: 'Sesión inválida o expirada'
       })
@@ -54,12 +54,12 @@ router.get('/stream', async (req: Request, res: Response) => {
     res.write(
       `data: ${JSON.stringify({
         type: 'connected',
-        userId: usuarioId,
+        userId: usuario_id,
         timestamp: new Date().toISOString()
       })}\n\n`
     )
 
-    const unsubscribe = subscribeToNotificationEvents(usuarioId, (payload) => {
+    const unsubscribe = subscribeToNotificationEvents(usuario_id, (payload) => {
       res.write(`event: ${payload.type}\n`)
       res.write(`data: ${JSON.stringify(payload)}\n\n`)
     })

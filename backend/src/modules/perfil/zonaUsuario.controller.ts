@@ -9,8 +9,8 @@ export const getZonasUsuario = async (req: Request, res: Response): Promise<Resp
 
     // ✅ CORREGIDO: usar camelCase según Prisma
     const zonas = await prisma.zona_usuario.findMany({
-      where: { usuarioId: usuario.id },
-      orderBy: { creadoEn: 'desc' }
+      where: { usuario_id: usuario.id },
+      orderBy: { creado_en: 'desc' }
     })
 
     return res.json(zonas)
@@ -31,7 +31,7 @@ export const getZonaById = async (req: Request, res: Response): Promise<Response
     const zona = await prisma.zona_usuario.findFirst({
       where: {
         id: Number(id),
-        usuarioId: usuario.id
+        usuario_id: usuario.id
       }
     })
 
@@ -67,9 +67,9 @@ export const createZona = async (req: Request, res: Response): Promise<Response>
         descripcion,
         geometria,
         area,
-        usuarioId: usuario.id,
-        actualizadoEn: new Date(),
-        creadoEn: new Date()
+        usuario_id: usuario.id,
+        actualizado_en: new Date(),
+        creado_en: new Date()
       }
     })
 
@@ -93,7 +93,7 @@ export const updateZona = async (req: Request, res: Response): Promise<Response>
     const zona = await prisma.zona_usuario.findFirst({
       where: {
         id: Number(id),
-        usuarioId: usuario.id
+        usuario_id: usuario.id
       }
     });
 
@@ -109,7 +109,7 @@ export const updateZona = async (req: Request, res: Response): Promise<Response>
         descripcion,
         geometria,
         area,
-        actualizadoEn: new Date()
+        actualizado_en: new Date()
       }
     });
 
@@ -131,7 +131,7 @@ export const deleteZona = async (req: Request, res: Response): Promise<Response>
     const zona = await prisma.zona_usuario.findFirst({
       where: {
         id: Number(id),
-        usuarioId: usuario.id
+        usuario_id: usuario.id
       }
     })
 
@@ -163,7 +163,7 @@ export const getPropiedadesEnZona = async (req: Request, res: Response): Promise
     const zona = await prisma.zona_usuario.findFirst({
       where: {
         id: zonaId,
-        usuarioId: usuario.id
+        usuario_id: usuario.id
       }
     })
 
@@ -177,7 +177,7 @@ export const getPropiedadesEnZona = async (req: Request, res: Response): Promise
     const inmueblesIds = await prisma.$queryRaw<{ id: number }[]>`
       SELECT DISTINCT i.id
       FROM "inmueble" i
-      INNER JOIN "ubicacion_inmueble" ui ON i.id = ui."inmueble_id"
+      INNER JOIN 'ubicacion' ui ON i.id = ui."inmueble_id"
       WHERE 
         ui.latitud IS NOT NULL 
         AND ui.longitud IS NOT NULL
@@ -200,16 +200,15 @@ export const getPropiedadesEnZona = async (req: Request, res: Response): Promise
         id: { in: ids },
         estado: 'ACTIVO'
       },
-      include: {
-        ubicacion_inmueble: true,
-        usuario: {
+      include: { ubicacion: true,
+        propietario: {
           select: {
             nombre: true,
             apellido: true,
             correo: true
           }
         },
-        publicacion: {
+        publicaciones: {
           where: { estado: 'ACTIVA' },
           take: 1,
           include: {
@@ -232,14 +231,14 @@ export const getPropiedadesEnZona = async (req: Request, res: Response): Promise
       superficie_m2: prop.superficie_m2,
       nro_cuartos: prop.nro_cuartos,
       nro_banos: prop.nro_banos,
-      direccion: prop.ubicacion_inmueble?.direccion,
-      ciudad: prop.ubicacion_inmueble?.ciudad,
-      zona: prop.ubicacion_inmueble?.zona,
-      latitud: prop.ubicacion_inmueble?.latitud ? Number(prop.ubicacion_inmueble.latitud) : null,
-      longitud: prop.ubicacion_inmueble?.longitud ? Number(prop.ubicacion_inmueble.longitud) : null,
-      imagen: prop.publicacion[0]?.multimedia[0]?.url || null,
-      propietario: `${prop.usuario.nombre} ${prop.usuario.apellido}`,
-      contacto: prop.usuario.correo
+      direccion: prop.ubicacion?.direccion,
+      ciudad: prop.ubicacion?.ciudad,
+      zona: prop.ubicacion?.zona,
+      latitud: prop.ubicacion?.latitud ? Number(prop.ubicacion.latitud) : null,
+      longitud: prop.ubicacion?.longitud ? Number(prop.ubicacion.longitud) : null,
+      imagen: prop.publicaciones[0]?.multimedia[0]?.url || null,
+      propietario: `${prop.propietario.nombre} ${prop.propietario.apellido}`,
+      contacto: prop.propietario.correo
     }))
 
     return res.json({

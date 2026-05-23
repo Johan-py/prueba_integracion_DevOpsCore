@@ -12,13 +12,13 @@ type AuthenticatedRequest = Request & {
 }
 
 const getAuthenticatedUserId = (req: AuthenticatedRequest): number => {
-  const usuarioId = Number(req.user?.id)
+  const usuario_id = Number(req.user?.id)
 
-  if (!Number.isInteger(usuarioId) || usuarioId <= 0) {
+  if (!Number.isInteger(usuario_id) || usuario_id <= 0) {
     throw new Error('Usuario no autenticado')
   }
 
-  return usuarioId
+  return usuario_id
 }
 
 export const getTutorialPublicacionContentController = async (
@@ -47,8 +47,8 @@ export const getTutorialPublicacionEstadoController = async (
   res: Response
 ) => {
   try {
-    const usuarioId = getAuthenticatedUserId(req as AuthenticatedRequest)
-    const result = await getTutorialPublicacionEstadoService({ usuarioId })
+    const usuario_id = getAuthenticatedUserId(req as AuthenticatedRequest)
+    const result = await getTutorialPublicacionEstadoService({ usuario_id })
 
     return res.status(200).json({
       ok: true,
@@ -76,8 +76,8 @@ export const confirmTutorialPublicacionController = async (
   res: Response
 ) => {
   try {
-    const usuarioId = getAuthenticatedUserId(req as AuthenticatedRequest)
-    const result = await confirmTutorialPublicacionService({ usuarioId })
+    const usuario_id = getAuthenticatedUserId(req as AuthenticatedRequest)
+    const result = await confirmTutorialPublicacionService({ usuario_id })
 
     return res.status(200).json({
       ok: true,

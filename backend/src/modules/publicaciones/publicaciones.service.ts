@@ -31,7 +31,7 @@ export const publicacionesService = {
         ? {
             id: suscripcion.id,
             planNombre: suscripcion.plan_suscripcion?.nombre_plan,
-            fechaInicio: suscripcion.fecha_inicio,
+            fecha_inicio: suscripcion.fecha_inicio,
             fechaFin: suscripcion.fecha_fin
           }
         : null
@@ -102,17 +102,17 @@ export const publicacionesService = {
     }
   },
 
-  async obtenerMetricasPorInmueble(inmuebleId: number): Promise<{
+  async obtenerMetricasPorInmueble(inmueble_id: number): Promise<{
     visitas: number
     favoritos: number
     contactos: number
   }> {
     const [visitas, favoritos] = await Promise.all([
       prisma.propiedad_vista.count({
-        where: { inmuebleId }
+        where: { inmueble_id }
       }),
       prisma.favorito.count({
-        where: { inmuebleId }
+        where: { inmueble_id }
       })
     ])
 
@@ -123,3 +123,4 @@ export const publicacionesService = {
     }
   }
 }
+

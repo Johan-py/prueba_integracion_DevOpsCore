@@ -63,19 +63,19 @@ export const estadisticasZonaService = {
           mode: 'insensitive'
         }
       },
-      include: { barrio: true }
+      include: { barrios: true }
     })
 
     // 3. Obtener inmuebles tipados explícitamente
     let inmuebles: InmuebleStats[] = []
 
-    if (zonaGeo && zonaGeo.barrio.length > 0) {
-      const barrioIds = zonaGeo.barrio.map((b: { id: number }) => b.id)
+    if (zonaGeo && zonaGeo.barrios.length > 0) {
+      const barrioIds = zonaGeo.barrios.map((b: { id: number }) => b.id)
 
       const resultado = await prisma.inmueble.findMany({
         where: {
           tipo_accion: tipoOperacion as 'VENTA' | 'ALQUILER' | 'ANTICRETO',
-          ubicacion_inmueble: {
+          ubicacion: {
             barrio_id: { in: barrioIds }
           }
         },
@@ -187,3 +187,5 @@ export const estadisticasZonaService = {
     })
   }
 }
+
+

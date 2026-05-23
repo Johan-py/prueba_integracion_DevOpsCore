@@ -23,3 +23,4 @@ router.delete('/cancelar-orden/:id', verificarToken, cancelarOrden)
 router.put('/cambiar-plan', verificarToken, cambiarPlan)
 
 export default router
+

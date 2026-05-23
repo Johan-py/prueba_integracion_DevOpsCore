@@ -1,7 +1,7 @@
 import { prisma } from '../../lib/prisma.client.js'
 
 export class TelemetriaRepository {
-  async guardarBusqueda(usuarioId: number | null, ip: string, metaData: any) {
+  async guardarBusqueda(usuario_id: number | null, ip: string, metaData: any) {
     const treintaMinutosAtras = new Date(Date.now() - 30 * 60 * 1000)
 
     const visitorExistente = await prisma.visitor.findFirst({
@@ -29,7 +29,7 @@ export class TelemetriaRepository {
       return await prisma.visitor.create({
         data: {
           ip: ip,
-          usuario_id: usuarioId,
+          usuario_id: usuario_id,
           meta_data: {
             busquedas: [metaData],
             primeraVisita: new Date().toISOString()
@@ -39,29 +39,29 @@ export class TelemetriaRepository {
     }
   }
 
-  async registrarClickInmueble(usuarioId: number, inmuebleId: number) {
+  async registrarClickInmueble(usuario_id: number, inmueble_id: number) {
   // 1. Registrar la vista como antes
   const vista = await prisma.propiedad_vista.upsert({
     where: {
-      usuarioId_inmuebleId: { usuarioId, inmuebleId }
+      usuario_id_inmueble_id: { usuario_id, inmueble_id }
     },
-    update: { vistaEn: new Date() },
-    create: { usuarioId, inmuebleId, vistaEn: new Date() }
+    update: { vista_en: new Date() },
+    create: { usuario_id, inmueble_id, vista_en: new Date() }
   })
 
   // 2. Obtener features del inmueble para guardar en entrenamiento_ml
   const inmueble = await prisma.inmueble.findUnique({
-    where: { id: inmuebleId },
-    include: { ubicacion_inmueble: true, inmueble_amenidad: true }
+    where: { id: inmueble_id },
+    include: { ubicacion: true, inmueble_amenidad: true }
   })
 
   if (inmueble) {
     // Calcular score_real basado en interacciones previas del usuario
     const vistasAnteriores = await prisma.propiedad_vista.count({
-      where: { usuarioId }
+      where: { usuario_id }
     })
     const favoritosCount = await prisma.favorito.count({
-      where: { usuarioId, inmuebleId }
+      where: { usuario_id, inmueble_id }
     })
     const esFavorito = favoritosCount > 0
     const score_real = esFavorito ? 1.0 : Math.min(vistasAnteriores / 10, 0.8)
@@ -69,8 +69,8 @@ export class TelemetriaRepository {
     // Guardar en entrenamiento_ml de forma asíncrona (no bloquea la respuesta)
     prisma.entrenamiento_ml.create({
       data: {
-        usuario_id: usuarioId,
-        inmueble_id: inmuebleId,
+        usuario_id: usuario_id,
+        inmueble_id: inmueble_id,
         tipo_evento: 'CLICK',
         score_real,
         features: {
@@ -80,8 +80,8 @@ export class TelemetriaRepository {
           superficie_m2: Number(inmueble.superficie_m2 || 0),
           nro_cuartos: inmueble.nro_cuartos || 0,
           nro_banos: inmueble.nro_banos || 0,
-          zona: inmueble.ubicacion_inmueble?.zona || null,
-          ciudad: inmueble.ubicacion_inmueble?.ciudad || null,
+          zona: inmueble.ubicacion?.zona || null,
+          ciudad: inmueble.ubicacion?.ciudad || null,
           amenidades: inmueble.inmueble_amenidad.map(a => a.amenidad_id),
           precioReducido: inmueble.precio_anterior !== null &&
             Number(inmueble.precio_anterior) > Number(inmueble.precio)
@@ -94,53 +94,54 @@ export class TelemetriaRepository {
   return vista
 }
 
-  async obtenerInmueblesRecomendados(usuarioId?: number): Promise<number[]> {
-    if (!usuarioId) {
+  async obtenerInmueblesRecomendados(usuario_id?: number): Promise<number[]> {
+    if (!usuario_id) {
       // CA 1: Si no está registrado, devolver populares generales
       const popularesGlobales = await prisma.propiedad_vista.groupBy({
-        by: ['inmuebleId'],
+        by: ['inmueble_id'],
         _count: {
-          inmuebleId: true,
+          inmueble_id: true,
         },
         orderBy: {
           _count: {
-            inmuebleId: 'desc',
+            inmueble_id: 'desc',
           },
         },
         take: 20,
       });
-      return popularesGlobales.map((p) => p.inmuebleId);
+      return popularesGlobales.map((p) => p.inmueble_id);
     }
 
     // CA 5, CA 6, CA 7, CA 10: Si está registrado, buscar por su historial
     const vistas = await prisma.propiedad_vista.findMany({
-      where: { usuarioId: usuarioId },
-      orderBy: { vistaEn: 'desc' },
+      where: { usuario_id: usuario_id },
+      orderBy: { vista_en: 'desc' },
       take: 20,
-      select: { inmuebleId: true }
+      select: { inmueble_id: true }
     })
 
     const favoritos = await prisma.favorito.findMany({
-      where: { usuarioId: usuarioId },
-      select: { inmuebleId: true }
+      where: { usuario_id: usuario_id },
+      select: { inmueble_id: true }
     })
 
-    const idsFavoritos = favoritos.map((f) => f.inmuebleId)
-    const idsVistos = vistas.map((v) => v.inmuebleId)
+    const idsFavoritos = favoritos.map((f) => f.inmueble_id)
+    const idsVistos = vistas.map((v) => v.inmueble_id)
 
     const resultados = [...new Set([...idsFavoritos, ...idsVistos])];
 
     // Fallback: Si el usuario está registrado pero su historial está vacío (ej. cuenta recién creada)
     if (resultados.length === 0) {
       const popularesGlobales = await prisma.propiedad_vista.groupBy({
-        by: ['inmuebleId'],
-        _count: { inmuebleId: true },
-        orderBy: { _count: { inmuebleId: 'desc' } },
+        by: ['inmueble_id'],
+        _count: { inmueble_id: true },
+        orderBy: { _count: { inmueble_id: 'desc' } },
         take: 20,
       });
-      return popularesGlobales.map((p) => p.inmuebleId);
+      return popularesGlobales.map((p) => p.inmueble_id);
     }
 
     return resultados;
   }
 }
+

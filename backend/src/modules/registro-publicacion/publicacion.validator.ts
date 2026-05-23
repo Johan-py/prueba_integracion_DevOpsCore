@@ -54,3 +54,4 @@ export const propertyValidationRules = [
     .isArray({ min: 3 })
     .withMessage("La zona difuminada debe tener al menos 3 vértices"),
 ];
+

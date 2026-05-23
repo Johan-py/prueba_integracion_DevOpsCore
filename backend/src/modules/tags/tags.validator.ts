@@ -13,3 +13,4 @@ export const replaceTagsRules = [
     .matches(/^[a-záéíóúüñA-ZÁÉÍÓÚÜÑ0-9\s\-]+$/)
     .withMessage("El tag contiene caracteres no permitidos"),
 ];
+

@@ -6,20 +6,19 @@ export const comparacionController = {
   // Obtener todas las comparaciones del usuario autenticado
   async getComparaciones(req: AuthRequest, res: Response) {
     try {
-      const usuarioId = req.usuario?.id
+      const usuario_id = req.usuario?.id
 
-      if (!usuarioId) {
+      if (!usuario_id) {
         return res.status(401).json({ error: 'Usuario no autenticado' })
       }
 
       const comparaciones = await prisma.comparacion.findMany({
-        where: { usuarioId },
+        where: { usuario_id },
         include: {
           detalle_comparacion: {
             include: {
               inmueble: {
-                include: {
-                  ubicacion_inmueble: true
+                include: { ubicacion: true
                 }
               }
             },
@@ -29,7 +28,7 @@ export const comparacionController = {
           }
         },
         orderBy: {
-          creadoEn: 'desc'
+          creado_en: 'desc'
         }
       })
 
@@ -37,13 +36,13 @@ export const comparacionController = {
       const historialFormateado = comparaciones.map((comp) => ({
         id: comp.id,
         nombre: comp.nombre,
-        fecha: comp.creadoEn,
+        fecha: comp.creado_en,
         propiedades: comp.detalle_comparacion.map((detalle) => ({
           id: detalle.inmueble.id,
           titulo: detalle.inmueble.titulo,
           ubicacion:
-            detalle.inmueble.ubicacion_inmueble?.zona ||
-            detalle.inmueble.ubicacion_inmueble?.ciudad ||
+            detalle.inmueble.ubicacion?.zona ||
+            detalle.inmueble.ubicacion?.ciudad ||
             'Ubicación no disponible',
           precio: detalle.inmueble.precio,
           superficie: detalle.inmueble.superficie_m2,
@@ -63,26 +62,25 @@ export const comparacionController = {
   async getComparacionById(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params
-      const usuarioId = req.usuario?.id
+      const usuario_id = req.usuario?.id
 
       // ✅ Asegurar que id es string
-      const comparacionId = Array.isArray(id) ? id[0] : id
+      const comparacion_id = Array.isArray(id) ? id[0] : id
 
-      if (!comparacionId) {
+      if (!comparacion_id) {
         return res.status(400).json({ error: 'ID no válido' })
       }
 
       const comparacion = await prisma.comparacion.findFirst({
         where: {
-          id: parseInt(comparacionId),
-          usuarioId
+          id: parseInt(comparacion_id),
+          usuario_id
         },
         include: {
           detalle_comparacion: {
             include: {
               inmueble: {
-                include: {
-                  ubicacion_inmueble: true
+                include: { ubicacion: true
                 }
               }
             },
@@ -107,10 +105,10 @@ export const comparacionController = {
   // Crear nueva comparación
   async crearComparacion(req: AuthRequest, res: Response) {
     try {
-      const usuarioId = req.usuario?.id
+      const usuario_id = req.usuario?.id
       const { nombre, inmueblesIds } = req.body
 
-      if (!usuarioId) {
+      if (!usuario_id) {
         return res.status(401).json({ error: 'Usuario no autenticado' })
       }
 
@@ -137,10 +135,10 @@ export const comparacionController = {
       const comparacion = await prisma.comparacion.create({
         data: {
           nombre: nombre || `Comparación ${new Date().toLocaleDateString('es-ES')}`,
-          usuarioId,
+          usuario_id,
           detalle_comparacion: {
-            create: inmueblesIds.map((inmuebleId: number, index: number) => ({
-              inmuebleId,
+            create: inmueblesIds.map((inmueble_id: number, index: number) => ({
+              inmueble_id,
               orden: index
             }))
           }
@@ -165,19 +163,19 @@ export const comparacionController = {
   async eliminarComparacion(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params
-      const usuarioId = req.usuario?.id
+      const usuario_id = req.usuario?.id
 
       // ✅ Asegurar que id es string
-      const comparacionId = Array.isArray(id) ? id[0] : id
+      const comparacion_id = Array.isArray(id) ? id[0] : id
 
-      if (!comparacionId) {
+      if (!comparacion_id) {
         return res.status(400).json({ error: 'ID no válido' })
       }
 
       const comparacion = await prisma.comparacion.findFirst({
         where: {
-          id: parseInt(comparacionId),
-          usuarioId
+          id: parseInt(comparacion_id),
+          usuario_id
         }
       })
 
@@ -186,7 +184,7 @@ export const comparacionController = {
       }
 
       await prisma.comparacion.delete({
-        where: { id: parseInt(comparacionId) }
+        where: { id: parseInt(comparacion_id) }
       })
 
       res.status(200).json({ message: 'Comparación eliminada exitosamente' })
@@ -200,20 +198,20 @@ export const comparacionController = {
   async agregarPropiedad(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params
-      const { inmuebleId } = req.body
-      const usuarioId = req.usuario?.id
+      const { inmueble_id } = req.body
+      const usuario_id = req.usuario?.id
 
       // ✅ Asegurar que id es string
-      const comparacionId = Array.isArray(id) ? id[0] : id
+      const comparacion_id = Array.isArray(id) ? id[0] : id
 
-      if (!comparacionId) {
+      if (!comparacion_id) {
         return res.status(400).json({ error: 'ID no válido' })
       }
 
       const comparacion = await prisma.comparacion.findFirst({
         where: {
-          id: parseInt(comparacionId),
-          usuarioId
+          id: parseInt(comparacion_id),
+          usuario_id
         },
         include: {
           detalle_comparacion: true
@@ -226,7 +224,7 @@ export const comparacionController = {
 
       // Verificar si la propiedad ya está en la comparación
       const yaExiste = comparacion.detalle_comparacion.some(
-        (d) => d.inmuebleId === parseInt(inmuebleId)
+        (d) => d.inmueble_id === parseInt(inmueble_id)
       )
 
       if (yaExiste) {
@@ -237,8 +235,8 @@ export const comparacionController = {
 
       const detalleActualizado = await prisma.detalle_comparacion.create({
         data: {
-          comparacionId: parseInt(comparacionId),
-          inmuebleId: parseInt(inmuebleId),
+          comparacion_id: parseInt(comparacion_id),
+          inmueble_id: parseInt(inmueble_id),
           orden: nuevoOrden
         },
         include: {
@@ -257,20 +255,20 @@ export const comparacionController = {
   async eliminarPropiedad(req: AuthRequest, res: Response) {
     try {
       const { id, propiedadId } = req.params
-      const usuarioId = req.usuario?.id
+      const usuario_id = req.usuario?.id
 
       // ✅ Asegurar que los IDs son strings
-      const comparacionId = Array.isArray(id) ? id[0] : id
+      const comparacion_id = Array.isArray(id) ? id[0] : id
       const propiedadIdValue = Array.isArray(propiedadId) ? propiedadId[0] : propiedadId
 
-      if (!comparacionId || !propiedadIdValue) {
+      if (!comparacion_id || !propiedadIdValue) {
         return res.status(400).json({ error: 'IDs no válidos' })
       }
 
       const comparacion = await prisma.comparacion.findFirst({
         where: {
-          id: parseInt(comparacionId),
-          usuarioId
+          id: parseInt(comparacion_id),
+          usuario_id
         }
       })
 
@@ -280,8 +278,8 @@ export const comparacionController = {
 
       await prisma.detalle_comparacion.deleteMany({
         where: {
-          comparacionId: parseInt(comparacionId),
-          inmuebleId: parseInt(propiedadIdValue)
+          comparacion_id: parseInt(comparacion_id),
+          inmueble_id: parseInt(propiedadIdValue)
         }
       })
 
@@ -298,7 +296,7 @@ export const comparacionController = {
   async getComparacionesPorCategoria(req: AuthRequest, res: Response) {
     try {
       const { categoria } = req.params
-      const usuarioId = req.usuario?.id
+      const usuario_id = req.usuario?.id
 
       // ✅ Asegurar que categoria es string
       const categoriaValue = Array.isArray(categoria) ? categoria[0] : categoria
@@ -309,7 +307,7 @@ export const comparacionController = {
 
       const comparaciones = await prisma.comparacion.findMany({
         where: {
-          usuarioId,
+          usuario_id,
           detalle_comparacion: {
             some: {
               inmueble: {
@@ -322,8 +320,7 @@ export const comparacionController = {
           detalle_comparacion: {
             include: {
               inmueble: {
-                include: {
-                  ubicacion_inmueble: true
+                include: { ubicacion: true
                 }
               }
             },
@@ -333,7 +330,7 @@ export const comparacionController = {
           }
         },
         orderBy: {
-          creadoEn: 'desc'
+          creado_en: 'desc'
         }
       })
 
@@ -347,27 +344,26 @@ export const comparacionController = {
   // Obtener resumen para el mockup (con datos agrupados por categoría)
   async getResumenComparaciones(req: AuthRequest, res: Response) {
     try {
-      const usuarioId = req.usuario?.id
+      const usuario_id = req.usuario?.id
 
-      if (!usuarioId) {
+      if (!usuario_id) {
         return res.status(401).json({ error: 'Usuario no autenticado' })
       }
 
       const comparaciones = await prisma.comparacion.findMany({
-        where: { usuarioId },
+        where: { usuario_id },
         include: {
           detalle_comparacion: {
             include: {
               inmueble: {
-                include: {
-                  ubicacion_inmueble: true
+                include: { ubicacion: true
                 }
               }
             }
           }
         },
         orderBy: {
-          creadoEn: 'desc'
+          creado_en: 'desc'
         }
       })
 
@@ -387,12 +383,12 @@ export const comparacionController = {
           acc[categoriaKey].push({
             id: comp.id,
             nombre: comp.nombre,
-            fecha: comp.creadoEn,
+            fecha: comp.creado_en,
             propiedades: comp.detalle_comparacion.map((detalle) => ({
               id: detalle.inmueble.id,
               ubicacion:
-                detalle.inmueble.ubicacion_inmueble?.zona ||
-                detalle.inmueble.ubicacion_inmueble?.ciudad ||
+                detalle.inmueble.ubicacion?.zona ||
+                detalle.inmueble.ubicacion?.ciudad ||
                 'Ubicación no disponible',
               precio: detalle.inmueble.precio,
               superficie: detalle.inmueble.superficie_m2,
@@ -419,3 +415,4 @@ export const comparacionController = {
     }
   }
 }
+

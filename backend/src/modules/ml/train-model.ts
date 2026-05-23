@@ -202,3 +202,4 @@ entrenar().catch((err) => {
   console.error("[TRAIN] Error:", err);
   process.exit(1);
 });
+

@@ -21,7 +21,7 @@ export class LocationsRepository {
       const municipios = await prisma.municipio.findMany({
         where: { nombre: { contains: cleanQuery, mode: "insensitive" } },
         include: {
-          provincia_municipio_provinciaToprovincia: { include: { departamento_provincia_departamentoTodepartamento: true } }
+          provincia: { include: { departamento: true } }
         },
         take: 3,
       });
@@ -30,10 +30,10 @@ export class LocationsRepository {
       const barrios = await prisma.barrio.findMany({
         where: { nombre: { contains: cleanQuery, mode: "insensitive" } },
         include: {
-          zona_geografica: {
+          zona: {
             include: {
-              municipio_zona_geografica_municipioTomunicipio: {
-                include: { provincia_municipio_provinciaToprovincia: { include: { departamento_provincia_departamentoTodepartamento: true } } }
+              municipio: {
+                include: { provincia: { include: { departamento: true } } }
               }
             }
           }
@@ -47,7 +47,7 @@ export class LocationsRepository {
         nombre: m.nombre, 
         municipio: m.nombre,
         // Usamos ?. para evitar el error y ?? para poner un valor por defecto
-        departamento: m.provincia_municipio_provinciaToprovincia?.departamento_provincia_departamentoTodepartamento.nombre ?? "Cochabamba", 
+        departamento: m.provincia?.departamento.nombre ?? "Cochabamba", 
         tipo: "Municipio" 
       }));
 
@@ -55,8 +55,8 @@ export class LocationsRepository {
       const resultadosBarrios = barrios.map((b) => ({
         id: b.id,
         nombre: b.nombre,
-        municipio: b.zona_geografica.municipio_zona_geografica_municipioTomunicipio.nombre,
-        departamento: b.zona_geografica.municipio_zona_geografica_municipioTomunicipio.provincia_municipio_provinciaToprovincia?.departamento_provincia_departamentoTodepartamento.nombre ?? "Cochabamba", 
+        municipio: b.zona.municipio.nombre,
+        departamento: b.zona.municipio.provincia?.departamento.nombre ?? "Cochabamba", 
         tipo: "Barrio"
       }));
 

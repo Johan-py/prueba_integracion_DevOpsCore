@@ -44,3 +44,4 @@ export interface RegisterVideoLinkBody {
 export interface RegisterImagesBody {
   images: ImageUploadItemInput[];
 }
+

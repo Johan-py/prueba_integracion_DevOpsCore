@@ -72,3 +72,4 @@ export const cancelProperty = async (_req: Request, res: Response) => {
     mensaje: "Operación cancelada, regresando a la pantalla anterior",
   });
 };
+

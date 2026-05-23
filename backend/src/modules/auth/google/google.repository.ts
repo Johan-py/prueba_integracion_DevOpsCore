@@ -20,7 +20,7 @@ export const findUserByGoogleId = async (googleId: string) => {
   const social = await prisma.autenticacion_social.findFirst({
     where: {
       proveedor: 'google',
-      idExterno: googleId,
+      id_externo: googleId,
       activo: true
     },
     include: {
@@ -38,7 +38,7 @@ export const findUserByGoogleEmail = async (correo: string) => {
 export const createGoogleUser = async (
   data: CreateGoogleUserInput,
   googleId: string,
-  correoProveedor: string
+  correo_proveedor: string
 ) => {
   return await prisma.$transaction(async (tx) => {
     const rol = await tx.rol.upsert({
@@ -59,10 +59,10 @@ export const createGoogleUser = async (
 
     await tx.autenticacion_social.create({
       data: {
-        usuarioId: user.id,
+        usuario_id: user.id,
         proveedor: 'google',
-        idExterno: googleId,
-        correoProveedor,
+        id_externo: googleId,
+        correo_proveedor,
         activo: true
       }
     })
@@ -72,31 +72,31 @@ export const createGoogleUser = async (
 }
 
 export const linkGoogleToUser = async (
-  usuarioId: number,
+  usuario_id: number,
   googleId: string,
-  correoProveedor: string
+  correo_proveedor: string
 ) => {
   return await createSocialLink({
-    usuarioId,
+    usuario_id,
     proveedor: 'google',
-    idExterno: googleId,
-    correoProveedor
+    id_externo: googleId,
+    correo_proveedor
   })
 }
 
 export const createGoogleSession = async ({
   token,
-  usuarioId,
-  fechaExpiracion
+  usuario_id,
+  fecha_expiracion
 }: {
   token: string
-  usuarioId: number
-  fechaExpiracion: Date
+  usuario_id: number
+  fecha_expiracion: Date
 }) => {
   return await createSession({
     token,
-    usuarioId,
-    fechaExpiracion
+    usuario_id,
+    fecha_expiracion
   })
 }
 
@@ -104,24 +104,24 @@ export const findGoogleLinkByExternalId = async (googleId: string) => {
   return await findSocialLinkByProviderAndExternalId('google', googleId)
 }
 
-export const findGoogleLinkByUserId = async (usuarioId: number) => {
-  return await findSocialLinkByUserAndProvider(usuarioId, 'google')
+export const findGoogleLinkByUserId = async (usuario_id: number) => {
+  return await findSocialLinkByUserAndProvider(usuario_id, 'google')
 }
 
 export const createGoogleLinkForUser = async ({
-  usuarioId,
+  usuario_id,
   googleId,
-  correoProveedor
+  correo_proveedor
 }: {
-  usuarioId: number
+  usuario_id: number
   googleId: string
-  correoProveedor?: string | null
+  correo_proveedor?: string | null
 }) => {
   return await createSocialLink({
-    usuarioId,
+    usuario_id,
     proveedor: 'google',
-    idExterno: googleId,
-    correoProveedor
+    id_externo: googleId,
+    correo_proveedor
   })
 }
 
@@ -129,12 +129,12 @@ export const findUserByGoogleSessionToken = async (sessionToken: string) => {
   return await findUserByActiveSessionTokenForSocialLink(sessionToken)
 }
 
-export const updateGoogleLastUsage = async (usuarioId: number, googleId: string) => {
+export const updateGoogleLastUsage = async (usuario_id: number, googleId: string) => {
   return await prisma.autenticacion_social.updateMany({
     where: {
-      usuarioId,
+      usuario_id,
       proveedor: 'google',
-      idExterno: googleId,
+      id_externo: googleId,
       activo: true
     },
     data: {
@@ -142,3 +142,4 @@ export const updateGoogleLastUsage = async (usuarioId: number, googleId: string)
     }
   })
 }
+

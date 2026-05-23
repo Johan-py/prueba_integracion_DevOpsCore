@@ -7,7 +7,7 @@ interface InmuebleConScore {
   precio: number
   superficie_m2: number | null
   categoria: string | null
-  ubicacion_inmueble: any
+  ubicacion: any
   score: number
   razones: string[]
 }
@@ -15,40 +15,40 @@ interface InmuebleConScore {
 export class FeaturesService {
   /**
    * Recomienda inmuebles para un usuario usando similitud de coseno
-   * @param usuarioId ID del usuario
+   * @param usuario_id ID del usuario
    * @param limit Número máximo de resultados
    * @returns Lista de inmuebles con score y razones
    */
   async recomendar(
-    usuarioId: number,
+    usuario_id: number,
     limit: number = 20,
     filtrosActivos?: { modoInmueble?: string[]; query?: string }
   ): Promise<InmuebleConScore[]> {
     try {
       // 1. Obtener el historial de interacciones del usuario
       const historial = await prisma.propiedad_vista.findMany({
-        where: { usuarioId: usuarioId },
-        select: { inmuebleId: true, vistaEn: true },
-        orderBy: { vistaEn: 'desc' },
+        where: { usuario_id: usuario_id },
+        select: { inmueble_id: true, vista_en: true },
+        orderBy: { vista_en: 'desc' },
         take: 50 // últimas 50 vistas
       })
 
       const favoritos = await prisma.favorito.findMany({
-        where: { usuarioId: usuarioId },
-        select: { inmuebleId: true }
+        where: { usuario_id: usuario_id },
+        select: { inmueble_id: true }
       })
 
       // Combinar interacciones (dar más peso a favoritos)
 
-      const interacciones = new Map<number, number>() // inmuebleId -> peso
+      const interacciones = new Map<number, number>() // inmueble_id -> peso
       const ahora = new Date()
       for (const v of historial) {
-        const horasDiff = (ahora.getTime() - new Date(v.vistaEn).getTime()) / (1000 * 3600)
+        const horasDiff = (ahora.getTime() - new Date(v.vista_en).getTime()) / (1000 * 3600)
         const pesoRecencia = horasDiff < 1 ? 8 : horasDiff < 24 ? 4 : horasDiff < 168 ? 2 : 1
-        interacciones.set(v.inmuebleId, (interacciones.get(v.inmuebleId) || 0) + pesoRecencia)
+        interacciones.set(v.inmueble_id, (interacciones.get(v.inmueble_id) || 0) + pesoRecencia)
       }
       for (const f of favoritos) {
-        interacciones.set(f.inmuebleId, (interacciones.get(f.inmuebleId) || 0) + 5) // favoritos suman más
+        interacciones.set(f.inmueble_id, (interacciones.get(f.inmueble_id) || 0) + 5) // favoritos suman más
       }
       console.log('[ML] Interacciones totales:', interacciones.size)
       console.log('[ML] IDs en interacciones:', Array.from(interacciones.keys()))
@@ -126,7 +126,7 @@ export class FeaturesService {
             precio: Number(propiedad.precio),
             superficie_m2: propiedad.superficie_m2,
             categoria: propiedad.categoria,
-            ubicacion_inmueble: propiedad.ubicacion_inmueble,
+            ubicacion: propiedad.ubicacion,
             score: Math.round(score * 100) / 100,
             razones: razonesMap.get(id) || ['Recomendado automático']
           }
@@ -150,7 +150,7 @@ export class FeaturesService {
     // Estrategia simple: obtener propiedades de las mismas categorías y zonas
     const interactuados = await prisma.inmueble.findMany({
       where: { id: { in: idsInteractuados } },
-      select: { categoria: true, ubicacion_inmueble: true }
+      select: { categoria: true, ubicacion: true }
     })
 
     const categorias = [
@@ -181,8 +181,8 @@ export class FeaturesService {
     if (filtrosActivos?.query && filtrosActivos.query.trim() !== '') {
       const texto = filtrosActivos.query.trim()
       where.OR = [
-        { ubicacion_inmueble: { zona: { contains: texto, mode: 'insensitive' } } },
-        { ubicacion_inmueble: { direccion: { contains: texto, mode: 'insensitive' } } },
+        { ubicacion: { zona: { contains: texto, mode: 'insensitive' } } },
+        { ubicacion: { direccion: { contains: texto, mode: 'insensitive' } } },
         { titulo: { contains: texto, mode: 'insensitive' } }
       ]
     }
@@ -190,7 +190,7 @@ export class FeaturesService {
     const candidatos = await prisma.inmueble.findMany({
       where,
       take: limite,
-      include: { publicacion: true }
+      include: { publicaciones: true }
     })
 
     return candidatos
@@ -271,7 +271,7 @@ export class FeaturesService {
       where: { estado: 'ACTIVO' },
       orderBy: { fecha_publicacion: 'desc' }, // asumiendo campo popularidad
       take: limit,
-      include: { publicacion: true, ubicacion_inmueble: true }
+      include: { publicaciones: true, ubicacion: true }
     })
     return fecha_publicacion.map((p) => ({
       id: p.id,
@@ -279,7 +279,7 @@ export class FeaturesService {
       precio: Number(p.precio),
       superficie_m2: p.superficie_m2 ? Number(p.superficie_m2) : null,
       categoria: p.categoria,
-      ubicacion_inmueble: p.ubicacion_inmueble,
+      ubicacion: p.ubicacion,
       score: 50,
       razones: ['Popularidad general']
     }))
@@ -287,3 +287,5 @@ export class FeaturesService {
 }
 
 export const featuresService = new FeaturesService()
+
+

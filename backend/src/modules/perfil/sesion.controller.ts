@@ -7,26 +7,26 @@ export const sesionController = {
   // Obtener todas las sesiones activas del usuario autenticado
   async getMisSesiones(req: AuthRequest, res: Response) {
     try {
-      const usuarioId = req.usuario?.id
+      const usuario_id = req.usuario?.id
 
-      if (!usuarioId) {
+      if (!usuario_id) {
         return res.status(401).json({ error: 'Usuario no autenticado' })
       }
 
       // ✅ Obtener SOLO sesiones activas (estado = true)
       const sesiones = await prisma.sesion.findMany({
         where: {
-          usuarioId,
+          usuario_id,
           estado: true // ← Agregar este filtro
         },
         orderBy: {
-          fechaInicio: 'desc'
+          fecha_inicio: 'desc'
         },
         select: {
           id: true,
           token: true,
-          fechaInicio: true,
-          fechaExpiracion: true,
+          fecha_inicio: true,
+          fecha_expiracion: true,
           estado: true,
           metodo_auth: true
         }
@@ -38,8 +38,8 @@ export const sesionController = {
       const sesionesFormateadas = sesiones.map((sesion) => ({
         id: sesion.id,
         token: sesion.token.substring(0, 20) + '...',
-        fechaInicio: sesion.fechaInicio,
-        fechaExpiracion: sesion.fechaExpiracion,
+        fecha_inicio: sesion.fecha_inicio,
+        fecha_expiracion: sesion.fecha_expiracion,
         estado: sesion.estado,
         metodoAuth: sesion.metodo_auth,
         esActual: sesion.token === tokenActual
@@ -60,7 +60,7 @@ export const sesionController = {
   async getSesionById(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params
-      const usuarioId = req.usuario?.id
+      const usuario_id = req.usuario?.id
 
       const sesionId = Array.isArray(id) ? id[0] : id
 
@@ -71,13 +71,13 @@ export const sesionController = {
       const sesion = await prisma.sesion.findFirst({
         where: {
           id: parseInt(sesionId),
-          usuarioId
+          usuario_id
         },
         select: {
           id: true,
           token: true,
-          fechaInicio: true,
-          fechaExpiracion: true,
+          fecha_inicio: true,
+          fecha_expiracion: true,
           estado: true,
           metodo_auth: true
         }
@@ -98,7 +98,7 @@ export const sesionController = {
   async cerrarSesion(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params
-      const usuarioId = req.usuario?.id
+      const usuario_id = req.usuario?.id
 
       const sesionId = Array.isArray(id) ? id[0] : id
 
@@ -110,7 +110,7 @@ export const sesionController = {
       const sesion = await prisma.sesion.findFirst({
         where: {
           id: parseInt(sesionId),
-          usuarioId
+          usuario_id
         }
       })
 
@@ -145,16 +145,16 @@ export const sesionController = {
   // Cerrar todas las sesiones excepto la actual
   async cerrarTodasSesionesExceptoActual(req: AuthRequest, res: Response) {
     try {
-      const usuarioId = req.usuario?.id
+      const usuario_id = req.usuario?.id
       const tokenActual = req.headers.authorization?.split(' ')[1]
 
-      if (!usuarioId) {
+      if (!usuario_id) {
         return res.status(401).json({ error: 'Usuario no autenticado' })
       }
 
       const result = await prisma.sesion.updateMany({
         where: {
-          usuarioId,
+          usuario_id,
           token: { not: tokenActual },
           estado: true
         },
@@ -171,3 +171,4 @@ export const sesionController = {
     }
   }
 }
+

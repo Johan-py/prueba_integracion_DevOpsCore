@@ -154,3 +154,4 @@ export const propertiesController = {
 export const search = propertiesController.search
 export const getAll = propertiesController.getAll
 export const compare = propertiesController.compare
+

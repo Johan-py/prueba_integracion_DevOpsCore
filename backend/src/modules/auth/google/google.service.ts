@@ -129,12 +129,12 @@ const buildGoogleSessionResponse = async (
   }
 
   const token = generateToken(jwtPayload)
-  const fechaExpiracion = new Date(Date.now() + SESSION_DURATION_MS)
+  const fecha_expiracion = new Date(Date.now() + SESSION_DURATION_MS)
 
   await createGoogleSession({
     token,
-    usuarioId: user.id,
-    fechaExpiracion
+    usuario_id: user.id,
+    fecha_expiracion
   })
 
   return {
@@ -275,7 +275,7 @@ export const linkGoogleToCurrentUserByCodeService = async (
   const googleUser = await getGoogleUserInfo(tokenData.access_token as string)
 
   const googleId = googleUser.sub?.trim()
-  const correoProveedor = googleUser.email?.trim().toLowerCase() ?? null
+  const correo_proveedor = googleUser.email?.trim().toLowerCase() ?? null
 
   if (!googleId) {
     throw new GoogleAuthError(
@@ -287,7 +287,7 @@ export const linkGoogleToCurrentUserByCodeService = async (
 
   const existingLinkByExternalId = await findGoogleLinkByExternalId(googleId)
 
-  if (existingLinkByExternalId && existingLinkByExternalId.usuarioId !== session.usuario.id) {
+  if (existingLinkByExternalId && existingLinkByExternalId.usuario_id !== session.usuario.id) {
     throw new GoogleAuthError(
       'Esta cuenta de Google ya está vinculada a otro usuario.',
       'GOOGLE_AUTH_FAILED',
@@ -298,11 +298,11 @@ export const linkGoogleToCurrentUserByCodeService = async (
   const existingLinkByUser = await findGoogleLinkByUserId(session.usuario.id)
 
   if (existingLinkByUser) {
-    if (existingLinkByUser.idExterno === googleId) {
+    if (existingLinkByUser.id_externo === googleId) {
       return {
         message: 'Tu cuenta de Google ya estaba vinculada.',
         provider: 'google',
-        linkedEmail: existingLinkByUser.correoProveedor ?? correoProveedor
+        linkedEmail: existingLinkByUser.correo_proveedor ?? correo_proveedor
       }
     }
 
@@ -314,14 +314,15 @@ export const linkGoogleToCurrentUserByCodeService = async (
   }
 
   await createGoogleLinkForUser({
-    usuarioId: session.usuario.id,
+    usuario_id: session.usuario.id,
     googleId,
-    correoProveedor
+    correo_proveedor
   })
 
   return {
     message: 'Google fue vinculado correctamente.',
     provider: 'google',
-    linkedEmail: correoProveedor
+    linkedEmail: correo_proveedor
   }
 }
+

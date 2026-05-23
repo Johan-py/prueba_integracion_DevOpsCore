@@ -577,3 +577,4 @@ export const verifyActivate2FACodeService = async ({
     two_factor_activo: true,
   };
 };
+

@@ -159,12 +159,12 @@ const buildDiscordSessionResponse = async (
   }
 
   const token = generateToken(jwtPayload)
-  const fechaExpiracion = new Date(Date.now() + SESSION_DURATION_MS)
+  const fecha_expiracion = new Date(Date.now() + SESSION_DURATION_MS)
 
   await createDiscordSession({
     token,
-    usuarioId: user.id,
-    fechaExpiracion
+    usuario_id: user.id,
+    fecha_expiracion
   })
 
   return {
@@ -323,7 +323,7 @@ export const linkDiscordToCurrentUserByCodeService = async (
   const discordUser = await getDiscordUserInfo(tokenData.access_token as string)
 
   const discordId = discordUser.id?.trim()
-  const correoProveedor = discordUser.email?.trim().toLowerCase() ?? null
+  const correo_proveedor = discordUser.email?.trim().toLowerCase() ?? null
 
   if (!discordId) {
     throw new DiscordAuthError(
@@ -335,7 +335,7 @@ export const linkDiscordToCurrentUserByCodeService = async (
 
   const existingLinkByExternalId = await findDiscordLinkByExternalId(discordId)
 
-  if (existingLinkByExternalId && existingLinkByExternalId.usuarioId !== session.usuario.id) {
+  if (existingLinkByExternalId && existingLinkByExternalId.usuario_id !== session.usuario.id) {
     throw new DiscordAuthError(
       'Esta cuenta de Discord ya está vinculada a otro usuario.',
       'DISCORD_AUTH_FAILED',
@@ -346,11 +346,11 @@ export const linkDiscordToCurrentUserByCodeService = async (
   const existingLinkByUser = await findDiscordLinkByUserId(session.usuario.id)
 
   if (existingLinkByUser) {
-    if (existingLinkByUser.idExterno === discordId) {
+    if (existingLinkByUser.id_externo === discordId) {
       return {
         message: 'Tu cuenta de Discord ya estaba vinculada.',
         provider: 'discord',
-        linkedEmail: existingLinkByUser.correoProveedor ?? correoProveedor
+        linkedEmail: existingLinkByUser.correo_proveedor ?? correo_proveedor
       }
     }
 
@@ -362,14 +362,15 @@ export const linkDiscordToCurrentUserByCodeService = async (
   }
 
   await createDiscordLinkForUser({
-    usuarioId: session.usuario.id,
+    usuario_id: session.usuario.id,
     discordId,
-    correoProveedor
+    correo_proveedor
   })
 
   return {
     message: 'Discord fue vinculado correctamente.',
     provider: 'discord',
-    linkedEmail: correoProveedor
+    linkedEmail: correo_proveedor
   }
 }
+

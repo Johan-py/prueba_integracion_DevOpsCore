@@ -21,3 +21,4 @@ router.get("/validate", (req, res) => {
 });
 
 export default router;
+

@@ -9,3 +9,4 @@ router.get('/consumo/me', requireAuth, getConsumo)
 
 router.get('/limite', getPlanLimit)
 export default router
+

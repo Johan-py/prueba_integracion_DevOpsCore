@@ -214,3 +214,4 @@ export const linkedInCallbackController = async (req: Request, res: Response) =>
     })
   }
 }
+

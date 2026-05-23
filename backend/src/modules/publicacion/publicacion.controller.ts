@@ -28,11 +28,11 @@ export const listarMisPublicacionesController = async (
   req: AuthRequest,
   res: Response,
 ) => {
-  const usuarioId = req.user?.id;
+  const usuario_id = req.user?.id;
 
   try {
     const publicaciones = await listarMisPublicacionesService(
-      Number(usuarioId),
+      Number(usuario_id),
     );
 
     return res.status(200).json({
@@ -316,11 +316,11 @@ export const obtenerDetallePublicacionPorInmuebleController = async (
   req: Request,
   res: Response,
 ) => {
-  const inmuebleId = Number(req.params.inmuebleId);
+  const inmueble_id = Number(req.params.inmueble_id);
 
   try {
     const detalle =
-      await obtenerDetallePublicacionPorInmuebleService(inmuebleId);
+      await obtenerDetallePublicacionPorInmuebleService(inmueble_id);
 
     return res.status(200).json({
       ok: true,
@@ -529,12 +529,12 @@ export const iniciarPublicidadController = async (
   res: Response
 ) => {
   const publicacionId = Number(req.params.id);
-  const usuarioId = req.user?.id;
+  const usuario_id = req.user?.id;
 
   try {
     const resultado = await iniciarPublicidadService(
       publicacionId,
-      Number(usuarioId)
+      Number(usuario_id)
     );
 
     return res.status(200).json({
@@ -592,13 +592,13 @@ export const confirmarPublicidadController = async (
   res: Response
 ) => {
   const publicacionId = Number(req.params.id);
-  const usuarioId = req.user?.id;
+  const usuario_id = req.user?.id;
   const { paymentIntentId, planId } = req.body;
 
   try {
     const resultado = await confirmarPublicidadService(
       publicacionId,
-      Number(usuarioId),
+      Number(usuario_id),
       paymentIntentId,
       planId
     );
@@ -658,12 +658,12 @@ export const cancelarPublicidadController = async (
   res: Response
 ) => {
   const publicacionId = Number(req.params.id);
-  const usuarioId = req.user?.id;
+  const usuario_id = req.user?.id;
 
   try {
     const resultado = await cancelarPublicidadService(
       publicacionId,
-      Number(usuarioId)
+      Number(usuario_id)
     );
 
     return res.status(200).json({
@@ -748,3 +748,4 @@ export const obtenerEstadoPublicidadController = async (
     });
   }
 };
+

@@ -10,9 +10,10 @@ import {
 const router = Router();
 
 router.post("/generar-qr", generarPagoQr);
-router.get("/pendiente/:usuarioId", obtenerPagoPendiente);
+router.get("/pendiente/:usuario_id", obtenerPagoPendiente);
 router.patch("/:id/confirmar", confirmarPago);
 router.patch("/:id/estado", actualizarEstadoPago);
 router.get("/:id/estado", consultarEstadoPago);
 
 export default router;
+

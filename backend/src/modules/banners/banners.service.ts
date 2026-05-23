@@ -7,3 +7,4 @@ export class BannersService {
     return await this.repository.getActiveBanners();
   }
 }
+

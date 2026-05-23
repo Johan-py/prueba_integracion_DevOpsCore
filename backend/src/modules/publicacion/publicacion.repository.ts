@@ -19,11 +19,11 @@ type ActualizarPublicacionInput = {
 };
 
 export const buscarPublicacionesPorUsuarioRepository = async (
-  usuarioId: number,
+  usuario_id: number,
 ) => {
   return prisma.publicacion.findMany({
     where: {
-      usuario_id: usuarioId,
+      usuario_id: usuario_id,
       estado: {
         not: ESTADO_PUBLICACION_ELIMINADA,
       },
@@ -31,8 +31,7 @@ export const buscarPublicacionesPorUsuarioRepository = async (
     include: {
       multimedia: true,
       inmueble: {
-        include: {
-          ubicacion_inmueble: {
+        include: { ubicacion: {
             select: {
               id: true,
               direccion: true,
@@ -56,8 +55,7 @@ export const buscarPublicacionPorIdRepository = async (id: number) => {
     where: { id },
     include: {
       inmueble: {
-        include: {
-          ubicacion_inmueble: true,
+        include: { ubicacion: true,
         },
       },
       multimedia: true,
@@ -90,7 +88,7 @@ export const buscarResumenFinalPorIdRepository = async (
           nro_banos: true,
           descripcion: true,
           estado: true,
-          ubicacion_inmueble: {
+          ubicacion: {
             select: {
               direccion: true,
               ciudad: true,
@@ -155,7 +153,7 @@ export const actualizarPublicacionRepository = async (
   const inmuebleData: {
     tipo_accion?: TipoAccionValue;
     precio?: number;
-    ubicacion_inmueble?: {
+    ubicacion?: {
       update: {
         direccion: string;
       };
@@ -186,7 +184,7 @@ export const actualizarPublicacionRepository = async (
   }
 
   if (direccionRaw !== undefined) {
-    inmuebleData.ubicacion_inmueble = {
+    inmuebleData.ubicacion = {
       update: {
         direccion: String(direccionRaw).trim(),
       },
@@ -205,8 +203,7 @@ export const actualizarPublicacionRepository = async (
     include: {
       multimedia: true,
       inmueble: {
-        include: {
-          ubicacion_inmueble: true,
+        include: { ubicacion: true,
         },
       },
     },
@@ -215,7 +212,7 @@ export const actualizarPublicacionRepository = async (
 
 export const eliminarLogicamentePublicacionRepository = async (
   publicacionId: number,
-  inmuebleId: number,
+  inmueble_id: number,
 ) => {
   return prisma.$transaction([
     prisma.publicacion.update({
@@ -225,7 +222,7 @@ export const eliminarLogicamentePublicacionRepository = async (
       },
     }),
     prisma.inmueble.update({
-      where: { id: inmuebleId },
+      where: { id: inmueble_id },
       data: {
         estado: ESTADO_INMUEBLE_INACTIVO,
       },
@@ -252,7 +249,7 @@ export const buscarDetallePublicacionPorIdRepository = async (
           nombre: true,
           apellido: true,
           correo: true,
-          telefono_telefono_usuarioIdTousuario: {
+          telefono_telefono_usuario_idTousuario: {
             select: {
               codigoPais: true,
               numero: true,
@@ -273,7 +270,7 @@ export const buscarDetallePublicacionPorIdRepository = async (
           nro_banos: true,
           descripcion: true,
           estado: true,
-          ubicacion_inmueble: {
+          ubicacion: {
             select: {
               direccion: true,
               latitud: true,
@@ -310,11 +307,11 @@ export const buscarDetallePublicacionPorIdRepository = async (
 };
 
 export const buscarDetallePublicacionPorInmuebleIdRepository = async (
-  inmuebleId: number,
+  inmueble_id: number,
 ) => {
   return prisma.publicacion.findFirst({
     where: {
-      inmueble_id: inmuebleId,
+      inmueble_id: inmueble_id,
       estado: {
         not: "ELIMINADA",
       },
@@ -333,7 +330,7 @@ export const buscarDetallePublicacionPorInmuebleIdRepository = async (
           nombre: true,
           apellido: true,
           correo: true,
-          telefono_telefono_usuarioIdTousuario: {
+          telefono_telefono_usuario_idTousuario: {
             select: {
               codigoPais: true,
               numero: true,
@@ -355,7 +352,7 @@ export const buscarDetallePublicacionPorInmuebleIdRepository = async (
           nro_banos: true,
           descripcion: true,
           estado: true,
-          ubicacion_inmueble: {
+          ubicacion: {
             select: {
               direccion: true,
               latitud: true,
@@ -399,8 +396,7 @@ export const confirmarPublicacionRepository = async (publicacionId: number) => {
     include: {
       multimedia: true,
       inmueble: {
-        include: {
-          ubicacion_inmueble: true,
+        include: { ubicacion: true,
         },
       },
     },
@@ -468,23 +464,23 @@ export const buscarMultimediaPublicacionRepository = async (
 
 export const activarPublicidadRepository = async (
   publicacionId: number,
-  usuarioId: number,
+  usuario_id: number,
   paymentIntentId: string,
   duracionDias: number = 30
 ) => {
-  const fechaInicio = new Date();
-  const fechaExpiracion = new Date();
-  fechaExpiracion.setDate(fechaExpiracion.getDate() + duracionDias);
+  const fecha_inicio = new Date();
+  const fecha_expiracion = new Date();
+  fecha_expiracion.setDate(fecha_expiracion.getDate() + duracionDias);
 
   return prisma.publicacion.update({
     where: {
       id: publicacionId,
-      usuario_id: usuarioId,
+      usuario_id: usuario_id,
     },
     data: {
       promoted: true,
-      promotedAt: fechaInicio,
-      promotedExpiresAt: fechaExpiracion,
+      promoted_at: fecha_inicio,
+      promoted_expires_at: fecha_expiracion,
       payment_intent_id: paymentIntentId,
     },
   });
@@ -492,17 +488,17 @@ export const activarPublicidadRepository = async (
 
 export const cancelarPublicidadRepository = async (
   publicacionId: number,
-  usuarioId: number
+  usuario_id: number
 ) => {
   return prisma.publicacion.update({
     where: {
       id: publicacionId,
-      usuario_id: usuarioId,
+      usuario_id: usuario_id,
     },
     data: {
       promoted: false,
-      promotedAt: null,
-      promotedExpiresAt: null,
+      promoted_at: null,
+      promoted_expires_at: null,
       payment_intent_id: null,
     },
   });
@@ -516,8 +512,8 @@ export const buscarPublicacionPorIdSimpleRepository = async (
     select: {
       id: true,
       promoted: true,
-      promotedAt: true,
-      promotedExpiresAt: true,
+      promoted_at: true,
+      promoted_expires_at: true,
     },
   });
 };
@@ -529,7 +525,7 @@ export const verificarPublicidadActivaRepository = async (
     where: { id: publicacionId },
     select: {
       promoted: true,
-      promotedExpiresAt: true,
+      promoted_expires_at: true,
     },
   });
 
@@ -537,7 +533,9 @@ export const verificarPublicidadActivaRepository = async (
 
   return (
     publicacion.promoted === true &&
-    publicacion.promotedExpiresAt !== null &&
-    new Date(publicacion.promotedExpiresAt) > new Date()
+    publicacion.promoted_expires_at !== null &&
+    new Date(publicacion.promoted_expires_at) > new Date()
   );
 };
+
+

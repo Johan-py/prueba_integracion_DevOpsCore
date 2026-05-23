@@ -12,7 +12,7 @@ router.post(
 );
 
 router.post(
-  "/inmuebles/:inmuebleId/vistas",
+  "/inmuebles/:inmueble_id/vistas",
   optionalAuth,
   EstadisticasPublicacionController.registrarVistaPorInmueble,
 );
@@ -24,7 +24,7 @@ router.post(
 );
 
 router.post(
-  "/inmuebles/:inmuebleId/compartidos",
+  "/inmuebles/:inmueble_id/compartidos",
   requireAuth,
   EstadisticasPublicacionController.registrarCompartidoPorInmueble,
 );
@@ -47,3 +47,4 @@ router.get(
 );
 
 export default router;
+

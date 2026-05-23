@@ -42,3 +42,4 @@ router.put("/fecha-nacimiento", validarJWT, editarFechaNacimiento);  // 👈 Agr
 router.delete("/publicaciones/:id", validarJWT, eliminarPublicacion);
 router.patch("/publicaciones/:id/estado", validarJWT, togglePublicacionEstado);
 export default router;
+

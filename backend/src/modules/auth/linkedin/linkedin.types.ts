@@ -48,3 +48,4 @@ export type LinkedInLinkSuccess = {
   provider: 'linkedin'
   linkedEmail: string | null
 }
+

@@ -11,11 +11,10 @@ export const getPlanLimit = async (req: Request, res: Response) => {
 
     const user = await prisma.usuario.findUnique({
       where: { id: Number(userId) },
-      include: {
-        publicacion: true,
+      include: { publicaciones: true,
         suscripciones_activas: true,
         _count: {
-          select: { publicacion: true },
+          select: { publicaciones: true },
         },
       },
     });
@@ -38,3 +37,4 @@ export const getPlanLimit = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Error en el servidor" });
   }
 };
+

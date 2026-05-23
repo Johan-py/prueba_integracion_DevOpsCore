@@ -61,7 +61,7 @@ export const crearPublicacion = async (req: Request, res: Response) => {
       estado: "Validado",
       mensaje: "Publicación creada correctamente",
       progress,
-      publicacion: nueva,
+      publicaciones: nueva,
     });
   } catch (_error) {
     return res.status(500).json({ error: "Error al crear publicación" });
@@ -94,3 +94,4 @@ export const validarPublicacionesFree = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Error al validar publicaciones gratuitas" });
   }
 };
+

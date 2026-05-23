@@ -273,13 +273,13 @@ export const loginService = async (payload: LoginDTO) => {
 
   if (user.two_factor_activo) {
     const codigo = generate2FACode();
-    const codigoHash = hash2FACode(codigo);
-    const expiraEn = new Date(
+    const codigo_hash = hash2FACode(codigo);
+    const expira_en = new Date(
       Date.now() + TWO_FACTOR_CODE_TTL_MINUTES * 60 * 1000,
     );
 
     await invalidateActive2FACodesByUserId(user.id);
-    await create2FACode({ usuarioId: user.id, codigoHash, expiraEn });
+    await create2FACode({ usuario_id: user.id, codigo_hash, expira_en });
 
     const emailResult = await enviarCodigo2FA({
       emailDestino: user.correo,
@@ -303,9 +303,9 @@ export const loginService = async (payload: LoginDTO) => {
 
   const jwtPayload: JwtPayload = { id: user.id, correo: user.correo };
   const token = generateToken(jwtPayload);
-  const fechaExpiracion = new Date(Date.now() + 60 * 60 * 1000);
+  const fecha_expiracion = new Date(Date.now() + 60 * 60 * 1000);
 
-  await createSession({ token, usuarioId: user.id, fechaExpiracion });
+  await createSession({ token, usuario_id: user.id, fecha_expiracion });
 
   return {
     requires2FA: false,
@@ -341,13 +341,13 @@ export const verify2FAService = async ({ userId, codigo }: Verify2FADTO) => {
 
   const activeCode = await findActive2FACodeByUserId(userId);
   if (!activeCode) throw new AuthError("El código es incorrecto", 401);
-  if (activeCode.expiraEn.getTime() < Date.now()) {
+  if (activeCode.expira_en.getTime() < Date.now()) {
     await expire2FACode(activeCode.id);
     throw new AuthError("El código ha expirado", 401);
   }
 
-  const codigoHash = hash2FACode(normalizedCode);
-  if (codigoHash !== activeCode.codigoHash) {
+  const codigo_hash = hash2FACode(normalizedCode);
+  if (codigo_hash !== activeCode.codigo_hash) {
     await increment2FACodeAttempts(activeCode.id, activeCode.intentos ?? 0);
     throw new AuthError("El código es incorrecto", 401);
   }
@@ -356,9 +356,9 @@ export const verify2FAService = async ({ userId, codigo }: Verify2FADTO) => {
 
   const jwtPayload: JwtPayload = { id: user.id, correo: user.correo };
   const token = generateToken(jwtPayload);
-  const fechaExpiracion = new Date(Date.now() + 60 * 60 * 1000);
+  const fecha_expiracion = new Date(Date.now() + 60 * 60 * 1000);
 
-  await createSession({ token, usuarioId: user.id, fechaExpiracion });
+  await createSession({ token, usuario_id: user.id, fecha_expiracion });
 
   return {
     user: {
@@ -456,9 +456,9 @@ export const verifyRegisterCodeService = async (
 
   const jwtPayload: JwtPayload = { id: newUser.id, correo: newUser.correo };
   const token = generateToken(jwtPayload);
-  const fechaExpiracion = new Date(Date.now() + 60 * 60 * 1000);
+  const fecha_expiracion = new Date(Date.now() + 60 * 60 * 1000);
 
-  await createSession({ token, usuarioId: newUser.id, fechaExpiracion });
+  await createSession({ token, usuario_id: newUser.id, fecha_expiracion });
 
   return {
     user: {
@@ -466,7 +466,7 @@ export const verifyRegisterCodeService = async (
       nombre: newUser.nombre,
       apellido: newUser.apellido,
       correo: newUser.correo,
-      telefono_telefono_usuarioIdTousuario: newUser.telefono_telefono_usuarioIdTousuario,
+      telefono_telefono_usuario_idTousuario: newUser.telefonos,
     },
     token,
   };
@@ -625,9 +625,9 @@ export const loginWithGoogleCodeService = async (code: string) => {
 
   const jwtPayload: JwtPayload = { id: user.id, correo: user.correo };
   const token = generateToken(jwtPayload);
-  const fechaExpiracion = new Date(Date.now() + 60 * 60 * 1000);
+  const fecha_expiracion = new Date(Date.now() + 60 * 60 * 1000);
 
-  await createSession({ token, usuarioId: user.id, fechaExpiracion });
+  await createSession({ token, usuario_id: user.id, fecha_expiracion });
 
   return {
     user: {
@@ -674,15 +674,15 @@ export const forgotPasswordService = async (payload: ForgotPasswordDTO) => {
   }
 
   const resetToken = crypto.randomUUID();
-  const expiraEn = new Date(
+  const expira_en = new Date(
     Date.now() + RESET_PASSWORD_TTL_MINUTES * 60 * 1000,
   );
 
   await desactivarRecuperacionesPasswordActivas(user.id);
   await createPasswordRecovery({
-    usuarioId: user.id,
+    usuario_id: user.id,
     token: resetToken,
-    expiraEn,
+    expira_en,
   });
 
   const resetLink = `${env.FRONTEND_URL}/reset-password?token=${resetToken}`;
@@ -738,7 +738,7 @@ export const resetPasswordService = async (payload: ResetPasswordDTO) => {
   const recovery = await findPasswordRecoveryByToken(token);
   if (!recovery || !recovery.activo)
     throw new AuthError("El enlace no es válido o ya fue utilizado", 400);
-  if (new Date() > recovery.expiraEn)
+  if (new Date() > recovery.expira_en)
     throw new AuthError("El enlace ha expirado. Solicita uno nuevo.", 400);
 
   const attempts = tokenAttempts.get(token) ?? 0;
@@ -756,14 +756,14 @@ export const resetPasswordService = async (payload: ResetPasswordDTO) => {
   await prisma.$transaction([
     prisma.recuperacion_password.update({
       where: { id: recovery.id },
-      data: { usadoEn: new Date(), activo: false },
+      data: { usado_en: new Date(), activo: false },
     }),
     prisma.usuario.update({
-      where: { id: recovery.usuarioId },
+      where: { id: recovery.usuario_id },
       data: { password },
     }),
     prisma.sesion.updateMany({
-      where: { usuarioId: recovery.usuarioId, estado: true },
+      where: { usuario_id: recovery.usuario_id, estado: true },
       data: { estado: false },
     }),
   ]);
@@ -790,3 +790,4 @@ export const marcarControladorService = async (token: string) => {
 
   return { message: "Tour marcado como visto" };
 };
+

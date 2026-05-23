@@ -45,3 +45,4 @@ export const verificarTransaccionShasta = async (
     return { valida: false, confirmaciones: 0, mensaje: 'Error al conectar con la red Tron' }
   }
 }
+

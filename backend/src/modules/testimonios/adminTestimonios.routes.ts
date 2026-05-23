@@ -15,3 +15,4 @@ router.put("/testimonios/:id", requireAuth, updateAdminTestimonio);
 router.delete("/testimonios/:id", requireAuth, deleteAdminTestimonio);
 
 export default router;
+

@@ -42,3 +42,4 @@ multimediaRoutes.post(
 )
 
 export default multimediaRoutes
+

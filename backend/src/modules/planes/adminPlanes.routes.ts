@@ -54,3 +54,4 @@ router.put('/planes/:id', validarJWT, validarAdmin, actualizarPlan)
 router.delete('/planes/:id', validarJWT, validarAdmin, eliminarPlan)
 
 export default router
+

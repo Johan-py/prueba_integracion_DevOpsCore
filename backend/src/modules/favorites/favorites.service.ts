@@ -2,21 +2,20 @@
 import { prisma } from "../../lib/prisma.client.js";
 
 export class FavoritesService {
-  static async getAll(usuarioId: number, page: number, perPage: number) {
+  static async getAll(usuario_id: number, page: number, perPage: number) {
     const skip = (page - 1) * perPage;
 
     const [total, favoritos] = await Promise.all([
-      prisma.favorito.count({ where: { usuarioId } }),
+      prisma.favorito.count({ where: { usuario_id } }),
       prisma.favorito.findMany({
-        where: { usuarioId },
+        where: { usuario_id },
         skip,
         take: perPage,
-        orderBy: { agregadoEn: "desc" },
+        orderBy: { agregado_en: "desc" },
         include: {
           inmueble: {
-            include: {
-              ubicacion_inmueble: true,
-              publicacion: {
+            include: { ubicacion: true,
+              publicaciones: {
                 where: { estado: "ACTIVA" }, // Solo publicaciones activas
                 include: { multimedia: true },
                 take: 1,
@@ -34,39 +33,39 @@ export class FavoritesService {
       per_page: perPage,
       data: favoritos.map((f) => ({
         id: f.id,
-        agregadoEn: f.agregadoEn,
+        agregado_en: f.agregado_en,
         inmueble: {
           ...f.inmueble,
           imagen_principal:
-            f.inmueble.publicacion[0]?.multimedia[0]?.url || null,
+            f.inmueble.publicaciones[0]?.multimedia[0]?.url || null,
         },
       })),
       totalPages: Math.ceil(total / perPage),
     };
   }
 
-  static async add(usuarioId: number, inmuebleId: number) {
-    console.log("[DEBUG] FavoritesService.add llamado:", usuarioId, inmuebleId);
+  static async add(usuario_id: number, inmueble_id: number) {
+    console.log("[DEBUG] FavoritesService.add llamado:", usuario_id, inmueble_id);
     try {
       const favorito = await prisma.favorito.create({
-        data: { usuarioId, inmuebleId },
+        data: { usuario_id, inmueble_id },
       });
 
       console.log(
         "[DEBUG] Buscando inmueble para entrenamiento_ml:",
-        inmuebleId,
+        inmueble_id,
       );
       const inmueble = await prisma.inmueble.findUnique({
-        where: { id: inmuebleId },
-        include: { ubicacion_inmueble: true, inmueble_amenidad: true },
+        where: { id: inmueble_id },
+        include: { ubicacion: true, inmueble_amenidad: true },
       });
       console.log("[DEBUG] Inmueble encontrado:", inmueble?.id);
       if (inmueble) {
         try {
           await prisma.entrenamiento_ml.create({
             data: {
-              usuario_id: usuarioId,
-              inmueble_id: inmuebleId,
+              usuario_id: usuario_id,
+              inmueble_id: inmueble_id,
               tipo_evento: "FAVORITO",
               score_real: 1.0,
               features: {
@@ -76,8 +75,8 @@ export class FavoritesService {
                 superficie_m2: Number(inmueble.superficie_m2 || 0),
                 nro_cuartos: inmueble.nro_cuartos || 0,
                 nro_banos: inmueble.nro_banos || 0,
-                zona: inmueble.ubicacion_inmueble?.zona || null,
-                ciudad: inmueble.ubicacion_inmueble?.ciudad || null,
+                zona: inmueble.ubicacion?.zona || null,
+                ciudad: inmueble.ubicacion?.ciudad || null,
                 amenidades: inmueble.inmueble_amenidad.map(
                   (a) => a.amenidad_id,
                 ),
@@ -102,14 +101,14 @@ export class FavoritesService {
       throw error;
     }
   }
-  static async remove(usuarioId: number, inmuebleId: number) {
+  static async remove(usuario_id: number, inmueble_id: number) {
     try {
       // Eliminar directamente usando el unique compuesto
       return await prisma.favorito.delete({
         where: {
-          usuarioId_inmuebleId: {
-            usuarioId,
-            inmuebleId,
+          usuario_id_inmueble_id: {
+            usuario_id,
+            inmueble_id,
           },
         },
       });
@@ -123,15 +122,15 @@ export class FavoritesService {
   }
 
   static async isFavorite(
-    usuarioId: number,
-    inmuebleId: number,
+    usuario_id: number,
+    inmueble_id: number,
   ): Promise<boolean> {
     try {
       const favorite = await prisma.favorito.findUnique({
         where: {
-          usuarioId_inmuebleId: {
-            usuarioId,
-            inmuebleId,
+          usuario_id_inmueble_id: {
+            usuario_id,
+            inmueble_id,
           },
         },
       });
@@ -141,3 +140,4 @@ export class FavoritesService {
     }
   }
 }
+

@@ -21,8 +21,8 @@ router.use(validarJWT)
  *     {
  *       "id": 1,
  *       "token": "eyJhbGciOiJIUzI1NiIs...",
- *       "fechaInicio": "2026-05-12T10:00:00.000Z",
- *       "fechaExpiracion": "2026-05-13T10:00:00.000Z",
+ *       "fecha_inicio": "2026-05-12T10:00:00.000Z",
+ *       "fecha_expiracion": "2026-05-13T10:00:00.000Z",
  *       "estado": true,
  *       "metodoAuth": "email",
  *       "esActual": true
@@ -70,3 +70,4 @@ router.delete('/:id', sesionController.cerrarSesion)
 router.delete('/cerrar/todas', sesionController.cerrarTodasSesionesExceptoActual)
 
 export default router
+

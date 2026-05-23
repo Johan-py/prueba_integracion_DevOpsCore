@@ -160,27 +160,27 @@ export const listarMisPublicacionesService = async (usuario_id: number) => {
     estadisticasPorPublicacion.set(estadistica.publicacion_id, estadistica);
   });
 
-  return publicaciones.map((publicacion: PublicacionesPorUsuario[number]) => {
-    const estadistica = estadisticasPorPublicacion.get(publicacion.id);
+  return publicaciones.map((pub: PublicacionesPorUsuario[number]) => {
+    const estadistica = estadisticasPorPublicacion.get(pub.id);
 
     return {
-      id: publicacion.id,
-      titulo: publicacion.titulo,
-      precio: Number(publicacion.inmueble.precio),
+      id: pub.id,
+      titulo: pub.titulo,
+      precio: Number(pub.inmueble.precio),
       ubicacion:
-        publicacion.inmueble.ubicacion_inmueble?.direccion || "Ubicación no disponible",
-      nro_banos: publicacion.inmueble.nro_banos,
-      nro_cuartos: publicacion.inmueble.nro_cuartos,
+        pub.inmueble.ubicacion?.direccion || "Ubicación no disponible",
+      nro_banos: pub.inmueble.nro_banos,
+      nro_cuartos: pub.inmueble.nro_cuartos,
       superficie_m2:
-        publicacion.inmueble.superficie_m2 !== null &&
-        publicacion.inmueble.superficie_m2 !== undefined
-          ? Number(publicacion.inmueble.superficie_m2)
+        pub.inmueble.superficie_m2 !== null &&
+        pub.inmueble.superficie_m2 !== undefined
+          ? Number(pub.inmueble.superficie_m2)
           : null,
-      imagenUrl: obtenerPrimeraImagenUrl(publicacion.multimedia),
+      imagenUrl: obtenerPrimeraImagenUrl(pub.multimedia),
 
-      tipoOperacion: publicacion.inmueble.tipo_accion,
-      activa: publicacion.estado === "ACTIVA",
-      estado: publicacion.estado,
+      tipoOperacion: pub.inmueble.tipo_accion,
+      activa: pub.estado === "ACTIVA",
+      estado: pub.estado,
 
       totalVisualizaciones: estadistica?.total_visualizaciones ?? 0,
       totalCompartidos: estadistica?.total_compartidos ?? 0,
@@ -291,7 +291,7 @@ export const editarPublicacionService = async (
     precio: Number(actualizada.inmueble.precio),
     tipoAccion: actualizada.inmueble.tipo_accion,
     ubicacion:
-      actualizada.inmueble.ubicacion_inmueble?.direccion || "Ubicación no disponible",
+      actualizada.inmueble.ubicacion?.direccion || "Ubicación no disponible",
     imagenUrl: obtenerPrimeraImagenUrl(actualizada.multimedia),
   };
 };
@@ -399,7 +399,7 @@ export const obtenerResumenFinalService = async (
     publicacionId: resumen.id,
     inmueble_id: resumen.inmueble_id,
 
-    publicacion: {
+    publicaciones: {
       titulo: resumen.titulo ?? resumen.inmueble?.titulo ?? null,
       descripcion: resumen.descripcion ?? resumen.inmueble?.descripcion ?? null,
       estado: resumen.estado,
@@ -409,9 +409,9 @@ export const obtenerResumenFinalService = async (
     datosGenerales: {
       tipoOperacion: resumen.inmueble?.tipo_accion ?? null,
       tipoInmueble: resumen.inmueble?.categoria ?? null,
-      direccion: resumen.inmueble?.ubicacion_inmueble?.direccion ?? "No especificado",
-      ciudad: resumen.inmueble?.ubicacion_inmueble?.ciudad ?? "No especificado",
-      zona: resumen.inmueble?.ubicacion_inmueble?.zona ?? "No especificado",
+      direccion: resumen.inmueble?.ubicacion?.direccion ?? "No especificado",
+      ciudad: resumen.inmueble?.ubicacion?.ciudad ?? "No especificado",
+      zona: resumen.inmueble?.ubicacion?.zona ?? "No especificado",
       precio:
         resumen.inmueble?.precio !== null &&
         resumen.inmueble?.precio !== undefined
@@ -423,8 +423,8 @@ export const obtenerResumenFinalService = async (
           ? Number(resumen.inmueble.superficie_m2)
           : null,
       coordenadas: {
-        latitud: resumen.inmueble?.ubicacion_inmueble?.latitud ?? null,
-        longitud: resumen.inmueble?.ubicacion_inmueble?.longitud ?? null,
+        latitud: resumen.inmueble?.ubicacion?.latitud ?? null,
+        longitud: resumen.inmueble?.ubicacion?.longitud ?? null,
       },
     },
 
@@ -461,8 +461,8 @@ export const obtenerDetallePublicacionService = async (
   }
 
   const telefonoPrincipal =
-    publicacion.usuario.telefono_telefono_usuarioIdTousuario.find((item) => item.principal) ??
-    publicacion.usuario.telefono_telefono_usuarioIdTousuario[0];
+    publicacion.usuario.telefono_telefono_usuario_idTousuario.find((item) => item.principal) ??
+    publicacion.usuario.telefono_telefono_usuario_idTousuario[0];
 
   return {
     id: publicacion.id,
@@ -471,7 +471,7 @@ export const obtenerDetallePublicacionService = async (
     tipoInmueble: publicacion.inmueble.categoria ?? null,
     tipoOperacion: publicacion.inmueble.tipo_accion,
     ubicacionTexto:
-      publicacion.inmueble.ubicacion_inmueble?.direccion || "Ubicación no disponible",
+      publicacion.inmueble.ubicacion?.direccion || "Ubicación no disponible",
     descripcion:
       publicacion.descripcion ||
       publicacion.inmueble.descripcion ||
@@ -508,13 +508,13 @@ export const obtenerDetallePublicacionService = async (
         (item) => item.etiqueta.nombre,
       ) ?? [],
     mapa: {
-      latitud: publicacion.inmueble.ubicacion_inmueble?.latitud
-        ? Number(publicacion.inmueble.ubicacion_inmueble.latitud)
+      latitud: publicacion.inmueble.ubicacion?.latitud
+        ? Number(publicacion.inmueble.ubicacion.latitud)
         : null,
-      longitud: publicacion.inmueble.ubicacion_inmueble?.longitud
-        ? Number(publicacion.inmueble.ubicacion_inmueble.longitud)
+      longitud: publicacion.inmueble.ubicacion?.longitud
+        ? Number(publicacion.inmueble.ubicacion.longitud)
         : null,
-      direccion: publicacion.inmueble.ubicacion_inmueble?.direccion || null,
+      direccion: publicacion.inmueble.ubicacion?.direccion || null,
     },
     contacto: {
       nombre: `${publicacion.usuario.nombre} ${publicacion.usuario.apellido}`,
@@ -541,8 +541,8 @@ export const obtenerDetallePublicacionPorInmuebleService = async (
   }
 
   const telefonoPrincipal =
-    publicacion.usuario.telefono_telefono_usuarioIdTousuario.find((item) => item.principal) ??
-    publicacion.usuario.telefono_telefono_usuarioIdTousuario[0];
+    publicacion.usuario.telefono_telefono_usuario_idTousuario.find((item) => item.principal) ??
+    publicacion.usuario.telefono_telefono_usuario_idTousuario[0];
 
   return {
     id: publicacion.id,
@@ -556,7 +556,7 @@ export const obtenerDetallePublicacionPorInmuebleService = async (
     tipoInmueble: publicacion.inmueble.categoria ?? null,
     tipoOperacion: publicacion.inmueble.tipo_accion,
     ubicacionTexto:
-      publicacion.inmueble.ubicacion_inmueble?.direccion || "Ubicación no disponible",
+      publicacion.inmueble.ubicacion?.direccion || "Ubicación no disponible",
     descripcion:
       publicacion.descripcion ||
       publicacion.inmueble.descripcion ||
@@ -593,13 +593,13 @@ export const obtenerDetallePublicacionPorInmuebleService = async (
         (item) => item.etiqueta.nombre,
       ) ?? [],
     mapa: {
-      latitud: publicacion.inmueble.ubicacion_inmueble?.latitud
-        ? Number(publicacion.inmueble.ubicacion_inmueble.latitud)
+      latitud: publicacion.inmueble.ubicacion?.latitud
+        ? Number(publicacion.inmueble.ubicacion.latitud)
         : null,
-      longitud: publicacion.inmueble.ubicacion_inmueble?.longitud
-        ? Number(publicacion.inmueble.ubicacion_inmueble.longitud)
+      longitud: publicacion.inmueble.ubicacion?.longitud
+        ? Number(publicacion.inmueble.ubicacion.longitud)
         : null,
-      direccion: publicacion.inmueble.ubicacion_inmueble?.direccion || null,
+      direccion: publicacion.inmueble.ubicacion?.direccion || null,
     },
 
     contacto: {
@@ -982,8 +982,8 @@ export const confirmarPublicidadService = async (
   return {
     id: publicacionActualizada.id,
     promoted: publicacionActualizada.promoted,
-    promotedAt: publicacionActualizada.promotedAt,
-    promotedExpiresAt: publicacionActualizada.promotedExpiresAt,
+    promoted_at: publicacionActualizada.promoted_at,
+    promoted_expires_at: publicacionActualizada.promoted_expires_at,
     message: `Publicidad activada correctamente por ${duracionDias} días`,
   };
 };
@@ -1045,13 +1045,15 @@ export const obtenerEstadoPublicidadService = async (publicacionId: number) => {
 
   const activa =
     publicacion.promoted === true &&
-    publicacion.promotedExpiresAt !== null &&
-    new Date(publicacion.promotedExpiresAt) > new Date();
+    publicacion.promoted_expires_at !== null &&
+    new Date(publicacion.promoted_expires_at) > new Date();
 
   return {
     id: publicacion.id,
     promoted: activa,
-    promotedAt: activa ? publicacion.promotedAt : null,
-    promotedExpiresAt: activa ? publicacion.promotedExpiresAt : null,
+    promoted_at: activa ? publicacion.promoted_at : null,
+    promoted_expires_at: activa ? publicacion.promoted_expires_at : null,
   };
 };
+
+

@@ -7,8 +7,7 @@ const findAll = async () => {
   })
 
   const publicacionesTags = await prisma.publicacion_tag.findMany({
-    where: {
-      publicacion: {
+    where: { publicacion: {
         estado: 'ACTIVA'
       }
     },
@@ -38,8 +37,7 @@ const findAllWithContextualCounts = async (inmuebleWhere: Prisma.inmuebleWhereIn
   })
 
   const publicacionesTags = await prisma.publicacion_tag.findMany({
-    where: {
-      publicacion: {
+    where: { publicacion: {
         estado: 'ACTIVA',
         inmueble: inmuebleWhere
       }
@@ -131,3 +129,4 @@ export const tagsRepository = {
   replacePublicacionTags,
   findPublicacionOwner
 }
+

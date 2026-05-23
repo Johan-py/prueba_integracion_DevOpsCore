@@ -15,3 +15,4 @@ export const MULTIMEDIA_TYPES = {
   IMAGE: "IMAGEN",
   VIDEO: "VIDEO",
 } as const;
+

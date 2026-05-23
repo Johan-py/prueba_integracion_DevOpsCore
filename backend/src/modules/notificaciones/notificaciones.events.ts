@@ -48,3 +48,4 @@ export const subscribeToNotificationEvents = (
     notificationsEmitter.off(channelName, listener);
   };
 };
+

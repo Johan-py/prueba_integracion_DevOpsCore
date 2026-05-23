@@ -41,3 +41,4 @@ export const propertyValidationRules = [
       "La descripción solo puede contener caracteres alfanuméricos y básicos",
     ),
 ];
+

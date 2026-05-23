@@ -127,9 +127,9 @@ const buildLinkedInSessionResponse = async (
 ): Promise<LinkedInLoginSuccess> => {
   const jwtPayload: JwtPayload = { id: user.id, correo: user.correo }
   const token = generateToken(jwtPayload)
-  const fechaExpiracion = new Date(Date.now() + SESSION_DURATION_MS)
+  const fecha_expiracion = new Date(Date.now() + SESSION_DURATION_MS)
 
-  await createLinkedInSession({ token, usuarioId: user.id, fechaExpiracion })
+  await createLinkedInSession({ token, usuario_id: user.id, fecha_expiracion })
 
   return {
     message,
@@ -239,7 +239,7 @@ export const linkLinkedInToCurrentUserByCodeService = async (
   const tokenStorage = buildLinkedInTokenStorage(tokenData)
 
   const linkedinId = linkedinUser.sub?.trim()
-  const correoProveedor = linkedinUser.email?.trim().toLowerCase() ?? null
+  const correo_proveedor = linkedinUser.email?.trim().toLowerCase() ?? null
 
   if (!linkedinId) {
     throw new LinkedInAuthError(
@@ -251,7 +251,7 @@ export const linkLinkedInToCurrentUserByCodeService = async (
 
   const existingLinkByExternalId = await findLinkedInLinkByExternalId(linkedinId)
 
-  if (existingLinkByExternalId && existingLinkByExternalId.usuarioId !== session.usuario.id) {
+  if (existingLinkByExternalId && existingLinkByExternalId.usuario_id !== session.usuario.id) {
     throw new LinkedInAuthError(
       'Esta cuenta de LinkedIn ya está vinculada a otro usuario.',
       'LINKEDIN_AUTH_FAILED',
@@ -262,13 +262,13 @@ export const linkLinkedInToCurrentUserByCodeService = async (
   const existingLinkByUser = await findLinkedInLinkByUserId(session.usuario.id)
 
   if (existingLinkByUser) {
-    if (existingLinkByUser.idExterno === linkedinId) {
-      await linkLinkedInToUser(session.usuario.id, linkedinId, correoProveedor ?? '', tokenStorage)
+    if (existingLinkByUser.id_externo === linkedinId) {
+      await linkLinkedInToUser(session.usuario.id, linkedinId, correo_proveedor ?? '', tokenStorage)
 
       return {
         message: 'Autorización de LinkedIn renovada correctamente.',
         provider: 'linkedin',
-        linkedEmail: correoProveedor ?? existingLinkByUser.correoProveedor
+        linkedEmail: correo_proveedor ?? existingLinkByUser.correo_proveedor
       }
     }
 
@@ -280,16 +280,16 @@ export const linkLinkedInToCurrentUserByCodeService = async (
   }
 
   await createLinkedInLinkForUser({
-    usuarioId: session.usuario.id,
+    usuario_id: session.usuario.id,
     linkedinId,
-    correoProveedor,
+    correo_proveedor,
     tokenStorage
   })
 
   return {
     message: 'LinkedIn fue vinculado correctamente.',
     provider: 'linkedin',
-    linkedEmail: correoProveedor
+    linkedEmail: correo_proveedor
   }
 }
 
@@ -388,3 +388,4 @@ if (existingUserByEmail) {
     'Cuenta creada e inicio de sesión con LinkedIn exitoso'
   )
 }
+

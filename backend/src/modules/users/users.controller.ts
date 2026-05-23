@@ -15,3 +15,4 @@ type CreateUserBody = {
 export const createUserController = async (data: CreateUserBody) => {
   return createUserService(data);
 };
+

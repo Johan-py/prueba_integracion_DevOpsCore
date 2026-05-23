@@ -11,3 +11,4 @@ router.get('/vistas', requireAuth, historialController.getHistorialVistas)
 router.patch('/limpiar', requireAuth, historialController.deleteHistorial)
 
 export default router
+

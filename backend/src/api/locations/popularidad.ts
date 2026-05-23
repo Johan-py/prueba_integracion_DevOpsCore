@@ -43,3 +43,4 @@ const popularidadHandler = async (req: any, res: any) => {
 
 //EXPORTACIÓN CLAVE PARA QUE EL SERVIDOR PUEDA USAR ESTE HANDLER
 export default popularidadHandler;
+

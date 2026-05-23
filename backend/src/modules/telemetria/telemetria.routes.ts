@@ -9,3 +9,4 @@ router.post('/click', validarJWT, trackClick)
 router.get('/recomendados', validarJWTOpcional, getRecomendados)
 
 export default router
+

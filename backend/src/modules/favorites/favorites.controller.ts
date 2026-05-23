@@ -12,11 +12,11 @@ export class FavoritesController {
         return res.status(401).json({ message: 'Usuario no autenticado' });
       }
       
-      const usuarioId = usuario.id;  // ← Tomar el id del usuario
+      const usuario_id = usuario.id;  // ← Tomar el id del usuario
       const page = parseInt(req.query.page as string) || 1
       const perPage = parseInt(req.query.per_page as string) || 8
 
-      const result = await FavoritesService.getAll(usuarioId, page, perPage)
+      const result = await FavoritesService.getAll(usuario_id, page, perPage)
 
       if (result.total === 0) {
         return res.status(200).json({
@@ -40,28 +40,28 @@ export class FavoritesController {
         return res.status(401).json({ message: 'Usuario no autenticado' });
       }
       
-      const usuarioId = usuario.id;
-      const { inmuebleId } = req.body
+      const usuario_id = usuario.id;
+      const { inmueble_id } = req.body
       
-      if (!inmuebleId) {
+      if (!inmueble_id) {
         return res.status(400).json({ 
-          message: 'Se requiere inmuebleId en el body',
-          example: { inmuebleId: 1 }
+          message: 'Se requiere inmueble_id en el body',
+          example: { inmueble_id: 1 }
         })
       }
       
-      const parsedId = parseInt(String(inmuebleId))
+      const parsedId = parseInt(String(inmueble_id))
       if (isNaN(parsedId)) {
         return res.status(400).json({ message: 'ID de inmueble inválido' })
       }
 
-      await FavoritesService.add(usuarioId, parsedId)
+      await FavoritesService.add(usuario_id, parsedId)
       
       return res.status(201).json({ 
         message: 'Inmueble agregado a favoritos',
         data: { 
-          usuarioId: usuarioId, 
-          inmuebleId: parsedId 
+          usuario_id: usuario_id, 
+          inmueble_id: parsedId 
         }
       })
     } catch (error: any) {
@@ -81,14 +81,14 @@ export class FavoritesController {
         return res.status(401).json({ message: 'Usuario no autenticado' });
       }
       
-      const usuarioId = usuario.id;
-      const inmuebleId = parseInt(String(req.params.inmuebleId))
+      const usuario_id = usuario.id;
+      const inmueble_id = parseInt(String(req.params.inmueble_id))
 
-      if (isNaN(inmuebleId)) {
+      if (isNaN(inmueble_id)) {
         return res.status(400).json({ message: 'ID de inmueble inválido' })
       }
 
-      await FavoritesService.remove(usuarioId, inmuebleId)
+      await FavoritesService.remove(usuario_id, inmueble_id)
       return res.status(200).json({ message: 'Inmueble eliminado de favoritos' })
     } catch (error: any) {
       if (error.message === 'NOT_FOUND') {
@@ -107,14 +107,14 @@ export class FavoritesController {
         return res.status(401).json({ message: 'Usuario no autenticado' });
       }
       
-      const usuarioId = usuario.id;
-      const inmuebleId = parseInt(String(req.params.inmuebleId))
+      const usuario_id = usuario.id;
+      const inmueble_id = parseInt(String(req.params.inmueble_id))
 
-      if (isNaN(inmuebleId)) {
+      if (isNaN(inmueble_id)) {
         return res.status(400).json({ message: 'ID de inmueble inválido' })
       }
 
-      const isFavorite = await FavoritesService.isFavorite(usuarioId, inmuebleId)
+      const isFavorite = await FavoritesService.isFavorite(usuario_id, inmueble_id)
       return res.status(200).json({ is_favorite: isFavorite })
     } catch (error) {
       console.error('Error en status:', error)

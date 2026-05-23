@@ -133,3 +133,4 @@ export const createManyMultimediaRepository = async (
 
   return createdItems.map(mapMultimediaRecord);
 };
+

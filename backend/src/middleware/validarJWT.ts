@@ -77,3 +77,4 @@ export const validarJWTOpcional = async (
     next(); // Si falla el token (ej. expirado), simplemente lo tratamos como "no logueado"
   }
 };
+

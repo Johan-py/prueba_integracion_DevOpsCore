@@ -166,3 +166,4 @@ export const enviarMagicLink = async (
     throw error;
   }
 };
+

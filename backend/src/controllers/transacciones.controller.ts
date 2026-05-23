@@ -55,11 +55,11 @@ export const generarPagoQr = async (req: Request, res: Response): Promise<void> 
 // Obtener pago pendiente
 export const obtenerPagoPendiente = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { usuarioId } = req.params
+    const { usuario_id } = req.params
 
     const pagoPendiente = await prisma.transacciones.findFirst({
       where: {
-        id_usuario: Number(usuarioId),
+        id_usuario: Number(usuario_id),
         estado: 'PENDIENTE'
       },
       orderBy: { fecha_intento: 'desc' }
@@ -74,7 +74,7 @@ export const obtenerPagoPendiente = async (req: Request, res: Response): Promise
       ? new Date(pagoPendiente.fecha_intento)
       : new Date()
 
-    const fechaExpiracion = new Date(fechaIntento.getTime() + 5 * 60000)
+    const fecha_expiracion = new Date(fechaIntento.getTime() + 5 * 60000)
 
     res.status(200).json({
       id: pagoPendiente.id.toString(),
@@ -82,7 +82,7 @@ export const obtenerPagoPendiente = async (req: Request, res: Response): Promise
       referencia: `PAY-${pagoPendiente.id}`,
       qrContent: '000201010211_TU_CODIGO_QR_BANCARIO_AQUI',
       estado: pagoPendiente.estado?.toLowerCase(),
-      fechaExpiracion: fechaExpiracion.toISOString()
+      fecha_expiracion: fecha_expiracion.toISOString()
     })
   } catch (error) {
     console.error(error)
@@ -187,3 +187,4 @@ export const actualizarEstadoPago = async (req: Request, res: Response): Promise
     res.status(500).json({ error: 'Error al actualizar el estado del pago' })
   }
 }
+

@@ -49,3 +49,4 @@ router.post(
   requireAuth,
   verifyActivate2FACodeController,
 );
+

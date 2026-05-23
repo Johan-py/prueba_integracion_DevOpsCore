@@ -16,17 +16,17 @@ export type TutorialPublicacionEstado = {
 
 export type TutorialPublicacionEstadoRecord = {
   id: number;
-  usuarioId: number;
+  usuario_id: number;
   confirmado: boolean;
   confirmadoEn: Date | null;
 };
 
 export type GetTutorialEstadoInput = {
-  usuarioId: number;
+  usuario_id: number;
 };
 
 export type ConfirmTutorialInput = {
-  usuarioId: number;
+  usuario_id: number;
 };
 
 export type ConfirmTutorialResult = {
@@ -34,3 +34,4 @@ export type ConfirmTutorialResult = {
   confirmado: boolean;
   confirmadoEn: string | null;
 };
+

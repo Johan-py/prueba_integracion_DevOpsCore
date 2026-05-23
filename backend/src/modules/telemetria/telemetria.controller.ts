@@ -5,11 +5,11 @@ const telemetriaService = new TelemetriaService()
 
 export const trackSearch = async (req: Request, res: Response) => {
   try {
-    const usuarioId = (req as any).usuario?.id || null
+    const usuario_id = (req as any).usuario?.id || null
     const ip = req.ip || req.socket.remoteAddress || 'unknown'
     const searchData = req.body
 
-    const result = await telemetriaService.trackSearch(usuarioId, ip, searchData)
+    const result = await telemetriaService.trackSearch(usuario_id, ip, searchData)
     res.status(200).json({ success: true, data: result })
   } catch (error) {
     console.error('Error tracking search:', error)
@@ -19,13 +19,13 @@ export const trackSearch = async (req: Request, res: Response) => {
 
 export const trackClick = async (req: Request, res: Response) => {
   try {
-    const usuarioId = (req as any).usuario?.id
-    if (!usuarioId) {
+    const usuario_id = (req as any).usuario?.id
+    if (!usuario_id) {
       return res.status(401).json({ success: false, error: 'Usuario no autenticado' })
     }
 
     const clickData = req.body
-    const result = await telemetriaService.trackClick(usuarioId, clickData)
+    const result = await telemetriaService.trackClick(usuario_id, clickData)
     res.status(200).json({ success: true, data: result })
   } catch (error) {
     console.error('Error tracking click:', error)
@@ -35,10 +35,11 @@ export const trackClick = async (req: Request, res: Response) => {
 
 export const getRecomendados = async (req: Request, res: Response) => {
   try {
-    const usuarioId = (req as any).usuario?.id;
-    const ids = await telemetriaService.getRecomendados(usuarioId);
+    const usuario_id = (req as any).usuario?.id;
+    const ids = await telemetriaService.getRecomendados(usuario_id);
     res.status(200).json({ success: true, data: ids });
   } catch (error) {
     res.status(500).json({ success: false, error: 'Error al obtener recomendados' });
   }
 };
+

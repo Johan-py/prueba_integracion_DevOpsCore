@@ -7,7 +7,7 @@ const router = Router()
 // Usar validarJWT en lugar de authMiddleware
 router.get('/', validarJWT, FavoritesController.getAll)
 router.post('/', validarJWT, FavoritesController.add)
-router.delete('/:inmuebleId', validarJWT, FavoritesController.remove)
-router.get('/status/:inmuebleId', validarJWT, FavoritesController.status)
+router.delete('/:inmueble_id', validarJWT, FavoritesController.remove)
+router.get('/status/:inmueble_id', validarJWT, FavoritesController.status)
 
 export default router

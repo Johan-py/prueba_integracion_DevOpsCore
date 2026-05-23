@@ -48,3 +48,4 @@ export const env = {
   LINKEDIN_CALLBACK_URL:
     process.env.LINKEDIN_CALLBACK_URL ?? 'http://localhost:5000/api/auth/linkedin/callback'
 }
+
