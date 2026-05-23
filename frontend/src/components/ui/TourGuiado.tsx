@@ -394,34 +394,47 @@ export default function TourGuiado() {
   const fontBtn = isMobile ? 12 : 13;
   const fontSkip = isMobile ? 11 : 12;
 
-  let top = vOffsetTop + NAVBAR_H + 10;
-  let left = vOffsetLeft + (vw - tooltipW) / 2;
+  const SAFE_TOP_MARGIN = NAVBAR_H + 16;
+const MOBILE_EXTRA_OFFSET = vw < 768 ? 14 : 0;
 
-  if (hasValid) {
-    const H = tooltipH;
-    const GAP = PADDING + 12;
-    const spaceBelow = vOffsetTop + vh - highlight.bottom;
-    const spaceAbove = highlight.top - vOffsetTop;
+let top = vOffsetTop + SAFE_TOP_MARGIN;
+let left = vOffsetLeft + (vw - tooltipW) / 2;
 
-    top =
-      spaceAbove >= H + GAP || spaceAbove >= spaceBelow
-        ? highlight.top - H - GAP
-        : highlight.bottom + GAP;
+if (hasValid) {
+  const H = tooltipH;
+  const GAP = PADDING + 12;
 
-    const clampedH = Math.min(H, vh - NAVBAR_H - 20);
-    top = Math.max(
-      vOffsetTop + NAVBAR_H + 10,
-      Math.min(top, vOffsetTop + vh - clampedH - 10)
-    );
+  // Área segura visible
+  const safeTop = vOffsetTop + SAFE_TOP_MARGIN;
+  const safeBottom = vOffsetTop + vh - 10;
 
-    left = Math.max(
-      vOffsetLeft + 12,
-      Math.min(
-        highlight.left + highlight.width / 2 - tooltipW / 2,
-        vOffsetLeft + vw - tooltipW - 12
-      )
-    );
-  }
+  const spaceBelow = safeBottom - highlight.bottom;
+  const spaceAbove = highlight.top - safeTop;
+
+  // Solo poner arriba si realmente entra
+  const shouldPlaceAbove =
+    spaceAbove >= H + GAP && spaceAbove > spaceBelow;
+
+  top = shouldPlaceAbove
+    ? highlight.top - H - GAP
+    : highlight.bottom + GAP + MOBILE_EXTRA_OFFSET;
+
+  // Nunca permitir que quede debajo del navbar
+  top = Math.max(
+    safeTop,
+    Math.min(top, safeBottom - H)
+  );
+
+  left = Math.max(
+    vOffsetLeft + 12,
+    Math.min(
+      highlight.left +
+        highlight.width / 2 -
+        tooltipW / 2,
+      vOffsetLeft + vw - tooltipW - 12
+    )
+  );
+}
 
   const tooltipVisible = hasValid && tooltipH > 0;
 
