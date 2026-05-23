@@ -83,37 +83,6 @@ export const useBlogFeed = () => {
       });
     };
 
-    const handleUpdatedBlog = (blog: any) => {
-      const mappedBlog: PublicBlogCard = {
-        id: String(blog.id),
-        title: blog.titulo,
-        excerpt: blog.resumen || blog.contenido,
-        imageUrl: blog.imagen,
-        category:
-          blog.categoria?.nombre || blog.categoria_blog?.nombre || "General",
-        categoryLabel:
-          blog.categoria?.nombre || blog.categoria_blog?.nombre || "General",
-
-        authorName:
-          `${blog.usuario?.nombre || ""} ${blog.usuario?.apellido || ""}`.trim(),
-
-        publishedAt:
-          blog.fecha_publicacion ||
-          blog.fecha_creacion ||
-          new Date().toISOString(),
-
-        isFeatured: blog.destacado ?? false,
-      };
-
-      setBlogs((prevBlogs) =>
-        orderBlogs(
-          prevBlogs.map((item) =>
-            item.id === mappedBlog.id ? mappedBlog : item,
-          ),
-        ),
-      );
-    };
-
     const handleDeletedBlog = (payload: any) => {
       const blogId = payload?.id ?? payload?.blogId ?? payload;
 
@@ -124,15 +93,9 @@ export const useBlogFeed = () => {
 
     socket.on("blog:publicado_global", handleNewPublishedBlog);
     socket.on("blog:eliminado_global", handleDeletedBlog);
-    socket.on("blog:publicado_global", handleNewPublishedBlog);
-    socket.on("blog:actualizado", handleUpdatedBlog);
-    socket.on("blog:eliminado_global", handleDeletedBlog);
 
     return () => {
       socket.off("blog:publicado_global", handleNewPublishedBlog);
-      socket.off("blog:eliminado_global", handleDeletedBlog);
-      socket.off("blog:publicado_global", handleNewPublishedBlog);
-      socket.off("blog:actualizado", handleUpdatedBlog);
       socket.off("blog:eliminado_global", handleDeletedBlog);
     };
   }, []);

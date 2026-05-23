@@ -139,7 +139,7 @@ export default function PublicacionCard({
     setError('')
   }
 
-  const precioFormateado = `Bs ${publicacion.precio.toLocaleString('en-US')}`
+  const precioFormateado = `USD ${publicacion.precio.toLocaleString('en-US')}`
   const tipoOperacionTexto = publicacion.tipoOperacion || 'Venta / Alquiler'
 
   const totalVisualizaciones = publicacion.totalVisualizaciones ?? 0
