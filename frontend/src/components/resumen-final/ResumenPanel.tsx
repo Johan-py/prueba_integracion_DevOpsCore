@@ -6,9 +6,7 @@ import InfoPropiedad from "./InfoPropiedad";
 import GaleriaResumen from "./GaleriaResumen";
 import AceptacionPublicacion from "./AceptacionPublicacion";
 import ParametrosPersonalizados from "./ParametrosPersonalizados";
-
 import PublicarModal from "../publicacion/PublicarModal";
-import { EstadoPublicacion } from "../../types/publicacion";
 
 interface Props {
   onPausar?: (p: boolean) => void;
@@ -104,6 +102,12 @@ function normalizarParametros(data: any): ParametroItem[] {
     .filter((item: ParametroItem) => item.nombre.trim() !== "");
 }
 
+function getApiUrl() {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (!apiUrl) throw new Error("Falta NEXT_PUBLIC_API_URL en el entorno");
+  return apiUrl.replace(/\/$/, "");
+}
+
 export default function ResumenPanel({ publicacionId }: Props) {
   const router = useRouter();
   const [aceptado, setAceptado] = useState(false);
@@ -112,14 +116,13 @@ export default function ResumenPanel({ publicacionId }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const [estadoPublicacion, setEstadoPublicacion] =
-    useState<EstadoPublicacion>("idle");
+  // DESPUÉS
+const [modalEstado, setModalEstado] = useState<string | null>(null);
   const [progreso, setProgreso] = useState(0);
 
-  const [mostrarModalExito, setMostrarModalExito] = useState(false);
-
-  const isCancelled = useRef(false);
-  const isPaused = useRef(false);
+  const canceladoRef = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const progresoIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // ================= FETCH RESUMEN + PARAMETROS =================
   useEffect(() => {
@@ -135,16 +138,11 @@ export default function ResumenPanel({ publicacionId }: Props) {
         setError("");
 
         const token = getAuthToken();
-
-        const headers = {
-          Authorization: `Bearer ${token}`,
-        };
+        const headers = { Authorization: `Bearer ${token}` };
 
         const resResumen = await fetch(
           `${API_BASE_URL}/api/publicaciones/${publicacionId}/resumen-final`,
-          {
-            headers,
-          }
+          { headers }
         );
 
         const jsonResumen = await resResumen.json();
@@ -166,7 +164,6 @@ export default function ResumenPanel({ publicacionId }: Props) {
 
         if (parametrosDesdeResumen.length > 0) {
           setParametrosExtra(parametrosDesdeResumen);
-
           console.log(
             "✅ Parámetros personalizados recuperados desde resumen:",
             parametrosDesdeResumen
@@ -174,17 +171,13 @@ export default function ResumenPanel({ publicacionId }: Props) {
         } else {
           const resParametros = await fetch(
             `${API_BASE_URL}/api/publicaciones/${publicacionId}/parametros`,
-            {
-              headers,
-            }
+            { headers }
           );
 
           if (resParametros.ok) {
             const jsonParametros = await resParametros.json();
             const parametrosNormalizados = normalizarParametros(jsonParametros);
-
             setParametrosExtra(parametrosNormalizados);
-
             console.log(
               "✅ Parámetros personalizados recuperados desde endpoint:",
               parametrosNormalizados
@@ -212,48 +205,131 @@ export default function ResumenPanel({ publicacionId }: Props) {
     const parametrosDesdeResumen = normalizarParametros(
       data?.parametrosPersonalizados
     );
-
-    if (parametrosDesdeResumen.length > 0) {
-      return parametrosDesdeResumen;
-    }
-
+    if (parametrosDesdeResumen.length > 0) return parametrosDesdeResumen;
     return parametrosExtra;
   }, [data, parametrosExtra]);
 
-  const ejecutarPublicacion = async () => {
-    if (!aceptado) return;
+  // ================= LOGICA MODAL (migrada de contenido-multimedia) =================
+  const iniciarProgresoAnimado = (
+    desde: number,
+    hasta: number,
+    duracionMs: number
+  ) => {
+    if (progresoIntervalRef.current) clearInterval(progresoIntervalRef.current);
+    const pasos = 30;
+    const incremento = (hasta - desde) / pasos;
+    const intervalo = duracionMs / pasos;
+    let progresoActual = desde;
+    progresoIntervalRef.current = setInterval(() => {
+      if (canceladoRef.current) {
+        clearInterval(progresoIntervalRef.current!);
+        return;
+      }
+      progresoActual += incremento + Math.random() * 0.5;
+      if (progresoActual >= hasta) {
+        progresoActual = hasta;
+        clearInterval(progresoIntervalRef.current!);
+      }
+      setProgreso(Math.round(progresoActual));
+    }, intervalo);
+  };
 
-    isCancelled.current = false;
-    isPaused.current = false;
-    setEstadoPublicacion("publicando");
-    setProgreso(0);
-
-    try {
-      await new Promise((r) => setTimeout(r, 500));
-      setProgreso(50);
-
-      await new Promise((r) => setTimeout(r, 500));
-      setProgreso(100);
-
-      setEstadoPublicacion("exito");
-      setMostrarModalExito(true);
-    } catch {
-      setEstadoPublicacion("error_publicacion");
+  const detenerProgresoAnimado = () => {
+    if (progresoIntervalRef.current) {
+      clearInterval(progresoIntervalRef.current);
+      progresoIntervalRef.current = null;
     }
   };
 
-  const handleCancelar = () => {
-    isCancelled.current = true;
-    setEstadoPublicacion("idle");
-    router.push("/");
+  const eliminarPublicacion = async () => {
+    try {
+      const token = getAuthToken();
+      if (!token || !publicacionId) return;
+      await fetch(`${getApiUrl()}/api/publicaciones/${publicacionId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (error) {
+      console.error("Error al eliminar publicación:", error);
+    }
   };
 
-  const handlePausar = (p: boolean) => {
-    isPaused.current = p;
+  const handleAbrirModal = () => {
+    if (!aceptado) return;
+    setProgreso(0);
+    canceladoRef.current = false;
+    setModalEstado("confirmando");
   };
 
-  const cerrarModalExito = () => setMostrarModalExito(false);
-  const irAlHome = () => router.push("/");
+  const handleConfirmarPublicacion = async () => {
+    const token = getAuthToken();
+    if (!token) return;
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    canceladoRef.current = false;
+
+    setModalEstado("publicando");
+    setProgreso(0);
+
+    iniciarProgresoAnimado(0, 85, 4000);
+
+    try {
+      // Simula la confirmación final de publicación
+      await new Promise<void>((resolve, reject) => {
+        const interval = setInterval(() => {
+          if (canceladoRef.current) {
+            clearInterval(interval);
+            reject(new DOMException("Cancelado", "AbortError"));
+          }
+        }, 100);
+
+        // Aquí va la lógica real de publicación si el backend lo requiere
+        setTimeout(() => {
+          clearInterval(interval);
+          resolve();
+        }, 4000);
+      });
+
+      detenerProgresoAnimado();
+
+      if (canceladoRef.current) {
+        await eliminarPublicacion();
+        setModalEstado(null);
+        setProgreso(0);
+        return;
+      }
+
+      setProgreso(100);
+      setModalEstado("exito");
+    } catch (error) {
+      detenerProgresoAnimado();
+      if (
+        canceladoRef.current ||
+        (error as DOMException)?.name === "AbortError"
+      )
+        return;
+      setModalEstado("error_publicacion");
+      setProgreso(0);
+    }
+  };
+
+  const handleCancelarPublicacion = async () => {
+    canceladoRef.current = true;
+    detenerProgresoAnimado();
+
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+
+    await eliminarPublicacion();
+    setModalEstado(null);
+    setProgreso(0);
+  };
 
   // ================= UI =================
   if (loading) {
@@ -277,9 +353,7 @@ export default function ResumenPanel({ publicacionId }: Props) {
   return (
     <>
       <section className="mx-auto max-w-7xl bg-white p-6 rounded-2xl">
-        <h1 className="text-3xl font-bold mb-6">
-          Resumen de la propiedad
-        </h1>
+        <h1 className="text-3xl font-bold mb-6">Resumen de la propiedad</h1>
 
         <div className="grid md:grid-cols-2 gap-6">
           <InfoPropiedad data={data} />
@@ -309,7 +383,7 @@ export default function ResumenPanel({ publicacionId }: Props) {
           <button
             type="button"
             disabled={!aceptado}
-            onClick={ejecutarPublicacion}
+            onClick={handleAbrirModal}
             className={`w-full h-12 rounded-xl font-bold transition ${
               aceptado
                 ? "bg-orange-400 text-white hover:bg-orange-500 cursor-pointer"
@@ -321,50 +395,24 @@ export default function ResumenPanel({ publicacionId }: Props) {
         </div>
       </section>
 
-      {/* Modal publicación */}
-      {estadoPublicacion !== "idle" && (
+      {modalEstado !== null && (
         <PublicarModal
-          estado={estadoPublicacion as any}
+          estado={modalEstado as "confirmando" | "publicando" | "exito" | "error_publicacion"}
           progreso={progreso}
-          onConfirmar={ejecutarPublicacion}
-          onCancelar={handleCancelar}
-          onReintentar={() => setEstadoPublicacion("confirmando")}
-          // @ts-ignore
-          onPausar={handlePausar}
+          onConfirmar={handleConfirmarPublicacion}
+          onCancelar={() => {
+            if (modalEstado === "exito") {
+              router.push("/");
+            } else {
+              handleCancelarPublicacion();
+            }
+          }}
+          onReintentar={() => {
+            setProgreso(0);
+            canceladoRef.current = false;
+            handleConfirmarPublicacion();
+          }}
         />
-      )}
-
-      {/* Modal éxito */}
-      {mostrarModalExito && (
-        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-          <div className="bg-white p-10 rounded-2xl text-center shadow-xl max-w-md w-full">
-            <h2 className="text-2xl font-bold mb-4">
-              Publicado con éxito
-            </h2>
-
-            <p className="text-gray-600 mb-6">
-              La publicación fue registrada correctamente.
-            </p>
-
-            <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={irAlHome}
-                className="w-full h-11 rounded-xl bg-orange-400 text-white font-bold hover:bg-orange-500 transition"
-              >
-                Ir al inicio
-              </button>
-
-              <button
-                type="button"
-                onClick={cerrarModalExito}
-                className="w-full h-11 rounded-xl border border-gray-400 bg-white text-gray-700 font-medium hover:bg-gray-100 transition"
-              >
-                Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
       )}
     </>
   );

@@ -48,7 +48,7 @@ const generarMockEstadisticas = (zona: ZonaSeleccionada, tipo: TipoOperacion): E
   const precioMaximo = precioBase + variacionMaxima;
   
   // Generar evolución de 6 meses con fluctuaciones realistas
-  const meses = ['Nov 2023', 'Dic 2023', 'Ene 2024', 'Feb 2024', 'Mar 2024', 'Abr 2024'];
+  const meses = ['Nov 2026', 'Dic 2026', 'Ene 2026', 'Feb 2026', 'Mar 2026', 'Abr 2026'];
   const evolucionPrecios = meses.map(mes => {
     // Fluctuación entre -10% y +10% del precio base
     const fluctuacion = precioBase * ((Math.random() * 0.2) - 0.1); 
@@ -77,7 +77,7 @@ const generarMockEstadisticas = (zona: ZonaSeleccionada, tipo: TipoOperacion): E
       { categoria: 'Departamentos', porcentaje: pctDeptos, cantidad: Math.floor(totalPropiedades * (pctDeptos/100)) },
       { categoria: 'Casas', porcentaje: pctCasas, cantidad: Math.floor(totalPropiedades * (pctCasas/100)) },
       { categoria: 'Oficinas', porcentaje: pctOficinas, cantidad: Math.floor(totalPropiedades * (pctOficinas/100)) },
-      { categoria: 'Locales', porcentaje: pctLocales, cantidad: Math.floor(totalPropiedades * (pctLocales/100)) }
+      { categoria: 'Terrenos', porcentaje: pctLocales, cantidad: Math.floor(totalPropiedades * (pctLocales/100)) }
     ]
   };
 }

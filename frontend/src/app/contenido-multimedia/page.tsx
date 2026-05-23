@@ -6,7 +6,6 @@ import FotosSection from '@/components/contenido-multimedia/FotosSection'
 import VideosSection from '@/components/contenido-multimedia/VideosSection'
 import PublicarSection from '@/components/contenido-multimedia/PublicarSection'
 import PlanModal from '@/components/contenido-multimedia/PlanModal'
-import PublicarModal from '@/components/publicacion/PublicarModal'
 
 type ImageItem = {
   id: string
@@ -60,21 +59,9 @@ function ContenidoMultimediaPageContent() {
 
   const [showPlanModal, setShowPlanModal] = useState(false)
 
-  const [modalEstado, setModalEstado] = useState<'confirmando' | 'publicando' | 'exito' | 'error_publicacion' | null>(null)
-  const [progreso, setProgreso] = useState(0)
-
-  // ── refs ──────────────────────────────────────────────────────────────────
-  // canceladoRef: señal compartida entre todos los efectos/promesas
-  const canceladoRef = useRef(false)
-  // abortControllerRef: cancela el fetch en vuelo (igual que en doc 2)
-  const abortControllerRef = useRef<AbortController | null>(null)
-  // progresoIntervalRef: controla la animación gradual de la barra (restaurado del original)
-  const progresoIntervalRef = useRef<NodeJS.Timeout | null>(null)
-
   const imageInputRef = useRef<HTMLInputElement | null>(null)
   const videoInputRef = useRef<HTMLInputElement | null>(null)
 
-  // ── carga multimedia existente ────────────────────────────────────────────
   useEffect(() => {
     const cargarMultimediaExistente = async () => {
       if (!publicacionId || Number.isNaN(publicacionId)) return
@@ -113,7 +100,6 @@ function ContenidoMultimediaPageContent() {
 
   const hasRequiredPhoto = images.length > 0
 
-  // ── pickers ───────────────────────────────────────────────────────────────
   const handleOpenImagePicker = () => {
     setImageError('')
     setPublishError('')
@@ -130,7 +116,6 @@ function ContenidoMultimediaPageContent() {
     videoInputRef.current?.click()
   }
 
-  // ── imágenes ──────────────────────────────────────────────────────────────
   const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || [])
     if (!files.length) return
@@ -171,7 +156,6 @@ function ContenidoMultimediaPageContent() {
     setPublishError('')
   }
 
-  // ── videos ────────────────────────────────────────────────────────────────
   const handleVideoFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || [])
     if (!files.length) return
@@ -242,8 +226,7 @@ function ContenidoMultimediaPageContent() {
     setPublishError('')
   }
 
-  // ── upload helpers ────────────────────────────────────────────────────────
-  const uploadImages = async (token: string, signal: AbortSignal) => {
+  const uploadImages = async (token: string) => {
     if (!images.length) throw new Error('Debes subir al menos una foto del inmueble antes de publicar.')
     const formData = new FormData()
     const imagenesActuales = images.filter((image) => image.isExisting).map((image) => image.previewUrl)
@@ -257,68 +240,20 @@ function ContenidoMultimediaPageContent() {
       method: 'PUT',
       headers: { Authorization: `Bearer ${token}` },
       body: formData,
-      signal,
     })
     const data = await response.json().catch(() => null)
     if (!response.ok) throw new Error(data?.message || 'No se pudieron registrar las imágenes.')
   }
 
   const uploadYoutubeLinks = async (_token: string) => {
-    // reservado para futura implementación
+    return
   }
 
-  // ── eliminar publicación al cancelar (restaurado del original) ─────────────
-  const eliminarPublicacion = async () => {
-    try {
-      const token = localStorage.getItem('token')
-      if (!token || !publicacionId) return
-      await fetch(`${getApiUrl()}/api/publicaciones/${publicacionId}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      })
-    } catch (error) {
-      console.error('Error al eliminar publicación:', error)
-    }
-  }
-
-  // ── animación de progreso gradual (restaurada del original) ───────────────
-  /**
-   * Anima la barra de progreso de `desde` hasta `hasta` en `duracionMs` ms.
-   * Agrega un pequeño jitter aleatorio en cada paso para que se vea orgánico.
-   * Se detiene solo al llegar al tope o cuando se llama detenerProgresoAnimado().
-   */
-  const iniciarProgresoAnimado = (desde: number, hasta: number, duracionMs: number) => {
-    if (progresoIntervalRef.current) clearInterval(progresoIntervalRef.current)
-    const pasos = 30
-    const incremento = (hasta - desde) / pasos
-    const intervalo = duracionMs / pasos
-    let progresoActual = desde
-    progresoIntervalRef.current = setInterval(() => {
-      if (canceladoRef.current) {
-        clearInterval(progresoIntervalRef.current!)
-        return
-      }
-      progresoActual += incremento + Math.random() * 0.5
-      if (progresoActual >= hasta) {
-        progresoActual = hasta
-        clearInterval(progresoIntervalRef.current!)
-      }
-      setProgreso(Math.round(progresoActual))
-    }, intervalo)
-  }
-
-  const detenerProgresoAnimado = () => {
-    if (progresoIntervalRef.current) {
-      clearInterval(progresoIntervalRef.current)
-      progresoIntervalRef.current = null
-    }
-  }
-
-  // ── abrir modal de confirmación ───────────────────────────────────────────
-  const handleAbrirModal = () => {
+  const handlePublish = async () => {
     setPublishError('')
     setImageError('')
     setVideoError('')
+
     if (!publicacionId || Number.isNaN(publicacionId)) { setPublishError('No se recibió el ID de la publicación.'); return }
     if (!hasRequiredPhoto) {
       setPublishError('Debes subir al menos una foto del inmueble antes de publicar.')
@@ -333,73 +268,20 @@ function ContenidoMultimediaPageContent() {
       setPublishError('Por ahora el backend solo permite registrar enlaces de video. Los videos subidos como archivo aún no están soportados.')
       return
     }
-    setProgreso(0)
-    canceladoRef.current = false
-    setModalEstado('confirmando')
-  }
-
-  // ── confirmar publicación ─────────────────────────────────────────────────
-  const handleConfirmarPublicacion = async () => {
-    const token = localStorage.getItem('token')
-    if (!token) return
-
-    // Nuevo AbortController para este intento (igual que doc 2)
-    const controller = new AbortController()
-    abortControllerRef.current = controller
-    canceladoRef.current = false
-
-    setModalEstado('publicando')
-    setProgreso(0)
-
-    // Animación gradual de 0 → 85 mientras sube (restaurada del original)
-    iniciarProgresoAnimado(0, 85, 4000)
 
     try {
-      await uploadImages(token, controller.signal)
+      setIsPublishing(true)
+      await uploadImages(token)
       await uploadYoutubeLinks(token)
-
-      detenerProgresoAnimado()
-
-      // Si canceló mientras subía — eliminar del backend y cerrar
-      if (canceladoRef.current) {
-        await eliminarPublicacion()
-        setModalEstado(null)
-        setProgreso(0)
-        return
-      }
-
-      // Éxito — completar barra y mostrar estado éxito
-      setProgreso(100)
-      setModalEstado('exito')
+      router.push(`/resumen-final?id=${publicacionId}`)
     } catch (error) {
-      detenerProgresoAnimado()
-      // Si fue un abort intencional no mostramos error
-      if (canceladoRef.current || (error as DOMException)?.name === 'AbortError') return
-      setModalEstado('error_publicacion')
-      setProgreso(0)
+      const message = error instanceof Error ? error.message : 'Ocurrió un error al registrar el contenido multimedia.'
+      setPublishError(message)
+    } finally {
+      setIsPublishing(false)
     }
   }
 
-  // ── cancelar publicación (con DELETE al backend) ──────────────────────────
-  const handleCancelarPublicacion = async () => {
-    canceladoRef.current = true
-    detenerProgresoAnimado()
-
-    // Abortar el fetch en vuelo si lo hay
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort()
-      abortControllerRef.current = null
-    }
-
-    // Eliminar la publicación del backend para que no quede en "mis publicaciones"
-    await eliminarPublicacion()
-
-    setModalEstado(null)
-    setProgreso(0)
-    setIsPublishing(false)
-  }
-
-  // ── render ────────────────────────────────────────────────────────────────
   return (
     <main style={{ minHeight: '100vh', background: '#fdf7f5', padding: '24px' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
@@ -443,8 +325,8 @@ function ContenidoMultimediaPageContent() {
         <PublicarSection
           confirmed={confirmed}
           onConfirmedChange={setConfirmed}
-          onPublish={handleAbrirModal}
-          publishError={publishError}
+          onPublish={handlePublish}
+          publishError={isPublishing ? 'Publicando contenido multimedia...' : publishError}
           canPublish={hasRequiredPhoto && !isPublishing}
         />
         <PlanModal
@@ -452,26 +334,6 @@ function ContenidoMultimediaPageContent() {
           onClose={() => setShowPlanModal(false)}
           onPayNow={() => alert('Aquí luego conectas el flujo de pago')}
         />
-
-        {modalEstado !== null && (
-          <PublicarModal
-            estado={modalEstado}
-            progreso={progreso}
-            onConfirmar={handleConfirmarPublicacion}
-            onCancelar={() => {
-              if (modalEstado === 'exito') {
-                router.push(`/resumen-final?id=${publicacionId}`)
-              } else {
-                handleCancelarPublicacion()
-              }
-            }}
-            onReintentar={() => {
-              setProgreso(0)
-              canceladoRef.current = false
-              handleConfirmarPublicacion()
-            }}
-          />
-        )}
       </div>
     </main>
   )
