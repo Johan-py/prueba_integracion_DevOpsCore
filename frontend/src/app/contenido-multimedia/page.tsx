@@ -6,6 +6,7 @@ import FotosSection from '@/components/contenido-multimedia/FotosSection'
 import VideosSection from '@/components/contenido-multimedia/VideosSection'
 import PublicarSection from '@/components/contenido-multimedia/PublicarSection'
 import PlanModal from '@/components/contenido-multimedia/PlanModal'
+import PublicarModal from '@/components/publicacion/PublicarModal'
 
 type ImageItem = {
   id: string
@@ -59,9 +60,21 @@ function ContenidoMultimediaPageContent() {
 
   const [showPlanModal, setShowPlanModal] = useState(false)
 
+  const [modalEstado, setModalEstado] = useState<'confirmando' | 'publicando' | 'exito' | 'error_publicacion' | null>(null)
+  const [progreso, setProgreso] = useState(0)
+
+  // ── refs ──────────────────────────────────────────────────────────────────
+  // canceladoRef: señal compartida entre todos los efectos/promesas
+  const canceladoRef = useRef(false)
+  // abortControllerRef: cancela el fetch en vuelo (igual que en doc 2)
+  const abortControllerRef = useRef<AbortController | null>(null)
+  // progresoIntervalRef: controla la animación gradual de la barra (restaurado del original)
+  const progresoIntervalRef = useRef<NodeJS.Timeout | null>(null)
+
   const imageInputRef = useRef<HTMLInputElement | null>(null)
   const videoInputRef = useRef<HTMLInputElement | null>(null)
 
+  // ── carga multimedia existente ────────────────────────────────────────────
   useEffect(() => {
     const cargarMultimediaExistente = async () => {
       if (!publicacionId || Number.isNaN(publicacionId)) return
@@ -100,6 +113,7 @@ function ContenidoMultimediaPageContent() {
 
   const hasRequiredPhoto = images.length > 0
 
+  // ── pickers ───────────────────────────────────────────────────────────────
   const handleOpenImagePicker = () => {
     setImageError('')
     setPublishError('')
@@ -116,6 +130,7 @@ function ContenidoMultimediaPageContent() {
     videoInputRef.current?.click()
   }
 
+  // ── imágenes ──────────────────────────────────────────────────────────────
   const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || [])
     if (!files.length) return
@@ -156,6 +171,7 @@ function ContenidoMultimediaPageContent() {
     setPublishError('')
   }
 
+  // ── videos ────────────────────────────────────────────────────────────────
   const handleVideoFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || [])
     if (!files.length) return
@@ -245,11 +261,41 @@ function ContenidoMultimediaPageContent() {
     if (!response.ok) throw new Error(data?.message || 'No se pudieron registrar las imágenes.')
   }
 
-  const uploadYoutubeLinks = async (_token: string) => {
-    return
+  // ── animación de progreso gradual (restaurada del original) ───────────────
+  /**
+   * Anima la barra de progreso de `desde` hasta `hasta` en `duracionMs` ms.
+   * Agrega un pequeño jitter aleatorio en cada paso para que se vea orgánico.
+   * Se detiene solo al llegar al tope o cuando se llama detenerProgresoAnimado().
+   */
+  const iniciarProgresoAnimado = (desde: number, hasta: number, duracionMs: number) => {
+    if (progresoIntervalRef.current) clearInterval(progresoIntervalRef.current)
+    const pasos = 30
+    const incremento = (hasta - desde) / pasos
+    const intervalo = duracionMs / pasos
+    let progresoActual = desde
+    progresoIntervalRef.current = setInterval(() => {
+      if (canceladoRef.current) {
+        clearInterval(progresoIntervalRef.current!)
+        return
+      }
+      progresoActual += incremento + Math.random() * 0.5
+      if (progresoActual >= hasta) {
+        progresoActual = hasta
+        clearInterval(progresoIntervalRef.current!)
+      }
+      setProgreso(Math.round(progresoActual))
+    }, intervalo)
   }
 
-  const handlePublish = async () => {
+  const detenerProgresoAnimado = () => {
+    if (progresoIntervalRef.current) {
+      clearInterval(progresoIntervalRef.current)
+      progresoIntervalRef.current = null
+    }
+  }
+
+  // ── abrir modal de confirmación ───────────────────────────────────────────
+  const handleAbrirModal = () => {
     setPublishError('')
     setImageError('')
     setVideoError('')
@@ -280,8 +326,16 @@ function ContenidoMultimediaPageContent() {
     } finally {
       setIsPublishing(false)
     }
+
+    // Eliminar la publicación del backend para que no quede en "mis publicaciones"
+    await eliminarPublicacion()
+
+    setModalEstado(null)
+    setProgreso(0)
+    setIsPublishing(false)
   }
 
+  // ── render ────────────────────────────────────────────────────────────────
   return (
     <main style={{ minHeight: '100vh', background: '#fdf7f5', padding: '24px' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
@@ -325,8 +379,8 @@ function ContenidoMultimediaPageContent() {
         <PublicarSection
           confirmed={confirmed}
           onConfirmedChange={setConfirmed}
-          onPublish={handlePublish}
-          publishError={isPublishing ? 'Publicando contenido multimedia...' : publishError}
+          onPublish={handleAbrirModal}
+          publishError={publishError}
           canPublish={hasRequiredPhoto && !isPublishing}
         />
         <PlanModal
@@ -334,6 +388,26 @@ function ContenidoMultimediaPageContent() {
           onClose={() => setShowPlanModal(false)}
           onPayNow={() => alert('Aquí luego conectas el flujo de pago')}
         />
+
+        {modalEstado !== null && (
+          <PublicarModal
+            estado={modalEstado}
+            progreso={progreso}
+            onConfirmar={handleConfirmarPublicacion}
+            onCancelar={() => {
+              if (modalEstado === 'exito') {
+                router.push(`/resumen-final?id=${publicacionId}`)
+              } else {
+                handleCancelarPublicacion()
+              }
+            }}
+            onReintentar={() => {
+              setProgreso(0)
+              canceladoRef.current = false
+              handleConfirmarPublicacion()
+            }}
+          />
+        )}
       </div>
     </main>
   )
