@@ -22,6 +22,8 @@ model Chat {
   @@index([remoteJid])
 }
 
+
+
 model Chatwoot {
   id                      String    @id
   enabled                 Boolean?  @default(true)
@@ -48,6 +50,7 @@ model Chatwoot {
 }
 
 model Contact {
+  
   id            String    @id
   remoteJid     String    @db.VarChar(100)
   pushName      String?   @db.VarChar(100)
