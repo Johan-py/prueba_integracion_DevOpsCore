@@ -433,7 +433,6 @@ server.listen(PORT, async () => {
   }
 
 
-
   try {
     await verifyEmailTransport()
     console.log('Ô£à Servicio de email de registro listo')

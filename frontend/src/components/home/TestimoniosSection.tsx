@@ -111,22 +111,21 @@ export default function TestimoniosSection() {
   const totalDots = maxIndex + 1
 
   return (
-    // FIX commit3: overflow-hidden en section evita scroll horizontal en 390px
-    <section className="bg-white py-10 md:py-14 lg:py-16 w-full overflow-hidden">
+    <section className="bg-white dark:bg-stone-900 py-10 md:py-14 lg:py-16 w-full overflow-hidden">
       <div className="max-w-[1100px] mx-auto px-4 sm:px-6 md:px-8">
 
         {/* Título */}
         <div className="text-center mb-6 md:mb-8">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-stone-900 mb-1 leading-snug">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-stone-900 dark:text-white mb-1 leading-snug">
             Historias reales de{' '}
             <span className="text-amber-600">Bolivia</span>
           </h2>
-          <p className="text-[10px] sm:text-xs tracking-widest text-stone-400 uppercase font-medium">
+          <p className="text-[10px] sm:text-xs tracking-widest text-stone-400 dark:text-stone-500 uppercase font-medium">
             Lo que dicen nuestros usuarios
           </p>
         </div>
 
-        {/* FIX commit3: whitespace-nowrap en botones para evitar saltos de línea internos */}
+        {/* Filtros de ciudad */}
         <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-6 md:mb-8">
           {CIUDADES.map((ciudad) => (
             <button
@@ -135,7 +134,7 @@ export default function TestimoniosSection() {
               className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium border transition-all duration-200 whitespace-nowrap ${
                 ciudadActiva === ciudad
                   ? 'bg-amber-600 text-white border-amber-600'
-                  : 'bg-white text-stone-600 border-stone-300 hover:border-amber-400 hover:text-amber-600'
+                  : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-300 dark:border-stone-600 hover:border-amber-400 hover:text-amber-600'
               }`}
             >
               {ciudad}
@@ -155,15 +154,16 @@ export default function TestimoniosSection() {
         ) : (
           <>
             <div className="relative flex items-center gap-1 sm:gap-2 md:gap-4">
+              {/* fix(a11y): aria-label en botón anterior */}
               <button
                 onClick={handlePrev}
                 disabled={testimonios.length <= visibleCount}
-                className="shrink-0 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full border border-stone-200 text-stone-400 hover:text-amber-600 hover:border-amber-400 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                aria-label="Testimonio anterior"
+                className="shrink-0 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full border border-stone-200 dark:border-stone-600 text-stone-400 dark:text-stone-400 bg-white dark:bg-stone-800 hover:text-amber-600 hover:border-amber-400 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
 
-              {/* FIX commit3: min-w-0 evita que el grid desborde su contenedor flex */}
               <div className="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-2 gap-4">
                 {visibleTestimonios.map((t) => (
                   <TarjetaTestimonio
@@ -176,10 +176,12 @@ export default function TestimoniosSection() {
                 ))}
               </div>
 
+              {/* fix(a11y): aria-label en botón siguiente */}
               <button
                 onClick={handleNext}
                 disabled={testimonios.length <= visibleCount}
-                className="shrink-0 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full border border-stone-200 text-stone-400 hover:text-amber-600 hover:border-amber-400 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                aria-label="Testimonio siguiente"
+                className="shrink-0 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full border border-stone-200 dark:border-stone-600 text-stone-400 dark:text-stone-400 bg-white dark:bg-stone-800 hover:text-amber-600 hover:border-amber-400 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
@@ -189,13 +191,16 @@ export default function TestimoniosSection() {
             {totalDots > 1 && (
               <div className="flex justify-center gap-2 mt-6">
                 {Array.from({ length: totalDots }).map((_, i) => (
+                  // fix(a11y): aria-label y aria-current en dots
                   <button
                     key={i}
                     onClick={() => setCurrentIndex(i)}
+                    aria-label={`Ir al testimonio ${i + 1}`}
+                    aria-current={i === currentIndex ? 'true' : undefined}
                     className={`rounded-full transition-all duration-200 ${
                       i === currentIndex
                         ? 'w-6 h-2.5 bg-amber-600'
-                        : 'w-2.5 h-2.5 bg-stone-300 hover:bg-stone-400'
+                        : 'w-2.5 h-2.5 bg-stone-300 dark:bg-white/40 hover:bg-stone-400 dark:hover:bg-white/70'
                     }`}
                   />
                 ))}
@@ -222,15 +227,15 @@ function TarjetaTestimonio({
   onLike: (t: Testimonio) => void
 }) {
   return (
-    // FIX commit3: min-w-0 + overflow-hidden evitan que texto largo rompa el layout
-    <div className="rounded-2xl border border-stone-100 shadow-md p-5 md:p-6 bg-white flex flex-col justify-between min-h-[200px] min-w-0 overflow-hidden">
-      {/* FIX commit3: break-words para testimonios con palabras muy largas */}
-      <p className="text-stone-600 italic text-center text-sm leading-relaxed mb-5 break-words">
+    <div className="rounded-2xl border border-stone-100 dark:border-stone-700 shadow-md p-5 md:p-6 bg-white dark:bg-stone-800 flex flex-col justify-between min-h-[200px] min-w-0 overflow-hidden">
+      <p className="text-stone-600 dark:text-stone-300 italic text-center text-sm leading-relaxed mb-4 break-words">
         "{testimonio.comentario}"
       </p>
 
+      {/* fix(a11y): mayor contraste en línea divisoria */}
+      <hr className="border-t border-stone-300 dark:border-stone-500 mb-4" />
+
       <div className="flex items-center justify-between gap-3">
-        {/* FIX commit3: min-w-0 para que truncate funcione en nombres largos */}
         <div className="flex items-center gap-2 md:gap-3 min-w-0">
           <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-amber-600 flex items-center justify-center shrink-0">
             <span className="text-white text-xs md:text-sm font-bold">
@@ -238,16 +243,17 @@ function TarjetaTestimonio({
             </span>
           </div>
           <div className="min-w-0">
-            <p className="text-xs md:text-sm font-semibold text-stone-800 leading-tight truncate">
+            <p className="text-xs md:text-sm font-semibold text-stone-800 dark:text-stone-100 leading-tight truncate">
               {testimonio.usuario.nombre} {testimonio.usuario.apellido}
             </p>
             {(testimonio.ciudad || testimonio.zona) && (
-              <p className="text-[11px] text-stone-400 truncate">
+              <p className="text-[11px] text-stone-400 dark:text-stone-500 truncate">
                 {[testimonio.ciudad, testimonio.zona].filter(Boolean).join(' – ')}
               </p>
             )}
+            {/* fix(bug): se agrega {testimonio.categoria} que faltaba dentro del span */}
             {testimonio.categoria && (
-              <span className="inline-block mt-1 text-[9px] md:text-[10px] font-semibold tracking-wide text-stone-500 border border-stone-200 rounded px-2 py-0.5 uppercase max-w-full truncate">
+              <span className="inline-block mt-1 text-[9px] md:text-[10px] font-semibold tracking-wide text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-full shadow-sm px-2.5 py-0.5 uppercase max-w-full truncate">
                 {testimonio.categoria}
               </span>
             )}
@@ -260,8 +266,8 @@ function TarjetaTestimonio({
           title={!isLoggedIn ? 'Inicia sesión para dar like' : ''}
           className={`flex items-center gap-1 md:gap-1.5 px-2.5 md:px-3 py-1.5 rounded-full border text-xs md:text-sm font-medium transition-all shrink-0 ${
             testimonio.meGusta
-              ? 'bg-amber-50 border-amber-400 text-amber-600'
-              : 'border-stone-200 text-stone-400 hover:border-amber-400 hover:text-amber-600'
+              ? 'bg-amber-50 dark:bg-amber-900/30 border-amber-400 text-amber-600 dark:text-amber-400'
+              : 'border-stone-200 dark:border-stone-600 text-stone-400 dark:text-stone-500 hover:border-amber-400 hover:text-amber-600'
           } ${!isLoggedIn ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}`}
         >
           <ThumbsUp className={`w-3.5 h-3.5 md:w-4 md:h-4 ${testimonio.meGusta ? 'fill-amber-500 text-amber-500' : ''}`} />

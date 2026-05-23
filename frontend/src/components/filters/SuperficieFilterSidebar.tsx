@@ -6,10 +6,11 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { X } from 'lucide-react'
 
 interface SuperficieFilterSidebarProps {
+  isOpen?: boolean; // Soluciona el error de TS
   onClose: () => void
 }
 
-export default function SuperficieFilterSidebar({ onClose }: SuperficieFilterSidebarProps) {
+export default function SuperficieFilterSidebar({ isOpen, onClose }: SuperficieFilterSidebarProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { updateFilters } = useSearchFilters()
@@ -160,7 +161,7 @@ export default function SuperficieFilterSidebar({ onClose }: SuperficieFilterSid
   }
 
   return (
-    <div className="flex flex-col h-full min-h-0 bg-white dark:bg-stone-900 w-full border-r border-stone-200 dark:border-stone-800">
+    <div className="flex flex-col w-full bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 shadow-sm overflow-hidden">
       {/* 1. HEADER (Fijo) */}
       <div className="shrink-0 p-4 pb-2 relative flex flex-col items-center justify-center">
         <div className="w-full flex items-center justify-center relative mb-1">
@@ -178,7 +179,7 @@ export default function SuperficieFilterSidebar({ onClose }: SuperficieFilterSid
       </div>
 
       {/* 2. CONTENIDO (Con Scroll) */}
-      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6 custom-scrollbar">
+      <div className="w-full px-4 py-4 space-y-6">
         {/* Campo Desde */}
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-3">
@@ -232,8 +233,8 @@ export default function SuperficieFilterSidebar({ onClose }: SuperficieFilterSid
         )}
       </div>
 
-      {/* 3. FOOTER (Fijo al fondo) */}
-      <div className="shrink-0 px-6 pb-6 pt-4 border-t border-stone-100 dark:border-stone-800 bg-white dark:bg-stone-900">
+      {/* 3. FOOTER */}
+      <div className="shrink-0 px-4 pb-4 pt-4 border-t border-stone-100 dark:border-stone-800 bg-white dark:bg-stone-900">
         {(desde || hasta) ? (
           <button
             type="button"

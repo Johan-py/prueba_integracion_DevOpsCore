@@ -44,12 +44,13 @@ export function LocationSearch({ value, onChange }: LocationSearchProps) {
 
   const recalcDropdown = () => {
     if (!containerRef.current) return
+    const rect = containerRef.current.getBoundingClientRect()
     setDropdownStyle({
-      position: 'absolute',
-      top: 'calc(100% + 8px)',
-      left: 0,
-      width: '100%',
-      zIndex: 50
+      position: 'fixed',
+      top: `${rect.bottom + 6}px`,
+      left: `${rect.left}px`,
+      width: `${rect.width}px`,
+      zIndex: 999999
     })
   }
 

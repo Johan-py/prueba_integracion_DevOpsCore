@@ -71,11 +71,7 @@ export default function PagoQRPage() {
       return
     }
     setComprobanteFile(file)
-    if (file.type.startsWith('image/')) {
-      setComprobantePreview(URL.createObjectURL(file))
-    } else {
-      setComprobantePreview(null)
-    }
+    setComprobantePreview(URL.createObjectURL(file))
   }
 
   const handleRemoveFile = () => {
@@ -328,17 +324,18 @@ export default function PagoQRPage() {
                 </label>
               ) : (
                 <div className="space-y-3">
-                  {comprobantePreview ? (
+                  {comprobanteFile.type === 'application/pdf' ? (
+                    <iframe
+                      src={comprobantePreview!}
+                      className="w-full h-48 rounded-lg border border-stone-100"
+                      title="Vista previa PDF"
+                    />
+                  ) : (
                     <img
-                      src={comprobantePreview}
+                      src={comprobantePreview!}
                       alt="Vista previa"
                       className="w-full max-h-48 object-contain rounded-lg border border-stone-100"
                     />
-                  ) : (
-                    <div className="flex items-center gap-3 rounded-lg border border-stone-100 bg-stone-50 p-3">
-                      <FileText size={24} className="text-red-500 shrink-0" />
-                      <span className="text-sm text-stone-700 truncate">{comprobanteFile.name}</span>
-                    </div>
                   )}
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-stone-500 truncate max-w-[70%]">{comprobanteFile.name}</span>

@@ -25,11 +25,11 @@ type CampoError =
   | 'mapa'
   | null
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '')
 
 export default function MiRegistroPage() {
   const router = useRouter()
-  const [mostrarVideo, setMostrarVideo] = useState(true)
+  const [mostrarVideo, setMostrarVideo] = useState(false)
 
   const [datos, setDatos] = useState({
     titulo: '',
@@ -61,6 +61,75 @@ export default function MiRegistroPage() {
   }[]
 >([])
 const [poiSeleccionado, setPoiSeleccionado] = useState<number | null>(null)
+
+  const contenidoTutorial = {
+    titulo: 'Antes de publicar tu propiedad',
+    mensaje:
+      'Mira este video y conoce qué necesitas tener listo para crear tu publicación de forma exitosa.',
+    requisitos: [
+      'Tipo de inmueble que deseas publicar.',
+      'Ubicación o dirección referencial de la propiedad.',
+      'Precio de venta, alquiler o anticrético.',
+      'Superficie y características principales del inmueble.',
+      'Fotografías o recursos multimedia claros de la propiedad.',
+    ],
+    videoUrl: '',
+    thumbnailUrl: null,
+    subtitlesUrl: null,
+    checkboxLabel: 'Sí entiendo qué necesito para publicar una propiedad',
+  }
+
+  const verificarTutorialPublicacion = async () => {
+    const token = localStorage.getItem('token')
+
+    if (!token) {
+      router.push('/sign-in')
+      return
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/api/publicaciones/tutorial/estado`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      const result = await response.json().catch(() => null)
+
+      if (response.ok && result?.data?.debeMostrarTutorial === true) {
+        setMostrarVideo(true)
+        return
+      }
+
+      setMostrarVideo(false)
+    } catch (error) {
+      console.error('Error al verificar tutorial de publicación:', error)
+      setMostrarVideo(false)
+    }
+  }
+
+  const confirmarTutorialPublicacion = async () => {
+    const token = localStorage.getItem('token')
+
+    setMostrarVideo(false)
+
+    if (!token) {
+      router.push('/sign-in')
+      return
+    }
+
+    try {
+      await fetch(`${API_URL}/api/publicaciones/tutorial/confirmar`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+    } catch (error) {
+      console.error('Error al confirmar tutorial de publicación:', error)
+    }
+  }
 
   useEffect(() => {
     const obtenerDireccion = async () => {
@@ -121,12 +190,15 @@ const [poiSeleccionado, setPoiSeleccionado] = useState<number | null>(null)
   }
 
   useEffect(() => {
-  const token = localStorage.getItem('token')
+    const token = localStorage.getItem('token')
 
-  if (!token) {
-    router.push('/sign-in')
-  }
-}, [router])
+    if (!token) {
+      router.push('/sign-in')
+      return
+    }
+
+    verificarTutorialPublicacion()
+  }, [router])
 
   const limpiarError = () => {
     setMensajeError('')
@@ -681,8 +753,9 @@ const [poiSeleccionado, setPoiSeleccionado] = useState<number | null>(null)
      <>
     {mostrarVideo && (
       <VideoPublicacionModal
-        onClose={() => setMostrarVideo(false)}
-        onContinue={() => setMostrarVideo(false)}
+        contenido={contenidoTutorial}
+        onClose={confirmarTutorialPublicacion}
+        onContinue={confirmarTutorialPublicacion}
       />
     )}
     <div className="min-h-screen bg-white text-gray-900">
@@ -945,8 +1018,8 @@ const [poiSeleccionado, setPoiSeleccionado] = useState<number | null>(null)
               </div>
 
               <div className="mt-6">
-                <div className="flex items-center gap-3 mb-4 gap-4">
-                  <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3 mb-4">
+                  <div className="flex flex-wrap items-center gap-3">
                     <button
                       type="button"
                       onClick={() => {
@@ -954,7 +1027,7 @@ const [poiSeleccionado, setPoiSeleccionado] = useState<number | null>(null)
                         setModoDifuminadoActivo(false)
                         setVertices([]) // Lógica de develop: borra el polígono anterior
                       }}
-                      className={`px-4 py-2 rounded-full text-xs transition ${
+                      className={`px-4 py-2 rounded-full text-sm transition ${
                         modoPinActivo ? 'bg-orange-500 text-white' : 'bg-gray-200'
                       }`}
                     >
@@ -995,17 +1068,25 @@ if (referenciasEnEsePunto.length >= 4) {
   return
 }
 
-setPois([
-  ...pois,
-  {
-    id: Date.now(),
-    nombre: '',
-    lat: pinCoords.lat,
-    lng: pinCoords.lng
-  }
-])
+const despl = [
+                          [0.001, 0],      // Norte
+                          [0, 0.001],      // Este
+                          [-0.001, 0],     // Sur
+                          [0, -0.001]      // Oeste
+                        ];
+                        const d = despl[pois.length % 4];
+
+                        setPois([
+                          ...pois,
+                          {
+                            id: Date.now(),
+                            nombre: '',
+                            lat: pinCoords.lat + d[0],
+                            lng: pinCoords.lng + d[1]
+                          }
+                        ])
       }}
-      className={`px-4 py-2 rounded-full text-xs ${
+      className={`px-4 py-2 rounded-full text-sm ${
         pinCoords
           ? 'bg-orange-500 text-white'
           : 'bg-gray-200 text-gray-400 cursor-not-allowed'
@@ -1031,7 +1112,7 @@ if (poiSeleccionado !== null) {
   setPois(pois.slice(0, -1))
 }
 }}
-      className={`px-4 py-2 rounded-full text-xs ${
+      className={`px-4 py-2 rounded-full text-sm ${
         pois.length > 0
           ? 'bg-red-500 text-white'
           : 'bg-gray-200 text-gray-400 cursor-not-allowed'
@@ -1060,7 +1141,7 @@ if (poiSeleccionado !== null) {
         direccion: ''
       }))
     }}
-    className={`px-4 py-2 rounded-full text-xs transition ${
+    className={`px-4 py-2 rounded-full text-sm transition ${
       !pinCoords && vertices.length === 0
         ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
         : 'bg-orange-500 text-white hover:bg-orange-600'
@@ -1100,18 +1181,18 @@ if (poiSeleccionado !== null) {
               </div>
 
               <div className="mt-12 space-y-6">
-                <div className="flex justify-center md:justify-end gap-6">
+                <div className="flex flex-col sm:flex-row justify-center md:justify-end gap-4 sm:gap-6">
                   <button
                     type="button"
                     onClick={() => router.back()}
-                    className="px-12 py-3 rounded-full border border-gray-400 bg-[#D9D9D9]"
+                    className="w-full sm:w-auto px-12 py-3 rounded-full border border-gray-400 bg-[#D9D9D9]"
                   >
                     Cancelar
                   </button>
 
                   <button
                     onClick={guardarPropiedad}
-                    className="px-12 py-3 rounded-full border-2 border-orange-400 bg-[#D9D9D9] hover:bg-orange-100 transition"
+                    className="w-full sm:w-auto px-12 py-3 rounded-full border-2 border-orange-400 bg-[#D9D9D9] hover:bg-orange-100 transition"
                   >
                     Continuar
                   </button>

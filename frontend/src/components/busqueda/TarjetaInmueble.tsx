@@ -1,6 +1,6 @@
 'use client'
 import { Inmueble } from '../../types/inmueble'
-import { BedDouble, Bath, Maximize, MapPin, Star, Check, TrendingUp } from 'lucide-react'
+import { BedDouble, Bath, Maximize, MapPin, Star, Check, TrendingUp, Sparkles } from 'lucide-react'
 import Image from 'next/image'
 import { useState } from 'react'
 import { useCompareStore } from '@/hooks/useCompareStore'
@@ -8,9 +8,10 @@ import { useCompareStore } from '@/hooks/useCompareStore'
 interface TarjetaInmuebleProps {
   inmueble: Inmueble
   posicion?: number
+  esRecomendadoIA?: boolean
 }
 
-export const TarjetaInmueble = ({ inmueble, posicion }: TarjetaInmuebleProps) => {
+export const TarjetaInmueble = ({ inmueble, posicion, esRecomendadoIA }: TarjetaInmuebleProps) => {
   const [isHovered, setIsHovered] = useState(false)
   
   // Conectamos la tarjeta al estado global de comparación
@@ -27,6 +28,9 @@ export const TarjetaInmueble = ({ inmueble, posicion }: TarjetaInmuebleProps) =>
     typeof inmueble.ubicacion === 'object' && inmueble.ubicacion !== null
       ? `${inmueble.ubicacion.zona ?? ''}, ${inmueble.ubicacion.ciudad ?? ''}`
       : ''
+      
+   const estaDestacada = inmueble.publicaciones?.[0]?.promoted === true
+
 
   const handleClick = async () => {
     // Si la función comparar está activa, el clic solo selecciona la tarjeta
@@ -74,6 +78,16 @@ export const TarjetaInmueble = ({ inmueble, posicion }: TarjetaInmuebleProps) =>
         </div>
       )}
 
+       {/* ✅ NUEVO: Badge "Destacada" para propiedades publicitadas */}
+      {estaDestacada && (
+        <div className="absolute top-3 left-3 z-20 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-2.5 py-1 rounded-full flex items-center gap-1 shadow-md">
+          <Sparkles size={12} />
+          <span className="text-xs font-bold">Destacada</span>
+        </div>
+      )} 
+
+
+
       <div className="relative aspect-[4/3] w-full bg-gray-200 dark:bg-stone-800 overflow-hidden">
         <Image
           src={`https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=600&h=400&ixlib=rb-4.0.3`}
@@ -87,6 +101,13 @@ export const TarjetaInmueble = ({ inmueble, posicion }: TarjetaInmuebleProps) =>
             <TrendingUp className="w-3.5 h-3.5 text-orange-500" />
             <span className="text-xs font-semibold text-gray-800 dark:text-stone-200">Popular</span>
           </div>
+        )}
+        {/* Badge IA — agregar aquí */}
+        {esRecomendadoIA && (
+          <div className="absolute bottom-3 left-3 bg-purple-600 text-white px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm z-10">
+            <span className="text-xs">✨</span>
+           <span className="text-xs font-semibold">Recomendado por IA</span>
+         </div>
         )}
       </div>
 

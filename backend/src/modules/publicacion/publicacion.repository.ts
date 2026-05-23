@@ -362,6 +362,14 @@ export const buscarDetallePublicacionPorInmuebleIdRepository = async (
               longitud: true,
             },
           },
+          puntosDeInteres: {
+            select: {
+              id: true,
+              nombre: true,
+              latitud: true,
+              longitud: true,
+            },
+          },
           inmueble_etiqueta: {
             select: {
               etiqueta: {

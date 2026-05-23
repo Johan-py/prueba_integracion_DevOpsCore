@@ -402,7 +402,9 @@ export default function LoginForm() {
     setShowMagicLinkForm(false);
   };
 
-  const handleMagicLinkSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleMagicLinkSubmit = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
     event.preventDefault();
 
     if (isLoadingMagicLink) {
@@ -1009,13 +1011,14 @@ export default function LoginForm() {
       }
 
       setSuccessMessage(
-        data.message || "Cuenta activada correctamente. Ahora puedes iniciar sesión.",
+        data.message ||
+          "Cuenta activada correctamente. Ahora puedes iniciar sesión.",
       );
       setErrorMessage("");
       setPassword("");
       closeActivationModal();
       router.push("/sign-in");
-    } catch {
+    } catch (error) {
       setActivationError(ACTIVATION_CONNECTION_ERROR_MESSAGE);
     } finally {
       window.clearTimeout(timeoutId);
@@ -1069,8 +1072,12 @@ export default function LoginForm() {
       setActivationStep("code");
       setActivationCode("");
       setTimeLeft(60);
-    } catch {
-      setActivationError(ACTIVATION_CONNECTION_ERROR_MESSAGE);
+    } catch (error) {
+      setActivationError(
+        error instanceof Error
+          ? error.message
+          : "Error al conectar con el servidor",
+      );
     } finally {
       window.clearTimeout(timeoutId);
       setIsActivating(false);
@@ -1946,7 +1953,7 @@ export default function LoginForm() {
                 <button
                   type="button"
                   onClick={handleActivateByPassword}
-                  disabled={isActivating || !activationPassword.trim()}
+                  disabled={isActivating}
                   className="rounded-md bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:bg-orange-300"
                 >
                   {isActivating ? "Activando..." : "Confirmar"}
@@ -2064,10 +2071,7 @@ export default function LoginForm() {
                 <button
                   type="button"
                   onClick={handleActivateByCode}
-                  disabled={
-                    isActivating ||
-                    activationCode.length !== ACTIVATION_CODE_LENGTH
-                  }
+                  disabled={isActivating}
                   className="rounded-md bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:bg-orange-300"
                 >
                   {isActivating ? "Activando..." : "Confirmar"}
