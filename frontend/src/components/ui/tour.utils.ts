@@ -96,3 +96,27 @@ export const getTourTheme = (isDark: boolean): TourTheme => ({
   textSubtle:   isDark ? "#6b7280" : "#9ca3af",
   stepInactive: isDark ? "#374151" : "#e5e7eb",
 });
+
+export const completeTourApi = (): void => {
+  const token = localStorage.getItem("token");
+  if (!token) return;
+
+  try {
+    const raw = localStorage.getItem("propbol_user");
+    if (raw) {
+      const sessionUser = JSON.parse(raw);
+      localStorage.setItem(
+        "propbol_user",
+        JSON.stringify({ ...sessionUser, controlador: true })
+      );
+    }
+  } catch {
+    // ignorar — el backend es la fuente de verdad
+  }
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
+  fetch(`${apiUrl}/api/auth/tour`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}` },
+  }).catch(() => {});
+};

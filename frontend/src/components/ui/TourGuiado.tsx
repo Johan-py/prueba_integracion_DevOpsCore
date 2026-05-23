@@ -8,6 +8,7 @@ import {
   waitForMenuClose,
   waitForMenuOpen,
   getTourTheme,
+  completeTourApi,
 } from "./tour.utils";
 
 type TourStep = {
@@ -127,7 +128,6 @@ export default function TourGuiado() {
     window.addEventListener("propbol:login", checkAndShowTour);
     return () => window.removeEventListener("propbol:login", checkAndShowTour);
   }, [checkAndShowTour]);
-
   useEffect(() => {
     const handleSessionChanged = () => {
       if (!isLoggedIn()) {
@@ -141,6 +141,17 @@ export default function TourGuiado() {
     return () =>
       window.removeEventListener("propbol:session-changed", handleSessionChanged);
   }, []);
+  useEffect(() => {
+  const handleIniciarTour = () => {
+    setHighlight(null);
+    prevStepRef.current = -1;
+    setCurrentStep(0);
+    setShowTour(true);
+  };
+  window.addEventListener("propbol:iniciar-tour", handleIniciarTour);
+  return () =>
+    window.removeEventListener("propbol:iniciar-tour", handleIniciarTour);
+}, []);
 
   // ─── Scroll lock ───────────────────────────────────────────────────────────
 
