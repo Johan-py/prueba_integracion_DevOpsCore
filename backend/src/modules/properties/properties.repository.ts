@@ -86,9 +86,9 @@ export const propertiesRepository = {
         .map((m) => normalizarModoAccion(String(m)));
 
       if (modos.length === 1) {
-        where.tipoAccion = modos[0];
+        where.tipo_accion = modos[0];
       } else if (modos.length > 1) {
-        where.tipoAccion = { in: modos };
+        where.tipo_accion = { in: modos };
       }
     }
 
@@ -100,105 +100,103 @@ export const propertiesRepository = {
       // Fallback original: Búsqueda estricta por texto
       const texto = filtros.query.trim();
 
-      where.ubicacion = {
-        
-  OR: [
-    //{ direccion: { contains: texto, mode: "insensitive" } },
-    { barrio: { nombre: { contains: texto, mode: "insensitive" } } },
-    {
-      barrio: {
-        zona: { nombre: { contains: texto, mode: "insensitive" } },
-      },
-    },
-    {
-      barrio: {
-        zona: {
-          municipio: {
-            nombre: { contains: texto, mode: "insensitive" },
-          },
-        },
-      },
-    },
-    {
-      barrio: {
-        zona: {
-          municipio: {
-            provincia: {
-              nombre: { contains: texto, mode: "insensitive" },
+      where.ubicacion_inmueble = {
+        OR: [
+          { barrio: { nombre: { contains: texto, mode: "insensitive" } } },
+          {
+            barrio: {
+              zona_geografica: { nombre: { contains: texto, mode: "insensitive" } },
             },
           },
-        },
-      },
-    },
-    {
-      barrio: {
-        zona: {
-          municipio: {
-            provincia: {
-              departamento: {
-                nombre: { contains: texto, mode: "insensitive" },
+          {
+            barrio: {
+              zona_geografica: {
+                municipio_zona_geografica_municipioTomunicipio: {
+                  nombre: { contains: texto, mode: "insensitive" },
+                },
               },
             },
           },
-        },
-      },
-    },
-    {
-      ubicacion_maestra: {
-        nombre: { contains: texto, mode: "insensitive" },
-      },
-    },
-  ],
-};
+          {
+            barrio: {
+              zona_geografica: {
+                municipio_zona_geografica_municipioTomunicipio: {
+                  provincia_municipio_provinciaToprovincia: {
+                    nombre: { contains: texto, mode: "insensitive" },
+                  },
+                },
+              },
+            },
+          },
+          {
+            barrio: {
+              zona_geografica: {
+                municipio_zona_geografica_municipioTomunicipio: {
+                  provincia_municipio_provinciaToprovincia: {
+                    departamento_provincia_departamentoTodepartamento: {
+                      nombre: { contains: texto, mode: "insensitive" },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          {
+            ubicacion_maestra: {
+              nombre: { contains: texto, mode: "insensitive" },
+            },
+          },
+        ],
+      };
     } else if (filtros.locationId) {
       // Fallback: Si no hay texto, asumimos que viene de un botón antiguo de "Ciudades Destacadas"
-      where.ubicacion = { ubicacionMaestraId: Number(filtros.locationId) };
+      where.ubicacion_inmueble = { ubicacion_maestra_id: Number(filtros.locationId) };
     }
     // Si un nivel está seleccionado y no es "todos", lo aplicamos y las demás condiciones (else if) se ignoran.
     if (
       filtros.barrioId &&
       String(filtros.barrioId).toLowerCase() !== "todos"
     ) {
-      where.ubicacion = {
-        ...where.ubicacion,
+      where.ubicacion_inmueble = {
+        ...where.ubicacion_inmueble,
         barrio_id: Number(filtros.barrioId),
       };
     } else if (
       filtros.zonaId &&
       String(filtros.zonaId).toLowerCase() !== "todos"
     ) {
-      where.ubicacion = {
-        ...where.ubicacion,
+      where.ubicacion_inmueble = {
+        ...where.ubicacion_inmueble,
         barrio: { zona_id: Number(filtros.zonaId) },
       };
     } else if (
       filtros.municipioId &&
       String(filtros.municipioId).toLowerCase() !== "todos"
     ) {
-      where.ubicacion = {
-        ...where.ubicacion,
-        barrio: { zona: { municipio_id: Number(filtros.municipioId) } },
+      where.ubicacion_inmueble = {
+        ...where.ubicacion_inmueble,
+        barrio: { zona_geografica: { municipio: Number(filtros.municipioId) } },
       };
     } else if (
       filtros.provinciaId &&
       String(filtros.provinciaId).toLowerCase() !== "todos"
     ) {
-      where.ubicacion = {
-        ...where.ubicacion,
+      where.ubicacion_inmueble = {
+        ...where.ubicacion_inmueble,
         barrio: {
-          zona: { municipio: { provincia_id: Number(filtros.provinciaId) } },
+          zona_geografica: { municipio_zona_geografica_municipioTomunicipio: { provincia: Number(filtros.provinciaId) } },
         },
       };
     } else if (
       filtros.departamentoId &&
       String(filtros.departamentoId).toLowerCase() !== "todos"
     ) {
-      where.ubicacion = {
-        ...where.ubicacion,
+      where.ubicacion_inmueble = {
+        ...where.ubicacion_inmueble,
         barrio: {
-          zona: {
-            municipio: {
-              provincia: { departamento_id: Number(filtros.departamentoId) },
+          zona_geografica: {
+            municipio_zona_geografica_municipioTomunicipio: {
+              provincia_municipio_provinciaToprovincia: { departamento: Number(filtros.departamentoId) },
             },
           },
         },
@@ -238,22 +236,22 @@ export const propertiesRepository = {
       filtros.dormitoriosMin !== undefined ||
       filtros.dormitoriosMax !== undefined
     ) {
-      where.nroCuartos = {};
+      where.nro_cuartos = {};
       if (filtros.dormitoriosMin !== undefined) {
-        where.nroCuartos.gte = filtros.dormitoriosMin;
+        where.nro_cuartos.gte = filtros.dormitoriosMin;
       }
       if (filtros.dormitoriosMax !== undefined) {
-        where.nroCuartos.lte = filtros.dormitoriosMax;
+        where.nro_cuartos.lte = filtros.dormitoriosMax;
       }
     }
 
     if (filtros.banosMin !== undefined || filtros.banosMax !== undefined) {
-      where.nroBanos = {};
+      where.nro_banos = {};
       if (filtros.banosMin !== undefined) {
-        where.nroBanos.gte = filtros.banosMin;
+        where.nro_banos.gte = filtros.banosMin;
       }
       if (filtros.banosMax !== undefined) {
-        where.nroBanos.lte = filtros.banosMax;
+        where.nro_banos.lte = filtros.banosMax;
       }
     }
 
@@ -262,12 +260,12 @@ export const propertiesRepository = {
     }
     // ── FILTRO DE SUPERFICIE ──────────────────────────────────────────────
     if (filtros.minSuperficie != null || filtros.maxSuperficie != null) {
-      where.superficieM2 = {};
+      where.superficie_m2 = {};
       if (filtros.minSuperficie != null) {
-        where.superficieM2.gte = filtros.minSuperficie;
+        where.superficie_m2.gte = filtros.minSuperficie;
       }
       if (filtros.maxSuperficie != null) {
-        where.superficieM2.lte = filtros.maxSuperficie;
+        where.superficie_m2.lte = filtros.maxSuperficie;
       }
     }
     //HU6
@@ -286,7 +284,7 @@ export const propertiesRepository = {
       where.AND = [
         ...(where.AND || []),
         ...filtros.labels.map((labelId) => ({
-          publicaciones: {
+          publicacion: {
             some: {
               estado: 'ACTIVA' as const,
               publicacion_tag: {
@@ -311,8 +309,7 @@ export const propertiesRepository = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const orderBy: any[] = [];
 
-    // Siempre priorizamos las publicitadas (promoted = true)
-    orderBy.push({ promoted: "desc"  });
+    // Nota: promoted se ordena en memoria post-consulta (no es campo de inmueble)
 
     if (filtros.precio === "menor-a-mayor") {
       orderBy.push({ precio: "asc" });
@@ -320,16 +317,16 @@ export const propertiesRepository = {
     } else if (filtros.precio === "mayor-a-menor") {
       orderBy.push({ precio: "desc" });
     } else if (filtros.superficie === "menor-a-mayor") {
-      orderBy.push({ superficieM2: "asc" });
+      orderBy.push({ superficie_m2: "asc" });
     } else if (filtros.superficie === "mayor-a-menor") {
-      orderBy.push({ superficieM2: "desc" });
+      orderBy.push({ superficie_m2: "desc" });
     } else if (filtros.fecha === "mas-recientes") {
-      orderBy.push({ fechaPublicacion: "desc" });
+      orderBy.push({ fecha_publicacion: "desc" });
     } else if (filtros.fecha === "mas-antiguos") {
-      orderBy.push({ fechaPublicacion: "asc" });
+      orderBy.push({ fecha_publicacion: "asc" });
     } else if (filtros.fecha === "mas-populares") {
       // fallback mientras se ordena en memoria
-      orderBy.push({ fechaPublicacion: "desc" });
+      orderBy.push({ fecha_publicacion: "desc" });
     } else if (filtros.fecha === "mayor-descuento") {
       orderBy.push({ id: "asc" });
     }
@@ -341,16 +338,16 @@ export const propertiesRepository = {
       where,
       orderBy,
       include: {
-        ubicacion: {
+        ubicacion_inmueble: {
           include: {
             barrio: {
               include: {
-                zona: {
+                zona_geografica: {
                   include: {
-                    municipio: {
+                    municipio_zona_geografica_municipioTomunicipio: {
                       include: {
-                        provincia: {
-                          include: { departamento: true },
+                        provincia_municipio_provinciaToprovincia: {
+                          include: { departamento_provincia_departamentoTodepartamento: true },
                         },
                       },
                     },
@@ -361,20 +358,28 @@ export const propertiesRepository = {
             ubicacion_maestra: true,
           },
         },
-        publicaciones: {
-      where: { estado: "ACTIVA" },
-      select: {
-      promoted: true,
-      multimedia: true,
-       },
-    },
-   },
+        publicacion: {
+          where: { estado: "ACTIVA" },
+          select: {
+            promoted: true,
+            multimedia: true,
+          },
+        },
+      },
+    });
+
+    // Ordenamos en memoria por promoted (no es campo directo de inmueble)
+    inmuebles.sort((a, b) => {
+      const aProm = (a as any).publicacion?.some((p: any) => p.promoted === true) ?? false;
+      const bProm = (b as any).publicacion?.some((p: any) => p.promoted === true) ?? false;
+      if (aProm !== bProm) return aProm ? -1 : 1;
+      return 0;
     });
 
     let resultados =
       filtros.lat && filtros.lng
         ? inmuebles.filter((inmueble) => {
-            const u = inmueble.ubicacion;
+            const u = inmueble.ubicacion_inmueble;
             if (!u || !u.latitud || !u.longitud) return false;
 
             const lat = Number(u.latitud);
@@ -461,7 +466,7 @@ export const propertiesRepository = {
       },
       // Incluimos exactamente lo necesario para la matriz comparativa
       include: {
-        publicaciones: {
+        publicacion: {
   where: { estado: "ACTIVA" },
       select: {
        promoted: true,
@@ -474,8 +479,8 @@ export const propertiesRepository = {
         inmueble_amenidad: {
           include: { amenidad: true },
         },
-        ubicacion: true, 
-        propietario: true,
+        ubicacion_inmueble: true, 
+        usuario: true,
       },
     });
 
