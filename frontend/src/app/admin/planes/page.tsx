@@ -35,6 +35,7 @@ export default function AdminPlanesPage() {
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [successMsg, setSuccessMsg] = useState<string | null>(null)
+  const [uploadingQr, setUploadingQr] = useState(false)
 
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
 
@@ -77,8 +78,19 @@ export default function AdminPlanesPage() {
     setShowForm(true)
   }
 
+  // Criterio 3 HU-10: campos obligatorios para crear/editar un plan.
+  // El QR solo es obligatorio para planes de pago (precio > 0); un plan gratuito no requiere cobro.
+  const camposObligatoriosOk =
+    !!form.nombre_plan?.trim() &&
+    form.precio_plan >= 0 &&
+    !!form.descripcion_plan?.trim() &&
+    (form.precio_plan === 0 || !!form.imagen_gr_url)
+
   const handleSave = async () => {
-    if (!form.nombre_plan?.trim()) return
+    if (!camposObligatoriosOk) {
+      setError('Completa todos los campos obligatorios: nombre, precio, descripción y QR de pago')
+      return
+    }
     if (form.precio_plan < 0) {
       setError('El precio no puede ser negativo')
       return
@@ -105,6 +117,37 @@ export default function AdminPlanesPage() {
       setError(e instanceof Error ? e.message : 'Error al guardar')
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleQrUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const allowed = ['image/png', 'image/jpeg', 'image/jpg']
+    if (!allowed.includes(file.type)) {
+      setError('Formato no permitido. Solo PNG, JPG o JPEG')
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setError('El archivo supera el tamaño máximo de 5 MB')
+      return
+    }
+    setUploadingQr(true)
+    try {
+      const fd = new FormData()
+      fd.append('qr', file)
+      const res = await fetch(`${API_URL}/api/admin/planes/qr`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: fd,
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Error al subir el QR')
+      setForm((f) => ({ ...f, imagen_gr_url: data.imagen_gr_url }))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error al subir el QR')
+    } finally {
+      setUploadingQr(false)
     }
   }
 
@@ -249,7 +292,7 @@ export default function AdminPlanesPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-stone-600 mb-1">Descripción</label>
+                  <label className="block text-xs font-semibold text-stone-600 mb-1">Descripción *</label>
                   <textarea
                     value={form.descripcion_plan ?? ''}
                     onChange={(e) => setForm({ ...form, descripcion_plan: e.target.value })}
@@ -292,21 +335,32 @@ export default function AdminPlanesPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-stone-600 mb-1">URL del QR de pago</label>
+                  <label className="block text-xs font-semibold text-stone-600 mb-1">QR de pago *</label>
                   <input
-                    type="url"
-                    value={form.imagen_gr_url ?? ''}
-                    onChange={(e) => setForm({ ...form, imagen_gr_url: e.target.value || null })}
-                    className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm outline-none focus:border-amber-500"
-                    placeholder="https://... o /qrs/mi-qr.png"
+                    type="file"
+                    accept="image/png,image/jpeg,image/jpg"
+                    onChange={handleQrUpload}
+                    disabled={uploadingQr}
+                    className="w-full text-sm text-stone-600 file:mr-3 file:rounded-lg file:border-0 file:bg-amber-50 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-amber-700 hover:file:bg-amber-100 disabled:opacity-50"
                   />
+                  <p className="mt-1 text-[11px] text-stone-400">PNG, JPG o JPEG · Máx. 5 MB</p>
+                  {uploadingQr && <p className="mt-1 text-xs text-amber-600">Subiendo QR...</p>}
                   {form.imagen_gr_url && (
-                    <img
-                      src={form.imagen_gr_url}
-                      alt="Vista previa QR"
-                      className="mt-2 h-24 w-24 object-contain rounded-lg border border-stone-100"
-                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
-                    />
+                    <div className="mt-2 flex items-center gap-3">
+                      <img
+                        src={form.imagen_gr_url}
+                        alt="Vista previa QR"
+                        className="h-24 w-24 object-contain rounded-lg border border-stone-100"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setForm({ ...form, imagen_gr_url: '' })}
+                        className="text-xs font-medium text-red-600 hover:underline"
+                      >
+                        Quitar
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
@@ -320,8 +374,8 @@ export default function AdminPlanesPage() {
                 </button>
                 <button
                   onClick={handleSave}
-                  disabled={saving || !form.nombre_plan?.trim()}
-                  className="flex-1 rounded-xl bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 disabled:opacity-50 transition-colors"
+                  disabled={saving || uploadingQr || !camposObligatoriosOk}
+                  className="flex-1 rounded-xl bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {saving ? 'Guardando...' : editId ? 'Actualizar' : 'Crear plan'}
                 </button>

@@ -18,7 +18,7 @@ export async function emitirComprobante(transaccionId: number): Promise<boolean>
     emailUsuario: transaccion.usuario.correo,
     nombreUsuario: `${transaccion.usuario.nombre} ${transaccion.usuario.apellido}`,
     idTransaccion: transaccion.id,
-    nombrePlan: transaccion.plan_suscripcion.nombre_plan ?? 'Plan PropBol',
+    nombrePlan: transaccion.plan_suscripcion?.nombre_plan ?? 'Plan PropBol',
     monto: Number(transaccion.total),
     fechaHora: transaccion.fecha_completado ?? transaccion.fecha_intento ?? new Date(),
     tipoFacturacion,

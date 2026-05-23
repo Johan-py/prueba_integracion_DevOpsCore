@@ -28,7 +28,7 @@ export default function NavLinks() {
   }, []);
 
   const linkStyle =
-    "hover:text-[#E68B25] hover:bg-[#E68B25]/10 px-3 py-2 rounded-md transition";
+    "hover:!text-[#E68B25] hover:bg-[#E68B25]/10 px-3 py-2 rounded-md transition";
 
   return (
     <div className="hidden lg:flex items-center gap-6 text-[15px] font-medium text-gray-700 dark:text-gray-300">
@@ -38,15 +38,14 @@ export default function NavLinks() {
           onClick={() => setOpen(!open)}
           className={`flex items-center gap-1 px-3 py-2 rounded-md transition ${
             open
-              ? "text-[#E68B25] bg-[#E68B25]/10"
-              : "hover:text-[#E68B25] hover:bg-[#E68B25]/10"
+              ? "!text-[#E68B25] bg-[#E68B25]/10"
+              : "hover:!text-[#E68B25] hover:bg-[#E68B25]/10"
           }`}
         >
           Propiedades
           <ChevronDown
-            className={`h-4 w-4 transition-transform ${
-              open ? "rotate-180" : ""
-            }`}
+            className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""
+              }`}
           />
         </button>
 
@@ -62,6 +61,7 @@ export default function NavLinks() {
               <button
                 key={item}
                 type="button"
+                aria-label={item}
                 data-confirm-exit="true"
                 onClick={() => {
                   setOpen(false);
@@ -108,7 +108,7 @@ export default function NavLinks() {
 
                   router.push(`/busqueda_mapa?${params.toString()}`);
                 }}
-                className="block w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#222] hover:text-[#E68B25]"
+                className="block w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:!bg-stone-800 hover:!text-[#E68B25]"
               >
                 {item}
               </button>
@@ -147,8 +147,8 @@ export default function NavLinks() {
           }, 300);
         }}
         className={linkStyle}
-        >
-         Ayuda
+      >
+        Ayuda
       </button>
     </div>
   );

@@ -111,7 +111,7 @@ function BlogRow({ blog }: { blog: AdminModerationBlog }) {
       </div>
 
       {blog.status === 'RECHAZADO' && blog.rejectionComment && (
-        <div className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700 md:col-span-5 font-inter">
+        <div className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700 md:col-span-5 font-inter truncate" title={blog.rejectionComment}>
           <span className="font-semibold">Comentario de rechazo:</span> {blog.rejectionComment}
         </div>
       )}
@@ -179,8 +179,8 @@ export default function AdminBlogsModeration() {
                   type="button"
                   onClick={() => setActiveFilter(filter.value)}
                   className={`inline-flex min-h-[46px] items-center justify-center rounded-full px-4 text-xs font-semibold uppercase tracking-[0.16em] transition-colors font-inter ${activeFilter === filter.value
-                      ? 'bg-amber-600 text-white'
-                      : 'text-stone-500 hover:bg-stone-100 hover:text-stone-800'
+                    ? 'bg-amber-600 text-white'
+                    : 'text-stone-500 hover:bg-stone-100 hover:text-stone-800'
                     }`}
                 >
                   {filter.label}

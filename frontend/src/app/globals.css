@@ -484,8 +484,8 @@ html.dark body :where([class*="bg-white"],
   [class*="bg-[#f5"],
   [class*="bg-[#F5"],
   [class*="bg-[#f8"],
-  [class*="bg-[#F8"]):not([class*="/"]):not([class*="bg-[#D97706]"]):not([class*="bg-[#d97706]"]):not([aria-pressed="true"]) {
-  background: var(--pb-surface) !important;
+  [class*="bg-[#F8"]):not([class*="/"]):not([class*="bg-[#D97706]"]):not([class*="bg-[#d97706]"]):not([aria-pressed="true"]):not([class*="hover:!bg-"]):not([class*="dark:hover:!bg-"]) {
+  background-color: var(--pb-surface) !important;
   background-image: none !important;
   color: var(--pb-text) !important;
 }
@@ -535,7 +535,7 @@ html.dark :where(nav [class*="absolute"],
 html.dark :where(nav [class*="absolute"] *,
   nav [class*="fixed"] *,
   [role="menu"] *,
-  [role="dialog"] *) {
+  [role="dialog"] *):not([class*="hover:text-"]):not([class*="dark:hover:text-"]):not([class*="text-[#"]) {
   color: var(--pb-text) !important;
   border-color: var(--pb-border) !important;
 }
@@ -558,7 +558,7 @@ html.dark body :where(h1,
   [class*="text-slate"],
   [class*="text-neutral"],
   [class*="text-zinc"],
-  [class*="text-stone"]) {
+  [class*="text-stone"]):not([class*="hover:text-"]):not([class*="dark:hover:text-"]):not([class*="text-[#"]) {
   color: var(--pb-text) !important;
 }
 
@@ -638,7 +638,7 @@ html.dark body :where([class*="bg-amber-500"],
 /* Hover general */
 html.dark body :where(a:hover,
   button:hover,
-  [role="menuitem"]:hover) {
+  [role="menuitem"]:hover):not([class*="dark:hover:bg-"]):not([class*="/"]):not([class*="hover:!bg-"]):not([class*="dark:hover:!bg-"]) {
   background-color: var(--pb-surface-2) !important;
 }
 

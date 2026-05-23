@@ -571,11 +571,10 @@ export default function Navbar() {
                               role="tab"
                               aria-selected={filter === item}
                               onClick={() => setFilter(item)}
-                              className={`rounded-full px-3 py-1 text-xs font-medium transition ${
-                                filter === item
+                              className={`rounded-full px-3 py-1 text-xs font-medium transition ${filter === item
                                   ? "bg-amber-600 text-white"
                                   : "bg-stone-100 text-stone-700 hover:bg-stone-200"
-                              }`}
+                                }`}
                             >
                               {item === "todas"
                                 ? "Todas"
@@ -652,11 +651,10 @@ export default function Navbar() {
                                       router.push(`/notificaciones/${notification.id}`);
                                     }
                                   }}
-                                  className={`cursor-pointer border-b border-stone-100 px-4 py-3 transition hover:bg-stone-50 ${
-                                    notification.status === "no leida"
+                                  className={`cursor-pointer border-b border-stone-100 px-4 py-3 transition hover:bg-stone-50 ${notification.status === "no leida"
                                       ? "bg-amber-50"
                                       : "bg-white"
-                                  }`}
+                                    }`}
                                 >
                                   <div className="flex items-start justify-between gap-3">
                                     <div className="min-w-0 flex-1">
@@ -678,22 +676,22 @@ export default function Navbar() {
                                       <div className="mt-2 flex flex-wrap items-center gap-2">
                                         {notification.tipo ===
                                           "BLOG_APROBADO" && (
-                                          <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-700">
-                                            Aprobado
-                                          </span>
-                                        )}
+                                            <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-700">
+                                              Aprobado
+                                            </span>
+                                          )}
                                         {notification.tipo ===
                                           "BLOG_RECHAZADO" && (
-                                          <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-600">
-                                            Rechazado
-                                          </span>
-                                        )}
+                                            <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-600">
+                                              Rechazado
+                                            </span>
+                                          )}
                                         {notification.tipo ===
                                           "BLOG_PENDIENTE" && (
-                                          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
-                                            Pendiente
-                                          </span>
-                                        )}
+                                            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
+                                              Pendiente
+                                            </span>
+                                          )}
                                         <span className="text-[10px] uppercase text-stone-400">
                                           {notification.status}
                                         </span>
@@ -805,14 +803,14 @@ export default function Navbar() {
 
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 z-[9999] bg-black/40 lg:hidden"
+          className="fixed inset-0 z-[9999] bg-black/40 dark:bg-white/10 backdrop-blur-md lg:hidden transition-all duration-300"
           onClick={() => setIsMobileMenuOpen(false)}
-          aria-modal="true"
-          role="dialog"
         >
           <div
             className="fixed right-0 top-0 h-full w-4/5 max-w-xs bg-[#F9F6EE] dark:bg-stone-900 p-6 shadow-xl overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
+            aria-modal="true"
+            role="dialog"
           >
             <div className="flex items-center justify-between">
               <Logo />
@@ -839,8 +837,9 @@ export default function Navbar() {
                   retroceder desde "tour-notificaciones" al paso anterior. */}
               <button
                 id="tour-publicar-home-mobile"
-                onClick={() => {setIsMobileMenuOpen(false);
-                void handlePublicarInmueble();
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  void handlePublicarInmueble();
                 }}
                 className="rounded-md px-3 py-2 text-lg font-bold text-[#E68B25] hover:bg-[#E68B25]/10"
               >
@@ -888,7 +887,7 @@ export default function Navbar() {
                         };
                         const currentFilters = JSON.parse(
                           sessionStorage.getItem("propbol_global_filters") ||
-                            "{}",
+                          "{}",
                         );
                         sessionStorage.setItem(
                           "propbol_global_filters",
