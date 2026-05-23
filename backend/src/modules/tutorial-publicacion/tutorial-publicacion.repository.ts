@@ -8,16 +8,16 @@ const mapTutorialEstadoRecord = (record: {
   confirmado_en: Date | null;
 }): TutorialPublicacionEstadoRecord => ({
   id: record.id,
-  usuarioId: record.usuario_id,
+  usuario_id: record.usuario_id,
   confirmado: record.confirmado,
   confirmadoEn: record.confirmado_en,
 });
 
 export const findTutorialEstadoByUsuarioIdRepository = async (
-  usuarioId: number,
+  usuario_id: number,
 ): Promise<TutorialPublicacionEstadoRecord | null> => {
   const record = await prisma.tutorial_publicacion_usuario.findUnique({
-    where: { usuario_id: usuarioId },
+    where: { usuario_id: usuario_id },
     select: {
       id: true,
       usuario_id: true,
@@ -30,14 +30,14 @@ export const findTutorialEstadoByUsuarioIdRepository = async (
 };
 
 export const upsertTutorialConfirmadoRepository = async (
-  usuarioId: number,
+  usuario_id: number,
 ): Promise<TutorialPublicacionEstadoRecord> => {
   const now = new Date();
 
   const record = await prisma.tutorial_publicacion_usuario.upsert({
-    where: { usuario_id: usuarioId },
+    where: { usuario_id: usuario_id },
     create: {
-      usuario_id: usuarioId,
+      usuario_id: usuario_id,
       confirmado: true,
       confirmado_en: now,
     },
@@ -55,3 +55,4 @@ export const upsertTutorialConfirmadoRepository = async (
 
   return mapTutorialEstadoRecord(record);
 };
+

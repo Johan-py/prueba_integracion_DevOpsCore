@@ -10,3 +10,4 @@ router.get('/zonas', EstadisticasZonaController.getZonas)
 router.get('/', EstadisticasZonaController.getEstadisticas)
 
 export default router
+

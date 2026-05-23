@@ -18,3 +18,4 @@ export const encryptLinkedInAccessToken = (accessToken: string) => {
 
   return [iv.toString('base64'), authTag.toString('base64'), encrypted.toString('base64')].join('.')
 }
+

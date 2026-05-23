@@ -49,14 +49,14 @@ export class EstadisticasPublicacionController {
         });
       }
 
-      const usuarioId = req.user?.id;
+      const usuario_id = req.user?.id;
       const visitorToken = obtenerVisitorToken(req);
       const ip = obtenerIp(req);
       const userAgent = req.headers["user-agent"];
 
       const resultado = await EstadisticasPublicacionService.registrarVista({
         publicacionId,
-        usuarioId,
+        usuario_id,
         visitorToken,
         ip,
         userAgent,
@@ -91,24 +91,24 @@ export class EstadisticasPublicacionController {
 
   static async registrarVistaPorInmueble(req: AuthRequest, res: Response) {
     try {
-      const inmuebleId = Number(req.params.inmuebleId);
+      const inmueble_id = Number(req.params.inmueble_id);
 
-      if (Number.isNaN(inmuebleId)) {
+      if (Number.isNaN(inmueble_id)) {
         return res.status(400).json({
           ok: false,
           mensaje: "El id del inmueble no es válido.",
         });
       }
 
-      const usuarioId = req.user?.id;
+      const usuario_id = req.user?.id;
       const visitorToken = obtenerVisitorToken(req);
       const ip = obtenerIp(req);
       const userAgent = req.headers["user-agent"];
 
       const resultado =
         await EstadisticasPublicacionService.registrarVistaPorInmueble({
-          inmuebleId,
-          usuarioId,
+          inmueble_id,
+          usuario_id,
           visitorToken,
           ip,
           userAgent,
@@ -144,10 +144,10 @@ export class EstadisticasPublicacionController {
   static async registrarCompartido(req: AuthRequest, res: Response) {
     try {
       const publicacionId = Number(req.params.publicacionId);
-      const usuarioId = req.user?.id;
+      const usuario_id = req.user?.id;
       const { medio } = req.body as { medio?: string };
 
-      if (!usuarioId) {
+      if (!usuario_id) {
         return res.status(401).json({
           ok: false,
           mensaje: "Debe iniciar sesión para compartir una publicación.",
@@ -164,7 +164,7 @@ export class EstadisticasPublicacionController {
       const resultado =
         await EstadisticasPublicacionService.registrarCompartido({
           publicacionId,
-          usuarioId,
+          usuario_id,
           medio,
         });
 
@@ -189,18 +189,18 @@ export class EstadisticasPublicacionController {
 
   static async registrarCompartidoPorInmueble(req: AuthRequest, res: Response) {
     try {
-      const inmuebleId = Number(req.params.inmuebleId);
-      const usuarioId = req.user?.id;
+      const inmueble_id = Number(req.params.inmueble_id);
+      const usuario_id = req.user?.id;
       const { medio } = req.body as { medio?: string };
 
-      if (!usuarioId) {
+      if (!usuario_id) {
         return res.status(401).json({
           ok: false,
           mensaje: "Debe iniciar sesión para compartir una publicación.",
         });
       }
 
-      if (Number.isNaN(inmuebleId)) {
+      if (Number.isNaN(inmueble_id)) {
         return res.status(400).json({
           ok: false,
           mensaje: "El id del inmueble no es válido.",
@@ -209,8 +209,8 @@ export class EstadisticasPublicacionController {
 
       const resultado =
         await EstadisticasPublicacionService.registrarCompartidoPorInmueble({
-          inmuebleId,
-          usuarioId,
+          inmueble_id,
+          usuario_id,
           medio,
         });
 
@@ -236,9 +236,9 @@ export class EstadisticasPublicacionController {
   static async obtenerEstadisticas(req: AuthRequest, res: Response) {
     try {
       const publicacionId = Number(req.params.publicacionId);
-      const usuarioId = req.user?.id;
+      const usuario_id = req.user?.id;
 
-      if (!usuarioId) {
+      if (!usuario_id) {
         return res.status(401).json({
           ok: false,
           mensaje: "Debe iniciar sesión para ver las estadísticas.",
@@ -255,7 +255,7 @@ export class EstadisticasPublicacionController {
       const estadisticas =
         await EstadisticasPublicacionService.obtenerEstadisticas({
           publicacionId,
-          usuarioId,
+          usuario_id,
         });
 
       return res.status(200).json({
@@ -330,9 +330,9 @@ export class EstadisticasPublicacionController {
 
   static async obtenerMisPropiedadesVistas(req: AuthRequest, res: Response) {
     try {
-      const usuarioId = req.user?.id;
+      const usuario_id = req.user?.id;
 
-      if (!usuarioId) {
+      if (!usuario_id) {
         return res.status(401).json({
           ok: false,
           mensaje: "Debe iniciar sesión para ver sus propiedades vistas.",
@@ -341,7 +341,7 @@ export class EstadisticasPublicacionController {
 
       const propiedades =
         await EstadisticasPublicacionService.obtenerMisPropiedadesVistas(
-          usuarioId,
+          usuario_id,
         );
 
       return res.status(200).json({
@@ -356,3 +356,4 @@ export class EstadisticasPublicacionController {
     }
   }
 }
+

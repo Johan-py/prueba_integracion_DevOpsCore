@@ -7,3 +7,4 @@ const router = Router()
 router.get('/mi-suscripcion', requireAuth, obtenerMiSuscripcion)
 
 export default router
+

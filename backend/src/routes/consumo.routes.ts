@@ -10,3 +10,4 @@ router.get("/consumo/:userId", getConsumo);
 
 router.get("/limite", getPlanLimit);
 export default router;
+

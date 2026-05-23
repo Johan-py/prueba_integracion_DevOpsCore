@@ -17,3 +17,4 @@ router.post('/solicitar-cambio-email', validarJWT, solicitarCambioEmail)
 router.post('/confirmar-cambio-email', validarJWT, confirmarCambioEmail)
 
 export default router;
+

@@ -71,3 +71,5 @@ export const obtenerConsumo = async (userId: number) => {
     plan: plan.nombre_plan ?? 'Plan sin nombre'
   }
 }
+
+

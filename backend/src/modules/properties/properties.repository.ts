@@ -100,28 +100,28 @@ export const propertiesRepository = {
       // Fallback original: Búsqueda estricta por texto
       const texto = filtros.query.trim();
 
-      where.ubicacion_inmueble = {
+      where.ubicacion = {
         OR: [
-          { barrio: { nombre: { contains: texto, mode: "insensitive" } } },
+          { barrios: { nombre: { contains: texto, mode: "insensitive" } } },
           {
-            barrio: {
+            barrios: {
               zona_geografica: { nombre: { contains: texto, mode: "insensitive" } },
             },
           },
           {
-            barrio: {
+            barrios: {
               zona_geografica: {
-                municipio_zona_geografica_municipioTomunicipio: {
+                municipio: {
                   nombre: { contains: texto, mode: "insensitive" },
                 },
               },
             },
           },
           {
-            barrio: {
+            barrios: {
               zona_geografica: {
-                municipio_zona_geografica_municipioTomunicipio: {
-                  provincia_municipio_provinciaToprovincia: {
+                municipio: {
+                  provincia: {
                     nombre: { contains: texto, mode: "insensitive" },
                   },
                 },
@@ -129,11 +129,11 @@ export const propertiesRepository = {
             },
           },
           {
-            barrio: {
+            barrios: {
               zona_geografica: {
-                municipio_zona_geografica_municipioTomunicipio: {
-                  provincia_municipio_provinciaToprovincia: {
-                    departamento_provincia_departamentoTodepartamento: {
+                municipio: {
+                  provincia: {
+                    departamento: {
                       nombre: { contains: texto, mode: "insensitive" },
                     },
                   },
@@ -150,53 +150,53 @@ export const propertiesRepository = {
       };
     } else if (filtros.locationId) {
       // Fallback: Si no hay texto, asumimos que viene de un botón antiguo de "Ciudades Destacadas"
-      where.ubicacion_inmueble = { ubicacion_maestra_id: Number(filtros.locationId) };
+      where.ubicacion = { ubicacion_maestra_id: Number(filtros.locationId) };
     }
     // Si un nivel está seleccionado y no es "todos", lo aplicamos y las demás condiciones (else if) se ignoran.
     if (
       filtros.barrioId &&
       String(filtros.barrioId).toLowerCase() !== "todos"
     ) {
-      where.ubicacion_inmueble = {
-        ...where.ubicacion_inmueble,
+      where.ubicacion = {
+        ...where.ubicacion,
         barrio_id: Number(filtros.barrioId),
       };
     } else if (
       filtros.zonaId &&
       String(filtros.zonaId).toLowerCase() !== "todos"
     ) {
-      where.ubicacion_inmueble = {
-        ...where.ubicacion_inmueble,
-        barrio: { zona_id: Number(filtros.zonaId) },
+      where.ubicacion = {
+        ...where.ubicacion,
+        barrios: { zona_id: Number(filtros.zonaId) },
       };
     } else if (
       filtros.municipioId &&
       String(filtros.municipioId).toLowerCase() !== "todos"
     ) {
-      where.ubicacion_inmueble = {
-        ...where.ubicacion_inmueble,
-        barrio: { zona_geografica: { municipio: Number(filtros.municipioId) } },
+      where.ubicacion = {
+        ...where.ubicacion,
+        barrios: { zona_geografica: { municipio: Number(filtros.municipioId) } },
       };
     } else if (
       filtros.provinciaId &&
       String(filtros.provinciaId).toLowerCase() !== "todos"
     ) {
-      where.ubicacion_inmueble = {
-        ...where.ubicacion_inmueble,
-        barrio: {
-          zona_geografica: { municipio_zona_geografica_municipioTomunicipio: { provincia: Number(filtros.provinciaId) } },
+      where.ubicacion = {
+        ...where.ubicacion,
+        barrios: {
+          zona_geografica: { municipio: { provincia: Number(filtros.provinciaId) } },
         },
       };
     } else if (
       filtros.departamentoId &&
       String(filtros.departamentoId).toLowerCase() !== "todos"
     ) {
-      where.ubicacion_inmueble = {
-        ...where.ubicacion_inmueble,
-        barrio: {
+      where.ubicacion = {
+        ...where.ubicacion,
+        barrios: {
           zona_geografica: {
-            municipio_zona_geografica_municipioTomunicipio: {
-              provincia_municipio_provinciaToprovincia: { departamento: Number(filtros.departamentoId) },
+            municipio: {
+              provincia: { departamento: Number(filtros.departamentoId) },
             },
           },
         },
@@ -283,8 +283,7 @@ export const propertiesRepository = {
     if (filtros.labels && filtros.labels.length > 0) {
       where.AND = [
         ...(where.AND || []),
-        ...filtros.labels.map((labelId) => ({
-          publicacion: {
+        ...filtros.labels.map((labelId) => ({ publicaciones: {
             some: {
               estado: 'ACTIVA' as const,
               publicacion_tag: {
@@ -337,17 +336,16 @@ export const propertiesRepository = {
     const inmuebles = await prisma.inmueble.findMany({
       where,
       orderBy,
-      include: {
-        ubicacion_inmueble: {
+      include: { ubicacion: {
           include: {
             barrio: {
               include: {
-                zona_geografica: {
+                zona: {
                   include: {
-                    municipio_zona_geografica_municipioTomunicipio: {
+                    municipio: {
                       include: {
-                        provincia_municipio_provinciaToprovincia: {
-                          include: { departamento_provincia_departamentoTodepartamento: true },
+                        provincia: {
+                          include: { departamento: true },
                         },
                       },
                     },
@@ -358,7 +356,7 @@ export const propertiesRepository = {
             ubicacion_maestra: true,
           },
         },
-        publicacion: {
+        publicaciones: {
           where: { estado: "ACTIVA" },
           select: {
             promoted: true,
@@ -370,8 +368,8 @@ export const propertiesRepository = {
 
     // Ordenamos en memoria por promoted (no es campo directo de inmueble)
     inmuebles.sort((a, b) => {
-      const aProm = (a as any).publicacion?.some((p: any) => p.promoted === true) ?? false;
-      const bProm = (b as any).publicacion?.some((p: any) => p.promoted === true) ?? false;
+      const aProm = (a as any).publicaciones?.some((p: any) => p.promoted === true) ?? false;
+      const bProm = (b as any).publicaciones?.some((p: any) => p.promoted === true) ?? false;
       if (aProm !== bProm) return aProm ? -1 : 1;
       return 0;
     });
@@ -379,7 +377,7 @@ export const propertiesRepository = {
     let resultados =
       filtros.lat && filtros.lng
         ? inmuebles.filter((inmueble) => {
-            const u = inmueble.ubicacion_inmueble;
+            const u = inmueble.ubicacion;
             if (!u || !u.latitud || !u.longitud) return false;
 
             const lat = Number(u.latitud);
@@ -422,12 +420,12 @@ export const propertiesRepository = {
     if (filtros.fecha === "mas-populares") {
       console.log("🔥 Entrando al bloque mas-populares");
       const vistas = await prisma.propiedad_vista.groupBy({
-        by: ["inmuebleId"],
-        _count: { usuarioId: true }, // usuarios únicos por inmueble
-        orderBy: { _count: { usuarioId: "desc" } },
+        by: ["inmueble_id"],
+        _count: { usuario_id: true }, // usuarios únicos por inmueble
+        orderBy: { _count: { usuario_id: "desc" } },
       });
       const vistaMap = new Map(
-        vistas.map((v) => [v.inmuebleId, v._count.usuarioId ?? 0]),
+        vistas.map((v) => [v.inmueble_id, v._count.usuario_id ?? 0]),
       );
       return resultados.sort(
         (a, b) => (vistaMap.get(b.id) ?? 0) - (vistaMap.get(a.id) ?? 0),
@@ -465,8 +463,7 @@ export const propertiesRepository = {
         estado: "ACTIVO",
       },
       // Incluimos exactamente lo necesario para la matriz comparativa
-      include: {
-        publicacion: {
+      include: { publicaciones: {
   where: { estado: "ACTIVA" },
       select: {
        promoted: true,
@@ -479,11 +476,13 @@ export const propertiesRepository = {
         inmueble_amenidad: {
           include: { amenidad: true },
         },
-        ubicacion_inmueble: true, 
-        usuario: true,
+        ubicacion: true, 
+        propietario: true,
       },
     });
 
     return inmuebles;
   },
 };
+
+

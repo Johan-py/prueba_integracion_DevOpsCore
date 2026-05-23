@@ -458,17 +458,17 @@ export const loginService = async (payload: LoginDTO) => {
 
   if (user.two_factor_activo) {
     const codigo = generate2FACode();
-    const codigoHash = hash2FACode(codigo);
-    const expiraEn = new Date(
+    const codigo_hash = hash2FACode(codigo);
+    const expira_en = new Date(
       Date.now() + TWO_FACTOR_CODE_TTL_MINUTES * 60 * 1000,
     );
 
     await invalidateActive2FACodesByUserId(user.id);
 
     await create2FACode({
-      usuarioId: user.id,
-      codigoHash,
-      expiraEn,
+      usuario_id: user.id,
+      codigo_hash,
+      expira_en,
     });
 
     const emailResult = await enviarCodigo2FA({
@@ -497,12 +497,12 @@ export const loginService = async (payload: LoginDTO) => {
   };
 
   const token = generateToken(jwtPayload);
-  const fechaExpiracion = new Date(Date.now() + 60 * 60 * 1000);
+  const fecha_expiracion = new Date(Date.now() + 60 * 60 * 1000);
 
   await createSession({
     token,
-    usuarioId: user.id,
-    fechaExpiracion,
+    usuario_id: user.id,
+    fecha_expiracion,
   });
 
   return {
@@ -552,14 +552,14 @@ export const verify2FAService = async ({ userId, codigo }: Verify2FADTO) => {
     throw new AuthError("El código es incorrecto", 401);
   }
 
-  if (activeCode.expiraEn.getTime() < Date.now()) {
+  if (activeCode.expira_en.getTime() < Date.now()) {
     await expire2FACode(activeCode.id);
     throw new AuthError("El código ha expirado", 401);
   }
 
-  const codigoHash = hash2FACode(normalizedCode);
+  const codigo_hash = hash2FACode(normalizedCode);
 
-  if (codigoHash !== activeCode.codigoHash) {
+  if (codigo_hash !== activeCode.codigo_hash) {
     await increment2FACodeAttempts(activeCode.id, activeCode.intentos ?? 0);
     throw new AuthError("El código es incorrecto", 401);
   }
@@ -572,12 +572,12 @@ export const verify2FAService = async ({ userId, codigo }: Verify2FADTO) => {
   };
 
   const token = generateToken(jwtPayload);
-  const fechaExpiracion = new Date(Date.now() + 60 * 60 * 1000);
+  const fecha_expiracion = new Date(Date.now() + 60 * 60 * 1000);
 
   await createSession({
     token,
-    usuarioId: user.id,
-    fechaExpiracion,
+    usuario_id: user.id,
+    fecha_expiracion,
   });
 
   return {
@@ -605,10 +605,10 @@ export const registerUser = async (payload: RegisterDTO) => {
   const codigo = generateRegisterCode();
   const nonce = crypto.randomUUID();
 
-  const codigoHash = hash2FACode(codigo);
+  const codigo_hash = hash2FACode(codigo);
   cache.set(
     `last_reg_code_${normalized.correo}`,
-    codigoHash,
+    codigo_hash,
     REGISTER_CODE_TTL_MINUTES * 60 * 1000,
   );
 
@@ -669,10 +669,10 @@ export const verifyRegisterCodeService = async (
     throw new Error("El código ingresado no es válido");
   }
 
-  const codigoHash = hash2FACode(codigo);
+  const codigo_hash = hash2FACode(codigo);
   const lastCodeHash = cache.get<string>(`last_reg_code_${decoded.correo}`);
 
-  if (lastCodeHash && lastCodeHash !== codigoHash) {
+  if (lastCodeHash && lastCodeHash !== codigo_hash) {
     throw new AuthError(
       "El código ingresado ha sido reemplazado. Por favor, use el código del correo más reciente",
       401,
@@ -712,12 +712,12 @@ export const verifyRegisterCodeService = async (
   };
 
   const token = generateToken(jwtPayload);
-  const fechaExpiracion = new Date(Date.now() + 60 * 60 * 1000);
+  const fecha_expiracion = new Date(Date.now() + 60 * 60 * 1000);
 
   await createSession({
     token,
-    usuarioId: newUser.id,
-    fechaExpiracion,
+    usuario_id: newUser.id,
+    fecha_expiracion,
   });
 
   return {
@@ -726,7 +726,7 @@ export const verifyRegisterCodeService = async (
       nombre: newUser.nombre,
       apellido: newUser.apellido,
       correo: newUser.correo,
-      telefono_telefono_usuarioIdTousuario: newUser.telefono_telefono_usuarioIdTousuario,
+      telefono_telefono_usuario_idTousuario: newUser.telefonos,
     },
     token,
   };
@@ -933,12 +933,12 @@ export const loginWithGoogleCodeService = async (code: string) => {
   };
 
   const token = generateToken(jwtPayload);
-  const fechaExpiracion = new Date(Date.now() + 60 * 60 * 1000);
+  const fecha_expiracion = new Date(Date.now() + 60 * 60 * 1000);
 
   await createSession({
     token,
-    usuarioId: user.id,
-    fechaExpiracion,
+    usuario_id: user.id,
+    fecha_expiracion,
   });
 
   return {
@@ -1001,7 +1001,7 @@ export const requestMagicLinkService = async (payload: RequestMagicLinkDTO) => {
     validateMagicLinkRequestLimit(correo);
 
     const serverNow = await getServerTime();
-    const expiraEn = new Date(
+    const expira_en = new Date(
       serverNow.getTime() + MAGIC_LINK_TTL_MINUTES * 60 * 1000,
     );
 
@@ -1023,10 +1023,10 @@ export const requestMagicLinkService = async (payload: RequestMagicLinkDTO) => {
     await invalidateActiveMagicLinksByUserId(user.id);
 
     await createMagicLink({
-      usuarioId: user.id,
+      usuario_id: user.id,
       tokenHash,
       correo: user.correo,
-      expiraEn,
+      expira_en,
     });
 
     const magicLink = `${env.FRONTEND_URL}/magic-link-sent?token=${magicToken}`;
@@ -1158,12 +1158,12 @@ export const loginWithMagicLinkService = async ({
   };
 
   const sessionToken = generateToken(sessionPayload);
-  const fechaExpiracion = new Date(Date.now() + 60 * 60 * 1000);
+  const fecha_expiracion = new Date(Date.now() + 60 * 60 * 1000);
 
   await createSession({
     token: sessionToken,
-    usuarioId: user.id,
-    fechaExpiracion,
+    usuario_id: user.id,
+    fecha_expiracion,
     metodo_auth: "magic_link",
   });
 
@@ -1217,16 +1217,16 @@ export const forgotPasswordService = async (payload: ForgotPasswordDTO) => {
   }
 
   const resetToken = crypto.randomUUID();
-  const expiraEn = new Date(
+  const expira_en = new Date(
     Date.now() + RESET_PASSWORD_TTL_MINUTES * 60 * 1000,
   );
 
   await desactivarRecuperacionesPasswordActivas(user.id);
 
   await createPasswordRecovery({
-    usuarioId: user.id,
+    usuario_id: user.id,
     token: resetToken,
-    expiraEn,
+    expira_en,
   });
 
   const resetLink = `${env.FRONTEND_URL}/reset-password?token=${resetToken}`;
@@ -1297,7 +1297,7 @@ export const resetPasswordService = async (payload: ResetPasswordDTO) => {
     throw new AuthError("El enlace no es válido o ya fue utilizado", 400);
   }
 
-  if (new Date() > recovery.expiraEn) {
+  if (new Date() > recovery.expira_en) {
     throw new AuthError("El enlace ha expirado. Solicita uno nuevo.", 400);
   }
 
@@ -1314,7 +1314,7 @@ export const resetPasswordService = async (payload: ResetPasswordDTO) => {
   tokenAttempts.set(token, attempts + 1);
 
   // Obtener el usuario para validar que la nueva contraseña sea diferente
-  const user = await findUserById(recovery.usuarioId);
+  const user = await findUserById(recovery.usuario_id);
 
   if (!user) {
     throw new AuthError("Usuario no encontrado", 404);
@@ -1331,14 +1331,14 @@ export const resetPasswordService = async (payload: ResetPasswordDTO) => {
   await prisma.$transaction([
     prisma.recuperacion_password.update({
       where: { id: recovery.id },
-      data: { usadoEn: new Date(), activo: false },
+      data: { usado_en: new Date(), activo: false },
     }),
     prisma.usuario.update({
-      where: { id: recovery.usuarioId },
+      where: { id: recovery.usuario_id },
       data: { password },
     }),
     prisma.sesion.updateMany({
-      where: { usuarioId: recovery.usuarioId, estado: true },
+      where: { usuario_id: recovery.usuario_id, estado: true },
       data: { estado: false },
     }),
   ]);
@@ -1365,17 +1365,17 @@ export const resend2FAService = async (userId: number) => {
   }
 
   const codigo = generate2FACode();
-  const codigoHash = hash2FACode(codigo);
-  const expiraEn = new Date(
+  const codigo_hash = hash2FACode(codigo);
+  const expira_en = new Date(
     Date.now() + TWO_FACTOR_CODE_TTL_MINUTES * 60 * 1000,
   );
 
   await invalidateActive2FACodesByUserId(user.id);
 
   await create2FACode({
-    usuarioId: user.id,
-    codigoHash,
-    expiraEn,
+    usuario_id: user.id,
+    codigo_hash,
+    expira_en,
   });
 
   const emailResult = await enviarCodigo2FA({
@@ -1412,17 +1412,17 @@ export const requestActivationCodeService = async (correo: string) => {
   }
 
   const codigo = generate2FACode();
-  const codigoHash = hash2FACode(codigo);
-  const expiraEn = new Date(
+  const codigo_hash = hash2FACode(codigo);
+  const expira_en = new Date(
     Date.now() + TWO_FACTOR_CODE_TTL_MINUTES * 60 * 1000,
   );
 
   await invalidateActive2FACodesByUserId(user.id);
 
   await create2FACode({
-    usuarioId: user.id,
-    codigoHash,
-    expiraEn,
+    usuario_id: user.id,
+    codigo_hash,
+    expira_en,
   });
 
   const emailResult = await enviarCodigoActivacionCuenta({
@@ -1477,15 +1477,15 @@ export const activateAccountByCodeService = async (
     throw new AuthError("El código es inválido", 401);
   }
 
-  if (activeCode.expiraEn.getTime() < Date.now()) {
+  if (activeCode.expira_en.getTime() < Date.now()) {
     await expire2FACode(activeCode.id);
     throw new AuthError("El código expiró", 401);
   }
 
-  const codigoHash = hash2FACode(normalizedCode);
+  const codigo_hash = hash2FACode(normalizedCode);
 
-  if (codigoHash !== activeCode.codigoHash) {
-    const anyCode = await findAny2FACodeByUserIdAndHash(user.id, codigoHash);
+  if (codigo_hash !== activeCode.codigo_hash) {
+    const anyCode = await findAny2FACodeByUserIdAndHash(user.id, codigo_hash);
 
     if (anyCode) {
       throw new AuthError(
@@ -1516,10 +1516,10 @@ export const resendRegisterCodeService = async (verificationToken: string) => {
   const codigo = generateRegisterCode();
   const nonce = crypto.randomUUID();
 
-  const codigoHash = hash2FACode(codigo);
+  const codigo_hash = hash2FACode(codigo);
   cache.set(
     `last_reg_code_${decoded.correo}`,
-    codigoHash,
+    codigo_hash,
     REGISTER_CODE_TTL_MINUTES * 60 * 1000,
   );
 
@@ -1554,3 +1554,4 @@ export const resendRegisterCodeService = async (verificationToken: string) => {
     expiresInMinutes: REGISTER_CODE_TTL_MINUTES,
   };
 };
+

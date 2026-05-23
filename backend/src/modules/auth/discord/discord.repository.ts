@@ -21,7 +21,7 @@ export const findUserByDiscordId = async (discordId: string) => {
   const social = await prisma.autenticacion_social.findFirst({
     where: {
       proveedor: 'discord',
-      idExterno: discordId,
+      id_externo: discordId,
       activo: true
     },
     include: {
@@ -41,7 +41,7 @@ export const findUserByDiscordEmail = async (correo: string) => {
 export const createDiscordUser = async (
   data: CreateDiscordUserInput,
   discordId: string,
-  correoProveedor: string
+  correo_proveedor: string
 ) => {
   const user = await createUser({
     nombre: data.nombre,
@@ -51,10 +51,10 @@ export const createDiscordUser = async (
   })
 
   await createSocialLink({
-    usuarioId: user.id,
+    usuario_id: user.id,
     proveedor: 'discord',
-    idExterno: discordId,
-    correoProveedor
+    id_externo: discordId,
+    correo_proveedor
   })
 
   return user
@@ -62,31 +62,31 @@ export const createDiscordUser = async (
 
 // Vincula Discord a un usuario existente (si se registró con email y luego vincula Discord)
 export const linkDiscordToUser = async (
-  usuarioId: number,
+  usuario_id: number,
   discordId: string,
-  correoProveedor: string
+  correo_proveedor: string
 ) => {
   return await createSocialLink({
-    usuarioId,
+    usuario_id,
     proveedor: 'discord',
-    idExterno: discordId,
-    correoProveedor
+    id_externo: discordId,
+    correo_proveedor
   })
 }
 
 export const createDiscordSession = async ({
   token,
-  usuarioId,
-  fechaExpiracion
+  usuario_id,
+  fecha_expiracion
 }: {
   token: string
-  usuarioId: number
-  fechaExpiracion: Date
+  usuario_id: number
+  fecha_expiracion: Date
 }) => {
   return await createSession({
     token,
-    usuarioId,
-    fechaExpiracion
+    usuario_id,
+    fecha_expiracion
   })
 }
 
@@ -94,24 +94,24 @@ export const findDiscordLinkByExternalId = async (discordId: string) => {
   return await findSocialLinkByProviderAndExternalId('discord', discordId)
 }
 
-export const findDiscordLinkByUserId = async (usuarioId: number) => {
-  return await findSocialLinkByUserAndProvider(usuarioId, 'discord')
+export const findDiscordLinkByUserId = async (usuario_id: number) => {
+  return await findSocialLinkByUserAndProvider(usuario_id, 'discord')
 }
 
 export const createDiscordLinkForUser = async ({
-  usuarioId,
+  usuario_id,
   discordId,
-  correoProveedor
+  correo_proveedor
 }: {
-  usuarioId: number
+  usuario_id: number
   discordId: string
-  correoProveedor?: string | null
+  correo_proveedor?: string | null
 }) => {
   return await createSocialLink({
-    usuarioId,
+    usuario_id,
     proveedor: 'discord',
-    idExterno: discordId,
-    correoProveedor
+    id_externo: discordId,
+    correo_proveedor
   })
 }
 
@@ -119,12 +119,12 @@ export const findUserByDiscordSessionToken = async (sessionToken: string) => {
   return await findUserByActiveSessionTokenForSocialLink(sessionToken)
 }
 
-export const updateDiscordLastUsage = async (usuarioId: number, discordId: string) => {
+export const updateDiscordLastUsage = async (usuario_id: number, discordId: string) => {
   return await prisma.autenticacion_social.updateMany({
     where: {
-      usuarioId,
+      usuario_id,
       proveedor: 'discord',
-      idExterno: discordId,
+      id_externo: discordId,
       activo: true
     },
     data: {
@@ -132,3 +132,4 @@ export const updateDiscordLastUsage = async (usuarioId: number, discordId: strin
     }
   })
 }
+

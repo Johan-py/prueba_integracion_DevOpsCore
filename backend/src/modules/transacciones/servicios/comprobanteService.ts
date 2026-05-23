@@ -38,3 +38,4 @@ export async function emitirComprobante(transaccionId: number): Promise<boolean>
 
   return resultado.success
 }
+

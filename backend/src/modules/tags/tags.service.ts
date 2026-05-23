@@ -104,25 +104,25 @@ const buildInmuebleWhereFromFilters = (filtros: TagsContextFilters): Prisma.inmu
   }
 
   if (filtros.barrioId && filtros.barrioId !== 'todos') {
-    where.ubicacion_inmueble = { barrio_id: Number(filtros.barrioId) }
+    where.ubicacion = { barrio_id: Number(filtros.barrioId) }
   } else if (filtros.zonaId && filtros.zonaId !== 'todos') {
-    where.ubicacion_inmueble = { barrio: { zona_id: Number(filtros.zonaId) } }
+    where.ubicacion = { barrio: { zona_id: Number(filtros.zonaId) } }
   } else if (filtros.municipioId && filtros.municipioId !== 'todos') {
-    where.ubicacion_inmueble = {
-      barrio: { zona_geografica: { municipio: Number(filtros.municipioId) } }
+    where.ubicacion = {
+      barrio: { zona: { municipio_id: Number(filtros.municipioId) } }
     }
   } else if (filtros.provinciaId && filtros.provinciaId !== 'todos') {
-    where.ubicacion_inmueble = {
+    where.ubicacion = {
       barrio: {
-        zona_geografica: { municipio_zona_geografica_municipioTomunicipio: { provincia: Number(filtros.provinciaId) } }
+        zona: { municipio: { provincia_id: Number(filtros.provinciaId) } }
       }
     }
   } else if (filtros.departamentoId && filtros.departamentoId !== 'todos') {
-    where.ubicacion_inmueble = {
+    where.ubicacion = {
       barrio: {
-        zona_geografica: {
-          municipio_zona_geografica_municipioTomunicipio: {
-            provincia_municipio_provinciaToprovincia: { departamento: Number(filtros.departamentoId) }
+        zona: {
+          municipio: {
+            provincia: { departamento_id: Number(filtros.departamentoId) }
           }
         }
       }
@@ -173,3 +173,4 @@ export const tagsService = {
   getTagsByPublicacion,
   replacePublicacionTags
 }
+

@@ -28,7 +28,7 @@ const r2 = (n: number): number => Math.round(n * 100) / 100
  * Devuelve la referencia + QR para el flujo manual de pago.
  */
 export async function crearOrdenPublicidad(
-  usuarioId: number,
+  usuario_id: number,
   publicacionId: number,
   planId: number,
 ) {
@@ -40,7 +40,7 @@ export async function crearOrdenPublicidad(
     select: { id: true, usuario_id: true, estado: true, promoted: true },
   })
   if (!publicacion) throw new Error('PUBLICACION_NO_EXISTE')
-  if (publicacion.usuario_id !== usuarioId) throw new Error('NO_AUTORIZADO')
+  if (publicacion.usuario_id !== usuario_id) throw new Error('NO_AUTORIZADO')
   if (publicacion.estado === 'ELIMINADA') throw new Error('PUBLICACION_YA_ELIMINADA')
   if (publicacion.promoted) throw new Error('PUBLICACION_YA_PUBLICITADA')
 
@@ -64,7 +64,7 @@ export async function crearOrdenPublicidad(
 
   const transaccion = await prisma.transacciones.create({
     data: {
-      id_usuario: usuarioId,
+      id_usuario: usuario_id,
       id_suscripcion: planFK.id,
       subtotal,
       iva_porcentaje: ivaPorcentaje,
@@ -78,7 +78,7 @@ export async function crearOrdenPublicidad(
 
   await prisma.bitacora_pagos.create({
     data: {
-      id_usuario: usuarioId,
+      id_usuario: usuario_id,
       id_transaccion: transaccion.id,
       evento: EVENTO_PUBLICIDAD,
       mensaje: JSON.stringify({ publicacionId, planId }),
@@ -98,7 +98,7 @@ export async function crearOrdenPublicidad(
     metodo_pago: METODO_PUBLICIDAD,
     estado: 'PENDIENTE',
     qrContent: planFK.imagen_gr_url ?? null,
-    fechaExpiracion: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+    fecha_expiracion: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
   }
 }
 
@@ -125,3 +125,4 @@ export async function obtenerDatosPublicidad(
     return null
   }
 }
+

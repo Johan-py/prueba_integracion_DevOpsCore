@@ -91,3 +91,4 @@ export async function aplicarCupon(transaccionId: number, codigo: string, totalO
 
   return { total: nuevoTotal, montoDescuento }
 }
+

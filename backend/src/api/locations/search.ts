@@ -17,3 +17,4 @@ export default async function locationSearchHandler(
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }
+

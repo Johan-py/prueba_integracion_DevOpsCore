@@ -4,6 +4,7 @@ import { requireAuth } from '../../middleware/auth.middleware.js'
 
 const router = Router()
 
-router.post('/inmueble/:inmuebleId', requireAuth, crearPoi)
+router.post('/inmueble/:inmueble_id', requireAuth, crearPoi)
 
 export default router
+

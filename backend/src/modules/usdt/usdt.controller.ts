@@ -12,8 +12,8 @@ const toMessage = (e: unknown) => (e instanceof Error ? e.message : 'Error inter
 
 export const crearPagoUsdt = async (req: AuthRequest, res: Response) => {
   try {
-    const usuarioId = req.user?.id
-    if (!usuarioId) return res.status(401).json({ error: 'No autenticado' })
+    const usuario_id = req.user?.id
+    if (!usuario_id) return res.status(401).json({ error: 'No autenticado' })
 
     const { transaccionId } = req.body
     if (!transaccionId) return res.status(400).json({ error: 'Falta transaccionId' })
@@ -23,7 +23,7 @@ export const crearPagoUsdt = async (req: AuthRequest, res: Response) => {
       include: { plan_suscripcion: true },
     })
     if (!transaccion) return res.status(404).json({ error: 'Transacción no encontrada' })
-    if (transaccion.id_usuario !== usuarioId) return res.status(403).json({ error: 'Sin permiso' })
+    if (transaccion.id_usuario !== usuario_id) return res.status(403).json({ error: 'Sin permiso' })
     if (transaccion.estado !== 'PENDIENTE') {
       return res.status(409).json({ error: 'La transacción ya no está pendiente' })
     }
@@ -37,7 +37,7 @@ export const crearPagoUsdt = async (req: AuthRequest, res: Response) => {
     const { bob_per_usdt } = getExchangeRate()
     const totalUsdt = convertirBobAUsdt(totalBob)
     const walletAddress = process.env.TRON_WALLET_ADDRESS ?? ''
-    const fechaExpiracion = new Date(
+    const fecha_expiracion = new Date(
       (transaccion.fecha_intento?.getTime() ?? Date.now()) + 30 * 60 * 1000
     )
 
@@ -49,7 +49,7 @@ export const crearPagoUsdt = async (req: AuthRequest, res: Response) => {
       bob_per_usdt,
       red: 'Shasta Testnet',
       token: 'USDT (TRC20)',
-      fechaExpiracion: fechaExpiracion.toISOString(),
+      fecha_expiracion: fecha_expiracion.toISOString(),
       referencia: `PAY-${transaccion.id}`,
       planNombre: transaccion.plan_suscripcion?.nombre_plan ?? '—',
     })
@@ -85,10 +85,10 @@ export const verificarPagoUsdt = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'Esta orden fue cancelada. Genera una nueva.' })
     }
 
-    const fechaExpiracion = new Date(
+    const fecha_expiracion = new Date(
       (transaccion.fecha_intento?.getTime() ?? Date.now()) + 30 * 60 * 1000
     )
-    if (Date.now() > fechaExpiracion.getTime()) {
+    if (Date.now() > fecha_expiracion.getTime()) {
       await prisma.transacciones.update({ where: { id }, data: { estado: 'CANCELADO' } })
       return res.status(400).json({ error: 'Tiempo de pago expirado. Genera una nueva orden.' })
     }
@@ -154,3 +154,4 @@ export const obtenerTipoCambio = (_req: Request, res: Response) => {
   const red = process.env.TRON_NETWORK === 'shasta' ? 'Shasta Testnet' : 'Mainnet'
   return res.json({ bob_per_usdt, walletAddress, red })
 }
+

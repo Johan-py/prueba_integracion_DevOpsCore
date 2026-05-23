@@ -19,13 +19,13 @@ const toMessage = (error: unknown): string =>
 export const generarPagoQr = async (req: AuthRequest, res: Response) => {
   try {
     const { idSuscripcion, userId } = req.body
-    const usuarioId: number = req.user?.id ?? userId ?? 1
+    const usuario_id: number = req.user?.id ?? userId ?? 1
 
     if (!idSuscripcion) {
       return res.status(400).json({ error: 'Falta idSuscripcion' })
     }
 
-    const { transaccion, plan } = await crearTransaccion(usuarioId, parseInt(idSuscripcion))
+    const { transaccion, plan } = await crearTransaccion(usuario_id, parseInt(idSuscripcion))
 
     return res.status(201).json({
       id: transaccion.id,
@@ -41,7 +41,7 @@ export const generarPagoQr = async (req: AuthRequest, res: Response) => {
       verificacion_requerida: transaccion.verificacion_requerida,
       monto_descuento: Number(transaccion.monto_descuento ?? 0),
       referencia: `REF-${transaccion.id}`,
-      fechaExpiracion: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+      fecha_expiracion: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
       qrContent: plan.imagen_gr_url ?? null,
       plan_suscripcion: {
         nombre_plan: plan.nombre_plan,
@@ -124,7 +124,7 @@ export const obtenerPagoPendiente = async (req: Request, res: Response) => {
       referencia: `REF-${transaccion.id}`,
       estado: transaccion.estado?.toLowerCase() ?? 'pendiente',
       qrContent: transaccion.plan_suscripcion?.imagen_gr_url ?? null,
-      fechaExpiracion: new Date(
+      fecha_expiracion: new Date(
         (transaccion.fecha_intento?.getTime() ?? Date.now()) + 30 * 60 * 1000
       ).toISOString(),
       subtotal: Number(transaccion.subtotal),
@@ -363,11 +363,11 @@ export const listarTransaccionesAdmin = async (_req: Request, res: Response) => 
 
 export const listarMisTransacciones = async (req: AuthRequest, res: Response) => {
   try {
-    const usuarioId = req.user?.id
-    if (!usuarioId) return res.status(401).json({ error: 'No autenticado' })
+    const usuario_id = req.user?.id
+    if (!usuario_id) return res.status(401).json({ error: 'No autenticado' })
 
     const transacciones = await prisma.transacciones.findMany({
-      where: { id_usuario: usuarioId },
+      where: { id_usuario: usuario_id },
       include: { plan_suscripcion: { select: { nombre_plan: true } } },
       orderBy: { fecha_intento: 'desc' },
     })
@@ -595,3 +595,4 @@ export const cancelarTransaccion = async (req: Request, res: Response) => {
     return res.status(500).json({ error: toMessage(error) })
   }
 }
+

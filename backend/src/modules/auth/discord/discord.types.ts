@@ -45,3 +45,4 @@ export class DiscordAuthError extends Error {
     this.statusCode = statusCode;
   }
 }
+

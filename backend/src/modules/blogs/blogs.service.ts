@@ -185,7 +185,7 @@ export const blogsService = {
 
       try {
         await createBlogNotificationService({
-          usuarioId: blog.usuario_id,
+          usuario_id: blog.usuario_id,
           blog_id: originalBlogId,
           blogTitulo: updatedOriginal.titulo,
           tipo: "BLOG_APROBADO",
@@ -225,7 +225,7 @@ export const blogsService = {
 
     try {
       await createBlogNotificationService({
-        usuarioId: blog.usuario_id,
+        usuario_id: blog.usuario_id,
         blog_id: id,
         blogTitulo: blog.titulo,
         tipo: estado === "PUBLICADO" ? "BLOG_APROBADO" : "BLOG_RECHAZADO",
@@ -351,3 +351,4 @@ export const comentariosService = {
     return comentarioEliminado;
   },
 };
+

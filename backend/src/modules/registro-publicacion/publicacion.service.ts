@@ -54,3 +54,4 @@ const createProperty = async (data: any, userId: number) => {
 }
 
 export default { createProperty }
+

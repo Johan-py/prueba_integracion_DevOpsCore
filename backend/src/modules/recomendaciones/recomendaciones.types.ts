@@ -4,7 +4,7 @@ export interface InmuebleConScore {
   precio: number
   superficie_m2: number | null
   categoria: string | null
-  ubicacion_inmueble: {
+  ubicacion: {
     zona: string | null
     ciudad: string | null
   } | null
@@ -14,8 +14,8 @@ export interface InmuebleConScore {
 }
 
 export interface HistorialVista {
-  inmuebleId: number
-  vistaEn: Date
+  inmueble_id: number
+  vista_en: Date
   peso: number // 1.0 para últimos 7 días, menor para más antiguos
 }
 
@@ -29,7 +29,7 @@ export interface PreferenciasUsuario {
 }
 
 export interface RecomendacionesParams {
-  usuarioId?: number
+  usuario_id?: number
   limit?: number
   excludeIds?: number[] // Inmuebles a excluir
   zonaForzada?: string // Para forzar 60% de una zona
@@ -61,3 +61,4 @@ export interface SimilaridadFuerte {
   rangoPrecioCercano: boolean // precio dentro del ±20% respecto a un favorito
   rangoSuperficieCercano: boolean // superficie dentro del ±20% respecto a un favorito
 }
+

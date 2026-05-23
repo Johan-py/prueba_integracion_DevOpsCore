@@ -36,3 +36,4 @@ export const getIO = (): SocketServer => {
   }
   return io;
 };
+

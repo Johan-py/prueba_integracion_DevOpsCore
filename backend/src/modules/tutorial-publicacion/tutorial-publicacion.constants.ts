@@ -23,3 +23,4 @@ export const TUTORIAL_PUBLICACION_CONTENT: TutorialPublicacionContent = {
   subtitlesUrl: getOptionalEnv("TUTORIAL_PUBLICACION_SUBTITLES_URL"),
   checkboxLabel: "Sí entiendo qué necesito para publicar una propiedad",
 };
+

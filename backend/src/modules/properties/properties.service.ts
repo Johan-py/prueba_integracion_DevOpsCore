@@ -19,3 +19,4 @@ export const propertiesService = {
     return propertiesRepository.getByIds(ids);
   },
 };
+

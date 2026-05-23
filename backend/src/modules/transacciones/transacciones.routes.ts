@@ -39,3 +39,4 @@ router.post('/:id/cupon', aplicarCupon)
 router.get('/:id/estado', consultarEstadoPago)
 
 export default router
+

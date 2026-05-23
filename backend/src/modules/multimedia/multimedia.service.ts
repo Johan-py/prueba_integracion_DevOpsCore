@@ -250,3 +250,4 @@ export const registerImagesService = async ({
     multimedia: createdImages
   }
 }
+

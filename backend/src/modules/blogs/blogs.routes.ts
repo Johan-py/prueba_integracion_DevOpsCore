@@ -62,3 +62,4 @@ router.post("/comentarios/:id/like", requireAuth, toggleLikeComentario);
 router.delete("/comentarios/:id", requireAuth, eliminarComentario);
 
 export default router;
+

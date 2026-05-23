@@ -21,7 +21,7 @@ export const obtenerMiSuscripcion = async (req: AuthRequest, res: Response) => {
         precioPlan: suscripcion.plan_suscripcion?.precio_plan
           ? Number(suscripcion.plan_suscripcion.precio_plan)
           : null,
-        fechaInicio: suscripcion.fecha_inicio,
+        fecha_inicio: suscripcion.fecha_inicio,
         fechaFin: suscripcion.fecha_fin,
       })
     }
@@ -42,7 +42,7 @@ export const obtenerMiSuscripcion = async (req: AuthRequest, res: Response) => {
         precioPlan: expirada.plan_suscripcion?.precio_plan
           ? Number(expirada.plan_suscripcion.precio_plan)
           : null,
-        fechaInicio: expirada.fecha_inicio,
+        fecha_inicio: expirada.fecha_inicio,
         fechaFin: expirada.fecha_fin,
       })
     }
@@ -54,3 +54,4 @@ export const obtenerMiSuscripcion = async (req: AuthRequest, res: Response) => {
     })
   }
 }
+

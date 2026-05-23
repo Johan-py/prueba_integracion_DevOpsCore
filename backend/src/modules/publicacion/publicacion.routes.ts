@@ -22,7 +22,7 @@ const router = Router();
 router.get("/mias", requireAuth, listarMisPublicacionesController);
 router.get("/:id/resumen-final", requireAuth, obtenerResumenFinalController);
 router.get(
-  "/inmueble/:inmuebleId/detalle",
+  "/inmueble/:inmueble_id/detalle",
   obtenerDetallePublicacionPorInmuebleController,
 );
 router.get("/:id/detalle", obtenerDetallePublicacionController);
@@ -63,3 +63,4 @@ router.delete(
 router.get("/:id/publicitar/estado", obtenerEstadoPublicidadController);
 
 export default router;
+

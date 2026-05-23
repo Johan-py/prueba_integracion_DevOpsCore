@@ -60,9 +60,9 @@ const buildErrorResponse = (error: unknown) => {
 
 export const getNotificationsController = async (req: Request, res: Response) => {
   try {
-    const usuarioId = getUserIdFromRequest(req as AuthenticatedRequest)
+    const usuario_id = getUserIdFromRequest(req as AuthenticatedRequest)
 
-    if (!usuarioId) {
+    if (!usuario_id) {
       return res.status(401).json({
         message: 'No autorizado'
       })
@@ -74,7 +74,7 @@ export const getNotificationsController = async (req: Request, res: Response) =>
     const offset =
       typeof req.query.offset === 'string' ? Number.parseInt(req.query.offset, 10) : undefined
 
-    const result = await getNotificationsService(usuarioId, {
+    const result = await getNotificationsService(usuario_id, {
       filter,
       limit,
       offset
@@ -97,7 +97,7 @@ export const getNotificationByIdController = async (req: Request, res: Response)
 
     const notification = await getNotificationByIdService({
       id,
-      usuarioId: userId
+      usuario_id: userId
     })
 
     if (!notification) {
@@ -112,15 +112,15 @@ export const getNotificationByIdController = async (req: Request, res: Response)
 
 export const getUnreadCountController = async (req: Request, res: Response) => {
   try {
-    const usuarioId = getUserIdFromRequest(req as AuthenticatedRequest)
+    const usuario_id = getUserIdFromRequest(req as AuthenticatedRequest)
 
-    if (!usuarioId) {
+    if (!usuario_id) {
       return res.status(401).json({
         message: 'No autorizado'
       })
     }
 
-    const result = await getUnreadCountService(usuarioId)
+    const result = await getUnreadCountService(usuario_id)
 
     return res.status(200).json(result)
   } catch (error) {
@@ -166,16 +166,16 @@ export const markNotificationAsReadController = async (
   res: Response
 ) => {
   try {
-    const usuarioId = getUserIdFromRequest(req as AuthenticatedRequest)
+    const usuario_id = getUserIdFromRequest(req as AuthenticatedRequest)
 
-    if (!usuarioId) {
+    if (!usuario_id) {
       return res.status(401).json({
         message: 'No autorizado'
       })
     }
 
     const id = Number.parseInt(req.params.id, 10)
-    const result = await markNotificationAsReadService(id, usuarioId)
+    const result = await markNotificationAsReadService(id, usuario_id)
 
     return res.status(200).json(result)
   } catch (error) {
@@ -189,15 +189,15 @@ export const markNotificationAsReadController = async (
 
 export const markAllNotificationsAsReadController = async (req: Request, res: Response) => {
   try {
-    const usuarioId = getUserIdFromRequest(req as AuthenticatedRequest)
+    const usuario_id = getUserIdFromRequest(req as AuthenticatedRequest)
 
-    if (!usuarioId) {
+    if (!usuario_id) {
       return res.status(401).json({
         message: 'No autorizado'
       })
     }
 
-    const result = await markAllNotificationsAsReadService(usuarioId)
+    const result = await markAllNotificationsAsReadService(usuario_id)
 
     return res.status(200).json(result)
   } catch (error) {
@@ -214,16 +214,16 @@ export const deleteNotificationController = async (
   res: Response
 ) => {
   try {
-    const usuarioId = getUserIdFromRequest(req as AuthenticatedRequest)
+    const usuario_id = getUserIdFromRequest(req as AuthenticatedRequest)
 
-    if (!usuarioId) {
+    if (!usuario_id) {
       return res.status(401).json({
         message: 'No autorizado'
       })
     }
 
     const id = Number.parseInt(req.params.id, 10)
-    const result = await deleteNotificationService(id, usuarioId)
+    const result = await deleteNotificationService(id, usuario_id)
 
     return res.status(200).json(result)
   } catch (error) {
@@ -240,10 +240,10 @@ export const archiveNotificationController = async (
   res: Response
 ) => {
   try {
-    const usuarioId = req.user!.id // 👈 CAMBIO CLAVE
+    const usuario_id = req.user!.id // 👈 CAMBIO CLAVE
 
     const id = Number.parseInt(req.params.id, 10)
-    const result = await archiveNotificationService(id, usuarioId)
+    const result = await archiveNotificationService(id, usuario_id)
 
     return res.status(200).json(result)
   } catch (error) {
@@ -254,3 +254,4 @@ export const archiveNotificationController = async (
     })
   }
 }
+

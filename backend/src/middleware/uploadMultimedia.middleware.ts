@@ -24,3 +24,4 @@ export const uploadMultimedia = multer({
   },
   fileFilter,
 });
+

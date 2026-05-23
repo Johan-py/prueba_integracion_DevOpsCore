@@ -5,23 +5,22 @@ export const historialController = {
   // GET: Obtener historial real
   getHistorialVistas: async (req: Request, res: Response) => {
     try {
-      const usuarioId = (req as any).user?.id
-      if (!usuarioId) return res.status(401).json({ error: 'No autorizado' })
+      const usuario_id = (req as any).user?.id
+      if (!usuario_id) return res.status(401).json({ error: 'No autorizado' })
 
       const historial = await prisma.propiedad_vista.findMany({
         where: {
-          usuarioId: Number(usuarioId),
+          usuario_id: Number(usuario_id),
           activo: true // Solo mostramos los que no han sido "limpiados"
         },
         include: {
           inmueble: {
-            include: {
-              ubicacion_inmueble: true,
-              publicacion: { include: { multimedia: true }, take: 1 }
+            include: { ubicacion: true,
+              publicaciones: { include: { multimedia: true }, take: 1 }
             }
           }
         },
-        orderBy: { vistaEn: 'desc' }
+        orderBy: { vista_en: 'desc' }
       })
 
       return res.json({
@@ -30,9 +29,9 @@ export const historialController = {
           id: item.id,
           title: item.inmueble?.titulo || 'Sin título',
           price: item.inmueble?.precio,
-          location: item.inmueble?.ubicacion_inmueble?.ciudad,
-          viewedDate: item.vistaEn,
-          imageUrl: item.inmueble?.publicacion[0]?.multimedia[0]?.url || null,
+          location: item.inmueble?.ubicacion?.ciudad,
+          viewedDate: item.vista_en,
+          imageUrl: item.inmueble?.publicaciones[0]?.multimedia[0]?.url || null,
           activo: (item as any).activo // Mostramos el estado
         }))
       })
@@ -44,12 +43,12 @@ export const historialController = {
   // PATCH: Limpiar historial (Borrado lógico)
   deleteHistorial: async (req: Request, res: Response) => {
     try {
-      const usuarioId = (req as any).user?.id
-      if (!usuarioId) return res.status(401).json({ error: 'No autorizado' })
+      const usuario_id = (req as any).user?.id
+      if (!usuario_id) return res.status(401).json({ error: 'No autorizado' })
 
       // Actualizamos todos los registros del usuario a activo = false
       const resultado = await prisma.propiedad_vista.updateMany({
-        where: { usuarioId: Number(usuarioId) },
+        where: { usuario_id: Number(usuario_id) },
         data: { activo: false } as any // El 'as any' evita errores de tipado si Prisma aún no se refrescó
       })
 
@@ -65,3 +64,4 @@ export const historialController = {
     }
   }
 }
+

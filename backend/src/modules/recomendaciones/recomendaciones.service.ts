@@ -12,15 +12,15 @@ export class RecomendacionesService {
     this.scoreCalculator = new ScoreCalculator()
   }
 
-  async getRecomendacionesPorPopularidad(zona: string, limit: number = 20, usuarioId?: number) {
-    const populares = await this.repository.getInmueblesPopularesPorZona(zona, limit, usuarioId)
+  async getRecomendacionesPorPopularidad(zona: string, limit: number = 20, usuario_id?: number) {
+    const populares = await this.repository.getInmueblesPopularesPorZona(zona, limit, usuario_id)
     return populares.map((p) => ({
       id: p.id,
       titulo: p.titulo,
       precio: Number(p.precio),
       superficie_m2: p.superficie_m2 ? Number(p.superficie_m2) : null,
       categoria: p.categoria ?? null,
-      ubicacion_inmueble: p.ubicacion_inmueble,
+      ubicacion: p.ubicacion,
       score: 50,
       razones: [`Popular en ${zona} (últimos 7 días)`]
     }))
@@ -29,17 +29,17 @@ export class RecomendacionesService {
   async getRecomendacionesGlobales(
     params: RecomendacionesParams & { ia?: boolean }
   ): Promise<InmuebleConScore[]> {
-    const { usuarioId, limit = 20, excludeIds = [], zonaForzada, ia, ...filtros } = params
-    if (!usuarioId) {
+    const { usuario_id, limit = 20, excludeIds = [], zonaForzada, ia, ...filtros } = params
+    if (!usuario_id) {
       const zonaAEvaluar = zonaForzada || 'Cochabamba'
       return this.getRecomendacionesPorPopularidad(zonaAEvaluar, limit)
     }
 
     if (ia) {
-      console.log(`[ML] Solicitando recomendaciones con ML para usuario ${usuarioId}`)
+      console.log(`[ML] Solicitando recomendaciones con ML para usuario ${usuario_id}`)
 
       const resultadosML = await featuresService.recomendar(
-        Number(usuarioId), // 1er argumento: usuarioId
+        Number(usuario_id), // 1er argumento: usuario_id
         limit, // 2do argumento: limit
         {
           // 3er argumento: objeto de filtros
@@ -58,20 +58,20 @@ export class RecomendacionesService {
       console.log('[ML] Sin resultados suficientes, usando fallback')
     }
 
-    const cacheKey = `recomendaciones_globales_usuario_${usuarioId}_limit_${limit}_zona_${zonaForzada || 'none'}`
+    const cacheKey = `recomendaciones_globales_usuario_${usuario_id}_limit_${limit}_zona_${zonaForzada || 'none'}`
     const cached = cache.get<InmuebleConScore[]>(cacheKey)
     if (cached) {
-      console.log(`[Cache] Hit para usuario ${usuarioId}`)
+      console.log(`[Cache] Hit para usuario ${usuario_id}`)
       return cached
     }
-    console.log(`[Cache] Miss para usuario ${usuarioId}, calculando...`)
-    const zonaConexion = await this.repository.getZonaConexionUsuario(usuarioId)
-    const historialVistas = await this.repository.getHistorialVistas(usuarioId)
-    const ultimasBusquedas = await this.repository.getUltimasBusquedas(usuarioId)
-    const favoritos = await this.repository.getFavoritos(usuarioId)
+    console.log(`[Cache] Miss para usuario ${usuario_id}, calculando...`)
+    const zonaConexion = await this.repository.getZonaConexionUsuario(usuario_id)
+    const historialVistas = await this.repository.getHistorialVistas(usuario_id)
+    const ultimasBusquedas = await this.repository.getUltimasBusquedas(usuario_id)
+    const favoritos = await this.repository.getFavoritos(usuario_id)
     const favoritosIds = favoritos.map((f: any) => f.id)
     const totalClics = historialVistas.length
-    console.log('usuarioId:', usuarioId)
+    console.log('usuario_id:', usuario_id)
     console.log('historialVistas.length:', historialVistas.length)
     console.log('favoritos.length:', favoritos.length)
     console.log('zonaConexion:', zonaConexion)
@@ -79,7 +79,7 @@ export class RecomendacionesService {
     if (historialVistas.length === 0 && favoritos.length === 0) {
       const zonaAEvaluar = zonaForzada || zonaConexion
       if (zonaAEvaluar) {
-        return await this.getRecomendacionesPorPopularidad(zonaAEvaluar, limit, usuarioId)
+        return await this.getRecomendacionesPorPopularidad(zonaAEvaluar, limit, usuario_id)
       }
       const populares = await this.repository.getInmueblesPopulares(limit)
       return populares.map((p) => ({
@@ -88,7 +88,7 @@ export class RecomendacionesService {
         precio: Number(p.precio),
         superficie_m2: p.superficie_m2 ? Number(p.superficie_m2) : null,
         categoria: p.categoria ?? null,
-        ubicacion_inmueble: p.ubicacion_inmueble,
+        ubicacion: p.ubicacion,
         score: 50,
         razones: ['Popularidad general']
       }))
@@ -100,17 +100,17 @@ export class RecomendacionesService {
       favoritos
     )
 
-    let candidatos = await this.repository.getInmueblesCandidatos(usuarioId, 100)
+    let candidatos = await this.repository.getInmueblesCandidatos(usuario_id, 100)
 
     if (zonaConexion) {
       const totalRequeridos = limit
       const minDeZona = Math.ceil(totalRequeridos * 0.6)
 
       const deZonaConexion = candidatos.filter((c) =>
-        c.ubicacion_inmueble?.zona?.toLowerCase().includes(zonaConexion.toLowerCase())
+        c.ubicacion?.zona?.toLowerCase().includes(zonaConexion.toLowerCase())
       )
       const otrasZonas = candidatos.filter(
-        (c) => !c.ubicacion_inmueble?.zona?.toLowerCase().includes(zonaConexion.toLowerCase())
+        (c) => !c.ubicacion?.zona?.toLowerCase().includes(zonaConexion.toLowerCase())
       )
 
       if (deZonaConexion.length < minDeZona) {
@@ -141,7 +141,7 @@ export class RecomendacionesService {
 
       if (
         zonaConexion &&
-        inmueble.ubicacion_inmueble?.zona?.toLowerCase().includes(zonaConexion.toLowerCase())
+        inmueble.ubicacion?.zona?.toLowerCase().includes(zonaConexion.toLowerCase())
       ) {
         scoreFinal += 10
         razones.push(`Zona de conexión (${zonaConexion}) +10pts`)
@@ -154,7 +154,7 @@ export class RecomendacionesService {
           precio: Number(inmueble.precio),
           superficie_m2: inmueble.superficie_m2 ? Number(inmueble.superficie_m2) : null,
           categoria: inmueble.categoria ?? null,
-          ubicacion_inmueble: inmueble.ubicacion_inmueble,
+          ubicacion: inmueble.ubicacion,
           score: scoreFinal,
           razones
         })
@@ -168,10 +168,10 @@ export class RecomendacionesService {
     return resultado
   }
 
-  async ordenarPorAfinidad(inmuebleIds: number[], usuarioId: number): Promise<InmuebleConScore[]> {
-    const historialVistas = await this.repository.getHistorialVistas(usuarioId)
-    const ultimasBusquedas = await this.repository.getUltimasBusquedas(usuarioId)
-    const favoritos = await this.repository.getFavoritos(usuarioId)
+  async ordenarPorAfinidad(inmuebleIds: number[], usuario_id: number): Promise<InmuebleConScore[]> {
+    const historialVistas = await this.repository.getHistorialVistas(usuario_id)
+    const ultimasBusquedas = await this.repository.getUltimasBusquedas(usuario_id)
+    const favoritos = await this.repository.getFavoritos(usuario_id)
     const totalClics = historialVistas.length
     const inmuebles = await this.repository.getInmueblesPorIds(inmuebleIds)
 
@@ -182,7 +182,7 @@ export class RecomendacionesService {
         precio: Number(p.precio),
         superficie_m2: p.superficie_m2 ? Number(p.superficie_m2) : null,
         categoria: p.categoria ?? null,
-        ubicacion_inmueble: p.ubicacion_inmueble,
+        ubicacion: p.ubicacion,
         score: 0,
         razones: ['Sin historial']
       }))
@@ -208,7 +208,7 @@ export class RecomendacionesService {
         precio: Number(inmueble.precio),
         superficie_m2: inmueble.superficie_m2 ? Number(inmueble.superficie_m2) : null,
         categoria: inmueble.categoria ?? null,
-        ubicacion_inmueble: inmueble.ubicacion_inmueble,
+        ubicacion: inmueble.ubicacion,
         score,
         razones
       }
@@ -218,8 +218,8 @@ export class RecomendacionesService {
     return resultado
   }
   async getRecomendacionesGlobalesML(params: RecomendacionesParams): Promise<InmuebleConScore[]> {
-    const { usuarioId, limit, zonaForzada } = params
-    if (!usuarioId) {
+    const { usuario_id, limit, zonaForzada } = params
+    if (!usuario_id) {
       const zona = zonaForzada || 'Cochabamba'
       return this.getRecomendacionesPorPopularidad(zona, limit)
     }
@@ -228,3 +228,4 @@ export class RecomendacionesService {
     return this.getRecomendacionesGlobales(params)
   }
 }
+

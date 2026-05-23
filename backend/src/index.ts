@@ -1,4 +1,4 @@
-﻿import path from "path";
+import path from "path";
 import http from "http";
 import "dotenv/config";
 import express from "express";
@@ -125,7 +125,7 @@ import testimoniosRoutes from './modules/testimonios/testimonios.routes.js'
 // --------------------
 // LEGACY
 // --------------------
-// Borra la l├¡nea 66 y pon esta:
+// Borra la l+�nea 66 y pon esta:
 import historialRoutes from './modules/perfil/historial.routes.js'
 
 // --------------------
@@ -369,7 +369,7 @@ app.patch('/notificaciones/:id/archivar', requireAuth, archiveNotificationContro
 // --------------------
 app.post('/api/publicaciones', (req, res) => {
   const nuevaPublicacion = req.body
-  res.json({ message: 'Publicaci├│n creada', publicacion: nuevaPublicacion })
+  res.json({ message: 'Publicaci+�n creada', publicaciones: nuevaPublicacion })
 })
 
 // --------------------
@@ -390,14 +390,14 @@ async function seedPlanes() {
   await prisma.plan_suscripcion.createMany({
     data: [
       {
-        nombre_plan: 'B├ísico',
+        nombre_plan: 'B+�sico',
         precio_plan: 0,
         nro_publicaciones_plan: 3,
         duracion_plan_dias: 30,
         imagen_gr_url: '/qrs/basico.png'
       },
       {
-        nombre_plan: 'Est├índar',
+        nombre_plan: 'Est+�ndar',
         precio_plan: 99,
         nro_publicaciones_plan: 10,
         duracion_plan_dias: 30,
@@ -412,7 +412,7 @@ async function seedPlanes() {
       }
     ]
   })
-  console.log('Ô£à Planes de suscripci├│n inicializados en DB')
+  console.log('ԣ� Planes de suscripci+�n inicializados en DB')
 }
 
 iniciarCronRetroalimentacion()
@@ -421,7 +421,7 @@ const server = http.createServer(app);
 initSocket(server);
 
 server.listen(PORT, async () => {
-  console.log(`­ƒÜÇ Server running on port ${PORT}`);
+  console.log(`���� Server running on port ${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/health`);
   await cargarModeloActivo()
 
@@ -429,16 +429,17 @@ server.listen(PORT, async () => {
   try {
     await seedPlanes()
   } catch (error) {
-    console.error('ÔØî Error al inicializar planes:', error)
+    console.error('��� Error al inicializar planes:', error)
   }
 
 
   try {
     await verifyEmailTransport()
-    console.log('Ô£à Servicio de email de registro listo')
+    console.log('ԣ� Servicio de email de registro listo')
   } catch (error) {
-    console.error('ÔØî Error en configuraci├│n de email de registro:', error)
+    console.error('��� Error en configuraci+�n de email de registro:', error)
   }
 })
 
 export default app
+

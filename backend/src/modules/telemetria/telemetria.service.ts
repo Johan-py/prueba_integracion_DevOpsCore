@@ -8,18 +8,19 @@ export class TelemetriaService {
     this.repository = new TelemetriaRepository()
   }
 
-  async trackSearch(usuarioId: number | null, ip: string, searchData: SearchTelemetriaData) {
-    return await this.repository.guardarBusqueda(usuarioId, ip, {
+  async trackSearch(usuario_id: number | null, ip: string, searchData: SearchTelemetriaData) {
+    return await this.repository.guardarBusqueda(usuario_id, ip, {
       ...searchData,
       timestamp: new Date().toISOString()
     })
   }
 
-  async trackClick(usuarioId: number, clickData: ClickTelemetriaData) {
-    return await this.repository.registrarClickInmueble(usuarioId, clickData.inmuebleId)
+  async trackClick(usuario_id: number, clickData: ClickTelemetriaData) {
+    return await this.repository.registrarClickInmueble(usuario_id, clickData.inmueble_id)
   }
 
-  async getRecomendados(usuarioId?: number): Promise<number[]> {
-    return await this.repository.obtenerInmueblesRecomendados(usuarioId)
+  async getRecomendados(usuario_id?: number): Promise<number[]> {
+    return await this.repository.obtenerInmueblesRecomendados(usuario_id)
   }
 }
+

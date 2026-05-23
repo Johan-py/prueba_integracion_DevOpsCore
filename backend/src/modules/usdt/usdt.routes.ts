@@ -9,3 +9,4 @@ router.post('/', requireAuth, crearPagoUsdt)
 router.post('/:id/verificar', requireAuth, verificarPagoUsdt)
 
 export default router
+

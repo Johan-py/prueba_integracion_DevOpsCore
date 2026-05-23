@@ -19,3 +19,4 @@ export const createUserRepository = async (data: payload) => {
 
   return newUser;
 };
+

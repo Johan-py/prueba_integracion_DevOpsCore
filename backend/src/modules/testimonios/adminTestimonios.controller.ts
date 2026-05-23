@@ -286,3 +286,4 @@ export const deleteAdminTestimonio = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Error interno del servidor" });
   }
 };
+

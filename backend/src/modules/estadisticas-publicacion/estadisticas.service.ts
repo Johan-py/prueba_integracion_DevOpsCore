@@ -4,15 +4,15 @@ import { prisma } from "../../lib/prisma.client.js";
 
 type RegistrarVistaParams = {
   publicacionId: number;
-  usuarioId?: number;
+  usuario_id?: number;
   visitorToken?: string;
   ip: string;
   userAgent?: string;
 };
 
 type RegistrarVistaPorInmuebleParams = {
-  inmuebleId: number;
-  usuarioId?: number;
+  inmueble_id: number;
+  usuario_id?: number;
   visitorToken?: string;
   ip: string;
   userAgent?: string;
@@ -20,19 +20,19 @@ type RegistrarVistaPorInmuebleParams = {
 
 type RegistrarCompartidoParams = {
   publicacionId: number;
-  usuarioId: number;
+  usuario_id: number;
   medio?: string;
 };
 
 type RegistrarCompartidoPorInmuebleParams = {
-  inmuebleId: number;
-  usuarioId: number;
+  inmueble_id: number;
+  usuario_id: number;
   medio?: string;
 };
 
 type ObtenerEstadisticasParams = {
   publicacionId: number;
-  usuarioId: number;
+  usuario_id: number;
 };
 
 export class EstadisticasPublicacionService {
@@ -40,12 +40,12 @@ export class EstadisticasPublicacionService {
     token,
     ip,
     userAgent,
-    usuarioId,
+    usuario_id,
   }: {
     token?: string;
     ip: string;
     userAgent?: string;
-    usuarioId?: number;
+    usuario_id?: number;
   }) {
     if (token) {
       const visitorExistente = await prisma.visitor.findUnique({
@@ -65,10 +65,10 @@ export class EstadisticasPublicacionService {
       data: {
         token: nuevoToken,
         ip,
-        usuario_id: usuarioId || null,
+        usuario_id: usuario_id || null,
         meta_data: {
           userAgent: userAgent || null,
-          tipo: usuarioId ? "USUARIO_REGISTRADO" : "VISITANTE",
+          tipo: usuario_id ? "USUARIO_REGISTRADO" : "VISITANTE",
         },
       },
     });
@@ -76,7 +76,7 @@ export class EstadisticasPublicacionService {
 
   static async registrarVista({
     publicacionId,
-    usuarioId,
+    usuario_id,
     visitorToken,
     ip,
     userAgent,
@@ -108,14 +108,14 @@ export class EstadisticasPublicacionService {
       token: visitorToken,
       ip,
       userAgent,
-      usuarioId,
+      usuario_id,
     });
 
     await prisma.$transaction(async (tx) => {
       await tx.publicacion_vista.create({
         data: {
           publicacion_id: publicacionId,
-          usuario_id: usuarioId || null,
+          usuario_id: usuario_id || null,
           visitor_id: visitor.id,
           ip,
           user_agent: userAgent || null,
@@ -143,24 +143,24 @@ export class EstadisticasPublicacionService {
         Esto actualiza la sección "Mis propiedades vistas".
         Solo se guarda cuando el usuario está logueado.
       */
-      if (usuarioId) {
+      if (usuario_id) {
         await tx.propiedad_vista.upsert({
           where: {
-            usuarioId_inmuebleId: {
-        usuarioId: usuarioId,
-              inmuebleId: publicacion.inmueble_id,
+            usuario_id_inmueble_id: {
+        usuario_id: usuario_id,
+              inmueble_id: publicacion.inmueble_id,
             },
           },
           update: {
             veces_visto: {
               increment: 1,
             },
-            vistaEn: new Date(),
+            vista_en: new Date(),
             activo: true,
           },
           create: {
-            usuarioId: usuarioId,
-            inmuebleId: publicacion.inmueble_id,
+            usuario_id: usuario_id,
+            inmueble_id: publicacion.inmueble_id,
             veces_visto: 1,
             activo: true,
           },
@@ -176,15 +176,15 @@ export class EstadisticasPublicacionService {
   }
 
   static async registrarVistaPorInmueble({
-    inmuebleId,
-    usuarioId,
+    inmueble_id,
+    usuario_id,
     visitorToken,
     ip,
     userAgent,
   }: RegistrarVistaPorInmuebleParams) {
     const publicacion = await prisma.publicacion.findFirst({
       where: {
-        inmueble_id: inmuebleId,
+        inmueble_id: inmueble_id,
         estado: EstadoPublicacion.ACTIVA,
       },
       select: {
@@ -198,7 +198,7 @@ export class EstadisticasPublicacionService {
 
     return this.registrarVista({
       publicacionId: publicacion.id,
-      usuarioId,
+      usuario_id,
       visitorToken,
       ip,
       userAgent,
@@ -207,7 +207,7 @@ export class EstadisticasPublicacionService {
 
   static async registrarCompartido({
     publicacionId,
-    usuarioId,
+    usuario_id,
     medio,
   }: RegistrarCompartidoParams) {
     const publicacion = await prisma.publicacion.findUnique({
@@ -235,7 +235,7 @@ export class EstadisticasPublicacionService {
       await tx.publicacion_compartido.create({
         data: {
           publicacion_id: publicacionId,
-          usuario_id: usuarioId,
+          usuario_id: usuario_id,
           medio: medio || "GENERAL",
         },
       });
@@ -265,13 +265,13 @@ export class EstadisticasPublicacionService {
   }
 
   static async registrarCompartidoPorInmueble({
-    inmuebleId,
-    usuarioId,
+    inmueble_id,
+    usuario_id,
     medio,
   }: RegistrarCompartidoPorInmuebleParams) {
     const publicacion = await prisma.publicacion.findFirst({
       where: {
-        inmueble_id: inmuebleId,
+        inmueble_id: inmueble_id,
         estado: EstadoPublicacion.ACTIVA,
       },
       select: {
@@ -285,14 +285,14 @@ export class EstadisticasPublicacionService {
 
     return this.registrarCompartido({
       publicacionId: publicacion.id,
-      usuarioId,
+      usuario_id,
       medio,
     });
   }
 
   static async obtenerEstadisticas({
     publicacionId,
-    usuarioId,
+    usuario_id,
   }: ObtenerEstadisticasParams) {
     const publicacion = await prisma.publicacion.findUnique({
       where: {
@@ -310,7 +310,7 @@ export class EstadisticasPublicacionService {
       throw new Error("PUBLICACION_NO_EXISTE");
     }
 
-    if (publicacion.usuario_id !== usuarioId) {
+    if (publicacion.usuario_id !== usuario_id) {
       throw new Error("NO_ES_PROPIETARIO");
     }
 
@@ -333,19 +333,18 @@ export class EstadisticasPublicacionService {
     };
   }
 
-  static async obtenerMisPropiedadesVistas(usuarioId: number) {
+  static async obtenerMisPropiedadesVistas(usuario_id: number) {
     const vistas = await prisma.propiedad_vista.findMany({
       where: {
-        usuarioId: usuarioId,
+        usuario_id: usuario_id,
         activo: true,
       },
       orderBy: {
-        vistaEn: "desc",
+        vista_en: "desc",
       },
       include: {
         inmueble: {
-          include: {
-            publicacion: {
+          include: { publicaciones: {
               where: {
                 estado: EstadoPublicacion.ACTIVA,
               },
@@ -353,14 +352,14 @@ export class EstadisticasPublicacionService {
                 multimedia: true,
               },
             },
-            ubicacion_inmueble: true,
+            ubicacion: true,
           },
         },
       },
     });
 
     const publicacionesIds = vistas
-      .map((vista) => vista.inmueble.publicacion[0]?.id)
+      .map((vista) => vista.inmueble.publicaciones[0]?.id)
       .filter((id): id is number => typeof id === "number");
 
     const estadisticas = await prisma.publicacion_estadistica.findMany({
@@ -390,7 +389,7 @@ export class EstadisticasPublicacionService {
     });
 
     return vistas.map((vista) => {
-      const publicacionActiva = vista.inmueble.publicacion[0];
+      const publicacionActiva = vista.inmueble.publicaciones[0];
 
       const estadistica = publicacionActiva
         ? estadisticasPorPublicacion.get(publicacionActiva.id)
@@ -398,20 +397,20 @@ export class EstadisticasPublicacionService {
 
       return {
         propiedadVistaId: vista.id,
-        inmuebleId: vista.inmuebleId,
+        inmueble_id: vista.inmueble_id,
         publicacionId: publicacionActiva?.id || null,
         titulo: vista.inmueble.titulo,
         descripcion: vista.inmueble.descripcion,
         precio: Number(vista.inmueble.precio),
         categoria: vista.inmueble.categoria,
         tipoAccion: vista.inmueble.tipo_accion,
-        zona: vista.inmueble.ubicacion_inmueble?.zona || null,
-        ciudad: vista.inmueble.ubicacion_inmueble?.ciudad || null,
+        zona: vista.inmueble.ubicacion?.zona || null,
+        ciudad: vista.inmueble.ubicacion?.ciudad || null,
         imagen:
           publicacionActiva?.multimedia?.find((item) => item.tipo === "IMAGEN")
             ?.url || null,
         vecesVisto: vista.veces_visto || 1,
-        ultimaVista: vista.vistaEn,
+        ultimaVista: vista.vista_en,
         totalVisualizaciones: estadistica?.total_visualizaciones ?? 0,
         totalCompartidos: estadistica?.total_compartidos ?? 0,
       };
@@ -476,3 +475,4 @@ export class EstadisticasPublicacionService {
     }, {});
   }
 }
+

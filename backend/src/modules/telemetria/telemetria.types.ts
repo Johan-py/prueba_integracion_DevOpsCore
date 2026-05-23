@@ -11,7 +11,8 @@ export interface SearchTelemetriaData {
 }
 
 export interface ClickTelemetriaData {
-  inmuebleId: number
+  inmueble_id: number
   posicionLista?: number
   filtrosAplicados?: any
 }
+

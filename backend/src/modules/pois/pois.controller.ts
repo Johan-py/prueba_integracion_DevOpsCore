@@ -3,9 +3,9 @@ import { prisma } from '../../lib/prisma.client.js'
 import { Prisma } from '@prisma/client'
 
 export const crearPoi = async (req: Request, res: Response) => {
-  const inmuebleId = parseInt(req.params.inmuebleId as string)
+  const inmueble_id = parseInt(req.params.inmueble_id as string)
 
-  if (isNaN(inmuebleId)) {
+  if (isNaN(inmueble_id)) {
     return res.status(400).json({ mensaje: 'ID de inmueble inválido' })
   }
 
@@ -21,7 +21,7 @@ export const crearPoi = async (req: Request, res: Response) => {
         nombre,
         latitud: new Prisma.Decimal(latitud),
         longitud: new Prisma.Decimal(longitud),
-        inmueble_id: inmuebleId
+        inmueble_id: inmueble_id
       }
     })
 
@@ -31,3 +31,4 @@ export const crearPoi = async (req: Request, res: Response) => {
     return res.status(500).json({ mensaje: 'Error al guardar el punto de interés' })
   }
 }
+

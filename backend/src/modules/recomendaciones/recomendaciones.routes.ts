@@ -15,3 +15,4 @@ router.post('/ordenar', validarJWT, ordenarPorAfinidad)
 router.post('/invalidar-cache', validarJWT, invalidarCacheUsuario)
 
 export default router
+

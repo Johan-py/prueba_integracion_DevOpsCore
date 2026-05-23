@@ -8,8 +8,8 @@ import {
 
 const SUPPORTED_PROVIDERS = ['facebook', 'discord', 'google', 'linkedin'] as const
 
-export const getSocialLinksService = async (usuarioId: number) => {
-  const links = await listSocialLinksByUser(usuarioId)
+export const getSocialLinksService = async (usuario_id: number) => {
+  const links = await listSocialLinksByUser(usuario_id)
 
   const facebook = links.find((item) => item.proveedor === 'facebook')
   const discord = links.find((item) => item.proveedor === 'discord')
@@ -26,33 +26,33 @@ export const getSocialLinksService = async (usuarioId: number) => {
   return {
     facebook: {
       linked: Boolean(facebook),
-      linkedEmail: facebook?.correoProveedor ?? null,
-      linkedAt: facebook?.vinculadoEn?.toISOString() ?? null,
+      linkedEmail: facebook?.correo_proveedor ?? null,
+      linkedAt: facebook?.vinculado_en?.toISOString() ?? null,
       requiresReauthorization: false
     },
     discord: {
       linked: Boolean(discord),
-      linkedEmail: discord?.correoProveedor ?? null,
-      linkedAt: discord?.vinculadoEn?.toISOString() ?? null,
+      linkedEmail: discord?.correo_proveedor ?? null,
+      linkedAt: discord?.vinculado_en?.toISOString() ?? null,
       requiresReauthorization: false
     },
     google: {
       linked: Boolean(google),
-      linkedEmail: google?.correoProveedor ?? null,
-      linkedAt: google?.vinculadoEn?.toISOString() ?? null,
+      linkedEmail: google?.correo_proveedor ?? null,
+      linkedAt: google?.vinculado_en?.toISOString() ?? null,
       requiresReauthorization: false
     },
     linkedin: {
       linked: Boolean(linkedin),
-      linkedEmail: linkedin?.correoProveedor ?? null,
-      linkedAt: linkedin?.vinculadoEn?.toISOString() ?? null,
+      linkedEmail: linkedin?.correo_proveedor ?? null,
+      linkedAt: linkedin?.vinculado_en?.toISOString() ?? null,
       requiresReauthorization: isLinkedInTokenExpired
     }
   }
 }
 
 export const unlinkSocialProviderService = async (
-  usuarioId: number,
+  usuario_id: number,
   provider: string,
   currentToken: string
 ) => {
@@ -60,22 +60,22 @@ export const unlinkSocialProviderService = async (
     throw new Error('Proveedor no soportado.')
   }
 
-  const existingLink = await findSocialLinkByUserAndProvider(usuarioId, provider)
+  const existingLink = await findSocialLinkByUserAndProvider(usuario_id, provider)
 
   if (!existingLink) {
     throw new Error('La red social no está vinculada.')
   }
 
-  const activeLinksCount = await countActiveSocialLinksByUser(usuarioId)
+  const activeLinksCount = await countActiveSocialLinksByUser(usuario_id)
 
   if (activeLinksCount <= 1) {
     throw new Error('No puedes desvincular esta red porque es tu único método de acceso activo.')
   }
 
-  await deactivateSocialLinkByUserAndProvider(usuarioId, provider)
+  await deactivateSocialLinkByUserAndProvider(usuario_id, provider)
 
   if (provider === 'linkedin') {
-    await invalidateOtherSessionsByAuthMethod(usuarioId, 'linkedin', currentToken)
+    await invalidateOtherSessionsByAuthMethod(usuario_id, 'linkedin', currentToken)
   }
 
   return {
@@ -84,8 +84,9 @@ export const unlinkSocialProviderService = async (
   }
 }
 
-export const getLinkedInOriginalEmail = async (usuarioId: number) => {
-  const link = await findSocialLinkByUserAndProvider(usuarioId, 'linkedin')
+export const getLinkedInOriginalEmail = async (usuario_id: number) => {
+  const link = await findSocialLinkByUserAndProvider(usuario_id, 'linkedin')
   if (!link) return null
-  return link.correoProveedor ?? null
+  return link.correo_proveedor ?? null
 }
+

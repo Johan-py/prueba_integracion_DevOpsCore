@@ -35,3 +35,4 @@ export const verifyJwtToken = (token: string) => {
     exp: number;
   };
 };
+

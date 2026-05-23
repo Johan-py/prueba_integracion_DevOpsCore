@@ -21,8 +21,8 @@ const ERROR_STATUS: Record<string, number> = {
  */
 export const crearSesionPublicidad = async (req: AuthRequest, res: Response) => {
   try {
-    const usuarioId = req.user?.id
-    if (!usuarioId) {
+    const usuario_id = req.user?.id
+    if (!usuario_id) {
       return res.status(401).json({ ok: false, message: 'No autenticado' })
     }
 
@@ -36,10 +36,11 @@ export const crearSesionPublicidad = async (req: AuthRequest, res: Response) => 
       return res.status(400).json({ ok: false, message: 'planId debe ser 1 (Básico) o 2 (Premium)' })
     }
 
-    const orden = await crearOrdenPublicidad(usuarioId, publicacionId, planId)
+    const orden = await crearOrdenPublicidad(usuario_id, publicacionId, planId)
     return res.status(201).json({ ok: true, data: orden })
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Error interno'
     return res.status(ERROR_STATUS[msg] ?? 500).json({ ok: false, message: msg })
   }
 }
+

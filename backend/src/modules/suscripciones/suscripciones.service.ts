@@ -4,12 +4,12 @@ export const suscripcionesService = {
   /**
    * Obtiene la suscripción activa de un usuario
    */
-  async obtenerSuscripcionActiva(usuarioId: number) {
+  async obtenerSuscripcionActiva(usuario_id: number) {
     const hoy = new Date();
 
     const suscripcion = await prisma.suscripciones_activas.findFirst({
       where: {
-        id_usuario: usuarioId,
+        id_usuario: usuario_id,
         estado: "ACTIVA",
         fecha_inicio: { lte: hoy },
         fecha_fin: { gte: hoy },
@@ -25,8 +25,8 @@ export const suscripcionesService = {
   /**
    * Verifica si el usuario tiene suscripción activa
    */
-  async tieneSuscripcionActiva(usuarioId: number): Promise<boolean> {
-    const suscripcion = await this.obtenerSuscripcionActiva(usuarioId);
+  async tieneSuscripcionActiva(usuario_id: number): Promise<boolean> {
+    const suscripcion = await this.obtenerSuscripcionActiva(usuario_id);
     return !!suscripcion;
   },
 
@@ -35,8 +35,8 @@ export const suscripcionesService = {
    * - Si tiene suscripción activa: retorna el límite del plan
    * - Si no tiene suscripción: retorna 3 (límite gratuito)
    */
-  async obtenerLimitePublicaciones(usuarioId: number): Promise<number> {
-    const suscripcion = await this.obtenerSuscripcionActiva(usuarioId);
+  async obtenerLimitePublicaciones(usuario_id: number): Promise<number> {
+    const suscripcion = await this.obtenerSuscripcionActiva(usuario_id);
 
     if (suscripcion?.plan_suscripcion?.nro_publicaciones_plan) {
       return suscripcion.plan_suscripcion.nro_publicaciones_plan;
@@ -49,15 +49,15 @@ export const suscripcionesService = {
   /**
    * Verifica si el usuario puede crear más publicaciones
    */
-  async puedeCrearPublicacion(usuarioId: number): Promise<{
+  async puedeCrearPublicacion(usuario_id: number): Promise<{
     puede: boolean;
     limite: number;
     usadas: number;
     mensaje: string;
   }> {
-    const limite = await this.obtenerLimitePublicaciones(usuarioId);
+    const limite = await this.obtenerLimitePublicaciones(usuario_id);
     const usadas = await prisma.publicacion.count({
-      where: { usuario_id: usuarioId },
+      where: { usuario_id: usuario_id },
     });
 
     const puede = usadas < limite;
@@ -72,3 +72,4 @@ export const suscripcionesService = {
     };
   },
 };
+

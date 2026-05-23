@@ -194,3 +194,4 @@ export const enviarCodigoRegistro = async ({
     textContent: `${saludo}\n\nTu código de verificación es: ${codigo}\n\nExpira en 5 minutos.`,
   });
 };
+

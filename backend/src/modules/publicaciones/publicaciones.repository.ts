@@ -23,8 +23,7 @@ export const publicacionesRepository = {
       where: { usuario_id: userId },
       include: {
         inmueble: {
-          include: {
-            ubicacion_inmueble: true,
+          include: { ubicacion: true,
           },
         },
         multimedia: true,
@@ -96,3 +95,5 @@ export const publicacionesRepository = {
     };
   },
 };
+
+

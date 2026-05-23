@@ -54,7 +54,7 @@ export const deactivateUserAccountRepository = async (
     }),
     prisma.sesion.updateMany({
       where: {
-        usuarioId: userId,
+        usuario_id: userId,
         estado: true,
       },
       data: {
@@ -69,10 +69,11 @@ export const findUserGoogleAuthRepository = async (
 ): Promise<boolean> => {
   const socialAuth = await prisma.autenticacion_social.findFirst({
     where: {
-      usuarioId: userId,
+      usuario_id: userId,
       proveedor: "google",
       activo: true,
     },
   });
   return Boolean(socialAuth);
 };
+

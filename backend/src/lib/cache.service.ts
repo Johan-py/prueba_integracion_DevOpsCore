@@ -28,9 +28,9 @@ class CacheService {
   clear(): void {
     this.cache.clear()
   }
-  invalidateUsuario(usuarioId: number): void {
+  invalidateUsuario(usuario_id: number): void {
     for (const key of this.cache.keys()) {
-      if (key.includes(`usuario_${usuarioId}`)) {
+      if (key.includes(`usuario_${usuario_id}`)) {
         this.cache.delete(key)
       }
     }
@@ -38,3 +38,4 @@ class CacheService {
 }
 
 export const cache = new CacheService()
+

@@ -20,3 +20,4 @@ router.post(
 router.post("/properties/cancel", cancelProperty);
 
 export default router;
+

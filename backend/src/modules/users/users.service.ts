@@ -32,3 +32,4 @@ export const createUserService = async (data: payload) => {
 
   return createUserRepository(userData);
 };
+
