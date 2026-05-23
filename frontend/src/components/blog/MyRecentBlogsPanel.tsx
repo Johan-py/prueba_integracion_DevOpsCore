@@ -7,13 +7,17 @@ import { Blog } from "@/types/blog";
 
 const MAX_VISIBLE = 5;
 const USER_STORAGE_KEY = "propbol_user";
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 const STATUS_STYLES: Record<string, string> = {
-  PUBLICADO: "bg-green-50 text-green-700 border-green-200",
-  PENDIENTE: "bg-amber-50 text-amber-700 border-amber-200",
-  RECHAZADO: "bg-red-50 text-red-600 border-red-200",
-  BORRADOR: "bg-stone-50 text-stone-500 border-stone-200",
+  PUBLICADO:
+    "bg-green-50 text-green-700 border-green-200 dark:border-emerald-400/40 dark:bg-emerald-500/15 dark:text-emerald-300",
+  PENDIENTE:
+    "bg-amber-50 text-amber-700 border-amber-200 dark:border-amber-400/40 dark:bg-amber-500/15 dark:text-amber-300",
+  RECHAZADO:
+    "bg-red-50 text-red-600 border-red-200 dark:border-red-400/40 dark:bg-red-500/15 dark:text-red-300",
+  BORRADOR:
+    "bg-stone-50 text-stone-500 border-stone-200 dark:border-zinc-400/30 dark:bg-zinc-500/15 dark:text-zinc-300",
 };
 
 function getEstadoLabel(estado: string) {
@@ -32,7 +36,10 @@ function getEstadoLabel(estado: string) {
 }
 
 function getStatusClass(estado: string) {
-  return STATUS_STYLES[estado] ?? "bg-stone-50 text-stone-500 border-stone-200";
+  return (
+    STATUS_STYLES[estado] ??
+    "bg-stone-50 text-stone-500 border-stone-200 dark:border-white/20 dark:bg-white/10 dark:text-white"
+  );
 }
 
 interface MyRecentBlogsPanelProps {
@@ -47,14 +54,16 @@ type UserBlogResponse = {
   fecha_creacion?: string;
 };
 
-const MyRecentBlogsPanel: React.FC<MyRecentBlogsPanelProps> = ({ blogs: propBlogs }) => {
+const MyRecentBlogsPanel: React.FC<MyRecentBlogsPanelProps> = ({
+  blogs: propBlogs,
+}) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [internalBlogs, setInternalBlogs] = useState<Blog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const syncAuthState = async () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const isAuth = Boolean(localStorage.getItem(USER_STORAGE_KEY));
       setIsAuthenticated(isAuth);
 
@@ -62,20 +71,20 @@ const MyRecentBlogsPanel: React.FC<MyRecentBlogsPanelProps> = ({ blogs: propBlog
         setIsLoading(true);
         try {
           const res = await fetch(`${API_URL}/api/blogs/mis-blogs`, {
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` },
           });
 
-          if (!res.ok) throw new Error('Error al obtener blogs');
+          if (!res.ok) throw new Error("Error al obtener blogs");
 
           const data = (await res.json()) as UserBlogResponse[];
           const mapped: Blog[] = data.map((b) => ({
             id: b.id,
             titulo: b.titulo,
-            imagenUrl: b.imagen || '/placeholder-house.jpg',
+            imagenUrl: b.imagen || "/placeholder-house.jpg",
             estado: b.estado,
             fecha: b.fecha_creacion
-              ? new Date(b.fecha_creacion).toLocaleDateString('es-BO')
-              : ''
+              ? new Date(b.fecha_creacion).toLocaleDateString("es-BO")
+              : "",
           }));
           setInternalBlogs(mapped);
         } catch {
@@ -88,12 +97,12 @@ const MyRecentBlogsPanel: React.FC<MyRecentBlogsPanelProps> = ({ blogs: propBlog
     };
 
     syncAuthState();
-    window.addEventListener('storage', syncAuthState);
-    window.addEventListener('propbol:session-changed', syncAuthState);
+    window.addEventListener("storage", syncAuthState);
+    window.addEventListener("propbol:session-changed", syncAuthState);
 
     return () => {
-      window.removeEventListener('storage', syncAuthState);
-      window.removeEventListener('propbol:session-changed', syncAuthState);
+      window.removeEventListener("storage", syncAuthState);
+      window.removeEventListener("propbol:session-changed", syncAuthState);
     };
   }, []);
 
@@ -111,7 +120,9 @@ const MyRecentBlogsPanel: React.FC<MyRecentBlogsPanelProps> = ({ blogs: propBlog
             <div className="h-4 bg-stone-200 rounded w-1/2"></div>
           </div>
         </div>
-        <p className="mt-4 text-sm text-stone-400 dark:text-stone-500">Cargando tus blogs...</p>
+        <p className="mt-4 text-sm text-stone-400 dark:text-stone-500">
+          Cargando tus blogs...
+        </p>
       </section>
     );
   }
@@ -119,7 +130,9 @@ const MyRecentBlogsPanel: React.FC<MyRecentBlogsPanelProps> = ({ blogs: propBlog
   if (blogs.length === 0) {
     return (
       <section className="bg-white dark:bg-stone-900 rounded-[32px] p-6 border border-stone-100 dark:border-stone-700 shadow-sm mb-10">
-        <p className="text-sm text-stone-400 dark:text-stone-500">No publicaste ningún blog aún</p>
+        <p className="text-sm text-stone-400 dark:text-stone-500">
+          No publicaste ningún blog aún
+        </p>
       </section>
     );
   }
@@ -135,7 +148,9 @@ const MyRecentBlogsPanel: React.FC<MyRecentBlogsPanelProps> = ({ blogs: propBlog
           <h2 className="text-stone-900 dark:text-stone-100 font-bold text-sm uppercase tracking-widest">
             Mis Blogs Recientes
           </h2>
-          <p className="text-stone-400 dark:text-stone-500 text-xs">Panel de control editorial</p>
+          <p className="text-stone-400 dark:text-stone-500 text-xs">
+            Panel de control editorial
+          </p>
         </div>
 
         <Link href="/mis-blogs">
@@ -171,7 +186,7 @@ const MyRecentBlogsPanel: React.FC<MyRecentBlogsPanelProps> = ({ blogs: propBlog
                 {blog.titulo}
               </p>
               <span
-                className={`inline-block rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${getStatusClass(blog.estado)}`}
+                className={`inline-block rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide shadow-sm backdrop-blur-sm ${getStatusClass(blog.estado)}`}
               >
                 {getEstadoLabel(blog.estado)}
               </span>
