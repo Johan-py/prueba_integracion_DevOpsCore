@@ -15,14 +15,14 @@ const createProperty = async (data: any, userId: number) => {
     const inmueble = await tx.inmueble.create({
       data: {
         titulo: data.titulo,
-        tipoAccion: data.tipoAccion,
+        tipo_accion: data.tipoAccion,
         categoria: data.categoria,
         precio: new Prisma.Decimal(data.precio),
-        superficieM2: data.superficieM2 ? new Prisma.Decimal(data.superficieM2) : null,
-        nroCuartos: data.nroCuartos,
-        nroBanos: data.nroBanos,
+        superficie_m2: data.superficieM2 ? new Prisma.Decimal(data.superficieM2) : null,
+        nro_cuartos: data.nroCuartos,
+        nro_banos: data.nroBanos,
         descripcion: data.descripcion,
-        propietarioId: userId
+        propietario_id: userId
       }
     })
 
@@ -30,20 +30,20 @@ const createProperty = async (data: any, userId: number) => {
       data: {
         titulo: data.titulo,
         descripcion: data.descripcion,
-        usuarioId: userId,
-        inmuebleId: inmueble.id
+        usuario_id: userId,
+        inmueble_id: inmueble.id
       }
     })
 
-    await tx.ubicacionInmueble.create({
+    await tx.ubicacion_inmueble.create({
       data: {
-        inmuebleId: inmueble.id,
+        inmueble_id: inmueble.id,
         direccion: data.direccion,
         latitud: new Prisma.Decimal(data.latitud ?? 0),
         longitud: new Prisma.Decimal(data.longitud ?? 0),
         ciudad: data.ciudad ?? 'Cochabamba',
         zona: data.zona ?? null,
-        verticesDifuminado: data.verticesDifuminado ?? null
+        vertices_difuminado: data.verticesDifuminado ?? null
       }
     })
 

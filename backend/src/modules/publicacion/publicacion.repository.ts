@@ -23,7 +23,7 @@ export const buscarPublicacionesPorUsuarioRepository = async (
 ) => {
   return prisma.publicacion.findMany({
     where: {
-      usuarioId,
+      usuario_id: usuarioId,
       estado: {
         not: ESTADO_PUBLICACION_ELIMINADA,
       },
@@ -32,21 +32,21 @@ export const buscarPublicacionesPorUsuarioRepository = async (
       multimedia: true,
       inmueble: {
         include: {
-          ubicacion: {
+          ubicacion_inmueble: {
             select: {
               id: true,
               direccion: true,
               latitud: true,
               longitud: true,
-              inmuebleId: true,
-              ubicacionMaestraId: true,
+              inmueble_id: true,
+              ubicacion_maestra_id: true,
             },
           },
         },
       },
     },
     orderBy: {
-      fechaPublicacion: "desc",
+      fecha_publicacion: "desc",
     },
   });
 };
@@ -57,7 +57,7 @@ export const buscarPublicacionPorIdRepository = async (id: number) => {
     include: {
       inmueble: {
         include: {
-          ubicacion: true,
+          ubicacion_inmueble: true,
         },
       },
       multimedia: true,
@@ -75,22 +75,22 @@ export const buscarResumenFinalPorIdRepository = async (
       titulo: true,
       descripcion: true,
       estado: true,
-      fechaPublicacion: true,
-      usuarioId: true,
-      inmuebleId: true,
+      fecha_publicacion: true,
+      usuario_id: true,
+      inmueble_id: true,
       inmueble: {
         select: {
           id: true,
           titulo: true,
-          tipoAccion: true,
+          tipo_accion: true,
           categoria: true,
           precio: true,
-          superficieM2: true,
-          nroCuartos: true,
-          nroBanos: true,
+          superficie_m2: true,
+          nro_cuartos: true,
+          nro_banos: true,
           descripcion: true,
           estado: true,
-          ubicacion: {
+          ubicacion_inmueble: {
             select: {
               direccion: true,
               ciudad: true,
@@ -116,7 +116,7 @@ export const buscarResumenFinalPorIdRepository = async (
           id: true,
           url: true,
           tipo: true,
-          pesoMb: true,
+          peso_mb: true,
         },
         orderBy: {
           id: "asc",
@@ -139,23 +139,23 @@ export const actualizarPublicacionRepository = async (
   const dataToUpdate: {
     titulo?: string;
     descripcion?: string;
-    inmueble?: {
-      update: {
-        tipoAccion?: TipoAccionValue;
-        precio?: number;
-        ubicacion?: {
+        inmueble?: {
           update: {
-            direccion: string;
+            tipo_accion?: TipoAccionValue;
+            precio?: number;
+            ubicacion_inmueble?: {
+              update: {
+                direccion: string;
+              };
+            };
           };
         };
-      };
-    };
-  } = {};
+      } = {};
 
   const inmuebleData: {
-    tipoAccion?: TipoAccionValue;
+    tipo_accion?: TipoAccionValue;
     precio?: number;
-    ubicacion?: {
+    ubicacion_inmueble?: {
       update: {
         direccion: string;
       };
@@ -171,7 +171,7 @@ export const actualizarPublicacionRepository = async (
   }
 
   if (tipoAccionRaw !== undefined) {
-    inmuebleData.tipoAccion = String(tipoAccionRaw)
+    inmuebleData.tipo_accion = String(tipoAccionRaw)
       .trim()
       .toUpperCase() as TipoAccionValue;
   }
@@ -186,7 +186,7 @@ export const actualizarPublicacionRepository = async (
   }
 
   if (direccionRaw !== undefined) {
-    inmuebleData.ubicacion = {
+    inmuebleData.ubicacion_inmueble = {
       update: {
         direccion: String(direccionRaw).trim(),
       },
@@ -206,7 +206,7 @@ export const actualizarPublicacionRepository = async (
       multimedia: true,
       inmueble: {
         include: {
-          ubicacion: true,
+          ubicacion_inmueble: true,
         },
       },
     },
@@ -243,16 +243,16 @@ export const buscarDetallePublicacionPorIdRepository = async (
       titulo: true,
       descripcion: true,
       estado: true,
-      fechaPublicacion: true,
-      usuarioId: true,
-      inmuebleId: true,
+      fecha_publicacion: true,
+      usuario_id: true,
+      inmueble_id: true,
       usuario: {
         select: {
           id: true,
           nombre: true,
           apellido: true,
           correo: true,
-          telefonos: {
+          telefono_telefono_usuarioIdTousuario: {
             select: {
               codigoPais: true,
               numero: true,
@@ -265,21 +265,21 @@ export const buscarDetallePublicacionPorIdRepository = async (
         select: {
           id: true,
           titulo: true,
-          tipoAccion: true,
+          tipo_accion: true,
           categoria: true,
           precio: true,
-          superficieM2: true,
-          nroCuartos: true,
-          nroBanos: true,
+          superficie_m2: true,
+          nro_cuartos: true,
+          nro_banos: true,
           descripcion: true,
           estado: true,
-          ubicacion: {
+          ubicacion_inmueble: {
             select: {
               direccion: true,
               latitud: true,
               longitud: true,
-              inmuebleId: true,
-              ubicacionMaestraId: true,
+              inmueble_id: true,
+              ubicacion_maestra_id: true,
             },
           },
           inmueble_etiqueta: {
@@ -299,7 +299,7 @@ export const buscarDetallePublicacionPorIdRepository = async (
           id: true,
           url: true,
           tipo: true,
-          pesoMb: true,
+          peso_mb: true,
         },
         orderBy: {
           id: "asc",
@@ -314,7 +314,7 @@ export const buscarDetallePublicacionPorInmuebleIdRepository = async (
 ) => {
   return prisma.publicacion.findFirst({
     where: {
-      inmuebleId,
+      inmueble_id: inmuebleId,
       estado: {
         not: "ELIMINADA",
       },
@@ -324,16 +324,16 @@ export const buscarDetallePublicacionPorInmuebleIdRepository = async (
       titulo: true,
       descripcion: true,
       estado: true,
-      fechaPublicacion: true,
-      usuarioId: true,
-      inmuebleId: true,
+      fecha_publicacion: true,
+      usuario_id: true,
+      inmueble_id: true,
       usuario: {
         select: {
           id: true,
           nombre: true,
           apellido: true,
           correo: true,
-          telefonos: {
+          telefono_telefono_usuarioIdTousuario: {
             select: {
               codigoPais: true,
               numero: true,
@@ -346,30 +346,23 @@ export const buscarDetallePublicacionPorInmuebleIdRepository = async (
         select: {
           id: true,
           titulo: true,
-          tipoAccion: true,
+          tipo_accion: true,
           categoria: true,
           precio: true,
           precio_anterior: true,
-          superficieM2: true,
-          nroCuartos: true,
-          nroBanos: true,
+          superficie_m2: true,
+          nro_cuartos: true,
+          nro_banos: true,
           descripcion: true,
           estado: true,
-          ubicacion: {
+          ubicacion_inmueble: {
             select: {
               direccion: true,
               latitud: true,
               longitud: true,
             },
           },
-          puntosDeInteres: {
-            select: {
-              id: true,
-              nombre: true,
-              latitud: true,
-              longitud: true,
-            },
-          },
+
           inmueble_etiqueta: {
             select: {
               etiqueta: {
@@ -387,7 +380,7 @@ export const buscarDetallePublicacionPorInmuebleIdRepository = async (
           id: true,
           url: true,
           tipo: true,
-          pesoMb: true,
+          peso_mb: true,
         },
         orderBy: {
           id: "asc",
@@ -407,7 +400,7 @@ export const confirmarPublicacionRepository = async (publicacionId: number) => {
       multimedia: true,
       inmueble: {
         include: {
-          ubicacion: true,
+          ubicacion_inmueble: true,
         },
       },
     },
@@ -417,8 +410,8 @@ export const confirmarPublicacionRepository = async (publicacionId: number) => {
 type NuevaMultimediaInput = {
   url: string;
   tipo: "IMAGEN" | "VIDEO";
-  pesoMb?: number | null;
-  publicacionId: number;
+  peso_mb?: number | null;
+  publicacion_id: number;
 };
 
 export const eliminarMultimediaPorIdsRepository = async (
@@ -432,7 +425,7 @@ export const eliminarMultimediaPorIdsRepository = async (
       id: {
         in: multimediaIds,
       },
-      publicacionId,
+      publicacion_id: publicacionId,
     },
   });
 };
@@ -442,7 +435,7 @@ export const eliminarVideosDePublicacionRepository = async (
 ) => {
   return prisma.multimedia.deleteMany({
     where: {
-      publicacionId,
+      publicacion_id: publicacionId,
       tipo: "VIDEO",
     },
   });
@@ -463,7 +456,7 @@ export const buscarMultimediaPublicacionRepository = async (
 ) => {
   return prisma.multimedia.findMany({
     where: {
-      publicacionId,
+      publicacion_id: publicacionId,
     },
     orderBy: {
       id: "asc",
@@ -486,13 +479,13 @@ export const activarPublicidadRepository = async (
   return prisma.publicacion.update({
     where: {
       id: publicacionId,
-      usuarioId: usuarioId,
+      usuario_id: usuarioId,
     },
     data: {
       promoted: true,
       promotedAt: fechaInicio,
       promotedExpiresAt: fechaExpiracion,
-      paymentIntentId: paymentIntentId,
+      payment_intent_id: paymentIntentId,
     },
   });
 };
@@ -504,13 +497,13 @@ export const cancelarPublicidadRepository = async (
   return prisma.publicacion.update({
     where: {
       id: publicacionId,
-      usuarioId: usuarioId,
+      usuario_id: usuarioId,
     },
     data: {
       promoted: false,
       promotedAt: null,
       promotedExpiresAt: null,
-      paymentIntentId: null,
+      payment_intent_id: null,
     },
   });
 };

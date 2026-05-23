@@ -29,18 +29,18 @@ function resolverDepartamento(raw: string): string {
 export class FiltersHomepageRepository {
   // backend/src/modules/filtershomepage/filtershomepage.repository.ts
 
-  async getCountsByCity(tipoAccion: $Enums.TipoAccion) {
-    const ubicaciones = await prisma.ubicacionInmueble.findMany({
+  async getCountsByCity(tipo_accion: $Enums.tipo_accion) {
+    const ubicaciones = await prisma.ubicacion_inmueble.findMany({
       where: {
         inmueble: {
-          tipoAccion: tipoAccion,
+          tipo_accion: tipo_accion,
           estado: $Enums.EstadoInmueble.ACTIVO,
         },
         latitud: { not: 0 },
         longitud: { not: 0 },
       },
       select: {
-        inmuebleId: true,
+        inmueble_id: true,
         ciudad: true,
         ubicacion_maestra: { select: { departamento: true } },
         inmueble: {
@@ -48,11 +48,11 @@ export class FiltersHomepageRepository {
             id: true,
             titulo: true,
             // Volvemos a tu estructura original que es la correcta para tu base de datos
-            publicaciones: {
+            publicacion: {
               take: 1,
               select: {
                 multimedia: {
-                  where: { tipo: $Enums.TipoMultimedia.IMAGEN },
+                  where: { tipo: $Enums.tipo_multimedia.IMAGEN },
                   select: { url: true },
                   take: 1,
                 },
@@ -70,7 +70,7 @@ export class FiltersHomepageRepository {
 
     for (const u of ubicaciones) {
       const rawDept = u.ubicacion_maestra?.departamento ?? u.ciudad ?? null;
-      if (!rawDept || !u.inmuebleId) continue;
+      if (!rawDept || !u.inmueble_id) continue;
 
       const dept = resolverDepartamento(rawDept);
 
@@ -79,12 +79,12 @@ export class FiltersHomepageRepository {
       }
 
       const entry = deptMap.get(dept)!;
-      entry.ids.add(u.inmuebleId);
+      entry.ids.add(u.inmueble_id);
       
       const inmueble = u.inmueble;
 
       // Aquí está el truco: Navegamos de forma segura por Inmueble -> Publicaciones -> Multimedia
-      const primeraImagen = inmueble?.publicaciones?.[0]?.multimedia?.[0]?.url ?? null;
+      const primeraImagen = inmueble?.publicacion?.[0]?.multimedia?.[0]?.url ?? null;
 
       if (entry.previews.length < 6 && primeraImagen && inmueble) {
         entry.previews.push({
@@ -107,7 +107,7 @@ export class FiltersHomepageRepository {
       where: {
         estado: $Enums.EstadoInmueble.ACTIVO,
         categoria: { not: null },
-        ubicacion: {
+        ubicacion_inmueble: {
           latitud: { not: 0 },
           longitud: { not: 0 }
         }

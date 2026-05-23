@@ -37,12 +37,12 @@ export const createUser = async (data: {
       correo: data.correo,
       password: data.password,
       ...(data.telefono && {
-        telefonos: {
+        telefono_telefono_usuarioIdTousuario: {
           create: [{ numero: data.telefono, codigoPais: "" }],
         },
       }),
     },
-    include: { telefonos: true, rol: true },
+    include: { telefono_telefono_usuarioIdTousuario: true, rol: true },
   });
 };
 

@@ -19,7 +19,7 @@ export const comparacionController = {
             include: {
               inmueble: {
                 include: {
-                  ubicacion: true
+                  ubicacion_inmueble: true
                 }
               }
             },
@@ -42,13 +42,13 @@ export const comparacionController = {
           id: detalle.inmueble.id,
           titulo: detalle.inmueble.titulo,
           ubicacion:
-            detalle.inmueble.ubicacion?.zona ||
-            detalle.inmueble.ubicacion?.ciudad ||
+            detalle.inmueble.ubicacion_inmueble?.zona ||
+            detalle.inmueble.ubicacion_inmueble?.ciudad ||
             'Ubicación no disponible',
           precio: detalle.inmueble.precio,
-          superficie: detalle.inmueble.superficieM2,
+          superficie: detalle.inmueble.superficie_m2,
           categoria: detalle.inmueble.categoria,
-          tipoAccion: detalle.inmueble.tipoAccion
+          tipoAccion: detalle.inmueble.tipo_accion
         }))
       }))
 
@@ -82,7 +82,7 @@ export const comparacionController = {
             include: {
               inmueble: {
                 include: {
-                  ubicacion: true
+                  ubicacion_inmueble: true
                 }
               }
             },
@@ -323,7 +323,7 @@ export const comparacionController = {
             include: {
               inmueble: {
                 include: {
-                  ubicacion: true
+                  ubicacion_inmueble: true
                 }
               }
             },
@@ -360,7 +360,7 @@ export const comparacionController = {
             include: {
               inmueble: {
                 include: {
-                  ubicacion: true
+                  ubicacion_inmueble: true
                 }
               }
             }
@@ -391,16 +391,16 @@ export const comparacionController = {
             propiedades: comp.detalle_comparacion.map((detalle) => ({
               id: detalle.inmueble.id,
               ubicacion:
-                detalle.inmueble.ubicacion?.zona ||
-                detalle.inmueble.ubicacion?.ciudad ||
+                detalle.inmueble.ubicacion_inmueble?.zona ||
+                detalle.inmueble.ubicacion_inmueble?.ciudad ||
                 'Ubicación no disponible',
               precio: detalle.inmueble.precio,
-              superficie: detalle.inmueble.superficieM2,
+              superficie: detalle.inmueble.superficie_m2,
               rangoPrecio: `$${detalle.inmueble.precio}`,
-              rangoSuperficie: detalle.inmueble.superficieM2
-                ? `${detalle.inmueble.superficieM2}m²`
+              rangoSuperficie: detalle.inmueble.superficie_m2
+                ? `${detalle.inmueble.superficie_m2}m²`
                 : 'Superficie no especificada',
-              tipoAccion: detalle.inmueble.tipoAccion
+              tipoAccion: detalle.inmueble.tipo_accion
             }))
           })
           return acc

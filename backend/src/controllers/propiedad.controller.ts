@@ -16,11 +16,11 @@ export const getHistorialVistas = async (req: Request, res: Response) => {
             include: {
                 inmueble: {
                     include: {
-                        publicaciones: {
+                        publicacion: {
                             include: { multimedia: true },
                             take: 1
                         },
-                        ubicacion: true
+                        ubicacion_inmueble: true
                     }
                 }
             },
@@ -33,8 +33,8 @@ export const getHistorialVistas = async (req: Request, res: Response) => {
             id: item.inmueble.id,
             title: item.inmueble.titulo,
             price: item.inmueble.precio,
-            image: item.inmueble.publicaciones[0]?.multimedia[0]?.url || null,
-            location: item.inmueble.ubicacion?.ciudad || "Cochabamba, Bolivia",
+            image: item.inmueble.publicacion[0]?.multimedia[0]?.url || null,
+            location: item.inmueble.ubicacion_inmueble?.ciudad || "Cochabamba, Bolivia",
             fechaVista: item.vistaEn
         }));
 

@@ -44,7 +44,7 @@ export class CityRepository {
   }
 
   async findLocationReference(cityName: string) {
-    const locations = await prisma.ubicacionInmueble.findMany({
+    const locations = await prisma.ubicacion_inmueble.findMany({
       where: {
         OR: [
           {

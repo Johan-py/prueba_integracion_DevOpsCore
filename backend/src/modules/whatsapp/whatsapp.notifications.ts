@@ -17,7 +17,7 @@ const obtenerDatosWhatsapp = async (usuarioId: number) => {
     select: {
       nombre: true,
       notificacion_whatsapp: true,
-      telefonos: {
+      telefono_telefono_usuario_idTousuario: {
         where: { principal: true },
         take: 1,
       },
@@ -26,9 +26,9 @@ const obtenerDatosWhatsapp = async (usuarioId: number) => {
 
   if (!usuario) return null;
   if (!usuario.notificacion_whatsapp) return null;  // No quiere notificaciones WA
-  if (usuario.telefonos.length === 0) return null;  // No tiene teléfono registrado
+  if (usuario.telefono_telefono_usuario_idTousuario.length === 0) return null;  // No tiene teléfono registrado
 
-  const tel = usuario.telefonos[0];
+  const tel = usuario.telefono_telefono_usuario_idTousuario[0];
   const telefono = formatearTelefono(tel.codigoPais, tel.numero);
 
   return { nombre: usuario.nombre, telefono };

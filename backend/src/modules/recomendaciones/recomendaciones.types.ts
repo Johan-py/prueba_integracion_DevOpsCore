@@ -2,9 +2,9 @@ export interface InmuebleConScore {
   id: number
   titulo: string
   precio: number
-  superficieM2: number | null
+  superficie_m2: number | null
   categoria: string | null
-  ubicacion: {
+  ubicacion_inmueble: {
     zona: string | null
     ciudad: string | null
   } | null

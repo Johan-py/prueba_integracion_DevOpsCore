@@ -32,7 +32,7 @@ const findAll = async () => {
   }))
 }
 
-const findAllWithContextualCounts = async (inmuebleWhere: Prisma.InmuebleWhereInput) => {
+const findAllWithContextualCounts = async (inmuebleWhere: Prisma.inmuebleWhereInput) => {
   const tags = await prisma.tag.findMany({
     orderBy: { nombre: 'asc' }
   })
@@ -118,7 +118,7 @@ const replacePublicacionTags = async (publicacionId: number, tagIds: number[]) =
 const findPublicacionOwner = async (publicacionId: number) => {
   return prisma.publicacion.findUnique({
     where: { id: publicacionId },
-    select: { id: true, usuarioId: true }
+    select: { id: true, usuario_id: true }
   })
 }
 

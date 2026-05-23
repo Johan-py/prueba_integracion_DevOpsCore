@@ -42,8 +42,8 @@ const esTipoAccionValido = (valor: string): valor is TipoAccion => {
   return (MODOS_VALIDOS as readonly string[]).includes(valor)
 }
 
-const buildInmuebleWhereFromFilters = (filtros: TagsContextFilters): Prisma.InmuebleWhereInput => {
-  const where: Prisma.InmuebleWhereInput = {
+const buildInmuebleWhereFromFilters = (filtros: TagsContextFilters): Prisma.inmuebleWhereInput => {
+  const where: Prisma.inmuebleWhereInput = {
     estado: 'ACTIVO'
   }
 
@@ -63,7 +63,7 @@ const buildInmuebleWhereFromFilters = (filtros: TagsContextFilters): Prisma.Inmu
     }).filter(esTipoAccionValido)
 
     if (modosValidos.length > 0) {
-      where.tipoAccion = { in: modosValidos }
+      where.tipo_accion = { in: modosValidos }
     }
   }
 
@@ -83,46 +83,46 @@ const buildInmuebleWhereFromFilters = (filtros: TagsContextFilters): Prisma.Inmu
   }
 
   if (filtros.minSuperficie != null || filtros.maxSuperficie != null) {
-    where.superficieM2 = {
+    where.superficie_m2 = {
       ...(filtros.minSuperficie != null ? { gte: filtros.minSuperficie } : {}),
       ...(filtros.maxSuperficie != null ? { lte: filtros.maxSuperficie } : {})
     }
   }
 
   if (filtros.dormitoriosMin !== undefined || filtros.dormitoriosMax !== undefined) {
-    where.nroCuartos = {
+    where.nro_cuartos = {
       ...(filtros.dormitoriosMin !== undefined ? { gte: filtros.dormitoriosMin } : {}),
       ...(filtros.dormitoriosMax !== undefined ? { lte: filtros.dormitoriosMax } : {})
     }
   }
 
   if (filtros.banosMin !== undefined || filtros.banosMax !== undefined) {
-    where.nroBanos = {
+    where.nro_banos = {
       ...(filtros.banosMin !== undefined ? { gte: filtros.banosMin } : {}),
       ...(filtros.banosMax !== undefined ? { lte: filtros.banosMax } : {})
     }
   }
 
   if (filtros.barrioId && filtros.barrioId !== 'todos') {
-    where.ubicacion = { barrio_id: Number(filtros.barrioId) }
+    where.ubicacion_inmueble = { barrio_id: Number(filtros.barrioId) }
   } else if (filtros.zonaId && filtros.zonaId !== 'todos') {
-    where.ubicacion = { barrio: { zona_id: Number(filtros.zonaId) } }
+    where.ubicacion_inmueble = { barrio: { zona_id: Number(filtros.zonaId) } }
   } else if (filtros.municipioId && filtros.municipioId !== 'todos') {
-    where.ubicacion = {
-      barrio: { zona: { municipio_id: Number(filtros.municipioId) } }
+    where.ubicacion_inmueble = {
+      barrio: { zona_geografica: { municipio: Number(filtros.municipioId) } }
     }
   } else if (filtros.provinciaId && filtros.provinciaId !== 'todos') {
-    where.ubicacion = {
+    where.ubicacion_inmueble = {
       barrio: {
-        zona: { municipio: { provincia_id: Number(filtros.provinciaId) } }
+        zona_geografica: { municipio_zona_geografica_municipioTomunicipio: { provincia: Number(filtros.provinciaId) } }
       }
     }
   } else if (filtros.departamentoId && filtros.departamentoId !== 'todos') {
-    where.ubicacion = {
+    where.ubicacion_inmueble = {
       barrio: {
-        zona: {
-          municipio: {
-            provincia: { departamento_id: Number(filtros.departamentoId) }
+        zona_geografica: {
+          municipio_zona_geografica_municipioTomunicipio: {
+            provincia_municipio_provinciaToprovincia: { departamento: Number(filtros.departamentoId) }
           }
         }
       }
@@ -149,7 +149,7 @@ const replacePublicacionTags = async (publicacionId: number, userId: number, nom
   const publicacion = await tagsRepository.findPublicacionOwner(publicacionId)
 
   if (!publicacion) throw new Error('PUBLICATION_NOT_FOUND')
-  if (publicacion.usuarioId !== userId) throw new Error('FORBIDDEN')
+  if (publicacion.usuario_id !== userId) throw new Error('FORBIDDEN')
 
   const nombresNormalizados = [...new Set(nombres.map((tag) => tag.trim().toLowerCase()))]
 

@@ -16,8 +16,8 @@ export const historialController = {
         include: {
           inmueble: {
             include: {
-              ubicacion: true,
-              publicaciones: { include: { multimedia: true }, take: 1 }
+              ubicacion_inmueble: true,
+              publicacion: { include: { multimedia: true }, take: 1 }
             }
           }
         },
@@ -30,9 +30,9 @@ export const historialController = {
           id: item.id,
           title: item.inmueble?.titulo || 'Sin título',
           price: item.inmueble?.precio,
-          location: item.inmueble?.ubicacion?.ciudad,
+          location: item.inmueble?.ubicacion_inmueble?.ciudad,
           viewedDate: item.vistaEn,
-          imageUrl: item.inmueble?.publicaciones[0]?.multimedia[0]?.url || null,
+          imageUrl: item.inmueble?.publicacion[0]?.multimedia[0]?.url || null,
           activo: (item as any).activo // Mostramos el estado
         }))
       })

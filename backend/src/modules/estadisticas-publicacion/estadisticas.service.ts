@@ -88,7 +88,7 @@ export class EstadisticasPublicacionService {
       select: {
         id: true,
         estado: true,
-        inmuebleId: true,
+        inmueble_id: true,
       },
     });
 
@@ -147,8 +147,8 @@ export class EstadisticasPublicacionService {
         await tx.propiedad_vista.upsert({
           where: {
             usuarioId_inmuebleId: {
-              usuarioId,
-              inmuebleId: publicacion.inmuebleId,
+        usuarioId: usuarioId,
+              inmuebleId: publicacion.inmueble_id,
             },
           },
           update: {
@@ -159,8 +159,8 @@ export class EstadisticasPublicacionService {
             activo: true,
           },
           create: {
-            usuarioId,
-            inmuebleId: publicacion.inmuebleId,
+            usuarioId: usuarioId,
+            inmuebleId: publicacion.inmueble_id,
             veces_visto: 1,
             activo: true,
           },
@@ -184,7 +184,7 @@ export class EstadisticasPublicacionService {
   }: RegistrarVistaPorInmuebleParams) {
     const publicacion = await prisma.publicacion.findFirst({
       where: {
-        inmuebleId,
+        inmueble_id: inmuebleId,
         estado: EstadoPublicacion.ACTIVA,
       },
       select: {
@@ -271,7 +271,7 @@ export class EstadisticasPublicacionService {
   }: RegistrarCompartidoPorInmuebleParams) {
     const publicacion = await prisma.publicacion.findFirst({
       where: {
-        inmuebleId,
+        inmueble_id: inmuebleId,
         estado: EstadoPublicacion.ACTIVA,
       },
       select: {
@@ -302,7 +302,7 @@ export class EstadisticasPublicacionService {
         id: true,
         titulo: true,
         estado: true,
-        usuarioId: true,
+        usuario_id: true,
       },
     });
 
@@ -310,7 +310,7 @@ export class EstadisticasPublicacionService {
       throw new Error("PUBLICACION_NO_EXISTE");
     }
 
-    if (publicacion.usuarioId !== usuarioId) {
+    if (publicacion.usuario_id !== usuarioId) {
       throw new Error("NO_ES_PROPIETARIO");
     }
 
@@ -336,7 +336,7 @@ export class EstadisticasPublicacionService {
   static async obtenerMisPropiedadesVistas(usuarioId: number) {
     const vistas = await prisma.propiedad_vista.findMany({
       where: {
-        usuarioId,
+        usuarioId: usuarioId,
         activo: true,
       },
       orderBy: {
@@ -345,7 +345,7 @@ export class EstadisticasPublicacionService {
       include: {
         inmueble: {
           include: {
-            publicaciones: {
+            publicacion: {
               where: {
                 estado: EstadoPublicacion.ACTIVA,
               },
@@ -353,14 +353,14 @@ export class EstadisticasPublicacionService {
                 multimedia: true,
               },
             },
-            ubicacion: true,
+            ubicacion_inmueble: true,
           },
         },
       },
     });
 
     const publicacionesIds = vistas
-      .map((vista) => vista.inmueble.publicaciones[0]?.id)
+      .map((vista) => vista.inmueble.publicacion[0]?.id)
       .filter((id): id is number => typeof id === "number");
 
     const estadisticas = await prisma.publicacion_estadistica.findMany({
@@ -390,7 +390,7 @@ export class EstadisticasPublicacionService {
     });
 
     return vistas.map((vista) => {
-      const publicacionActiva = vista.inmueble.publicaciones[0];
+      const publicacionActiva = vista.inmueble.publicacion[0];
 
       const estadistica = publicacionActiva
         ? estadisticasPorPublicacion.get(publicacionActiva.id)
@@ -404,9 +404,9 @@ export class EstadisticasPublicacionService {
         descripcion: vista.inmueble.descripcion,
         precio: Number(vista.inmueble.precio),
         categoria: vista.inmueble.categoria,
-        tipoAccion: vista.inmueble.tipoAccion,
-        zona: vista.inmueble.ubicacion?.zona || null,
-        ciudad: vista.inmueble.ubicacion?.ciudad || null,
+        tipoAccion: vista.inmueble.tipo_accion,
+        zona: vista.inmueble.ubicacion_inmueble?.zona || null,
+        ciudad: vista.inmueble.ubicacion_inmueble?.ciudad || null,
         imagen:
           publicacionActiva?.multimedia?.find((item) => item.tipo === "IMAGEN")
             ?.url || null,

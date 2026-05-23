@@ -58,7 +58,7 @@ type MultimediaResumen = {
   id: number;
   url: string;
   tipo: string;
-  pesoMb: number | null;
+  peso_mb: number | null;
 };
 
 type EstadisticaPublicacionResumen = {
@@ -124,13 +124,13 @@ const obtenerPrimeraImagenUrl = (
   return primeraImagen?.url ?? null;
 };
 
-export const listarMisPublicacionesService = async (usuarioId: number) => {
-  if (Number.isNaN(usuarioId) || usuarioId <= 0) {
+export const listarMisPublicacionesService = async (usuario_id: number) => {
+  if (Number.isNaN(usuario_id) || usuario_id <= 0) {
     throw new Error("USUARIO_INVALIDO");
   }
 
   const publicaciones =
-    await buscarPublicacionesPorUsuarioRepository(usuarioId);
+    await buscarPublicacionesPorUsuarioRepository(usuario_id);
 
   type PublicacionesPorUsuario = Awaited<
     ReturnType<typeof buscarPublicacionesPorUsuarioRepository>
@@ -168,17 +168,17 @@ export const listarMisPublicacionesService = async (usuarioId: number) => {
       titulo: publicacion.titulo,
       precio: Number(publicacion.inmueble.precio),
       ubicacion:
-        publicacion.inmueble.ubicacion?.direccion || "Ubicación no disponible",
-      nroBanos: publicacion.inmueble.nroBanos,
-      nroCuartos: publicacion.inmueble.nroCuartos,
-      superficieM2:
-        publicacion.inmueble.superficieM2 !== null &&
-        publicacion.inmueble.superficieM2 !== undefined
-          ? Number(publicacion.inmueble.superficieM2)
+        publicacion.inmueble.ubicacion_inmueble?.direccion || "Ubicación no disponible",
+      nro_banos: publicacion.inmueble.nro_banos,
+      nro_cuartos: publicacion.inmueble.nro_cuartos,
+      superficie_m2:
+        publicacion.inmueble.superficie_m2 !== null &&
+        publicacion.inmueble.superficie_m2 !== undefined
+          ? Number(publicacion.inmueble.superficie_m2)
           : null,
       imagenUrl: obtenerPrimeraImagenUrl(publicacion.multimedia),
 
-      tipoOperacion: publicacion.inmueble.tipoAccion,
+      tipoOperacion: publicacion.inmueble.tipo_accion,
       activa: publicacion.estado === "ACTIVA",
       estado: publicacion.estado,
 
@@ -207,7 +207,7 @@ export const editarPublicacionService = async (
     throw new Error("PUBLICACION_NO_EXISTE");
   }
 
-  if (publicacion.usuarioId !== usuarioSolicitanteId) {
+  if (publicacion.usuario_id !== usuarioSolicitanteId) {
     throw new Error("NO_AUTORIZADO");
   }
 
@@ -289,9 +289,9 @@ export const editarPublicacionService = async (
     titulo: actualizada.titulo,
     descripcion: actualizada.descripcion,
     precio: Number(actualizada.inmueble.precio),
-    tipoAccion: actualizada.inmueble.tipoAccion,
+    tipoAccion: actualizada.inmueble.tipo_accion,
     ubicacion:
-      actualizada.inmueble.ubicacion?.direccion || "Ubicación no disponible",
+      actualizada.inmueble.ubicacion_inmueble?.direccion || "Ubicación no disponible",
     imagenUrl: obtenerPrimeraImagenUrl(actualizada.multimedia),
   };
 };
@@ -314,7 +314,7 @@ export const eliminarPublicacionService = async (
     throw new Error("PUBLICACION_NO_EXISTE");
   }
 
-  if (publicacion.usuarioId !== usuarioSolicitanteId) {
+  if (publicacion.usuario_id !== usuarioSolicitanteId) {
     throw new Error("NO_AUTORIZADO");
   }
 
@@ -324,7 +324,7 @@ export const eliminarPublicacionService = async (
 
   await eliminarLogicamentePublicacionRepository(
     publicacion.id,
-    publicacion.inmuebleId,
+    publicacion.inmueble_id,
   );
 
   return {
@@ -351,7 +351,7 @@ export const obtenerResumenFinalService = async (
     throw new Error("PUBLICACION_NO_EXISTE");
   }
 
-  if (resumen.usuarioId !== usuarioSolicitanteId) {
+  if (resumen.usuario_id !== usuarioSolicitanteId) {
     throw new Error("NO_AUTORIZADO");
   }
 
@@ -379,9 +379,9 @@ export const obtenerResumenFinalService = async (
       id: item.id,
       url: item.url,
       tipo: normalizarTipoMultimedia(item.tipo),
-      pesoMb:
-        item.pesoMb !== null && item.pesoMb !== undefined
-          ? Number(item.pesoMb)
+      peso_mb:
+        item.peso_mb !== null && item.peso_mb !== undefined
+          ? Number(item.peso_mb)
           : null,
     }),
   );
@@ -397,40 +397,40 @@ export const obtenerResumenFinalService = async (
   return {
     id: resumen.id,
     publicacionId: resumen.id,
-    inmuebleId: resumen.inmuebleId,
+    inmueble_id: resumen.inmueble_id,
 
     publicacion: {
       titulo: resumen.titulo ?? resumen.inmueble?.titulo ?? null,
       descripcion: resumen.descripcion ?? resumen.inmueble?.descripcion ?? null,
       estado: resumen.estado,
-      fechaPublicacion: resumen.fechaPublicacion,
+      fecha_publicacion: resumen.fecha_publicacion,
     },
 
     datosGenerales: {
-      tipoOperacion: resumen.inmueble?.tipoAccion ?? null,
+      tipoOperacion: resumen.inmueble?.tipo_accion ?? null,
       tipoInmueble: resumen.inmueble?.categoria ?? null,
-      direccion: resumen.inmueble?.ubicacion?.direccion ?? "No especificado",
-      ciudad: resumen.inmueble?.ubicacion?.ciudad ?? "No especificado",
-      zona: resumen.inmueble?.ubicacion?.zona ?? "No especificado",
+      direccion: resumen.inmueble?.ubicacion_inmueble?.direccion ?? "No especificado",
+      ciudad: resumen.inmueble?.ubicacion_inmueble?.ciudad ?? "No especificado",
+      zona: resumen.inmueble?.ubicacion_inmueble?.zona ?? "No especificado",
       precio:
         resumen.inmueble?.precio !== null &&
         resumen.inmueble?.precio !== undefined
           ? Number(resumen.inmueble.precio)
           : null,
       areaM2:
-        resumen.inmueble?.superficieM2 !== null &&
-        resumen.inmueble?.superficieM2 !== undefined
-          ? Number(resumen.inmueble.superficieM2)
+        resumen.inmueble?.superficie_m2 !== null &&
+        resumen.inmueble?.superficie_m2 !== undefined
+          ? Number(resumen.inmueble.superficie_m2)
           : null,
       coordenadas: {
-        latitud: resumen.inmueble?.ubicacion?.latitud ?? null,
-        longitud: resumen.inmueble?.ubicacion?.longitud ?? null,
+        latitud: resumen.inmueble?.ubicacion_inmueble?.latitud ?? null,
+        longitud: resumen.inmueble?.ubicacion_inmueble?.longitud ?? null,
       },
     },
 
     caracteristicas: {
-      habitaciones: resumen.inmueble?.nroCuartos ?? null,
-      banos: resumen.inmueble?.nroBanos ?? null,
+      habitaciones: resumen.inmueble?.nro_cuartos ?? null,
+      banos: resumen.inmueble?.nro_banos ?? null,
       estacionamiento: null,
     },
 
@@ -461,17 +461,17 @@ export const obtenerDetallePublicacionService = async (
   }
 
   const telefonoPrincipal =
-    publicacion.usuario.telefonos.find((item) => item.principal) ??
-    publicacion.usuario.telefonos[0];
+    publicacion.usuario.telefono_telefono_usuarioIdTousuario.find((item) => item.principal) ??
+    publicacion.usuario.telefono_telefono_usuarioIdTousuario[0];
 
   return {
     id: publicacion.id,
     titulo: publicacion.titulo,
     precio: Number(publicacion.inmueble.precio),
     tipoInmueble: publicacion.inmueble.categoria ?? null,
-    tipoOperacion: publicacion.inmueble.tipoAccion,
+    tipoOperacion: publicacion.inmueble.tipo_accion,
     ubicacionTexto:
-      publicacion.inmueble.ubicacion?.direccion || "Ubicación no disponible",
+      publicacion.inmueble.ubicacion_inmueble?.direccion || "Ubicación no disponible",
     descripcion:
       publicacion.descripcion ||
       publicacion.inmueble.descripcion ||
@@ -485,7 +485,7 @@ export const obtenerDetallePublicacionService = async (
         id: item.id,
         url: item.url,
         tipo: item.tipo,
-        pesoMb: item.pesoMb ? Number(item.pesoMb) : null,
+        peso_mb: item.peso_mb ? Number(item.peso_mb) : null,
       })),
     videoUrl:
       publicacion.multimedia.find(
@@ -497,10 +497,10 @@ export const obtenerDetallePublicacionService = async (
       )
       .map((item) => item.url),
     detalles: {
-      habitaciones: publicacion.inmueble.nroCuartos ?? null,
-      banos: publicacion.inmueble.nroBanos ?? null,
-      superficieUtil: publicacion.inmueble.superficieM2
-        ? Number(publicacion.inmueble.superficieM2)
+      habitaciones: publicacion.inmueble.nro_cuartos ?? null,
+      banos: publicacion.inmueble.nro_banos ?? null,
+      superficieUtil: publicacion.inmueble.superficie_m2
+        ? Number(publicacion.inmueble.superficie_m2)
         : null,
     },
     caracteristicasAdicionales:
@@ -508,13 +508,13 @@ export const obtenerDetallePublicacionService = async (
         (item) => item.etiqueta.nombre,
       ) ?? [],
     mapa: {
-      latitud: publicacion.inmueble.ubicacion?.latitud
-        ? Number(publicacion.inmueble.ubicacion.latitud)
+      latitud: publicacion.inmueble.ubicacion_inmueble?.latitud
+        ? Number(publicacion.inmueble.ubicacion_inmueble.latitud)
         : null,
-      longitud: publicacion.inmueble.ubicacion?.longitud
-        ? Number(publicacion.inmueble.ubicacion.longitud)
+      longitud: publicacion.inmueble.ubicacion_inmueble?.longitud
+        ? Number(publicacion.inmueble.ubicacion_inmueble.longitud)
         : null,
-      direccion: publicacion.inmueble.ubicacion?.direccion || null,
+      direccion: publicacion.inmueble.ubicacion_inmueble?.direccion || null,
     },
     contacto: {
       nombre: `${publicacion.usuario.nombre} ${publicacion.usuario.apellido}`,
@@ -527,26 +527,26 @@ export const obtenerDetallePublicacionService = async (
 };
 
 export const obtenerDetallePublicacionPorInmuebleService = async (
-  inmuebleId: number,
+  inmueble_id: number,
 ) => {
-  if (Number.isNaN(inmuebleId) || inmuebleId <= 0) {
+  if (Number.isNaN(inmueble_id) || inmueble_id <= 0) {
     throw new Error("ID_INVALIDO");
   }
 
   const publicacion =
-    await buscarDetallePublicacionPorInmuebleIdRepository(inmuebleId);
+    await buscarDetallePublicacionPorInmuebleIdRepository(inmueble_id);
 
   if (!publicacion || publicacion.estado === "ELIMINADA") {
     throw new Error("PUBLICACION_NO_EXISTE");
   }
 
   const telefonoPrincipal =
-    publicacion.usuario.telefonos.find((item) => item.principal) ??
-    publicacion.usuario.telefonos[0];
+    publicacion.usuario.telefono_telefono_usuarioIdTousuario.find((item) => item.principal) ??
+    publicacion.usuario.telefono_telefono_usuarioIdTousuario[0];
 
   return {
     id: publicacion.id,
-    inmuebleId: publicacion.inmueble.id,
+    inmueble_id: publicacion.inmueble.id,
     titulo: publicacion.titulo,
     precio: Number(publicacion.inmueble.precio),
     //HU6-precio Anterior
@@ -554,9 +554,9 @@ export const obtenerDetallePublicacionPorInmuebleService = async (
       ? Number(publicacion.inmueble.precio_anterior)
       : undefined,
     tipoInmueble: publicacion.inmueble.categoria ?? null,
-    tipoOperacion: publicacion.inmueble.tipoAccion,
+    tipoOperacion: publicacion.inmueble.tipo_accion,
     ubicacionTexto:
-      publicacion.inmueble.ubicacion?.direccion || "Ubicación no disponible",
+      publicacion.inmueble.ubicacion_inmueble?.direccion || "Ubicación no disponible",
     descripcion:
       publicacion.descripcion ||
       publicacion.inmueble.descripcion ||
@@ -570,7 +570,7 @@ export const obtenerDetallePublicacionPorInmuebleService = async (
         id: item.id,
         url: item.url,
         tipo: item.tipo,
-        pesoMb: item.pesoMb ? Number(item.pesoMb) : null,
+        peso_mb: item.peso_mb ? Number(item.peso_mb) : null,
       })),
     videoUrl:
      publicacion.multimedia.find(
@@ -582,10 +582,10 @@ export const obtenerDetallePublicacionPorInmuebleService = async (
       )
        .map((item) => item.url),
       detalles: {
-      habitaciones: publicacion.inmueble.nroCuartos ?? null,
-      banos: publicacion.inmueble.nroBanos ?? null,
-      superficieUtil: publicacion.inmueble.superficieM2
-        ? Number(publicacion.inmueble.superficieM2)
+      habitaciones: publicacion.inmueble.nro_cuartos ?? null,
+      banos: publicacion.inmueble.nro_banos ?? null,
+      superficieUtil: publicacion.inmueble.superficie_m2
+        ? Number(publicacion.inmueble.superficie_m2)
         : null,
     },
     caracteristicasAdicionales:
@@ -593,20 +593,15 @@ export const obtenerDetallePublicacionPorInmuebleService = async (
         (item) => item.etiqueta.nombre,
       ) ?? [],
     mapa: {
-      latitud: publicacion.inmueble.ubicacion?.latitud
-        ? Number(publicacion.inmueble.ubicacion.latitud)
+      latitud: publicacion.inmueble.ubicacion_inmueble?.latitud
+        ? Number(publicacion.inmueble.ubicacion_inmueble.latitud)
         : null,
-      longitud: publicacion.inmueble.ubicacion?.longitud
-        ? Number(publicacion.inmueble.ubicacion.longitud)
+      longitud: publicacion.inmueble.ubicacion_inmueble?.longitud
+        ? Number(publicacion.inmueble.ubicacion_inmueble.longitud)
         : null,
-      direccion: publicacion.inmueble.ubicacion?.direccion || null,
+      direccion: publicacion.inmueble.ubicacion_inmueble?.direccion || null,
     },
-    puntosDeInteres: publicacion.inmueble.puntosDeInteres?.map((poi) => ({
-      id: poi.id,
-      nombre: poi.nombre,
-      latitud: Number(poi.latitud),
-      longitud: Number(poi.longitud),
-    })) ?? [],
+
     contacto: {
       nombre: `${publicacion.usuario.nombre} ${publicacion.usuario.apellido}`,
       correo: publicacion.usuario.correo ?? null,
@@ -635,7 +630,7 @@ export const confirmarPublicacionService = async (
     throw new Error("PUBLICACION_NO_EXISTE");
   }
 
-  if (publicacion.usuarioId !== usuarioSolicitanteId) {
+  if (publicacion.usuario_id !== usuarioSolicitanteId) {
     throw new Error("NO_AUTORIZADO");
   }
 
@@ -654,7 +649,7 @@ export const confirmarPublicacionService = async (
   return {
     id: publicacionConfirmada.id,
     estado: publicacionConfirmada.estado,
-    fechaPublicacion: publicacionConfirmada.fechaPublicacion,
+    fecha_publicacion: publicacionConfirmada.fecha_publicacion,
     multimediaTotal: publicacionConfirmada.multimedia.length,
   };
 };
@@ -741,7 +736,7 @@ export const editarMultimediaPublicacionService = async (
     throw new Error("PUBLICACION_NO_EXISTE");
   }
 
-  if (publicacion.usuarioId !== usuarioSolicitanteId) {
+  if (publicacion.usuario_id !== usuarioSolicitanteId) {
     throw new Error("NO_AUTORIZADO");
   }
 
@@ -829,8 +824,8 @@ export const editarMultimediaPublicacionService = async (
       return {
         url,
         tipo: "IMAGEN" as const,
-        pesoMb: Number((file.size / 1024 / 1024).toFixed(2)),
-        publicacionId,
+        peso_mb: Number((file.size / 1024 / 1024).toFixed(2)),
+        publicacion_id: publicacionId,
       };
     }),
   );
@@ -842,8 +837,8 @@ export const editarMultimediaPublicacionService = async (
       return {
         url,
         tipo: "IMAGEN" as const,
-        pesoMb: null,
-        publicacionId,
+        peso_mb: null,
+        publicacion_id: publicacionId,
       };
     }),
   );
@@ -863,8 +858,8 @@ export const editarMultimediaPublicacionService = async (
         videosFinales.map((video) => ({
           url: video,
           tipo: "VIDEO" as const,
-          pesoMb: null,
-          publicacionId,
+          peso_mb: null,
+          publicacion_id: publicacionId,
         })),
       );
     }
@@ -887,7 +882,7 @@ export const editarMultimediaPublicacionService = async (
       id: item.id,
       url: item.url,
       tipo: item.tipo,
-      pesoMb: item.pesoMb ? Number(item.pesoMb) : null,
+      peso_mb: item.peso_mb ? Number(item.peso_mb) : null,
     })),
     videoUrl: videos[0]?.url ?? null,
     videoUrls: videos.map((item) => item.url),
@@ -899,13 +894,13 @@ export const editarMultimediaPublicacionService = async (
 
 export const iniciarPublicidadService = async (
   publicacionId: number,
-  usuarioId: number
+  usuario_id: number
 ): Promise<{ checkoutUrl: string }> => {
   if (Number.isNaN(publicacionId) || publicacionId <= 0) {
     throw new Error("ID_INVALIDO");
   }
 
-  if (Number.isNaN(usuarioId) || usuarioId <= 0) {
+  if (Number.isNaN(usuario_id) || usuario_id <= 0) {
     throw new Error("USUARIO_INVALIDO");
   }
 
@@ -915,7 +910,7 @@ export const iniciarPublicidadService = async (
     throw new Error("PUBLICACION_NO_EXISTE");
   }
 
-  if (publicacion.usuarioId !== usuarioId) {
+  if (publicacion.usuario_id !== usuario_id) {
     throw new Error("NO_AUTORIZADO");
   }
 
@@ -941,7 +936,7 @@ export const iniciarPublicidadService = async (
 
 export const confirmarPublicidadService = async (
   publicacionId: number,
-  usuarioId: number,
+  usuario_id: number,
   paymentIntentId: string,
   planId?: number
 ) => {
@@ -949,7 +944,7 @@ export const confirmarPublicidadService = async (
     throw new Error("ID_INVALIDO");
   }
 
-  if (Number.isNaN(usuarioId) || usuarioId <= 0) {
+  if (Number.isNaN(usuario_id) || usuario_id <= 0) {
     throw new Error("USUARIO_INVALIDO");
   }
 
@@ -963,7 +958,7 @@ export const confirmarPublicidadService = async (
     throw new Error("PUBLICACION_NO_EXISTE");
   }
 
-  if (publicacion.usuarioId !== usuarioId) {
+  if (publicacion.usuario_id !== usuario_id) {
     throw new Error("NO_AUTORIZADO");
   }
 
@@ -979,7 +974,7 @@ export const confirmarPublicidadService = async (
 
   const publicacionActualizada = await activarPublicidadRepository(
     publicacionId,
-    usuarioId,
+    usuario_id,
     paymentIntentId,
     duracionDias
   );
@@ -995,13 +990,13 @@ export const confirmarPublicidadService = async (
 
 export const cancelarPublicidadService = async (
   publicacionId: number,
-  usuarioId: number
+  usuario_id: number
 ) => {
   if (Number.isNaN(publicacionId) || publicacionId <= 0) {
     throw new Error("ID_INVALIDO");
   }
 
-  if (Number.isNaN(usuarioId) || usuarioId <= 0) {
+  if (Number.isNaN(usuario_id) || usuario_id <= 0) {
     throw new Error("USUARIO_INVALIDO");
   }
 
@@ -1011,7 +1006,7 @@ export const cancelarPublicidadService = async (
     throw new Error("PUBLICACION_NO_EXISTE");
   }
 
-  if (publicacion.usuarioId !== usuarioId) {
+  if (publicacion.usuario_id !== usuario_id) {
     throw new Error("NO_AUTORIZADO");
   }
 
@@ -1025,7 +1020,7 @@ export const cancelarPublicidadService = async (
 
   const publicacionActualizada = await cancelarPublicidadRepository(
     publicacionId,
-    usuarioId
+    usuario_id
   );
 
   return {

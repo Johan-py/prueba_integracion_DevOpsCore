@@ -1,13 +1,13 @@
-import { Publicacion } from "@prisma/client";
+import { publicacion } from "@prisma/client";
 // ✅ Ruta corregida: apunta al prisma.client.ts de tu equipo
 import { prisma } from "../../lib/prisma.client.js";
 
 export const publicacionesRepository = {
-  async findAll(): Promise<Publicacion[]> {
+  async findAll(): Promise<publicacion[]> {
     return prisma.publicacion.findMany();
   },
 
-  async findGratis(): Promise<Publicacion[]> {
+  async findGratis(): Promise<publicacion[]> {
     // Ajusta el campo según tu schema.prisma (ejemplo: costo en vez de precio)
     return prisma.publicacion.findMany({
       where: { inmueble: { precio: 0 } },
@@ -15,16 +15,16 @@ export const publicacionesRepository = {
   },
 
   async countByUser(userId: number): Promise<number> {
-    return prisma.publicacion.count({ where: { usuarioId: userId } });
+    return prisma.publicacion.count({ where: { usuario_id: userId } });
   },
 
-  async findByUserId(userId: number): Promise<Publicacion[]> {
+  async findByUserId(userId: number): Promise<publicacion[]> {
     return prisma.publicacion.findMany({
-      where: { usuarioId: userId },
+      where: { usuario_id: userId },
       include: {
         inmueble: {
           include: {
-            ubicacion: true,
+            ubicacion_inmueble: true,
           },
         },
         multimedia: true,
@@ -38,19 +38,19 @@ export const publicacionesRepository = {
         },
       },
       orderBy: {
-        fechaPublicacion: "desc",
+        fecha_publicacion: "desc",
       },
     });
   },
 
   async create(
     userId: number,
-    data: Omit<Publicacion, "id" | "usuarioId">,
-  ): Promise<Publicacion> {
+    data: Omit<publicacion, "id" | "usuario_id">,
+  ): Promise<publicacion> {
     return prisma.publicacion.create({
       data: {
         ...data,
-        usuarioId: userId,
+        usuario_id: userId,
       },
     });
   },

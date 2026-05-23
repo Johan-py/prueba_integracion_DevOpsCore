@@ -104,17 +104,17 @@ const normalizeYoutubeUrl = (videoUrl: string): string => {
   return `https://www.youtube.com/watch?v=${videoId}`
 }
 
-const validatePublicationOwnership = async (publicacionId: number, usuarioId: number) => {
-  validatePositiveInteger(publicacionId, 'ID de publicación')
-  validatePositiveInteger(usuarioId, 'Usuario')
+const validatePublicationOwnership = async (publicacion_id: number, usuario_id: number) => {
+  validatePositiveInteger(publicacion_id, 'ID de publicación')
+  validatePositiveInteger(usuario_id, 'Usuario')
 
-  const publication = await findPublicationByIdRepository(publicacionId)
+  const publication = await findPublicationByIdRepository(publicacion_id)
 
   if (!publication) {
     throw new Error('La publicación no existe')
   }
 
-  if (publication.usuarioId !== usuarioId) {
+  if (publication.usuario_id !== usuario_id) {
     throw new Error('La publicación no pertenece al usuario autenticado')
   }
 
@@ -151,11 +151,11 @@ const validateImagesInput = (images: RegisterImagesInput['images']) => {
       throw new Error('Formato no permitido. Solo PNG, JPG o JPEG')
     }
 
-    if (typeof image.pesoMb !== 'number' || Number.isNaN(image.pesoMb) || image.pesoMb <= 0) {
+    if (typeof image.peso_mb !== 'number' || Number.isNaN(image.peso_mb) || image.peso_mb <= 0) {
       throw new Error(`El tamaño de la imagen ${imageIndex} no es válido`)
     }
 
-    if (image.pesoMb > MAX_IMAGE_SIZE_MB) {
+    if (image.peso_mb > MAX_IMAGE_SIZE_MB) {
       throw new Error('La imagen supera el tamaño máximo permitido de 5 MB')
     }
 
@@ -164,18 +164,18 @@ const validateImagesInput = (images: RegisterImagesInput['images']) => {
     return {
       url: normalizedUrl,
       extension: normalizedExtension,
-      pesoMb: image.pesoMb
+      peso_mb: image.peso_mb
     }
   })
 }
 
 export const getPublicationMultimediaService = async ({
-  publicacionId,
-  usuarioId
+  publicacion_id,
+  usuario_id
 }: GetPublicationMultimediaInput) => {
-  const publication = await validatePublicationOwnership(publicacionId, usuarioId)
+  const publication = await validatePublicationOwnership(publicacion_id, usuario_id)
 
-  const multimedia = await getMultimediaByPublicationIdRepository(publicacionId)
+  const multimedia = await getMultimediaByPublicationIdRepository(publicacion_id)
 
   return {
     publication,
@@ -184,11 +184,11 @@ export const getPublicationMultimediaService = async ({
 }
 
 export const registerVideoLinkService = async ({
-  publicacionId,
-  usuarioId,
+  publicacion_id,
+  usuario_id,
   videoUrl
 }: RegisterVideoLinkInput) => {
-  const publication = await validatePublicationOwnership(publicacionId, usuarioId)
+  const publication = await validatePublicationOwnership(publicacion_id, usuario_id)
 
   if (typeof videoUrl !== 'string' || !videoUrl.trim()) {
     throw new Error('El enlace de video es obligatorio')
@@ -197,7 +197,7 @@ export const registerVideoLinkService = async ({
   const normalizedVideoUrl = normalizeYoutubeUrl(videoUrl)
 
   const totalVideos = await countMultimediaByPublicationIdAndTypeRepository(
-    publicacionId,
+    publicacion_id,
     MULTIMEDIA_TYPES.VIDEO
   )
 
@@ -206,10 +206,10 @@ export const registerVideoLinkService = async ({
   }
 
   const newVideo = await createMultimediaRepository({
-    publicacionId,
+    publicacion_id,
     tipo: MULTIMEDIA_TYPES.VIDEO,
     url: normalizedVideoUrl,
-    pesoMb: null
+    peso_mb: null
   })
 
   return {
@@ -219,16 +219,16 @@ export const registerVideoLinkService = async ({
 }
 
 export const registerImagesService = async ({
-  publicacionId,
-  usuarioId,
+  publicacion_id,
+  usuario_id,
   images
 }: RegisterImagesInput) => {
-  const publication = await validatePublicationOwnership(publicacionId, usuarioId)
+  const publication = await validatePublicationOwnership(publicacion_id, usuario_id)
 
   const normalizedImages = validateImagesInput(images)
 
   const totalImages = await countMultimediaByPublicationIdAndTypeRepository(
-    publicacionId,
+    publicacion_id,
     MULTIMEDIA_TYPES.IMAGE
   )
 
@@ -238,10 +238,10 @@ export const registerImagesService = async ({
 
   const createdImages = await createManyMultimediaRepository(
     normalizedImages.map((image) => ({
-      publicacionId,
+      publicacion_id,
       tipo: MULTIMEDIA_TYPES.IMAGE,
       url: image.url,
-      pesoMb: image.pesoMb
+      peso_mb: image.peso_mb
     }))
   )
 

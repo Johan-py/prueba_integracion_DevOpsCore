@@ -5,9 +5,9 @@ interface InmuebleConScore {
   id: number
   titulo: string
   precio: number
-  superficieM2: number | null
+  superficie_m2: number | null
   categoria: string | null
-  ubicacion: any
+  ubicacion_inmueble: any
   score: number
   razones: string[]
 }
@@ -124,9 +124,9 @@ export class FeaturesService {
             id: propiedad.id,
             titulo: propiedad.titulo,
             precio: Number(propiedad.precio),
-            superficieM2: propiedad.superficieM2,
+            superficie_m2: propiedad.superficie_m2,
             categoria: propiedad.categoria,
-            ubicacion: propiedad.ubicacion,
+            ubicacion_inmueble: propiedad.ubicacion_inmueble,
             score: Math.round(score * 100) / 100,
             razones: razonesMap.get(id) || ['Recomendado automático']
           }
@@ -150,7 +150,7 @@ export class FeaturesService {
     // Estrategia simple: obtener propiedades de las mismas categorías y zonas
     const interactuados = await prisma.inmueble.findMany({
       where: { id: { in: idsInteractuados } },
-      select: { categoria: true, ubicacion: true }
+      select: { categoria: true, ubicacion_inmueble: true }
     })
 
     const categorias = [
@@ -181,8 +181,8 @@ export class FeaturesService {
     if (filtrosActivos?.query && filtrosActivos.query.trim() !== '') {
       const texto = filtrosActivos.query.trim()
       where.OR = [
-        { ubicacion: { zona: { contains: texto, mode: 'insensitive' } } },
-        { ubicacion: { direccion: { contains: texto, mode: 'insensitive' } } },
+        { ubicacion_inmueble: { zona: { contains: texto, mode: 'insensitive' } } },
+        { ubicacion_inmueble: { direccion: { contains: texto, mode: 'insensitive' } } },
         { titulo: { contains: texto, mode: 'insensitive' } }
       ]
     }
@@ -190,7 +190,7 @@ export class FeaturesService {
     const candidatos = await prisma.inmueble.findMany({
       where,
       take: limite,
-      include: { ubicacion: true }
+      include: { publicacion: true }
     })
 
     return candidatos
@@ -211,11 +211,11 @@ export class FeaturesService {
 
     // Normalizar precios y superficies (valores de ejemplo, ajusta según tus rangos)
     const maxPrice = Math.max(...inmuebles.map((p) => Number(p.precio) || 0))
-    const maxSuperficie = Math.max(...inmuebles.map((p) => Number(p.superficieM2) || 0))
+    const maxSuperficie = Math.max(...inmuebles.map((p) => Number(p.superficie_m2) || 0))
 
     return inmuebles.map((inm) => {
       const precioNorm = Number(inm.precio) / (maxPrice || 1)
-      const superficieNorm = (Number(inm.superficieM2) || 0) / (maxSuperficie || 1)
+      const superficieNorm = (Number(inm.superficie_m2) || 0) / (maxSuperficie || 1)
       const categoriaVal = categoriasMap.get(inm.categoria || '') || 0
       // Puedes agregar más características: zona (hash), número de cuartos, baños, etc.
       return [categoriaVal, precioNorm, superficieNorm]
@@ -267,19 +267,19 @@ export class FeaturesService {
    * Fallback: recomendar propiedades populares
    */
   private async fallbackPopulares(limit: number): Promise<InmuebleConScore[]> {
-    const fechaPublicacion = await prisma.inmueble.findMany({
+    const fecha_publicacion = await prisma.inmueble.findMany({
       where: { estado: 'ACTIVO' },
-      orderBy: { fechaPublicacion: 'desc' }, // asumiendo campo popularidad
+      orderBy: { fecha_publicacion: 'desc' }, // asumiendo campo popularidad
       take: limit,
-      include: { ubicacion: true }
+      include: { publicacion: true, ubicacion_inmueble: true }
     })
-    return fechaPublicacion.map((p) => ({
+    return fecha_publicacion.map((p) => ({
       id: p.id,
       titulo: p.titulo,
       precio: Number(p.precio),
-      superficieM2: p.superficieM2 ? Number(p.superficieM2) : null,
+      superficie_m2: p.superficie_m2 ? Number(p.superficie_m2) : null,
       categoria: p.categoria,
-      ubicacion: p.ubicacion,
+      ubicacion_inmueble: p.ubicacion_inmueble,
       score: 50,
       razones: ['Popularidad general']
     }))

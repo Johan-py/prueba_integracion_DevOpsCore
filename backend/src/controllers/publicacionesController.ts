@@ -83,7 +83,7 @@ export const validarPublicacionesFree = async (req: Request, res: Response) => {
   try {
     const userId = parseInt(req.params.id as string, 10);
     const publicaciones = await prisma.publicacion.count({
-      where: { usuarioId: userId },
+      where: { usuario_id: userId },
     });
 
     const limiteGratis = 3; // Límite gratuito de publicaciones

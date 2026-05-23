@@ -60,8 +60,8 @@ export const obtenerConsumo = async (userId: number) => {
 
   const publicacionesMes = await prisma.publicacion.count({
     where: {
-      usuarioId: userId,
-      fechaPublicacion: { gte: inicioMes },
+      usuario_id: userId,
+      fecha_publicacion: { gte: inicioMes },
     },
   })
 

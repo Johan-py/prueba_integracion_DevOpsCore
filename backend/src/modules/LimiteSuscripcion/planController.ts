@@ -12,10 +12,10 @@ export const getPlanLimit = async (req: Request, res: Response) => {
     const user = await prisma.usuario.findUnique({
       where: { id: Number(userId) },
       include: {
-        publicaciones: true,
+        publicacion: true,
         suscripciones_activas: true,
         _count: {
-          select: { publicaciones: true }
+          select: { publicacion: true }
         }
       }
     })
@@ -26,7 +26,7 @@ export const getPlanLimit = async (req: Request, res: Response) => {
 
     const publicacionesMes = await prisma.publicacion.count({
       where: {
-        usuarioId: Number(userId)
+        usuario_id: Number(userId)
       }
     })
 

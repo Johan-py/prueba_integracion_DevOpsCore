@@ -1,14 +1,14 @@
 import { publicacionesRepository } from './publicaciones.repository.js'
-import { Publicacion } from '@prisma/client'
+import { publicacion } from '@prisma/client'
 import { suscripcionesService } from '../suscripciones/suscripciones.service.js'
 import { prisma } from '../../lib/prisma.client.js'
 
 export const publicacionesService = {
-  async listarTodas(): Promise<Publicacion[]> {
+  async listarTodas(): Promise<publicacion[]> {
     return publicacionesRepository.findAll()
   },
 
-  async listarGratis(): Promise<Publicacion[]> {
+  async listarGratis(): Promise<publicacion[]> {
     return publicacionesRepository.findGratis()
   },
 
@@ -38,7 +38,7 @@ export const publicacionesService = {
     }
   },
 
-  async crear(userId: number, data: Partial<Publicacion>): Promise<Publicacion> {
+  async crear(userId: number, data: Partial<publicacion>): Promise<publicacion> {
     const count = await publicacionesRepository.countByUser(userId)
 
     console.log('📊 Publicaciones del usuario:', count)
@@ -47,7 +47,7 @@ export const publicacionesService = {
       throw new Error('LIMIT_REACHED')
     }
 
-    return publicacionesRepository.create(userId, data as Omit<Publicacion, 'id' | 'usuarioId'>)
+    return publicacionesRepository.create(userId, data as Omit<publicacion, 'id' | 'usuario_id'>)
   },
 
   async validarFlujo(userId: number): Promise<string> {
@@ -69,7 +69,7 @@ export const publicacionesService = {
       throw new Error('PUBLICACION_NOT_FOUND')
     }
 
-    if (publicacion.usuarioId !== userId) {
+    if (publicacion.usuario_id !== userId) {
       throw new Error('UNAUTHORIZED')
     }
 
@@ -83,14 +83,14 @@ export const publicacionesService = {
       throw new Error('PUBLICACION_NOT_FOUND')
     }
 
-    if (publicacion.usuarioId !== userId) {
+    if (publicacion.usuario_id !== userId) {
       throw new Error('UNAUTHORIZED')
     }
 
     await publicacionesRepository.updateEstado(publicacionId, activa)
   },
 
-  async validarPublicacionHU5(userId: number, data: Partial<Publicacion>) {
+  async validarPublicacionHU5(userId: number, data: Partial<publicacion>) {
     const count = await publicacionesRepository.countByUser(userId)
     if (count >= 3) {
       throw new Error('LIMIT_REACHED')

@@ -17,23 +17,23 @@ type AuthenticatedRequest = Request & {
 }
 
 const parsePublicacionId = (req: Request): number => {
-  const publicacionId = Number(req.params.publicacionId)
+  const publicacion_id = Number(req.params.publicacion_id)
 
-  if (!Number.isInteger(publicacionId) || publicacionId <= 0) {
+  if (!Number.isInteger(publicacion_id) || publicacion_id <= 0) {
     throw new Error('ID de publicación no válido')
   }
 
-  return publicacionId
+  return publicacion_id
 }
 
 const getAuthenticatedUserId = (req: AuthenticatedRequest): number => {
-  const usuarioId = Number(req.user?.id)
+  const usuario_id = Number(req.user?.id)
 
-  if (!Number.isInteger(usuarioId) || usuarioId <= 0) {
+  if (!Number.isInteger(usuario_id) || usuario_id <= 0) {
     throw new Error('Usuario no autenticado')
   }
 
-  return usuarioId
+  return usuario_id
 }
 
 const getErrorStatus = (message: string): number => {
@@ -81,12 +81,12 @@ const handleControllerError = (error: unknown, res: Response) => {
 
 export const getPublicationMultimediaController = async (req: Request, res: Response) => {
   try {
-    const publicacionId = parsePublicacionId(req)
-    const usuarioId = getAuthenticatedUserId(req as AuthenticatedRequest)
+    const publicacion_id = parsePublicacionId(req)
+    const usuario_id = getAuthenticatedUserId(req as AuthenticatedRequest)
 
     const result = await getPublicationMultimediaService({
-      publicacionId,
-      usuarioId
+      publicacion_id,
+      usuario_id
     })
 
     return res.json({
@@ -100,13 +100,13 @@ export const getPublicationMultimediaController = async (req: Request, res: Resp
 
 export const registerVideoLinkController = async (req: Request, res: Response) => {
   try {
-    const publicacionId = parsePublicacionId(req)
-    const usuarioId = getAuthenticatedUserId(req as AuthenticatedRequest)
+    const publicacion_id = parsePublicacionId(req)
+    const usuario_id = getAuthenticatedUserId(req as AuthenticatedRequest)
     const { videoUrl } = req.body as Partial<RegisterVideoLinkBody>
 
     const result = await registerVideoLinkService({
-      publicacionId,
-      usuarioId,
+      publicacion_id,
+      usuario_id,
       videoUrl: typeof videoUrl === 'string' ? videoUrl : ''
     })
 
@@ -121,8 +121,8 @@ export const registerVideoLinkController = async (req: Request, res: Response) =
 
 export const registerImagesController = async (req: Request, res: Response) => {
   try {
-    const publicacionId = parsePublicacionId(req)
-    const usuarioId = getAuthenticatedUserId(req as AuthenticatedRequest)
+    const publicacion_id = parsePublicacionId(req)
+    const usuario_id = getAuthenticatedUserId(req as AuthenticatedRequest)
     const files = (req as AuthenticatedRequest).files ?? []
 
     if (files.length === 0) {
@@ -132,19 +132,19 @@ export const registerImagesController = async (req: Request, res: Response) => {
     const normalizedImages: ImageUploadItemInput[] = await Promise.all(
       files.map(async (file) => {
         const extension = file.originalname.split('.').pop()?.toLowerCase() ?? ''
-        const uploadedImage = await uploadImageToCloudinary(file, publicacionId)
+        const uploadedImage = await uploadImageToCloudinary(file, publicacion_id)
 
         return {
           url: uploadedImage.url,
           extension,
-          pesoMb: uploadedImage.pesoMb
+          peso_mb: uploadedImage.pesoMb
         }
       })
     )
 
     const result = await registerImagesService({
-      publicacionId,
-      usuarioId,
+      publicacion_id,
+      usuario_id,
       images: normalizedImages
     })
 

@@ -29,7 +29,7 @@ const replacePublicationParameters = async (
     throw new Error('PUBLICATION_NOT_FOUND')
   }
 
-  if (publication.usuarioId !== userId) {
+  if (publication.usuario_id !== userId) {
     throw new Error('FORBIDDEN')
   }
 
@@ -47,7 +47,7 @@ const removePublicationParameter = async (
     throw new Error('PUBLICATION_NOT_FOUND')
   }
 
-  if (publication.usuarioId !== userId) {
+  if (publication.usuario_id !== userId) {
     throw new Error('FORBIDDEN')
   }
 

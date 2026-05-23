@@ -37,10 +37,10 @@ export async function crearOrdenPublicidad(
 
   const publicacion = await prisma.publicacion.findUnique({
     where: { id: publicacionId },
-    select: { id: true, usuarioId: true, estado: true, promoted: true },
+    select: { id: true, usuario_id: true, estado: true, promoted: true },
   })
   if (!publicacion) throw new Error('PUBLICACION_NO_EXISTE')
-  if (publicacion.usuarioId !== usuarioId) throw new Error('NO_AUTORIZADO')
+  if (publicacion.usuario_id !== usuarioId) throw new Error('NO_AUTORIZADO')
   if (publicacion.estado === 'ELIMINADA') throw new Error('PUBLICACION_YA_ELIMINADA')
   if (publicacion.promoted) throw new Error('PUBLICACION_YA_PUBLICITADA')
 

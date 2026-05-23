@@ -1,4 +1,4 @@
-import type { TipoMultimedia } from "@prisma/client";
+import type { tipo_multimedia } from "@prisma/client";
 import { prisma } from "../../lib/prisma.client.js";
 import type {
   MultimediaRecord,
@@ -8,32 +8,32 @@ import type {
 
 const mapPublicationRecord = (publication: {
   id: number;
-  usuarioId: number;
+  usuario_id: number;
   titulo: string;
 }): PublicacionRecord => {
   return {
     id: publication.id,
-    usuarioId: publication.usuarioId,
+    usuario_id: publication.usuario_id,
     titulo: publication.titulo,
   };
 };
 
 const mapMultimediaRecord = (multimedia: {
   id: number;
-  publicacionId: number;
-  tipo: TipoMultimedia;
+  publicacion_id: number;
+  tipo: tipo_multimedia;
   url: string;
-  pesoMb: unknown;
+  peso_mb: unknown;
 }): MultimediaRecord => {
   return {
     id: multimedia.id,
-    publicacionId: multimedia.publicacionId,
+    publicacion_id: multimedia.publicacion_id,
     tipo: multimedia.tipo as MultimediaType,
     url: multimedia.url,
-    pesoMb:
-      multimedia.pesoMb === null || multimedia.pesoMb === undefined
+    peso_mb:
+      multimedia.peso_mb === null || multimedia.peso_mb === undefined
         ? null
-        : Number(multimedia.pesoMb),
+        : Number(multimedia.peso_mb),
   };
 };
 
@@ -44,7 +44,7 @@ export const findPublicationByIdRepository = async (
     where: { id: publicacionId },
     select: {
       id: true,
-      usuarioId: true,
+      usuario_id: true,
       titulo: true,
     },
   });
@@ -56,14 +56,14 @@ export const getMultimediaByPublicationIdRepository = async (
   publicacionId: number,
 ): Promise<MultimediaRecord[]> => {
   const multimedia = await prisma.multimedia.findMany({
-    where: { publicacionId },
+    where: { publicacion_id: publicacionId },
     orderBy: { id: "asc" },
     select: {
       id: true,
-      publicacionId: true,
+      publicacion_id: true,
       tipo: true,
       url: true,
-      pesoMb: true,
+      peso_mb: true,
     },
   });
 
@@ -76,8 +76,8 @@ export const countMultimediaByPublicationIdAndTypeRepository = async (
 ): Promise<number> => {
   return prisma.multimedia.count({
     where: {
-      publicacionId,
-      tipo: tipo as TipoMultimedia,
+      publicacion_id: publicacionId,
+      tipo: tipo as tipo_multimedia,
     },
   });
 };
@@ -87,17 +87,17 @@ export const createMultimediaRepository = async (
 ): Promise<MultimediaRecord> => {
   const created = await prisma.multimedia.create({
     data: {
-      publicacionId: data.publicacionId,
-      tipo: data.tipo as TipoMultimedia,
+      publicacion_id: data.publicacion_id,
+      tipo: data.tipo as tipo_multimedia,
       url: data.url,
-      pesoMb: data.pesoMb ?? null,
+      peso_mb: data.peso_mb ?? null,
     },
     select: {
       id: true,
-      publicacionId: true,
+      publicacion_id: true,
       tipo: true,
       url: true,
-      pesoMb: true,
+      peso_mb: true,
     },
   });
 
@@ -115,17 +115,17 @@ export const createManyMultimediaRepository = async (
     items.map((item) =>
       prisma.multimedia.create({
         data: {
-          publicacionId: item.publicacionId,
-          tipo: item.tipo as TipoMultimedia,
+          publicacion_id: item.publicacion_id,
+          tipo: item.tipo as tipo_multimedia,
           url: item.url,
-          pesoMb: item.pesoMb ?? null,
+          peso_mb: item.peso_mb ?? null,
         },
         select: {
           id: true,
-          publicacionId: true,
+          publicacion_id: true,
           tipo: true,
           url: true,
-          pesoMb: true,
+          peso_mb: true,
         },
       }),
     ),

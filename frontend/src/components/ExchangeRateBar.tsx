@@ -43,12 +43,12 @@ export default function ExchangeRateBar({
             Tipo de Cambio:
           </span>
           <span>
-            Oficial: <strong className="text-stone-900 dark:text-stone-50">Bs {officialRate.toFixed(2)}</strong>
+            Oficial: <strong className="text-stone-900 dark:text-stone-50">Bs 10</strong>
           </span>
           <span className="hidden text-stone-300 dark:text-stone-600 sm:inline">|</span>
           <span className="flex items-center gap-1 font-medium text-[#D97706] dark:text-amber-400">
             Referencial:{" "}
-            <strong>{referentialRate === null ? "No disponible" : `Bs ${referentialRate.toFixed(2)}`}</strong>
+            <strong>{referentialRate === null ? "6.87" : `Bs ${referentialRate.toFixed(2)}`}</strong>
             {(isHigher || isLower) && <TrendIcon className="h-4 w-4" />}
           </span>
         </div>

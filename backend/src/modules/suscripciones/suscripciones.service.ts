@@ -57,7 +57,7 @@ export const suscripcionesService = {
   }> {
     const limite = await this.obtenerLimitePublicaciones(usuarioId);
     const usadas = await prisma.publicacion.count({
-      where: { usuarioId },
+      where: { usuario_id: usuarioId },
     });
 
     const puede = usadas < limite;

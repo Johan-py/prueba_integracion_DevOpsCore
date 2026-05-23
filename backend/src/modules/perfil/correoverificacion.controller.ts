@@ -471,7 +471,7 @@ export const solicitarCambioEmail = async (req: AuthRequest, res: Response) => {
     const otp = Math.floor(1000 + Math.random() * 9000).toString();
     const expiraEn = new Date(Date.now() + 5 * 60 * 1000);
 
-    await prisma.cambioEmail.create({
+    await prisma.cambio_email.create({
       data: {
         token: otp,
         email_nuevo: emailNuevo,
@@ -518,7 +518,7 @@ export const confirmarCambioEmail = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ ok: false, msg: "Código requerido" });
     }
 
-    const solicitud = await prisma.cambioEmail.findFirst({
+    const solicitud = await prisma.cambio_email.findFirst({
       where: {
         usuario_id: usuarioId,
         completado_en: null,
@@ -552,7 +552,7 @@ export const confirmarCambioEmail = async (req: AuthRequest, res: Response) => {
         where: { id: usuarioId },
         data: { correo: solicitud.email_nuevo },
       }),
-      prisma.cambioEmail.update({
+      prisma.cambio_email.update({
         where: { id: solicitud.id },
         data: { completado_en: new Date() },
       }),

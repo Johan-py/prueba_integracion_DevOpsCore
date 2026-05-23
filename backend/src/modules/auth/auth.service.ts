@@ -726,7 +726,7 @@ export const verifyRegisterCodeService = async (
       nombre: newUser.nombre,
       apellido: newUser.apellido,
       correo: newUser.correo,
-      telefonos: newUser.telefonos,
+      telefono_telefono_usuarioIdTousuario: newUser.telefono_telefono_usuarioIdTousuario,
     },
     token,
   };

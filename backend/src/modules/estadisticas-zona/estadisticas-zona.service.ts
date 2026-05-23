@@ -38,8 +38,8 @@ interface InmuebleStats {
   id: number
   precio: { toString: () => string } | number | string
   categoria: string | null
-  fechaPublicacion: Date | null
-  createdAt: Date | null
+  fecha_publicacion: Date | null
+  created_at: Date | null
 }
 
 export const estadisticasZonaService = {
@@ -47,7 +47,7 @@ export const estadisticasZonaService = {
     const { zonaId, tipoOperacion } = params
 
     // 1. Obtener la zona predefinida
-    const zona = await prisma.zonaPredefinida.findUnique({
+    const zona = await prisma.zona_predefinida.findUnique({
       where: { id: zonaId }
     })
 
@@ -63,19 +63,19 @@ export const estadisticasZonaService = {
           mode: 'insensitive'
         }
       },
-      include: { barrios: true }
+      include: { barrio: true }
     })
 
     // 3. Obtener inmuebles tipados explícitamente
     let inmuebles: InmuebleStats[] = []
 
-    if (zonaGeo && zonaGeo.barrios.length > 0) {
-      const barrioIds = zonaGeo.barrios.map((b: { id: number }) => b.id)
+    if (zonaGeo && zonaGeo.barrio.length > 0) {
+      const barrioIds = zonaGeo.barrio.map((b: { id: number }) => b.id)
 
       const resultado = await prisma.inmueble.findMany({
         where: {
-          tipoAccion: tipoOperacion as 'VENTA' | 'ALQUILER' | 'ANTICRETO',
-          ubicacion: {
+          tipo_accion: tipoOperacion as 'VENTA' | 'ALQUILER' | 'ANTICRETO',
+          ubicacion_inmueble: {
             barrio_id: { in: barrioIds }
           }
         },
@@ -83,10 +83,10 @@ export const estadisticasZonaService = {
           id: true,
           precio: true,
           categoria: true,
-          fechaPublicacion: true,
-          createdAt: true
+          fecha_publicacion: true,
+          created_at: true
         },
-        orderBy: { fechaPublicacion: 'asc' }
+        orderBy: { fecha_publicacion: 'asc' }
       })
 
       // Cast explícito al tipo mínimo que necesitamos
@@ -113,14 +113,14 @@ export const estadisticasZonaService = {
 
     const inmueblesRecientes: InmuebleStats[] = inmuebles.filter(
       (i: InmuebleStats): boolean => {
-        const fecha: Date | null = i.fechaPublicacion ?? i.createdAt
+        const fecha: Date | null = i.fecha_publicacion ?? i.created_at
         return fecha !== null && fecha >= hace12Meses
       }
     )
 
     const porMes: Record<string, number[]> = {}
     for (const inmueble of inmueblesRecientes) {
-      const fecha: Date | null = inmueble.fechaPublicacion ?? inmueble.createdAt
+      const fecha: Date | null = inmueble.fecha_publicacion ?? inmueble.created_at
       if (!fecha) continue
       const clave = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}`
       if (!porMes[clave]) porMes[clave] = []
@@ -180,7 +180,7 @@ export const estadisticasZonaService = {
   },
 
   async getZonas() {
-    return prisma.zonaPredefinida.findMany({
+    return prisma.zona_predefinida.findMany({
       where: { activa: true },
       select: { id: true, nombre: true },
       orderBy: { nombre: 'asc' }

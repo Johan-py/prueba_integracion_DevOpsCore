@@ -60,7 +60,7 @@ export const createUser = async (data: CreateUserInput) => {
         correo: data.correo,
         password: data.password,
         rolId: rol.id,
-        telefonos: data.telefono
+        telefono_telefono_usuarioIdTousuario: data.telefono
           ? {
               create: {
                 codigoPais: "+591",
@@ -71,7 +71,7 @@ export const createUser = async (data: CreateUserInput) => {
           : undefined,
       },
       include: {
-        telefonos: true,
+        telefono_telefono_usuarioIdTousuario: true,
         rol: true,
       },
     });

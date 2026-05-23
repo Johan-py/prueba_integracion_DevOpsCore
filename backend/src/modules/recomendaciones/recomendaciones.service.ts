@@ -18,9 +18,9 @@ export class RecomendacionesService {
       id: p.id,
       titulo: p.titulo,
       precio: Number(p.precio),
-      superficieM2: p.superficieM2 ? Number(p.superficieM2) : null,
+      superficie_m2: p.superficie_m2 ? Number(p.superficie_m2) : null,
       categoria: p.categoria ?? null,
-      ubicacion: p.ubicacion,
+      ubicacion_inmueble: p.ubicacion_inmueble,
       score: 50,
       razones: [`Popular en ${zona} (últimos 7 días)`]
     }))
@@ -86,9 +86,9 @@ export class RecomendacionesService {
         id: p.id,
         titulo: p.titulo,
         precio: Number(p.precio),
-        superficieM2: p.superficieM2 ? Number(p.superficieM2) : null,
+        superficie_m2: p.superficie_m2 ? Number(p.superficie_m2) : null,
         categoria: p.categoria ?? null,
-        ubicacion: p.ubicacion,
+        ubicacion_inmueble: p.ubicacion_inmueble,
         score: 50,
         razones: ['Popularidad general']
       }))
@@ -107,10 +107,10 @@ export class RecomendacionesService {
       const minDeZona = Math.ceil(totalRequeridos * 0.6)
 
       const deZonaConexion = candidatos.filter((c) =>
-        c.ubicacion?.zona?.toLowerCase().includes(zonaConexion.toLowerCase())
+        c.ubicacion_inmueble?.zona?.toLowerCase().includes(zonaConexion.toLowerCase())
       )
       const otrasZonas = candidatos.filter(
-        (c) => !c.ubicacion?.zona?.toLowerCase().includes(zonaConexion.toLowerCase())
+        (c) => !c.ubicacion_inmueble?.zona?.toLowerCase().includes(zonaConexion.toLowerCase())
       )
 
       if (deZonaConexion.length < minDeZona) {
@@ -141,7 +141,7 @@ export class RecomendacionesService {
 
       if (
         zonaConexion &&
-        inmueble.ubicacion?.zona?.toLowerCase().includes(zonaConexion.toLowerCase())
+        inmueble.ubicacion_inmueble?.zona?.toLowerCase().includes(zonaConexion.toLowerCase())
       ) {
         scoreFinal += 10
         razones.push(`Zona de conexión (${zonaConexion}) +10pts`)
@@ -152,9 +152,9 @@ export class RecomendacionesService {
           id: inmueble.id,
           titulo: inmueble.titulo,
           precio: Number(inmueble.precio),
-          superficieM2: inmueble.superficieM2 ? Number(inmueble.superficieM2) : null,
+          superficie_m2: inmueble.superficie_m2 ? Number(inmueble.superficie_m2) : null,
           categoria: inmueble.categoria ?? null,
-          ubicacion: inmueble.ubicacion,
+          ubicacion_inmueble: inmueble.ubicacion_inmueble,
           score: scoreFinal,
           razones
         })
@@ -180,9 +180,9 @@ export class RecomendacionesService {
         id: p.id,
         titulo: p.titulo,
         precio: Number(p.precio),
-        superficieM2: p.superficieM2 ? Number(p.superficieM2) : null,
+        superficie_m2: p.superficie_m2 ? Number(p.superficie_m2) : null,
         categoria: p.categoria ?? null,
-        ubicacion: p.ubicacion,
+        ubicacion_inmueble: p.ubicacion_inmueble,
         score: 0,
         razones: ['Sin historial']
       }))
@@ -206,9 +206,9 @@ export class RecomendacionesService {
         id: inmueble.id,
         titulo: inmueble.titulo,
         precio: Number(inmueble.precio),
-        superficieM2: inmueble.superficieM2 ? Number(inmueble.superficieM2) : null,
+        superficie_m2: inmueble.superficie_m2 ? Number(inmueble.superficie_m2) : null,
         categoria: inmueble.categoria ?? null,
-        ubicacion: inmueble.ubicacion,
+        ubicacion_inmueble: inmueble.ubicacion_inmueble,
         score,
         razones
       }

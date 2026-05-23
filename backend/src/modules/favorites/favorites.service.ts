@@ -15,8 +15,8 @@ export class FavoritesService {
         include: {
           inmueble: {
             include: {
-              ubicacion: true,
-              publicaciones: {
+              ubicacion_inmueble: true,
+              publicacion: {
                 where: { estado: "ACTIVA" }, // Solo publicaciones activas
                 include: { multimedia: true },
                 take: 1,
@@ -38,7 +38,7 @@ export class FavoritesService {
         inmueble: {
           ...f.inmueble,
           imagen_principal:
-            f.inmueble.publicaciones[0]?.multimedia[0]?.url || null,
+            f.inmueble.publicacion[0]?.multimedia[0]?.url || null,
         },
       })),
       totalPages: Math.ceil(total / perPage),
@@ -58,7 +58,7 @@ export class FavoritesService {
       );
       const inmueble = await prisma.inmueble.findUnique({
         where: { id: inmuebleId },
-        include: { ubicacion: true, inmueble_amenidad: true },
+        include: { ubicacion_inmueble: true, inmueble_amenidad: true },
       });
       console.log("[DEBUG] Inmueble encontrado:", inmueble?.id);
       if (inmueble) {
@@ -71,13 +71,13 @@ export class FavoritesService {
               score_real: 1.0,
               features: {
                 categoria: inmueble.categoria,
-                tipoAccion: inmueble.tipoAccion,
+                tipo_accion: inmueble.tipo_accion,
                 precio: Number(inmueble.precio),
-                superficieM2: Number(inmueble.superficieM2 || 0),
-                nroCuartos: inmueble.nroCuartos || 0,
-                nroBanos: inmueble.nroBanos || 0,
-                zona: inmueble.ubicacion?.zona || null,
-                ciudad: inmueble.ubicacion?.ciudad || null,
+                superficie_m2: Number(inmueble.superficie_m2 || 0),
+                nro_cuartos: inmueble.nro_cuartos || 0,
+                nro_banos: inmueble.nro_banos || 0,
+                zona: inmueble.ubicacion_inmueble?.zona || null,
+                ciudad: inmueble.ubicacion_inmueble?.ciudad || null,
                 amenidades: inmueble.inmueble_amenidad.map(
                   (a) => a.amenidad_id,
                 ),

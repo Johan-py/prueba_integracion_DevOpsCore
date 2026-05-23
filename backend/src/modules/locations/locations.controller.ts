@@ -19,7 +19,7 @@ export const locationsController = {
     try {
       const { deptoId } = req.params;
       const provincias = await prisma.provincia.findMany({
-        where: { departamento_id: Number(deptoId) },
+        where: { departamento: Number(deptoId) },
         orderBy: { nombre: 'asc' }
       });
       res.json(provincias);
@@ -33,7 +33,7 @@ export const locationsController = {
     try {
       const { provId } = req.params;
       const municipios = await prisma.municipio.findMany({
-        where: { provincia_id: Number(provId) },
+        where: { provincia: Number(provId) },
         orderBy: { nombre: 'asc' }
       });
       res.json(municipios);
@@ -47,7 +47,7 @@ export const locationsController = {
     try {
       const { munId } = req.params;
       const zonas = await prisma.zona_geografica.findMany({ // <--- Cambio aquí
-        where: { municipio_id: Number(munId) },
+        where: { municipio: Number(munId) },
         orderBy: { nombre: 'asc' }
       });
       res.json(zonas);

@@ -201,15 +201,15 @@ export const getPropiedadesEnZona = async (req: Request, res: Response): Promise
         estado: 'ACTIVO'
       },
       include: {
-        ubicacion: true,              // ✅ relación correcta
-        propietario: {                // ✅ relación correcta (no "usuario")
+        ubicacion_inmueble: true,
+        usuario: {
           select: {
             nombre: true,
             apellido: true,
             correo: true
           }
         },
-        publicaciones: {              // ✅ relación correcta (plural)
+        publicacion: {
           where: { estado: 'ACTIVA' },
           take: 1,
           include: {
@@ -227,19 +227,19 @@ export const getPropiedadesEnZona = async (req: Request, res: Response): Promise
     const propiedadesFormateadas = propiedades.map(prop => ({
       id: prop.id,
       titulo: prop.titulo,
-      tipo_accion: prop.tipoAccion,        // campo: tipoAccion
+      tipo_accion: prop.tipo_accion,
       precio: prop.precio,
-      superficie_m2: prop.superficieM2,    // campo: superficieM2
-      nro_cuartos: prop.nroCuartos,        // campo: nroCuartos
-      nro_banos: prop.nroBanos,            // campo: nroBanos
-      direccion: prop.ubicacion?.direccion,
-      ciudad: prop.ubicacion?.ciudad,
-      zona: prop.ubicacion?.zona,
-      latitud: prop.ubicacion?.latitud ? Number(prop.ubicacion.latitud) : null,
-      longitud: prop.ubicacion?.longitud ? Number(prop.ubicacion.longitud) : null,
-      imagen: prop.publicaciones[0]?.multimedia[0]?.url || null,
-      propietario: `${prop.propietario.nombre} ${prop.propietario.apellido}`,
-      contacto: prop.propietario.correo
+      superficie_m2: prop.superficie_m2,
+      nro_cuartos: prop.nro_cuartos,
+      nro_banos: prop.nro_banos,
+      direccion: prop.ubicacion_inmueble?.direccion,
+      ciudad: prop.ubicacion_inmueble?.ciudad,
+      zona: prop.ubicacion_inmueble?.zona,
+      latitud: prop.ubicacion_inmueble?.latitud ? Number(prop.ubicacion_inmueble.latitud) : null,
+      longitud: prop.ubicacion_inmueble?.longitud ? Number(prop.ubicacion_inmueble.longitud) : null,
+      imagen: prop.publicacion[0]?.multimedia[0]?.url || null,
+      propietario: `${prop.usuario.nombre} ${prop.usuario.apellido}`,
+      contacto: prop.usuario.correo
     }))
 
     return res.json({

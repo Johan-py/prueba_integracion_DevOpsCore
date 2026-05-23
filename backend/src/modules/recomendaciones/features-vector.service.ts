@@ -5,7 +5,7 @@ export interface ContextoUsuario {
   categoriasPreferidas: string[] // categorías más interactuadas
   precioPromedio: number // precio promedio de lo que vio
   superficiePromedio: number
-  tipoAccionPreferida: string | null // VENTA, ALQUILER, ANTICRETO
+  tipo_accionPreferida: string | null // VENTA, ALQUILER, ANTICRETO
   amenidadesPreferidas: number[] // ids de amenidades vistas frecuentemente
 }
 
@@ -28,8 +28,9 @@ export class FeaturesVectorService {
       include: {
         inmueble: {
           include: {
-            ubicacion: true,
-            inmueble_amenidad: true
+            publicacion: true,
+            inmueble_amenidad: true,
+            ubicacion_inmueble: true
           }
         }
       }
@@ -40,8 +41,9 @@ export class FeaturesVectorService {
       include: {
         inmueble: {
           include: {
-            ubicacion: true,
-            inmueble_amenidad: true
+            publicacion: true,
+            inmueble_amenidad: true,
+            ubicacion_inmueble: true
           }
         }
       }
@@ -59,7 +61,7 @@ export class FeaturesVectorService {
         categoriasPreferidas: [],
         precioPromedio: 0,
         superficiePromedio: 0,
-        tipoAccionPreferida: null,
+        tipo_accionPreferida: null,
         amenidadesPreferidas: []
       }
     }
@@ -67,26 +69,26 @@ export class FeaturesVectorService {
     // Contar zonas
     const zonaCount = new Map<string, number>()
     const categoriaCount = new Map<string, number>()
-    const tipoAccionCount = new Map<string, number>()
+    const tipo_accionCount = new Map<string, number>()
     const amenidadCount = new Map<number, number>()
     let precioTotal = 0,
       superficieTotal = 0,
       count = 0
 
     for (const { inmueble, peso } of todos) {
-      const zona = inmueble.ubicacion?.zona
+      const zona = inmueble.ubicacion_inmueble?.zona
       if (zona) zonaCount.set(zona, (zonaCount.get(zona) || 0) + peso)
 
       const cat = inmueble.categoria
       if (cat) categoriaCount.set(cat, (categoriaCount.get(cat) || 0) + peso)
 
-      tipoAccionCount.set(
-        inmueble.tipoAccion,
-        (tipoAccionCount.get(inmueble.tipoAccion) || 0) + peso
+      tipo_accionCount.set(
+        inmueble.tipo_accion,
+        (tipo_accionCount.get(inmueble.tipo_accion) || 0) + peso
       )
 
       precioTotal += Number(inmueble.precio) * peso
-      superficieTotal += Number(inmueble.superficieM2 || 0) * peso
+      superficieTotal += Number(inmueble.superficie_m2 || 0) * peso
       count += peso
 
       for (const a of inmueble.inmueble_amenidad) {
@@ -105,7 +107,7 @@ export class FeaturesVectorService {
       categoriasPreferidas: top(categoriaCount, 3),
       precioPromedio: count > 0 ? precioTotal / count : 0,
       superficiePromedio: count > 0 ? superficieTotal / count : 0,
-      tipoAccionPreferida: top(tipoAccionCount, 1)[0] ?? null,
+      tipo_accionPreferida: top(tipo_accionCount, 1)[0] ?? null,
       amenidadesPreferidas: top(amenidadCount, 5)
     }
   }
@@ -117,9 +119,10 @@ export class FeaturesVectorService {
     const inmueble = await prisma.inmueble.findUnique({
       where: { id: inmuebleId },
       include: {
-        ubicacion: true,
+        publicacion: true,
         inmueble_amenidad: true,
-        inmueble_etiqueta: { include: { etiqueta: true } }
+        inmueble_etiqueta: { include: { etiqueta: true } },
+        ubicacion_inmueble: true
       }
     })
 
@@ -133,19 +136,19 @@ export class FeaturesVectorService {
       CUARTO: 5,
       TERRENO_MORTUORIO: 6
     }
-    const tipoAccionMap: Record<string, number> = {
+    const tipo_accionMap: Record<string, number> = {
       VENTA: 1,
       ALQUILER: 2,
       ANTICRETO: 3
     }
 
     const precio = Number(inmueble.precio)
-    const superficie = Number(inmueble.superficieM2 || 0)
-    const zona = inmueble.ubicacion?.zona || ''
+    const superficie = Number(inmueble.superficie_m2 || 0)
+    const zona = inmueble.ubicacion_inmueble?.zona || ''
 
     // === FEATURES DEL INMUEBLE ===
     const f_categoria = (categoriaMap[inmueble.categoria || ''] || 0) / 6
-    const f_tipoAccion = (tipoAccionMap[inmueble.tipoAccion] || 0) / 3
+    const f_tipo_accion = (tipo_accionMap[inmueble.tipo_accion] || 0) / 3
     const f_precio =
       contexto.precioPromedio > 0
         ? Math.min(precio / (contexto.precioPromedio * 2), 1) // normalizado respecto al promedio del usuario
@@ -154,15 +157,15 @@ export class FeaturesVectorService {
       contexto.superficiePromedio > 0
         ? Math.min(superficie / (contexto.superficiePromedio * 2), 1)
         : Math.min(superficie / 500, 1)
-    const f_cuartos = Math.min((inmueble.nroCuartos || 0) / 10, 1)
-    const f_banos = Math.min((inmueble.nroBanos || 0) / 5, 1)
+    const f_cuartos = Math.min((inmueble.nro_cuartos || 0) / 10, 1)
+    const f_banos = Math.min((inmueble.nro_banos || 0) / 5, 1)
 
     // === FEATURES DE AFINIDAD CON EL USUARIO ===
     const f_zonaMatch = contexto.zonasPreferidas.includes(zona) ? 1 : 0
     const f_categoriaMatch = contexto.categoriasPreferidas.includes(inmueble.categoria || '')
       ? 1
       : 0
-    const f_tipoAccionMatch = contexto.tipoAccionPreferida === inmueble.tipoAccion ? 1 : 0
+    const f_tipo_accionMatch = contexto.tipo_accionPreferida === inmueble.tipo_accion ? 1 : 0
 
     // Similitud de precio (qué tan cerca está del promedio que prefiere el usuario)
     const f_similitudPrecio =
@@ -186,14 +189,14 @@ export class FeaturesVectorService {
 
     const vector = [
       f_categoria, // 0: tipo de categoría normalizado
-      f_tipoAccion, // 1: tipo de acción normalizado
+      f_tipo_accion, // 1: tipo de acción normalizado
       f_precio, // 2: precio normalizado
       f_superficie, // 3: superficie normalizada
       f_cuartos, // 4: nro cuartos normalizado
       f_banos, // 5: nro baños normalizado
       f_zonaMatch, // 6: afinidad de zona
       f_categoriaMatch, // 7: afinidad de categoría
-      f_tipoAccionMatch, // 8: afinidad de tipo acción
+      f_tipo_accionMatch, // 8: afinidad de tipo acción
       f_similitudPrecio, // 9: similitud de precio con preferencias
       f_amenidades, // 10: overlap de amenidades
       f_precioReducido // 11: precio reducido recientemente
@@ -204,14 +207,14 @@ export class FeaturesVectorService {
       vector,
       etiquetas: [
         'categoria',
-        'tipoAccion',
+        'tipo_accion',
         'precio',
         'superficie',
         'cuartos',
         'banos',
         'zonaMatch',
         'categoriaMatch',
-        'tipoAccionMatch',
+        'tipo_accionMatch',
         'similitudPrecio',
         'amenidades',
         'precioReducido'

@@ -6,8 +6,8 @@ export class FiltersHomepageService {
 
   async getHomeFilters() {
     const [rentalsRaw, salesRaw, categoriesRaw] = await Promise.all([
-      this.repository.getCountsByCity($Enums.TipoAccion.ALQUILER),
-      this.repository.getCountsByCity($Enums.TipoAccion.VENTA),
+      this.repository.getCountsByCity($Enums.tipo_accion.ALQUILER),
+      this.repository.getCountsByCity($Enums.tipo_accion.VENTA),
       this.repository.getCountsByCategoria(),
     ]);
 
