@@ -487,7 +487,7 @@ export const comentariosRepository = {
 
   async toggleLike(usuarioId: number, comentario_id: number) {
     const existing = await prisma.comentario_like.findUnique({
-      where: { usuarioId_comentario_id: { usuarioId, comentario_id } },
+      where: { usuario_id_comentario_id: { usuarioId, comentario_id } },
     });
 
     if (existing) {

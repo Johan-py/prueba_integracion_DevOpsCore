@@ -3,7 +3,7 @@ import type { TutorialPublicacionEstadoRecord } from "./tutorial-publicacion.typ
 
 const mapTutorialEstadoRecord = (record: {
   id: number;
-  usuarioId: number;
+  usuario_id: number;
   confirmado: boolean;
   confirmado_en: Date | null;
 }): TutorialPublicacionEstadoRecord => ({
@@ -17,10 +17,10 @@ export const findTutorialEstadoByUsuarioIdRepository = async (
   usuarioId: number,
 ): Promise<TutorialPublicacionEstadoRecord | null> => {
   const record = await prisma.tutorial_publicacion_usuario.findUnique({
-    where: { usuarioId: usuarioId },
+    where: { usuario_id: usuarioId },
     select: {
       id: true,
-      usuarioId: true,
+      usuario_id: true,
       confirmado: true,
       confirmado_en: true,
     },
@@ -35,9 +35,9 @@ export const upsertTutorialConfirmadoRepository = async (
   const now = new Date();
 
   const record = await prisma.tutorial_publicacion_usuario.upsert({
-    where: { usuarioId: usuarioId },
+    where: { usuario_id: usuarioId },
     create: {
-      usuarioId: usuarioId,
+      usuario_id: usuarioId,
       confirmado: true,
       confirmado_en: now,
     },
@@ -47,7 +47,7 @@ export const upsertTutorialConfirmadoRepository = async (
     },
     select: {
       id: true,
-      usuarioId: true,
+      usuario_id: true,
       confirmado: true,
       confirmado_en: true,
     },

@@ -20,7 +20,7 @@ export const findUserByGoogleId = async (googleId: string) => {
   const social = await prisma.autenticacion_social.findFirst({
     where: {
       proveedor: 'google',
-      id_externo: googleId,
+      idExterno: googleId,
       activo: true
     },
     include: {
@@ -28,7 +28,7 @@ export const findUserByGoogleId = async (googleId: string) => {
     }
   })
 
-  return social?.usuario ?? null
+  return social?.usuarioId ?? null
 }
 
 export const findUserByGoogleEmail = async (correo: string) => {
@@ -61,8 +61,8 @@ export const createGoogleUser = async (
       data: {
         usuarioId: user.id,
         proveedor: 'google',
-        id_externo: googleId,
-        correo_proveedor,
+        idExterno: googleId,
+        correoProveedor,
         activo: true
       }
     })
@@ -79,8 +79,8 @@ export const linkGoogleToUser = async (
   return await createSocialLink({
     usuarioId,
     proveedor: 'google',
-    id_externo: googleId,
-    correo_proveedor
+    idExterno: googleId,
+    correoProveedor
   })
 }
 
@@ -120,8 +120,8 @@ export const createGoogleLinkForUser = async ({
   return await createSocialLink({
     usuarioId,
     proveedor: 'google',
-    id_externo: googleId,
-    correo_proveedor
+    idExterno: googleId,
+    correoProveedor
   })
 }
 
@@ -134,7 +134,7 @@ export const updateGoogleLastUsage = async (usuarioId: number, googleId: string)
     where: {
       usuarioId,
       proveedor: 'google',
-      id_externo: googleId,
+      idExterno: googleId,
       activo: true
     },
     data: {

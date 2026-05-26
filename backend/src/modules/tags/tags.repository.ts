@@ -26,7 +26,7 @@ const findAll = async () => {
   return tags.map((tag) => ({
     id: tag.id,
     nombre: tag.nombre,
-    creado_en: tag.creado_en,
+    creadoEn: tag.creado_en,
     cantidad: countMap.get(tag.id) ?? 0
   }))
 }
@@ -57,7 +57,7 @@ const findAllWithContextualCounts = async (inmuebleWhere: Prisma.inmuebleWhereIn
   return tags.map((tag) => ({
     id: tag.id,
     nombre: tag.nombre,
-    creado_en: tag.creado_en,
+    creadoEn: tag.creado_en,
     cantidad: countMap.get(tag.id) ?? 0
   }))
 }
@@ -116,7 +116,7 @@ const replacePublicacionTags = async (publicacionId: number, tagIds: number[]) =
 const findPublicacionOwner = async (publicacionId: number) => {
   return prisma.publicacion.findUnique({
     where: { id: publicacionId },
-    select: { id: true, usuarioId: true }
+    select: { id: true, usuario_id: true }
   })
 }
 

@@ -16,7 +16,7 @@ const getNotificationStreamUserId = async (token: string) => {
     return null
   }
 
-  const usuarioId = Number(session.usuario.id)
+  const usuarioId = Number(session.usuarioId)
 
   if (!Number.isInteger(usuarioId) || usuarioId <= 0) {
     return null

@@ -79,7 +79,7 @@ export const blogsService = {
   ) {
     const blog = await blogsRepository.findById(id);
     if (!blog) throw new Error("BLOG_NOT_FOUND");
-    if (blog.usuarioId !== usuarioId) throw new Error("FORBIDDEN");
+    if (blog.usuario_id !== usuarioId) throw new Error("FORBIDDEN");
     if (
       blog.estado !== "BORRADOR" &&
       blog.estado !== "PENDIENTE" &&
@@ -185,7 +185,7 @@ export const blogsService = {
 
       try {
         await createBlogNotificationService({
-          usuarioId: blog.usuarioId,
+          usuarioId: blog.usuario_id,
           blog_id: originalBlogId,
           blogTitulo: updatedOriginal.titulo,
           tipo: "BLOG_APROBADO",
@@ -201,7 +201,7 @@ export const blogsService = {
 
       io.emit("blog:actualizado", updatedOriginal);
       io.emit(
-        `usuario:${blog.usuarioId}:actualizar_mis_blogs`,
+        `usuario:${blog.usuario_id}:actualizar_mis_blogs`,
         updatedOriginal,
       );
       io.emit("admin:blog_revisado", { id, estado });
@@ -225,7 +225,7 @@ export const blogsService = {
 
     try {
       await createBlogNotificationService({
-        usuarioId: blog.usuarioId,
+        usuarioId: blog.usuario_id,
         blog_id: id,
         blogTitulo: blog.titulo,
         tipo: estado === "PUBLICADO" ? "BLOG_APROBADO" : "BLOG_RECHAZADO",
@@ -239,7 +239,7 @@ export const blogsService = {
     if (estado === "PUBLICADO") {
       io.emit("blog:publicado_global", updatedBlog);
     }
-    io.emit(`usuario:${blog.usuarioId}:actualizar_mis_blogs`, updatedBlog);
+    io.emit(`usuario:${blog.usuario_id}:actualizar_mis_blogs`, updatedBlog);
     io.emit("admin:blog_revisado", { id, estado });
 
     return updatedBlog;
@@ -248,7 +248,7 @@ export const blogsService = {
   async resubmit(id: number, usuarioId: number) {
     const blog = await blogsRepository.findById(id);
     if (!blog) throw new Error("BLOG_NOT_FOUND");
-    if (blog.usuarioId !== usuarioId) throw new Error("FORBIDDEN");
+    if (blog.usuario_id !== usuarioId) throw new Error("FORBIDDEN");
     if (blog.estado !== "RECHAZADO") throw new Error("BLOG_NOT_REJECTED");
 
     const updatedBlog = await blogsRepository.resubmit(id);
@@ -270,7 +270,7 @@ export const blogsService = {
     if (!blog) {
       throw new Error("BLOG_NOT_FOUND");
     }
-    if (blog.usuarioId !== usuarioId) {
+    if (blog.usuario_id !== usuarioId) {
       throw new Error("FORBIDDEN");
     }
     const blogEliminado = await blogsRepository.delete(id);
@@ -328,7 +328,7 @@ export const comentariosService = {
   ) {
     const comentario = await comentariosRepository.findById(id);
     if (!comentario) throw new Error("COMENTARIO_NOT_FOUND");
-    if (comentario.usuarioId !== usuarioId) throw new Error("FORBIDDEN");
+    if (comentario.usuario_id !== usuarioId) throw new Error("FORBIDDEN");
 
     const comentarioActualizado = await comentariosRepository.update(id, data);
     getIO().emit(
@@ -345,7 +345,7 @@ export const comentariosService = {
   async eliminar(id: number, usuarioId: number) {
     const comentario = await comentariosRepository.findById(id);
     if (!comentario) throw new Error("COMENTARIO_NOT_FOUND");
-    if (comentario.usuarioId !== usuarioId) throw new Error("FORBIDDEN");
+    if (comentario.usuario_id !== usuarioId) throw new Error("FORBIDDEN");
     const comentarioEliminado = await comentariosRepository.delete(id);
     getIO().emit(`blog:${comentario.blog_id}:comentario_eliminado`, { id });
     return comentarioEliminado;

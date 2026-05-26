@@ -29,7 +29,7 @@ export const obtenerPerfil = async (req: AuthRequest, res: Response) => {
         pais: true,
         genero: true,
         direccion: true,
-        telefono_telefono_usuarioIdTousuario: true,
+        telefono_telefono_usuario_idTousuario: true,
         fecha_nacimiento: true,
       },
     });
@@ -456,7 +456,7 @@ export const obtenerPreferenciasNotificacion = async (req: AuthRequest, res: Res
         notificacion_email: true,
         notificacion_whatsapp: true,
         correo: true,
-        telefono_telefono_usuarioIdTousuario: {
+        telefono_telefono_usuario_idTousuario: {
           take: 1,
           select: { numero: true }
         }
@@ -470,7 +470,7 @@ export const obtenerPreferenciasNotificacion = async (req: AuthRequest, res: Res
         whatsapp: usuario.notificacion_whatsapp ?? false
       },
       tieneCorreo: !!usuario.correo,
-      tieneTelefono: usuario.telefono_telefono_usuarioIdTousuario.length > 0
+      tieneTelefono: usuario.telefono_telefono_usuario_idTousuario.length > 0
     })
   } catch (error) {
     console.error('Error en obtenerPreferenciasNotificacion:', error)

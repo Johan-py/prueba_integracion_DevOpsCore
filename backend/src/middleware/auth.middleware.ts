@@ -34,7 +34,7 @@ export const requireAuth = async (
     }
 
     req.user = {
-      id: session.usuario.id,
+      id: session.usuarioId,
       correo: session.usuario.correo,
     };
 
@@ -86,7 +86,7 @@ export const verifyAuth = async (
     return {
       token,
       user: {
-        id: session.usuario.id,
+        id: session.usuarioId,
         correo: session.usuario.correo,
       },
     };

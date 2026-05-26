@@ -22,12 +22,12 @@ type FindNotificationByIdParams = {
 type MarkNotificationAsReadParams = {
   id: number;
   usuarioId: number;
-  fecha_lectura: Date;
+  fechaLectura: Date;
 };
 
 type MarkAllNotificationsAsReadParams = {
   usuarioId: number;
-  fecha_lectura: Date;
+  fechaLectura: Date;
 };
 
 type SoftDeleteNotificationParams = {
@@ -135,8 +135,8 @@ export const createNotificationRepository = async ({
       leida: false,
       eliminada: false,
       archivada: false,
-      fecha_creacion: new Date(),
-      fecha_lectura: null,
+      fechaCreacion: new Date(),
+      fechaLectura: null,
     },
   });
 };
@@ -144,21 +144,21 @@ export const createNotificationRepository = async ({
 export const markNotificationAsReadRepository = async ({
   id,
   usuarioId,
-  fecha_lectura,
+  fechaLectura,
 }: MarkNotificationAsReadParams) => {
   return prisma.notificacion.updateMany({
     where: { id, usuarioId, eliminada: false, leida: false },
-    data: { leida: true, fecha_lectura },
+    data: { leida: true, fechaLectura },
   });
 };
 
 export const markAllNotificationsAsReadRepository = async ({
   usuarioId,
-  fecha_lectura,
+  fechaLectura,
 }: MarkAllNotificationsAsReadParams) => {
   return prisma.notificacion.updateMany({
     where: { usuarioId, eliminada: false, archivada: false, leida: false },
-    data: { leida: true, fecha_lectura },
+    data: { leida: true, fechaLectura },
   });
 };
 

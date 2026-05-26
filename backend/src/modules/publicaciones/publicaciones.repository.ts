@@ -15,12 +15,12 @@ export const publicacionesRepository = {
   },
 
   async countByUser(userId: number): Promise<number> {
-    return prisma.publicacion.count({ where: { usuarioId: userId } });
+    return prisma.publicacion.count({ where: { usuario_id: userId } });
   },
 
   async findByUserId(userId: number): Promise<publicacion[]> {
     return prisma.publicacion.findMany({
-      where: { usuarioId: userId },
+      where: { usuario_id: userId },
       include: {
         inmueble: {
           include: { ubicacion: true,
@@ -49,7 +49,7 @@ export const publicacionesRepository = {
     return prisma.publicacion.create({
       data: {
         ...data,
-        usuarioId: userId,
+        usuario_id: userId,
       },
     });
   },

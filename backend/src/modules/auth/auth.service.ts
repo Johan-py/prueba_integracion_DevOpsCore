@@ -468,7 +468,7 @@ export const loginService = async (payload: LoginDTO) => {
     await create2FACode({
       usuarioId: user.id,
       codigo_hash,
-      expira_en,
+      expiraEn,
     });
 
     const emailResult = await enviarCodigo2FA({
@@ -552,14 +552,14 @@ export const verify2FAService = async ({ userId, codigo }: Verify2FADTO) => {
     throw new AuthError("El código es incorrecto", 401);
   }
 
-  if (activeCode.expira_en.getTime() < Date.now()) {
+  if (activeCode.expiraEn.getTime() < Date.now()) {
     await expire2FACode(activeCode.id);
     throw new AuthError("El código ha expirado", 401);
   }
 
   const codigo_hash = hash2FACode(normalizedCode);
 
-  if (codigo_hash !== activeCode.codigo_hash) {
+  if (codigo_hash !== activeCode.codigoHash) {
     await increment2FACodeAttempts(activeCode.id, activeCode.intentos ?? 0);
     throw new AuthError("El código es incorrecto", 401);
   }
@@ -726,7 +726,7 @@ export const verifyRegisterCodeService = async (
       nombre: newUser.nombre,
       apellido: newUser.apellido,
       correo: newUser.correo,
-      telefono_telefono_usuarioIdTousuario: newUser.telefonos,
+      telefono_telefono_usuario_idTousuario: newUser.telefonos,
     },
     token,
   };
@@ -739,18 +739,18 @@ export const getMeService = async (token: string) => {
     throw new Error("Sesión inválida o expirada");
   }
 
-  if (session.usuario.activo === false) {
+  if (session.usuarioId.activo === false) {
     throw new AuthError("Esta cuenta está desactivada", 403);
   }
 
   return {
     user: {
-      id: session.usuario.id,
-      nombre: session.usuario.nombre,
-      apellido: session.usuario.apellido,
-      avatar: session.usuario.avatar,
-      correo: session.usuario.correo,
-      rol: session.usuario.rol,
+      id: session.usuarioId,
+      nombre: session.usuarioId.nombre,
+      apellido: session.usuarioId.apellido,
+      avatar: session.usuarioId.avatar,
+      correo: session.usuarioId.correo,
+      rol: session.usuarioId.rol,
     },
   };
 };
@@ -1297,7 +1297,7 @@ export const resetPasswordService = async (payload: ResetPasswordDTO) => {
     throw new AuthError("El enlace no es válido o ya fue utilizado", 400);
   }
 
-  if (new Date() > recovery.expira_en) {
+  if (new Date() > recovery.expiraEn) {
     throw new AuthError("El enlace ha expirado. Solicita uno nuevo.", 400);
   }
 
@@ -1331,7 +1331,7 @@ export const resetPasswordService = async (payload: ResetPasswordDTO) => {
   await prisma.$transaction([
     prisma.recuperacion_password.update({
       where: { id: recovery.id },
-      data: { usado_en: new Date(), activo: false },
+      data: { usadoEn: new Date(), activo: false },
     }),
     prisma.usuario.update({
       where: { id: recovery.usuarioId },
@@ -1375,7 +1375,7 @@ export const resend2FAService = async (userId: number) => {
   await create2FACode({
     usuarioId: user.id,
     codigo_hash,
-    expira_en,
+    expiraEn,
   });
 
   const emailResult = await enviarCodigo2FA({
@@ -1422,7 +1422,7 @@ export const requestActivationCodeService = async (correo: string) => {
   await create2FACode({
     usuarioId: user.id,
     codigo_hash,
-    expira_en,
+    expiraEn,
   });
 
   const emailResult = await enviarCodigoActivacionCuenta({
@@ -1477,14 +1477,14 @@ export const activateAccountByCodeService = async (
     throw new AuthError("El código es inválido", 401);
   }
 
-  if (activeCode.expira_en.getTime() < Date.now()) {
+  if (activeCode.expiraEn.getTime() < Date.now()) {
     await expire2FACode(activeCode.id);
     throw new AuthError("El código expiró", 401);
   }
 
   const codigo_hash = hash2FACode(normalizedCode);
 
-  if (codigo_hash !== activeCode.codigo_hash) {
+  if (codigo_hash !== activeCode.codigoHash) {
     const anyCode = await findAny2FACodeByUserIdAndHash(user.id, codigo_hash);
 
     if (anyCode) {

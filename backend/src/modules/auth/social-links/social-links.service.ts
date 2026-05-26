@@ -26,26 +26,26 @@ export const getSocialLinksService = async (usuarioId: number) => {
   return {
     facebook: {
       linked: Boolean(facebook),
-      linkedEmail: facebook?.correo_proveedor ?? null,
-      linkedAt: facebook?.vinculado_en?.toISOString() ?? null,
+      linkedEmail: facebook?.correoProveedor ?? null,
+      linkedAt: facebook?.vinculadoEn?.toISOString() ?? null,
       requiresReauthorization: false
     },
     discord: {
       linked: Boolean(discord),
-      linkedEmail: discord?.correo_proveedor ?? null,
-      linkedAt: discord?.vinculado_en?.toISOString() ?? null,
+      linkedEmail: discord?.correoProveedor ?? null,
+      linkedAt: discord?.vinculadoEn?.toISOString() ?? null,
       requiresReauthorization: false
     },
     google: {
       linked: Boolean(google),
-      linkedEmail: google?.correo_proveedor ?? null,
-      linkedAt: google?.vinculado_en?.toISOString() ?? null,
+      linkedEmail: google?.correoProveedor ?? null,
+      linkedAt: google?.vinculadoEn?.toISOString() ?? null,
       requiresReauthorization: false
     },
     linkedin: {
       linked: Boolean(linkedin),
-      linkedEmail: linkedin?.correo_proveedor ?? null,
-      linkedAt: linkedin?.vinculado_en?.toISOString() ?? null,
+      linkedEmail: linkedin?.correoProveedor ?? null,
+      linkedAt: linkedin?.vinculadoEn?.toISOString() ?? null,
       requiresReauthorization: isLinkedInTokenExpired
     }
   }
@@ -87,6 +87,6 @@ export const unlinkSocialProviderService = async (
 export const getLinkedInOriginalEmail = async (usuarioId: number) => {
   const link = await findSocialLinkByUserAndProvider(usuarioId, 'linkedin')
   if (!link) return null
-  return link.correo_proveedor ?? null
+  return link.correoProveedor ?? null
 }
 

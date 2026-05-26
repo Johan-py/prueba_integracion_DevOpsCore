@@ -30,11 +30,11 @@ const obtenerBloqueoPorCambiosFrecuentes = async (usuarioId: number) => {
       usuarioId,
     },
     orderBy: {
-      creado_en: "desc",
+      creadoEn: "desc",
     },
     take: MAX_CAMBIOS_PASSWORD_EN_VENTANA,
     select: {
-      creado_en: true,
+      creadoEn: true,
     },
   });
 
@@ -43,7 +43,7 @@ const obtenerBloqueoPorCambiosFrecuentes = async (usuarioId: number) => {
   }
 
   const fechas = ultimosCambios
-    .map((item) => item.creado_en)
+    .map((item) => item.creadoEn)
     .filter((fecha): fecha is Date => fecha instanceof Date);
 
   if (fechas.length < MAX_CAMBIOS_PASSWORD_EN_VENTANA) {
@@ -223,13 +223,13 @@ export const cambiarPassword = async (req: AuthRequest, res: Response) => {
 
     const historialReciente = await prisma.historial_password.findMany({
       where: { usuarioId },
-      orderBy: { creado_en: "desc" },
+      orderBy: { creadoEn: "desc" },
       take: 3,
-      select: { password_hash: true },
+      select: { passwordHash: true },
     });
 
     const esPasswordReciente = historialReciente.some(
-      (h) => h.password_hash === nuevaPasswordNormalizada
+      (h) => h.passwordHash === nuevaPasswordNormalizada
     );
 
     if (esPasswordReciente) {
@@ -272,7 +272,7 @@ export const cambiarPassword = async (req: AuthRequest, res: Response) => {
     await tx.historial_password.create({
       data: {
         usuarioId,
-        password_hash: passwordActualNormalizada,
+        passwordHash: passwordActualNormalizada,
       },
     });
 
@@ -476,7 +476,7 @@ export const solicitarCambioEmail = async (req: AuthRequest, res: Response) => {
         token: otp,
         email_nuevo: emailNuevo,
         expira_en: expira_en,
-        usuarioId: usuarioId,
+        usuario_id: usuarioId,
       },
     });
 
@@ -520,10 +520,10 @@ export const confirmarCambioEmail = async (req: AuthRequest, res: Response) => {
 
     const solicitud = await prisma.cambio_email.findFirst({
       where: {
-        usuarioId: usuarioId,
+        usuario_id: usuarioId,
         completado_en: null,
       },
-      orderBy: { creado_en: "desc" },
+      orderBy: { creadoEn: "desc" },
     });
 
     if (!solicitud) {

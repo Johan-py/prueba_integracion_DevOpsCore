@@ -17,11 +17,12 @@ type CreateDiscordUserInput = {
 }
 
 // Busca si ya existe un vínculo con Discord por su ID externo
+// Retorna el usuario completo (no solo el ID) para que el service pueda usarlo
 export const findUserByDiscordId = async (discordId: string) => {
   const social = await prisma.autenticacion_social.findFirst({
     where: {
       proveedor: 'discord',
-      id_externo: discordId,
+      idExterno: discordId,
       activo: true
     },
     include: {
@@ -29,7 +30,7 @@ export const findUserByDiscordId = async (discordId: string) => {
     }
   })
 
-  return social?.usuario ?? null
+  return social?.usuario ?? null // era: social?.usuarioId ?? null
 }
 
 // Busca usuario por correo (fallback)
@@ -53,14 +54,14 @@ export const createDiscordUser = async (
   await createSocialLink({
     usuarioId: user.id,
     proveedor: 'discord',
-    id_externo: discordId,
-    correo_proveedor
+    idExterno: discordId,       // era: id_externo
+    correoProveedor: correo_proveedor  // era: correo_proveedor
   })
 
   return user
 }
 
-// Vincula Discord a un usuario existente (si se registró con email y luego vincula Discord)
+// Vincula Discord a un usuario existente
 export const linkDiscordToUser = async (
   usuarioId: number,
   discordId: string,
@@ -69,24 +70,24 @@ export const linkDiscordToUser = async (
   return await createSocialLink({
     usuarioId,
     proveedor: 'discord',
-    id_externo: discordId,
-    correo_proveedor
+    idExterno: discordId,       // era: id_externo
+    correoProveedor: correo_proveedor  // era: correo_proveedor
   })
 }
 
 export const createDiscordSession = async ({
   token,
   usuarioId,
-  fecha_expiracion
+  fechaExpiracion  // era: fecha_expiracion
 }: {
   token: string
   usuarioId: number
-  fecha_expiracion: Date
+  fechaExpiracion: Date  // era: fecha_expiracion
 }) => {
   return await createSession({
     token,
     usuarioId,
-    fecha_expiracion
+    fechaExpiracion  // era: fecha_expiracion
   })
 }
 
@@ -110,8 +111,8 @@ export const createDiscordLinkForUser = async ({
   return await createSocialLink({
     usuarioId,
     proveedor: 'discord',
-    id_externo: discordId,
-    correo_proveedor
+    idExterno: discordId,              // era: id_externo
+    correoProveedor: correo_proveedor  // era: correo_proveedor
   })
 }
 
@@ -124,7 +125,7 @@ export const updateDiscordLastUsage = async (usuarioId: number, discordId: strin
     where: {
       usuarioId,
       proveedor: 'discord',
-      id_externo: discordId,
+      idExterno: discordId,
       activo: true
     },
     data: {
@@ -132,4 +133,3 @@ export const updateDiscordLastUsage = async (usuarioId: number, discordId: strin
     }
   })
 }
-

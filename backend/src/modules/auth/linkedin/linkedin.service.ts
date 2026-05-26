@@ -251,7 +251,7 @@ export const linkLinkedInToCurrentUserByCodeService = async (
 
   const existingLinkByExternalId = await findLinkedInLinkByExternalId(linkedinId)
 
-  if (existingLinkByExternalId && existingLinkByExternalId.usuarioId !== session.usuario.id) {
+  if (existingLinkByExternalId && existingLinkByExternalId.usuarioId !== session.usuarioId) {
     throw new LinkedInAuthError(
       'Esta cuenta de LinkedIn ya está vinculada a otro usuario.',
       'LINKEDIN_AUTH_FAILED',
@@ -259,16 +259,16 @@ export const linkLinkedInToCurrentUserByCodeService = async (
     )
   }
 
-  const existingLinkByUser = await findLinkedInLinkByUserId(session.usuario.id)
+  const existingLinkByUser = await findLinkedInLinkByUserId(session.usuarioId)
 
   if (existingLinkByUser) {
-    if (existingLinkByUser.id_externo === linkedinId) {
-      await linkLinkedInToUser(session.usuario.id, linkedinId, correo_proveedor ?? '', tokenStorage)
+    if (existingLinkByUser.idExterno === linkedinId) {
+      await linkLinkedInToUser(session.usuarioId, linkedinId, correo_proveedor ?? '', tokenStorage)
 
       return {
         message: 'Autorización de LinkedIn renovada correctamente.',
         provider: 'linkedin',
-        linkedEmail: correo_proveedor ?? existingLinkByUser.correo_proveedor
+        linkedEmail: correo_proveedor ?? existingLinkByUser.correoProveedor
       }
     }
 
@@ -280,7 +280,7 @@ export const linkLinkedInToCurrentUserByCodeService = async (
   }
 
   await createLinkedInLinkForUser({
-    usuarioId: session.usuario.id,
+    usuarioId: session.usuarioId,
     linkedinId,
     correo_proveedor,
     tokenStorage

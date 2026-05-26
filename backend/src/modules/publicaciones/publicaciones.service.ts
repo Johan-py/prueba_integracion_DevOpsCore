@@ -69,7 +69,7 @@ export const publicacionesService = {
       throw new Error('PUBLICACION_NOT_FOUND')
     }
 
-    if (publicacion.usuarioId !== userId) {
+    if (publicacion.usuario_id !== userId) {
       throw new Error('UNAUTHORIZED')
     }
 
@@ -83,7 +83,7 @@ export const publicacionesService = {
       throw new Error('PUBLICACION_NOT_FOUND')
     }
 
-    if (publicacion.usuarioId !== userId) {
+    if (publicacion.usuario_id !== userId) {
       throw new Error('UNAUTHORIZED')
     }
 

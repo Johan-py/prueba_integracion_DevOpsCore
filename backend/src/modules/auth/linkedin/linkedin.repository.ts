@@ -25,13 +25,13 @@ export const findUserByLinkedInId = async (linkedinId: string) => {
   const social = await prisma.autenticacion_social.findFirst({
     where: {
       proveedor: 'linkedin',
-      id_externo: linkedinId,
+      idExterno: linkedinId,
       activo: true
     },
     include: { usuario: true }
   })
 
-  return social?.usuario ?? null
+  return social?.usuarioId ?? null
 }
 
 export const findUserByLinkedInEmail = async (correo: string) => {
@@ -66,10 +66,10 @@ export const createLinkedInUser = async (
       data: {
         usuarioId: user.id,
         proveedor: 'linkedin',
-        id_externo: linkedinId,
-        correo_proveedor,
+        idExterno: linkedinId,
+        correoProveedor,
         activo: true,
-        vinculado_en: new Date(),
+        vinculadoEn: new Date(),
         ultimo_uso_en: new Date(),
         token_acceso_cifrado: tokenStorage.encryptedAccessToken,
         token_expira_en: tokenStorage.tokenExpiresAt
@@ -89,7 +89,7 @@ export const linkLinkedInToUser = async (
   const existingLink = await prisma.autenticacion_social.findFirst({
     where: {
       proveedor: 'linkedin',
-      id_externo: linkedinId
+      idExterno: linkedinId
     }
   })
 
@@ -100,9 +100,9 @@ export const linkLinkedInToUser = async (
       },
       data: {
         usuarioId,
-        correo_proveedor,
+        correoProveedor,
         activo: true,
-        vinculado_en: new Date(),
+        vinculadoEn: new Date(),
         ultimo_uso_en: new Date(),
         token_acceso_cifrado: tokenStorage.encryptedAccessToken,
         token_expira_en: tokenStorage.tokenExpiresAt
@@ -114,10 +114,10 @@ export const linkLinkedInToUser = async (
     data: {
       usuarioId,
       proveedor: 'linkedin',
-      id_externo: linkedinId,
-      correo_proveedor,
+      idExterno: linkedinId,
+      correoProveedor,
       activo: true,
-      vinculado_en: new Date(),
+      vinculadoEn: new Date(),
       ultimo_uso_en: new Date(),
       token_acceso_cifrado: tokenStorage.encryptedAccessToken,
       token_expira_en: tokenStorage.tokenExpiresAt
@@ -177,7 +177,7 @@ export const updateLinkedInLastUsage = async (
     where: {
       usuarioId,
       proveedor: 'linkedin',
-      id_externo: linkedinId,
+      idExterno: linkedinId,
       activo: true
     },
     data: {

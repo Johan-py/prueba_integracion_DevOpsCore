@@ -273,13 +273,13 @@ export const loginService = async (payload: LoginDTO) => {
 
   if (user.two_factor_activo) {
     const codigo = generate2FACode();
-    const codigo_hash = hash2FACode(codigo);
-    const expira_en = new Date(
+    const codigoHash = hash2FACode(codigo); // era: codigo_hash
+    const expiraEn = new Date(                // era: expira_en
       Date.now() + TWO_FACTOR_CODE_TTL_MINUTES * 60 * 1000,
     );
 
     await invalidateActive2FACodesByUserId(user.id);
-    await create2FACode({ usuarioId: user.id, codigo_hash, expira_en });
+    await create2FACode({ usuarioId: user.id, codigoHash, expiraEn }); // era: codigo_hash, expira_en
 
     const emailResult = await enviarCodigo2FA({
       emailDestino: user.correo,
@@ -303,9 +303,12 @@ export const loginService = async (payload: LoginDTO) => {
 
   const jwtPayload: JwtPayload = { id: user.id, correo: user.correo };
   const token = generateToken(jwtPayload);
-  const fecha_expiracion = new Date(Date.now() + 60 * 60 * 1000);
 
-  await createSession({ token, usuarioId: user.id, fecha_expiracion });
+  await createSession({
+    token,
+    usuarioId: user.id,
+    fechaExpiracion: new Date(Date.now() + 60 * 60 * 1000), // era: fecha_expiracion
+  });
 
   return {
     requires2FA: false,
@@ -341,13 +344,13 @@ export const verify2FAService = async ({ userId, codigo }: Verify2FADTO) => {
 
   const activeCode = await findActive2FACodeByUserId(userId);
   if (!activeCode) throw new AuthError("El código es incorrecto", 401);
-  if (activeCode.expira_en.getTime() < Date.now()) {
+  if (activeCode.expiraEn.getTime() < Date.now()) {
     await expire2FACode(activeCode.id);
     throw new AuthError("El código ha expirado", 401);
   }
 
   const codigo_hash = hash2FACode(normalizedCode);
-  if (codigo_hash !== activeCode.codigo_hash) {
+  if (codigo_hash !== activeCode.codigoHash) {
     await increment2FACodeAttempts(activeCode.id, activeCode.intentos ?? 0);
     throw new AuthError("El código es incorrecto", 401);
   }
@@ -356,9 +359,12 @@ export const verify2FAService = async ({ userId, codigo }: Verify2FADTO) => {
 
   const jwtPayload: JwtPayload = { id: user.id, correo: user.correo };
   const token = generateToken(jwtPayload);
-  const fecha_expiracion = new Date(Date.now() + 60 * 60 * 1000);
 
-  await createSession({ token, usuarioId: user.id, fecha_expiracion });
+  await createSession({
+    token,
+    usuarioId: user.id,
+    fechaExpiracion: new Date(Date.now() + 60 * 60 * 1000), // era: fecha_expiracion
+  });
 
   return {
     user: {
@@ -456,9 +462,12 @@ export const verifyRegisterCodeService = async (
 
   const jwtPayload: JwtPayload = { id: newUser.id, correo: newUser.correo };
   const token = generateToken(jwtPayload);
-  const fecha_expiracion = new Date(Date.now() + 60 * 60 * 1000);
 
-  await createSession({ token, usuarioId: newUser.id, fecha_expiracion });
+  await createSession({
+    token,
+    usuarioId: newUser.id,
+    fechaExpiracion: new Date(Date.now() + 60 * 60 * 1000), // era: fecha_expiracion
+  });
 
   return {
     user: {
@@ -466,13 +475,12 @@ export const verifyRegisterCodeService = async (
       nombre: newUser.nombre,
       apellido: newUser.apellido,
       correo: newUser.correo,
-      telefono_telefono_usuarioIdTousuario: newUser.telefonos,
+      telefono_telefono_usuario_idTousuario: newUser.telefonos,
     },
     token,
   };
 };
 
-// ✅ MODIFICADO: ahora devuelve controlador
 export const getMeService = async (token: string) => {
   const session = await findActiveSessionByToken(token);
 
@@ -482,12 +490,12 @@ export const getMeService = async (token: string) => {
 
   return {
     user: {
-      id: session.usuario.id,
+      id: session.usuarioId,
       nombre: session.usuario.nombre,
       apellido: session.usuario.apellido,
       correo: session.usuario.correo,
       rol: session.usuario.rol,
-      controlador: session.usuario.controlador, // ← nuevo
+      controlador: session.usuario.controlador,
     },
   };
 };
@@ -625,9 +633,12 @@ export const loginWithGoogleCodeService = async (code: string) => {
 
   const jwtPayload: JwtPayload = { id: user.id, correo: user.correo };
   const token = generateToken(jwtPayload);
-  const fecha_expiracion = new Date(Date.now() + 60 * 60 * 1000);
 
-  await createSession({ token, usuarioId: user.id, fecha_expiracion });
+  await createSession({
+    token,
+    usuarioId: user.id,
+    fechaExpiracion: new Date(Date.now() + 60 * 60 * 1000), // era: fecha_expiracion
+  });
 
   return {
     user: {
@@ -674,15 +685,12 @@ export const forgotPasswordService = async (payload: ForgotPasswordDTO) => {
   }
 
   const resetToken = crypto.randomUUID();
-  const expira_en = new Date(
-    Date.now() + RESET_PASSWORD_TTL_MINUTES * 60 * 1000,
-  );
 
   await desactivarRecuperacionesPasswordActivas(user.id);
   await createPasswordRecovery({
     usuarioId: user.id,
     token: resetToken,
-    expira_en,
+    expiraEn: new Date(Date.now() + RESET_PASSWORD_TTL_MINUTES * 60 * 1000), // era: expira_en
   });
 
   const resetLink = `${env.FRONTEND_URL}/reset-password?token=${resetToken}`;
@@ -738,7 +746,7 @@ export const resetPasswordService = async (payload: ResetPasswordDTO) => {
   const recovery = await findPasswordRecoveryByToken(token);
   if (!recovery || !recovery.activo)
     throw new AuthError("El enlace no es válido o ya fue utilizado", 400);
-  if (new Date() > recovery.expira_en)
+  if (new Date() > recovery.expiraEn)
     throw new AuthError("El enlace ha expirado. Solicita uno nuevo.", 400);
 
   const attempts = tokenAttempts.get(token) ?? 0;
@@ -756,7 +764,7 @@ export const resetPasswordService = async (payload: ResetPasswordDTO) => {
   await prisma.$transaction([
     prisma.recuperacion_password.update({
       where: { id: recovery.id },
-      data: { usado_en: new Date(), activo: false },
+      data: { usadoEn: new Date(), activo: false },
     }),
     prisma.usuario.update({
       where: { id: recovery.usuarioId },
@@ -775,7 +783,6 @@ export const resetPasswordService = async (payload: ResetPasswordDTO) => {
   };
 };
 
-// ✅ NUEVO: marcar tour como visto
 export const marcarControladorService = async (token: string) => {
   const session = await findActiveSessionByToken(token);
 
@@ -784,10 +791,9 @@ export const marcarControladorService = async (token: string) => {
     throw new AuthError("Esta cuenta está desactivada", 403);
 
   await prisma.usuario.update({
-    where: { id: session.usuario.id },
+    where: { id: session.usuarioId },
     data: { controlador: true },
   });
 
   return { message: "Tour marcado como visto" };
 };
-

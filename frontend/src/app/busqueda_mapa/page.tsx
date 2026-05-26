@@ -418,7 +418,7 @@ function BusquedaMapaContent() {
         if (coordenadas.length < 3) return null
 
         return {
-          id: -zonaUsuario.id,
+          id: zonaUsuarioId,
           nombre: zonaUsuario.nombre,
           coordenadas,
           activa: true,

@@ -44,7 +44,7 @@ export const findPublicationByIdRepository = async (
     where: { id: publicacionId },
     select: {
       id: true,
-      usuarioId: true,
+      usuario_id: true,
       titulo: true,
     },
   });

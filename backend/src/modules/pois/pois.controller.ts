@@ -21,7 +21,7 @@ export const crearPoi = async (req: Request, res: Response) => {
         nombre,
         latitud: new Prisma.Decimal(latitud),
         longitud: new Prisma.Decimal(longitud),
-        inmuebleId: inmuebleId
+        inmueble_id: inmuebleId
       }
     })
 
