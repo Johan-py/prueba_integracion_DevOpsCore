@@ -124,13 +124,13 @@ const obtenerPrimeraImagenUrl = (
   return primeraImagen?.url ?? null;
 };
 
-export const listarMisPublicacionesService = async (usuario_id: number) => {
-  if (Number.isNaN(usuario_id) || usuario_id <= 0) {
+export const listarMisPublicacionesService = async (usuarioId: number) => {
+  if (Number.isNaN(usuarioId) || usuarioId <= 0) {
     throw new Error("USUARIO_INVALIDO");
   }
 
   const publicaciones =
-    await buscarPublicacionesPorUsuarioRepository(usuario_id);
+    await buscarPublicacionesPorUsuarioRepository(usuarioId);
 
   type PublicacionesPorUsuario = Awaited<
     ReturnType<typeof buscarPublicacionesPorUsuarioRepository>
@@ -207,7 +207,7 @@ export const editarPublicacionService = async (
     throw new Error("PUBLICACION_NO_EXISTE");
   }
 
-  if (publicacion.usuario_id !== usuarioSolicitanteId) {
+  if (publicacion.usuarioId !== usuarioSolicitanteId) {
     throw new Error("NO_AUTORIZADO");
   }
 
@@ -314,7 +314,7 @@ export const eliminarPublicacionService = async (
     throw new Error("PUBLICACION_NO_EXISTE");
   }
 
-  if (publicacion.usuario_id !== usuarioSolicitanteId) {
+  if (publicacion.usuarioId !== usuarioSolicitanteId) {
     throw new Error("NO_AUTORIZADO");
   }
 
@@ -324,7 +324,7 @@ export const eliminarPublicacionService = async (
 
   await eliminarLogicamentePublicacionRepository(
     publicacion.id,
-    publicacion.inmueble_id,
+    publicacion.inmuebleId,
   );
 
   return {
@@ -351,7 +351,7 @@ export const obtenerResumenFinalService = async (
     throw new Error("PUBLICACION_NO_EXISTE");
   }
 
-  if (resumen.usuario_id !== usuarioSolicitanteId) {
+  if (resumen.usuarioId !== usuarioSolicitanteId) {
     throw new Error("NO_AUTORIZADO");
   }
 
@@ -397,7 +397,7 @@ export const obtenerResumenFinalService = async (
   return {
     id: resumen.id,
     publicacionId: resumen.id,
-    inmueble_id: resumen.inmueble_id,
+    inmuebleId: resumen.inmuebleId,
 
     publicaciones: {
       titulo: resumen.titulo ?? resumen.inmueble?.titulo ?? null,
@@ -461,8 +461,8 @@ export const obtenerDetallePublicacionService = async (
   }
 
   const telefonoPrincipal =
-    publicacion.usuario.telefono_telefono_usuario_idTousuario.find((item) => item.principal) ??
-    publicacion.usuario.telefono_telefono_usuario_idTousuario[0];
+    publicacion.usuario.telefono_telefono_usuarioIdTousuario.find((item) => item.principal) ??
+    publicacion.usuario.telefono_telefono_usuarioIdTousuario[0];
 
   return {
     id: publicacion.id,
@@ -527,26 +527,26 @@ export const obtenerDetallePublicacionService = async (
 };
 
 export const obtenerDetallePublicacionPorInmuebleService = async (
-  inmueble_id: number,
+  inmuebleId: number,
 ) => {
-  if (Number.isNaN(inmueble_id) || inmueble_id <= 0) {
+  if (Number.isNaN(inmuebleId) || inmuebleId <= 0) {
     throw new Error("ID_INVALIDO");
   }
 
   const publicacion =
-    await buscarDetallePublicacionPorInmuebleIdRepository(inmueble_id);
+    await buscarDetallePublicacionPorInmuebleIdRepository(inmuebleId);
 
   if (!publicacion || publicacion.estado === "ELIMINADA") {
     throw new Error("PUBLICACION_NO_EXISTE");
   }
 
   const telefonoPrincipal =
-    publicacion.usuario.telefono_telefono_usuario_idTousuario.find((item) => item.principal) ??
-    publicacion.usuario.telefono_telefono_usuario_idTousuario[0];
+    publicacion.usuario.telefono_telefono_usuarioIdTousuario.find((item) => item.principal) ??
+    publicacion.usuario.telefono_telefono_usuarioIdTousuario[0];
 
   return {
     id: publicacion.id,
-    inmueble_id: publicacion.inmueble.id,
+    inmuebleId: publicacion.inmueble.id,
     titulo: publicacion.titulo,
     precio: Number(publicacion.inmueble.precio),
     //HU6-precio Anterior
@@ -630,7 +630,7 @@ export const confirmarPublicacionService = async (
     throw new Error("PUBLICACION_NO_EXISTE");
   }
 
-  if (publicacion.usuario_id !== usuarioSolicitanteId) {
+  if (publicacion.usuarioId !== usuarioSolicitanteId) {
     throw new Error("NO_AUTORIZADO");
   }
 
@@ -736,7 +736,7 @@ export const editarMultimediaPublicacionService = async (
     throw new Error("PUBLICACION_NO_EXISTE");
   }
 
-  if (publicacion.usuario_id !== usuarioSolicitanteId) {
+  if (publicacion.usuarioId !== usuarioSolicitanteId) {
     throw new Error("NO_AUTORIZADO");
   }
 
@@ -894,13 +894,13 @@ export const editarMultimediaPublicacionService = async (
 
 export const iniciarPublicidadService = async (
   publicacionId: number,
-  usuario_id: number
+  usuarioId: number
 ): Promise<{ checkoutUrl: string }> => {
   if (Number.isNaN(publicacionId) || publicacionId <= 0) {
     throw new Error("ID_INVALIDO");
   }
 
-  if (Number.isNaN(usuario_id) || usuario_id <= 0) {
+  if (Number.isNaN(usuarioId) || usuarioId <= 0) {
     throw new Error("USUARIO_INVALIDO");
   }
 
@@ -910,7 +910,7 @@ export const iniciarPublicidadService = async (
     throw new Error("PUBLICACION_NO_EXISTE");
   }
 
-  if (publicacion.usuario_id !== usuario_id) {
+  if (publicacion.usuarioId !== usuarioId) {
     throw new Error("NO_AUTORIZADO");
   }
 
@@ -936,7 +936,7 @@ export const iniciarPublicidadService = async (
 
 export const confirmarPublicidadService = async (
   publicacionId: number,
-  usuario_id: number,
+  usuarioId: number,
   paymentIntentId: string,
   planId?: number
 ) => {
@@ -944,7 +944,7 @@ export const confirmarPublicidadService = async (
     throw new Error("ID_INVALIDO");
   }
 
-  if (Number.isNaN(usuario_id) || usuario_id <= 0) {
+  if (Number.isNaN(usuarioId) || usuarioId <= 0) {
     throw new Error("USUARIO_INVALIDO");
   }
 
@@ -958,7 +958,7 @@ export const confirmarPublicidadService = async (
     throw new Error("PUBLICACION_NO_EXISTE");
   }
 
-  if (publicacion.usuario_id !== usuario_id) {
+  if (publicacion.usuarioId !== usuarioId) {
     throw new Error("NO_AUTORIZADO");
   }
 
@@ -974,7 +974,7 @@ export const confirmarPublicidadService = async (
 
   const publicacionActualizada = await activarPublicidadRepository(
     publicacionId,
-    usuario_id,
+    usuarioId,
     paymentIntentId,
     duracionDias
   );
@@ -990,13 +990,13 @@ export const confirmarPublicidadService = async (
 
 export const cancelarPublicidadService = async (
   publicacionId: number,
-  usuario_id: number
+  usuarioId: number
 ) => {
   if (Number.isNaN(publicacionId) || publicacionId <= 0) {
     throw new Error("ID_INVALIDO");
   }
 
-  if (Number.isNaN(usuario_id) || usuario_id <= 0) {
+  if (Number.isNaN(usuarioId) || usuarioId <= 0) {
     throw new Error("USUARIO_INVALIDO");
   }
 
@@ -1006,7 +1006,7 @@ export const cancelarPublicidadService = async (
     throw new Error("PUBLICACION_NO_EXISTE");
   }
 
-  if (publicacion.usuario_id !== usuario_id) {
+  if (publicacion.usuarioId !== usuarioId) {
     throw new Error("NO_AUTORIZADO");
   }
 
@@ -1020,7 +1020,7 @@ export const cancelarPublicidadService = async (
 
   const publicacionActualizada = await cancelarPublicidadRepository(
     publicacionId,
-    usuario_id
+    usuarioId
   );
 
   return {

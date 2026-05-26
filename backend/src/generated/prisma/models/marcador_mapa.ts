@@ -28,14 +28,14 @@ export type AggregateMarcador_mapa = {
 export type Marcador_mapaAvgAggregateOutputType = {
   id: number | null
   nivel_z: number | null
-  inmueble_id: number | null
+  inmuebleId: number | null
   ubicacion_id: number | null
 }
 
 export type Marcador_mapaSumAggregateOutputType = {
   id: number | null
   nivel_z: number | null
-  inmueble_id: number | null
+  inmuebleId: number | null
   ubicacion_id: number | null
 }
 
@@ -44,7 +44,7 @@ export type Marcador_mapaMinAggregateOutputType = {
   tipo: $Enums.tipo_marcador | null
   es_visible: boolean | null
   nivel_z: number | null
-  inmueble_id: number | null
+  inmuebleId: number | null
   ubicacion_id: number | null
 }
 
@@ -53,7 +53,7 @@ export type Marcador_mapaMaxAggregateOutputType = {
   tipo: $Enums.tipo_marcador | null
   es_visible: boolean | null
   nivel_z: number | null
-  inmueble_id: number | null
+  inmuebleId: number | null
   ubicacion_id: number | null
 }
 
@@ -62,7 +62,7 @@ export type Marcador_mapaCountAggregateOutputType = {
   tipo: number
   es_visible: number
   nivel_z: number
-  inmueble_id: number
+  inmuebleId: number
   ubicacion_id: number
   _all: number
 }
@@ -70,14 +70,14 @@ export type Marcador_mapaCountAggregateOutputType = {
 export type Marcador_mapaAvgAggregateInputType = {
   id?: true
   nivel_z?: true
-  inmueble_id?: true
+  inmuebleId?: true
   ubicacion_id?: true
 }
 
 export type Marcador_mapaSumAggregateInputType = {
   id?: true
   nivel_z?: true
-  inmueble_id?: true
+  inmuebleId?: true
   ubicacion_id?: true
 }
 
@@ -86,7 +86,7 @@ export type Marcador_mapaMinAggregateInputType = {
   tipo?: true
   es_visible?: true
   nivel_z?: true
-  inmueble_id?: true
+  inmuebleId?: true
   ubicacion_id?: true
 }
 
@@ -95,7 +95,7 @@ export type Marcador_mapaMaxAggregateInputType = {
   tipo?: true
   es_visible?: true
   nivel_z?: true
-  inmueble_id?: true
+  inmuebleId?: true
   ubicacion_id?: true
 }
 
@@ -104,7 +104,7 @@ export type Marcador_mapaCountAggregateInputType = {
   tipo?: true
   es_visible?: true
   nivel_z?: true
-  inmueble_id?: true
+  inmuebleId?: true
   ubicacion_id?: true
   _all?: true
 }
@@ -205,7 +205,7 @@ export type Marcador_mapaGroupByOutputType = {
   tipo: $Enums.tipo_marcador
   es_visible: boolean | null
   nivel_z: number | null
-  inmueble_id: number
+  inmuebleId: number
   ubicacion_id: number
   _count: Marcador_mapaCountAggregateOutputType | null
   _avg: Marcador_mapaAvgAggregateOutputType | null
@@ -235,7 +235,7 @@ export type marcador_mapaWhereInput = {
   tipo?: Prisma.Enumtipo_marcadorFilter<'marcador_mapa'> | $Enums.tipo_marcador
   es_visible?: Prisma.BoolNullableFilter<'marcador_mapa'> | boolean | null
   nivel_z?: Prisma.IntNullableFilter<'marcador_mapa'> | number | null
-  inmueble_id?: Prisma.IntFilter<'marcador_mapa'> | number
+  inmuebleId?: Prisma.IntFilter<'marcador_mapa'> | number
   ubicacion_id?: Prisma.IntFilter<'marcador_mapa'> | number
   detalle_grupo?: Prisma.Detalle_grupoListRelationFilter
   interaccion_mapa?: Prisma.Interaccion_mapaListRelationFilter
@@ -251,7 +251,7 @@ export type marcador_mapaOrderByWithRelationInput = {
   tipo?: Prisma.SortOrder
   es_visible?: Prisma.SortOrderInput | Prisma.SortOrder
   nivel_z?: Prisma.SortOrderInput | Prisma.SortOrder
-  inmueble_id?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
   ubicacion_id?: Prisma.SortOrder
   detalle_grupo?: Prisma.detalle_grupoOrderByRelationAggregateInput
   interaccion_mapa?: Prisma.interaccion_mapaOrderByRelationAggregateInput
@@ -268,7 +268,7 @@ export type marcador_mapaWhereUniqueInput = Prisma.AtLeast<
     tipo?: Prisma.Enumtipo_marcadorFilter<'marcador_mapa'> | $Enums.tipo_marcador
     es_visible?: Prisma.BoolNullableFilter<'marcador_mapa'> | boolean | null
     nivel_z?: Prisma.IntNullableFilter<'marcador_mapa'> | number | null
-    inmueble_id?: Prisma.IntFilter<'marcador_mapa'> | number
+    inmuebleId?: Prisma.IntFilter<'marcador_mapa'> | number
     ubicacion_id?: Prisma.IntFilter<'marcador_mapa'> | number
     detalle_grupo?: Prisma.Detalle_grupoListRelationFilter
     interaccion_mapa?: Prisma.Interaccion_mapaListRelationFilter
@@ -286,7 +286,7 @@ export type marcador_mapaOrderByWithAggregationInput = {
   tipo?: Prisma.SortOrder
   es_visible?: Prisma.SortOrderInput | Prisma.SortOrder
   nivel_z?: Prisma.SortOrderInput | Prisma.SortOrder
-  inmueble_id?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
   ubicacion_id?: Prisma.SortOrder
   _count?: Prisma.marcador_mapaCountOrderByAggregateInput
   _avg?: Prisma.marcador_mapaAvgOrderByAggregateInput
@@ -307,7 +307,7 @@ export type marcador_mapaScalarWhereWithAggregatesInput = {
   tipo?: Prisma.Enumtipo_marcadorWithAggregatesFilter<'marcador_mapa'> | $Enums.tipo_marcador
   es_visible?: Prisma.BoolNullableWithAggregatesFilter<'marcador_mapa'> | boolean | null
   nivel_z?: Prisma.IntNullableWithAggregatesFilter<'marcador_mapa'> | number | null
-  inmueble_id?: Prisma.IntWithAggregatesFilter<'marcador_mapa'> | number
+  inmuebleId?: Prisma.IntWithAggregatesFilter<'marcador_mapa'> | number
   ubicacion_id?: Prisma.IntWithAggregatesFilter<'marcador_mapa'> | number
 }
 
@@ -326,7 +326,7 @@ export type marcador_mapaUncheckedCreateInput = {
   tipo: $Enums.tipo_marcador
   es_visible?: boolean | null
   nivel_z?: number | null
-  inmueble_id: number
+  inmuebleId: number
   ubicacion_id: number
   detalle_grupo?: Prisma.detalle_grupoUncheckedCreateNestedManyWithoutMarcador_mapaInput
   interaccion_mapa?: Prisma.interaccion_mapaUncheckedCreateNestedManyWithoutMarcador_mapaInput
@@ -347,7 +347,7 @@ export type marcador_mapaUncheckedUpdateInput = {
   tipo?: Prisma.Enumtipo_marcadorFieldUpdateOperationsInput | $Enums.tipo_marcador
   es_visible?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   nivel_z?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  inmueble_id?: Prisma.IntFieldUpdateOperationsInput | number
+  inmuebleId?: Prisma.IntFieldUpdateOperationsInput | number
   ubicacion_id?: Prisma.IntFieldUpdateOperationsInput | number
   detalle_grupo?: Prisma.detalle_grupoUncheckedUpdateManyWithoutMarcador_mapaNestedInput
   interaccion_mapa?: Prisma.interaccion_mapaUncheckedUpdateManyWithoutMarcador_mapaNestedInput
@@ -358,7 +358,7 @@ export type marcador_mapaCreateManyInput = {
   tipo: $Enums.tipo_marcador
   es_visible?: boolean | null
   nivel_z?: number | null
-  inmueble_id: number
+  inmuebleId: number
   ubicacion_id: number
 }
 
@@ -373,7 +373,7 @@ export type marcador_mapaUncheckedUpdateManyInput = {
   tipo?: Prisma.Enumtipo_marcadorFieldUpdateOperationsInput | $Enums.tipo_marcador
   es_visible?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   nivel_z?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  inmueble_id?: Prisma.IntFieldUpdateOperationsInput | number
+  inmuebleId?: Prisma.IntFieldUpdateOperationsInput | number
   ubicacion_id?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -402,14 +402,14 @@ export type marcador_mapaCountOrderByAggregateInput = {
   tipo?: Prisma.SortOrder
   es_visible?: Prisma.SortOrder
   nivel_z?: Prisma.SortOrder
-  inmueble_id?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
   ubicacion_id?: Prisma.SortOrder
 }
 
 export type marcador_mapaAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   nivel_z?: Prisma.SortOrder
-  inmueble_id?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
   ubicacion_id?: Prisma.SortOrder
 }
 
@@ -418,7 +418,7 @@ export type marcador_mapaMaxOrderByAggregateInput = {
   tipo?: Prisma.SortOrder
   es_visible?: Prisma.SortOrder
   nivel_z?: Prisma.SortOrder
-  inmueble_id?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
   ubicacion_id?: Prisma.SortOrder
 }
 
@@ -427,14 +427,14 @@ export type marcador_mapaMinOrderByAggregateInput = {
   tipo?: Prisma.SortOrder
   es_visible?: Prisma.SortOrder
   nivel_z?: Prisma.SortOrder
-  inmueble_id?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
   ubicacion_id?: Prisma.SortOrder
 }
 
 export type marcador_mapaSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   nivel_z?: Prisma.SortOrder
-  inmueble_id?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
   ubicacion_id?: Prisma.SortOrder
 }
 
@@ -682,7 +682,7 @@ export type marcador_mapaUncheckedCreateWithoutDetalle_grupoInput = {
   tipo: $Enums.tipo_marcador
   es_visible?: boolean | null
   nivel_z?: number | null
-  inmueble_id: number
+  inmuebleId: number
   ubicacion_id: number
   interaccion_mapa?: Prisma.interaccion_mapaUncheckedCreateNestedManyWithoutMarcador_mapaInput
 }
@@ -729,7 +729,7 @@ export type marcador_mapaUncheckedUpdateWithoutDetalle_grupoInput = {
   tipo?: Prisma.Enumtipo_marcadorFieldUpdateOperationsInput | $Enums.tipo_marcador
   es_visible?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   nivel_z?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  inmueble_id?: Prisma.IntFieldUpdateOperationsInput | number
+  inmuebleId?: Prisma.IntFieldUpdateOperationsInput | number
   ubicacion_id?: Prisma.IntFieldUpdateOperationsInput | number
   interaccion_mapa?: Prisma.interaccion_mapaUncheckedUpdateManyWithoutMarcador_mapaNestedInput
 }
@@ -802,7 +802,7 @@ export type marcador_mapaScalarWhereInput = {
   tipo?: Prisma.Enumtipo_marcadorFilter<'marcador_mapa'> | $Enums.tipo_marcador
   es_visible?: Prisma.BoolNullableFilter<'marcador_mapa'> | boolean | null
   nivel_z?: Prisma.IntNullableFilter<'marcador_mapa'> | number | null
-  inmueble_id?: Prisma.IntFilter<'marcador_mapa'> | number
+  inmuebleId?: Prisma.IntFilter<'marcador_mapa'> | number
   ubicacion_id?: Prisma.IntFilter<'marcador_mapa'> | number
 }
 
@@ -820,7 +820,7 @@ export type marcador_mapaUncheckedCreateWithoutInteraccion_mapaInput = {
   tipo: $Enums.tipo_marcador
   es_visible?: boolean | null
   nivel_z?: number | null
-  inmueble_id: number
+  inmuebleId: number
   ubicacion_id: number
   detalle_grupo?: Prisma.detalle_grupoUncheckedCreateNestedManyWithoutMarcador_mapaInput
 }
@@ -867,7 +867,7 @@ export type marcador_mapaUncheckedUpdateWithoutInteraccion_mapaInput = {
   tipo?: Prisma.Enumtipo_marcadorFieldUpdateOperationsInput | $Enums.tipo_marcador
   es_visible?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   nivel_z?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  inmueble_id?: Prisma.IntFieldUpdateOperationsInput | number
+  inmuebleId?: Prisma.IntFieldUpdateOperationsInput | number
   ubicacion_id?: Prisma.IntFieldUpdateOperationsInput | number
   detalle_grupo?: Prisma.detalle_grupoUncheckedUpdateManyWithoutMarcador_mapaNestedInput
 }
@@ -886,7 +886,7 @@ export type marcador_mapaUncheckedCreateWithoutUbicacion_inmuebleInput = {
   tipo: $Enums.tipo_marcador
   es_visible?: boolean | null
   nivel_z?: number | null
-  inmueble_id: number
+  inmuebleId: number
   detalle_grupo?: Prisma.detalle_grupoUncheckedCreateNestedManyWithoutMarcador_mapaInput
   interaccion_mapa?: Prisma.interaccion_mapaUncheckedCreateNestedManyWithoutMarcador_mapaInput
 }
@@ -974,7 +974,7 @@ export type marcador_mapaCreateManyUbicacion_inmuebleInput = {
   tipo: $Enums.tipo_marcador
   es_visible?: boolean | null
   nivel_z?: number | null
-  inmueble_id: number
+  inmuebleId: number
 }
 
 export type marcador_mapaUpdateWithoutUbicacion_inmuebleInput = {
@@ -991,7 +991,7 @@ export type marcador_mapaUncheckedUpdateWithoutUbicacion_inmuebleInput = {
   tipo?: Prisma.Enumtipo_marcadorFieldUpdateOperationsInput | $Enums.tipo_marcador
   es_visible?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   nivel_z?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  inmueble_id?: Prisma.IntFieldUpdateOperationsInput | number
+  inmuebleId?: Prisma.IntFieldUpdateOperationsInput | number
   detalle_grupo?: Prisma.detalle_grupoUncheckedUpdateManyWithoutMarcador_mapaNestedInput
   interaccion_mapa?: Prisma.interaccion_mapaUncheckedUpdateManyWithoutMarcador_mapaNestedInput
 }
@@ -1001,7 +1001,7 @@ export type marcador_mapaUncheckedUpdateManyWithoutUbicacion_inmuebleInput = {
   tipo?: Prisma.Enumtipo_marcadorFieldUpdateOperationsInput | $Enums.tipo_marcador
   es_visible?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   nivel_z?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  inmueble_id?: Prisma.IntFieldUpdateOperationsInput | number
+  inmuebleId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 /**
@@ -1058,7 +1058,7 @@ export type marcador_mapaSelect<
     tipo?: boolean
     es_visible?: boolean
     nivel_z?: boolean
-    inmueble_id?: boolean
+    inmuebleId?: boolean
     ubicacion_id?: boolean
     detalle_grupo?: boolean | Prisma.marcador_mapa$detalle_grupoArgs<ExtArgs>
     interaccion_mapa?: boolean | Prisma.marcador_mapa$interaccion_mapaArgs<ExtArgs>
@@ -1077,7 +1077,7 @@ export type marcador_mapaSelectCreateManyAndReturn<
     tipo?: boolean
     es_visible?: boolean
     nivel_z?: boolean
-    inmueble_id?: boolean
+    inmuebleId?: boolean
     ubicacion_id?: boolean
     inmueble?: boolean | Prisma.inmuebleDefaultArgs<ExtArgs>
     ubicacion_inmueble?: boolean | Prisma.ubicacion_inmuebleDefaultArgs<ExtArgs>
@@ -1093,7 +1093,7 @@ export type marcador_mapaSelectUpdateManyAndReturn<
     tipo?: boolean
     es_visible?: boolean
     nivel_z?: boolean
-    inmueble_id?: boolean
+    inmuebleId?: boolean
     ubicacion_id?: boolean
     inmueble?: boolean | Prisma.inmuebleDefaultArgs<ExtArgs>
     ubicacion_inmueble?: boolean | Prisma.ubicacion_inmuebleDefaultArgs<ExtArgs>
@@ -1106,14 +1106,14 @@ export type marcador_mapaSelectScalar = {
   tipo?: boolean
   es_visible?: boolean
   nivel_z?: boolean
-  inmueble_id?: boolean
+  inmuebleId?: boolean
   ubicacion_id?: boolean
 }
 
 export type marcador_mapaOmit<
   ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs
 > = runtime.Types.Extensions.GetOmit<
-  'id' | 'tipo' | 'es_visible' | 'nivel_z' | 'inmueble_id' | 'ubicacion_id',
+  'id' | 'tipo' | 'es_visible' | 'nivel_z' | 'inmuebleId' | 'ubicacion_id',
   ExtArgs['result']['marcador_mapa']
 >
 export type marcador_mapaInclude<
@@ -1154,7 +1154,7 @@ export type $marcador_mapaPayload<
       tipo: $Enums.tipo_marcador
       es_visible: boolean | null
       nivel_z: number | null
-      inmueble_id: number
+      inmuebleId: number
       ubicacion_id: number
     },
     ExtArgs['result']['marcador_mapa']
@@ -1780,7 +1780,7 @@ export interface marcador_mapaFieldRefs {
   readonly tipo: Prisma.FieldRef<'marcador_mapa', 'tipo_marcador'>
   readonly es_visible: Prisma.FieldRef<'marcador_mapa', 'Boolean'>
   readonly nivel_z: Prisma.FieldRef<'marcador_mapa', 'Int'>
-  readonly inmueble_id: Prisma.FieldRef<'marcador_mapa', 'Int'>
+  readonly inmuebleId: Prisma.FieldRef<'marcador_mapa', 'Int'>
   readonly ubicacion_id: Prisma.FieldRef<'marcador_mapa', 'Int'>
 }
 

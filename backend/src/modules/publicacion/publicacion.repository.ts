@@ -19,11 +19,11 @@ type ActualizarPublicacionInput = {
 };
 
 export const buscarPublicacionesPorUsuarioRepository = async (
-  usuario_id: number,
+  usuarioId: number,
 ) => {
   return prisma.publicacion.findMany({
     where: {
-      usuario_id: usuario_id,
+      usuarioId: usuarioId,
       estado: {
         not: ESTADO_PUBLICACION_ELIMINADA,
       },
@@ -37,7 +37,7 @@ export const buscarPublicacionesPorUsuarioRepository = async (
               direccion: true,
               latitud: true,
               longitud: true,
-              inmueble_id: true,
+              inmuebleId: true,
               ubicacion_maestra_id: true,
             },
           },
@@ -74,8 +74,8 @@ export const buscarResumenFinalPorIdRepository = async (
       descripcion: true,
       estado: true,
       fecha_publicacion: true,
-      usuario_id: true,
-      inmueble_id: true,
+      usuarioId: true,
+      inmuebleId: true,
       inmueble: {
         select: {
           id: true,
@@ -212,7 +212,7 @@ export const actualizarPublicacionRepository = async (
 
 export const eliminarLogicamentePublicacionRepository = async (
   publicacionId: number,
-  inmueble_id: number,
+  inmuebleId: number,
 ) => {
   return prisma.$transaction([
     prisma.publicacion.update({
@@ -222,7 +222,7 @@ export const eliminarLogicamentePublicacionRepository = async (
       },
     }),
     prisma.inmueble.update({
-      where: { id: inmueble_id },
+      where: { id: inmuebleId },
       data: {
         estado: ESTADO_INMUEBLE_INACTIVO,
       },
@@ -241,15 +241,15 @@ export const buscarDetallePublicacionPorIdRepository = async (
       descripcion: true,
       estado: true,
       fecha_publicacion: true,
-      usuario_id: true,
-      inmueble_id: true,
+      usuarioId: true,
+      inmuebleId: true,
       usuario: {
         select: {
           id: true,
           nombre: true,
           apellido: true,
           correo: true,
-          telefono_telefono_usuario_idTousuario: {
+          telefono_telefono_usuarioIdTousuario: {
             select: {
               codigoPais: true,
               numero: true,
@@ -275,7 +275,7 @@ export const buscarDetallePublicacionPorIdRepository = async (
               direccion: true,
               latitud: true,
               longitud: true,
-              inmueble_id: true,
+              inmuebleId: true,
               ubicacion_maestra_id: true,
             },
           },
@@ -307,11 +307,11 @@ export const buscarDetallePublicacionPorIdRepository = async (
 };
 
 export const buscarDetallePublicacionPorInmuebleIdRepository = async (
-  inmueble_id: number,
+  inmuebleId: number,
 ) => {
   return prisma.publicacion.findFirst({
     where: {
-      inmueble_id: inmueble_id,
+      inmuebleId: inmuebleId,
       estado: {
         not: "ELIMINADA",
       },
@@ -322,15 +322,15 @@ export const buscarDetallePublicacionPorInmuebleIdRepository = async (
       descripcion: true,
       estado: true,
       fecha_publicacion: true,
-      usuario_id: true,
-      inmueble_id: true,
+      usuarioId: true,
+      inmuebleId: true,
       usuario: {
         select: {
           id: true,
           nombre: true,
           apellido: true,
           correo: true,
-          telefono_telefono_usuario_idTousuario: {
+          telefono_telefono_usuarioIdTousuario: {
             select: {
               codigoPais: true,
               numero: true,
@@ -464,7 +464,7 @@ export const buscarMultimediaPublicacionRepository = async (
 
 export const activarPublicidadRepository = async (
   publicacionId: number,
-  usuario_id: number,
+  usuarioId: number,
   paymentIntentId: string,
   duracionDias: number = 30
 ) => {
@@ -475,7 +475,7 @@ export const activarPublicidadRepository = async (
   return prisma.publicacion.update({
     where: {
       id: publicacionId,
-      usuario_id: usuario_id,
+      usuarioId: usuarioId,
     },
     data: {
       promoted: true,
@@ -488,12 +488,12 @@ export const activarPublicidadRepository = async (
 
 export const cancelarPublicidadRepository = async (
   publicacionId: number,
-  usuario_id: number
+  usuarioId: number
 ) => {
   return prisma.publicacion.update({
     where: {
       id: publicacionId,
-      usuario_id: usuario_id,
+      usuarioId: usuarioId,
     },
     data: {
       promoted: false,

@@ -64,7 +64,7 @@ export const createLinkedInUser = async (
 
     await tx.autenticacion_social.create({
       data: {
-        usuario_id: user.id,
+        usuarioId: user.id,
         proveedor: 'linkedin',
         id_externo: linkedinId,
         correo_proveedor,
@@ -81,7 +81,7 @@ export const createLinkedInUser = async (
 }
 
 export const linkLinkedInToUser = async (
-  usuario_id: number,
+  usuarioId: number,
   linkedinId: string,
   correo_proveedor: string,
   tokenStorage: LinkedInTokenStorageInput
@@ -99,7 +99,7 @@ export const linkLinkedInToUser = async (
         id: existingLink.id
       },
       data: {
-        usuario_id,
+        usuarioId,
         correo_proveedor,
         activo: true,
         vinculado_en: new Date(),
@@ -112,7 +112,7 @@ export const linkLinkedInToUser = async (
 
   return await prisma.autenticacion_social.create({
     data: {
-      usuario_id,
+      usuarioId,
       proveedor: 'linkedin',
       id_externo: linkedinId,
       correo_proveedor,
@@ -127,16 +127,16 @@ export const linkLinkedInToUser = async (
 
 export const createLinkedInSession = async ({
   token,
-  usuario_id,
+  usuarioId,
   fecha_expiracion
 }: {
   token: string
-  usuario_id: number
+  usuarioId: number
   fecha_expiracion: Date
 }) => {
   return await createSession({
     token,
-    usuario_id,
+    usuarioId,
     fecha_expiracion,
     metodo_auth: 'linkedin'
   })
@@ -146,22 +146,22 @@ export const findLinkedInLinkByExternalId = async (linkedinId: string) => {
   return await findSocialLinkByProviderAndExternalId('linkedin', linkedinId)
 }
 
-export const findLinkedInLinkByUserId = async (usuario_id: number) => {
-  return await findSocialLinkByUserAndProvider(usuario_id, 'linkedin')
+export const findLinkedInLinkByUserId = async (usuarioId: number) => {
+  return await findSocialLinkByUserAndProvider(usuarioId, 'linkedin')
 }
 
 export const createLinkedInLinkForUser = async ({
-  usuario_id,
+  usuarioId,
   linkedinId,
   correo_proveedor,
   tokenStorage
 }: {
-  usuario_id: number
+  usuarioId: number
   linkedinId: string
   correo_proveedor?: string | null
   tokenStorage: LinkedInTokenStorageInput
 }) => {
-  return await linkLinkedInToUser(usuario_id, linkedinId, correo_proveedor ?? '', tokenStorage)
+  return await linkLinkedInToUser(usuarioId, linkedinId, correo_proveedor ?? '', tokenStorage)
 }
 
 export const findUserByLinkedInSessionToken = async (sessionToken: string) => {
@@ -169,13 +169,13 @@ export const findUserByLinkedInSessionToken = async (sessionToken: string) => {
 }
 
 export const updateLinkedInLastUsage = async (
-  usuario_id: number,
+  usuarioId: number,
   linkedinId: string,
   tokenStorage: LinkedInTokenStorageInput
 ) => {
   return await prisma.autenticacion_social.updateMany({
     where: {
-      usuario_id,
+      usuarioId,
       proveedor: 'linkedin',
       id_externo: linkedinId,
       activo: true

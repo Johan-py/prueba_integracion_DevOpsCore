@@ -48,7 +48,7 @@ export const createFacebookUser = async (
 
   await prisma.autenticacion_social.create({
     data: {
-      usuario_id: user.id,
+      usuarioId: user.id,
       proveedor: 'facebook',
       id_externo: facebookId,
       correo_proveedor,
@@ -60,13 +60,13 @@ export const createFacebookUser = async (
 }
 
 export const linkFacebookToUser = async (
-  usuario_id: number,
+  usuarioId: number,
   facebookId: string,
   correo_proveedor: string | null
 ) => {
   return await prisma.autenticacion_social.create({
     data: {
-      usuario_id,
+      usuarioId,
       proveedor: 'facebook',
       id_externo: facebookId,
       correo_proveedor,
@@ -77,16 +77,16 @@ export const linkFacebookToUser = async (
 
 export const createFacebookSession = async ({
   token,
-  usuario_id,
+  usuarioId,
   fecha_expiracion
 }: {
   token: string
-  usuario_id: number
+  usuarioId: number
   fecha_expiracion: Date
 }) => {
   return await createSession({
     token,
-    usuario_id,
+    usuarioId,
     fecha_expiracion
   })
 }
@@ -95,21 +95,21 @@ export const findFacebookLinkByExternalId = async (facebookId: string) => {
   return await findSocialLinkByProviderAndExternalId('facebook', facebookId)
 }
 
-export const findFacebookLinkByUserId = async (usuario_id: number) => {
-  return await findSocialLinkByUserAndProvider(usuario_id, 'facebook')
+export const findFacebookLinkByUserId = async (usuarioId: number) => {
+  return await findSocialLinkByUserAndProvider(usuarioId, 'facebook')
 }
 
 export const createFacebookLinkForUser = async ({
-  usuario_id,
+  usuarioId,
   facebookId,
   correo_proveedor
 }: {
-  usuario_id: number
+  usuarioId: number
   facebookId: string
   correo_proveedor?: string | null
 }) => {
   return await createSocialLink({
-    usuario_id,
+    usuarioId,
     proveedor: 'facebook',
     id_externo: facebookId,
     correo_proveedor
@@ -120,10 +120,10 @@ export const findUserByFacebookSessionToken = async (sessionToken: string) => {
   return await findUserByActiveSessionTokenForSocialLink(sessionToken)
 }
 
-export const updateFacebookLastUsage = async (usuario_id: number, facebookId: string) => {
+export const updateFacebookLastUsage = async (usuarioId: number, facebookId: string) => {
   return await prisma.autenticacion_social.updateMany({
     where: {
-      usuario_id,
+      usuarioId,
       proveedor: 'facebook',
       id_externo: facebookId,
       activo: true

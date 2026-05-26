@@ -24,10 +24,10 @@ const MIN_PASSWORD_LENGTH = 8;
 const PASSWORD_SEGURA_REGEX =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
 
-const obtenerBloqueoPorCambiosFrecuentes = async (usuario_id: number) => {
+const obtenerBloqueoPorCambiosFrecuentes = async (usuarioId: number) => {
   const ultimosCambios = await prisma.historial_password.findMany({
     where: {
-      usuario_id,
+      usuarioId,
     },
     orderBy: {
       creado_en: "desc",
@@ -77,11 +77,11 @@ const obtenerBloqueoPorCambiosFrecuentes = async (usuario_id: number) => {
 export const cambiarPassword = async (req: AuthRequest, res: Response) => {
   try {
     const { passwordActual, nuevaPassword } = req.body;
-    const usuario_id = req.usuario?.id;
+    const usuarioId = req.usuario?.id;
     const authHeader = req.headers.authorization;
     const currentToken = authHeader && authHeader.split(" ")[1];
 
-    if (!usuario_id || !currentToken) {
+    if (!usuarioId || !currentToken) {
       return res.status(401).json({ ok: false, msg: "No autorizado" });
     }
 
@@ -113,7 +113,7 @@ export const cambiarPassword = async (req: AuthRequest, res: Response) => {
     }
 
     const usuario = await prisma.usuario.findUnique({
-      where: { id: usuario_id },
+      where: { id: usuarioId },
     });
 
     if (!usuario) {
@@ -130,7 +130,7 @@ export const cambiarPassword = async (req: AuthRequest, res: Response) => {
       ahora >= usuario.bloqueo_cambio_password_hasta
     ) {
       await prisma.usuario.update({
-        where: { id: usuario_id },
+        where: { id: usuarioId },
         data: {
           intentos_fallidos_cambio_password: 0,
           bloqueo_cambio_password_hasta: null,
@@ -181,7 +181,7 @@ export const cambiarPassword = async (req: AuthRequest, res: Response) => {
         );
 
         await prisma.usuario.update({
-          where: { id: usuario_id },
+          where: { id: usuarioId },
           data: {
             intentos_fallidos_cambio_password: MAX_INTENTOS_CAMBIO_PASSWORD,
             bloqueo_cambio_password_hasta: bloqueoHasta,
@@ -198,7 +198,7 @@ export const cambiarPassword = async (req: AuthRequest, res: Response) => {
       }
 
       await prisma.usuario.update({
-        where: { id: usuario_id },
+        where: { id: usuarioId },
         data: {
           intentos_fallidos_cambio_password: nuevosIntentos,
           bloqueo_cambio_password_hasta: null,
@@ -222,7 +222,7 @@ export const cambiarPassword = async (req: AuthRequest, res: Response) => {
     }
 
     const historialReciente = await prisma.historial_password.findMany({
-      where: { usuario_id },
+      where: { usuarioId },
       orderBy: { creado_en: "desc" },
       take: 3,
       select: { password_hash: true },
@@ -239,8 +239,8 @@ export const cambiarPassword = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    const bloqueoPorCambiosFrecuentes = await obtenerBloqueoPorCambiosFrecuentes(usuario_id);
-      await obtenerBloqueoPorCambiosFrecuentes(usuario_id);
+    const bloqueoPorCambiosFrecuentes = await obtenerBloqueoPorCambiosFrecuentes(usuarioId);
+      await obtenerBloqueoPorCambiosFrecuentes(usuarioId);
 
     if (bloqueoPorCambiosFrecuentes) {
       return res.status(429).json({
@@ -254,7 +254,7 @@ export const cambiarPassword = async (req: AuthRequest, res: Response) => {
     const cambioRealizado = await prisma.$transaction(async (tx) => {
     const resultadoActualizacion = await tx.usuario.updateMany({
       where: {
-        id: usuario_id,
+        id: usuarioId,
         password: passwordActualNormalizada,
       },
       data: {
@@ -271,7 +271,7 @@ export const cambiarPassword = async (req: AuthRequest, res: Response) => {
 
     await tx.historial_password.create({
       data: {
-        usuario_id,
+        usuarioId,
         password_hash: passwordActualNormalizada,
       },
     });
@@ -286,14 +286,14 @@ export const cambiarPassword = async (req: AuthRequest, res: Response) => {
     });
   }
 
-    await invalidateOtherUserSessions(usuario_id, currentToken);
+    await invalidateOtherUserSessions(usuarioId, currentToken);
 
     enviarAvisoCambioPassword({
       emailDestino: usuario.correo,
       nombreUsuario: usuario.nombre,
     }).catch((err) => console.error("Error enviando email de aviso cambio password:", err));
 
-    notificarCambioPassword(usuario_id).catch((err) =>
+    notificarCambioPassword(usuarioId).catch((err) =>
       console.error("Error enviando WhatsApp de aviso cambio password:", err)
     );
 
@@ -313,9 +313,9 @@ export const cambiarPassword = async (req: AuthRequest, res: Response) => {
 export const verificarPassword = async (req: AuthRequest, res: Response) => {
   try {
     const { passwordActual } = req.body;
-    const usuario_id = req.usuario?.id;
+    const usuarioId = req.usuario?.id;
 
-    if (!usuario_id) {
+    if (!usuarioId) {
       return res.status(401).json({ ok: false, msg: "No hay token válido" });
     }
 
@@ -327,7 +327,7 @@ export const verificarPassword = async (req: AuthRequest, res: Response) => {
     }
 
     const usuario = await prisma.usuario.findUnique({
-      where: { id: usuario_id },
+      where: { id: usuarioId },
     });
 
     if (!usuario) {
@@ -341,7 +341,7 @@ export const verificarPassword = async (req: AuthRequest, res: Response) => {
       ahora >= usuario.bloqueo_cambio_password_hasta
     ) {
       await prisma.usuario.update({
-        where: { id: usuario_id },
+        where: { id: usuarioId },
         data: {
           intentos_fallidos_cambio_password: 0,
           bloqueo_cambio_password_hasta: null,
@@ -392,7 +392,7 @@ export const verificarPassword = async (req: AuthRequest, res: Response) => {
         );
 
         await prisma.usuario.update({
-          where: { id: usuario_id },
+          where: { id: usuarioId },
           data: {
             intentos_fallidos_cambio_password: MAX_INTENTOS_CAMBIO_PASSWORD,
             bloqueo_cambio_password_hasta: bloqueoHasta,
@@ -409,7 +409,7 @@ export const verificarPassword = async (req: AuthRequest, res: Response) => {
       }
 
       await prisma.usuario.update({
-        where: { id: usuario_id },
+        where: { id: usuarioId },
         data: {
           intentos_fallidos_cambio_password: nuevosIntentos,
           bloqueo_cambio_password_hasta: null,
@@ -426,7 +426,7 @@ export const verificarPassword = async (req: AuthRequest, res: Response) => {
     }
 
     await prisma.usuario.update({
-      where: { id: usuario_id },
+      where: { id: usuarioId },
       data: {
         intentos_fallidos_cambio_password: 0,
         bloqueo_cambio_password_hasta: null,
@@ -446,10 +446,10 @@ export const verificarPassword = async (req: AuthRequest, res: Response) => {
 export const solicitarCambioEmail = async (req: AuthRequest, res: Response) => {
   try {
     const { emailNuevo } = req.body;
-    const usuario_id = req.usuario?.id;
+    const usuarioId = req.usuario?.id;
     const nombreUsuario = req.usuario?.nombre;
 
-    if (!usuario_id) {
+    if (!usuarioId) {
       return res.status(401).json({ ok: false, msg: "No autorizado" });
     }
 
@@ -476,7 +476,7 @@ export const solicitarCambioEmail = async (req: AuthRequest, res: Response) => {
         token: otp,
         email_nuevo: emailNuevo,
         expira_en: expira_en,
-        usuario_id: usuario_id,
+        usuarioId: usuarioId,
       },
     });
 
@@ -508,9 +508,9 @@ export const solicitarCambioEmail = async (req: AuthRequest, res: Response) => {
 export const confirmarCambioEmail = async (req: AuthRequest, res: Response) => {
   try {
     const { otp } = req.body;
-    const usuario_id = req.usuario?.id;
+    const usuarioId = req.usuario?.id;
 
-    if (!usuario_id) {
+    if (!usuarioId) {
       return res.status(401).json({ ok: false, msg: "No autorizado" });
     }
 
@@ -520,7 +520,7 @@ export const confirmarCambioEmail = async (req: AuthRequest, res: Response) => {
 
     const solicitud = await prisma.cambio_email.findFirst({
       where: {
-        usuario_id: usuario_id,
+        usuarioId: usuarioId,
         completado_en: null,
       },
       orderBy: { creado_en: "desc" },
@@ -549,7 +549,7 @@ export const confirmarCambioEmail = async (req: AuthRequest, res: Response) => {
 
     const [usuarioActualizado] = await prisma.$transaction([
       prisma.usuario.update({
-        where: { id: usuario_id },
+        where: { id: usuarioId },
         data: { correo: solicitud.email_nuevo },
       }),
       prisma.cambio_email.update({

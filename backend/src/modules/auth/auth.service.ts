@@ -466,7 +466,7 @@ export const loginService = async (payload: LoginDTO) => {
     await invalidateActive2FACodesByUserId(user.id);
 
     await create2FACode({
-      usuario_id: user.id,
+      usuarioId: user.id,
       codigo_hash,
       expira_en,
     });
@@ -501,7 +501,7 @@ export const loginService = async (payload: LoginDTO) => {
 
   await createSession({
     token,
-    usuario_id: user.id,
+    usuarioId: user.id,
     fecha_expiracion,
   });
 
@@ -576,7 +576,7 @@ export const verify2FAService = async ({ userId, codigo }: Verify2FADTO) => {
 
   await createSession({
     token,
-    usuario_id: user.id,
+    usuarioId: user.id,
     fecha_expiracion,
   });
 
@@ -716,7 +716,7 @@ export const verifyRegisterCodeService = async (
 
   await createSession({
     token,
-    usuario_id: newUser.id,
+    usuarioId: newUser.id,
     fecha_expiracion,
   });
 
@@ -726,7 +726,7 @@ export const verifyRegisterCodeService = async (
       nombre: newUser.nombre,
       apellido: newUser.apellido,
       correo: newUser.correo,
-      telefono_telefono_usuario_idTousuario: newUser.telefonos,
+      telefono_telefono_usuarioIdTousuario: newUser.telefonos,
     },
     token,
   };
@@ -937,7 +937,7 @@ export const loginWithGoogleCodeService = async (code: string) => {
 
   await createSession({
     token,
-    usuario_id: user.id,
+    usuarioId: user.id,
     fecha_expiracion,
   });
 
@@ -1023,7 +1023,7 @@ export const requestMagicLinkService = async (payload: RequestMagicLinkDTO) => {
     await invalidateActiveMagicLinksByUserId(user.id);
 
     await createMagicLink({
-      usuario_id: user.id,
+      usuarioId: user.id,
       tokenHash,
       correo: user.correo,
       expira_en,
@@ -1128,7 +1128,7 @@ export const loginWithMagicLinkService = async ({
   }
 
   if (
-    magicLink.usuario_id !== decoded.userId ||
+    magicLink.usuarioId !== decoded.userId ||
     magicLink.correo !== decoded.correo
   ) {
     throw new AuthError("El Magic Link no corresponde al usuario.", 401);
@@ -1162,7 +1162,7 @@ export const loginWithMagicLinkService = async ({
 
   await createSession({
     token: sessionToken,
-    usuario_id: user.id,
+    usuarioId: user.id,
     fecha_expiracion,
     metodo_auth: "magic_link",
   });
@@ -1224,7 +1224,7 @@ export const forgotPasswordService = async (payload: ForgotPasswordDTO) => {
   await desactivarRecuperacionesPasswordActivas(user.id);
 
   await createPasswordRecovery({
-    usuario_id: user.id,
+    usuarioId: user.id,
     token: resetToken,
     expira_en,
   });
@@ -1314,7 +1314,7 @@ export const resetPasswordService = async (payload: ResetPasswordDTO) => {
   tokenAttempts.set(token, attempts + 1);
 
   // Obtener el usuario para validar que la nueva contraseña sea diferente
-  const user = await findUserById(recovery.usuario_id);
+  const user = await findUserById(recovery.usuarioId);
 
   if (!user) {
     throw new AuthError("Usuario no encontrado", 404);
@@ -1334,11 +1334,11 @@ export const resetPasswordService = async (payload: ResetPasswordDTO) => {
       data: { usado_en: new Date(), activo: false },
     }),
     prisma.usuario.update({
-      where: { id: recovery.usuario_id },
+      where: { id: recovery.usuarioId },
       data: { password },
     }),
     prisma.sesion.updateMany({
-      where: { usuario_id: recovery.usuario_id, estado: true },
+      where: { usuarioId: recovery.usuarioId, estado: true },
       data: { estado: false },
     }),
   ]);
@@ -1373,7 +1373,7 @@ export const resend2FAService = async (userId: number) => {
   await invalidateActive2FACodesByUserId(user.id);
 
   await create2FACode({
-    usuario_id: user.id,
+    usuarioId: user.id,
     codigo_hash,
     expira_en,
   });
@@ -1420,7 +1420,7 @@ export const requestActivationCodeService = async (correo: string) => {
   await invalidateActive2FACodesByUserId(user.id);
 
   await create2FACode({
-    usuario_id: user.id,
+    usuarioId: user.id,
     codigo_hash,
     expira_en,
   });

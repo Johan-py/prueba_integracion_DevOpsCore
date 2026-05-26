@@ -293,7 +293,7 @@ export const crearComentario = async (req: AuthRequest, res: Response) => {
 
     const comentario = await comentariosService.crear({
       contenido,
-      usuario_id: req.user.id,
+      usuarioId: req.user.id,
       blog_id: Number(blog_id),
       comentario_padre_id: comentario_padre_id
         ? Number(comentario_padre_id)
@@ -312,7 +312,7 @@ export const listarComentarios = async (req: Request, res: Response) => {
     const blog_id = Number(req.params.id);
     const { page, limit } = req.query;
 
-    let usuario_id: number | undefined;
+    let usuarioId: number | undefined;
     const authHeader = req.headers.authorization;
     if (authHeader?.startsWith("Bearer ")) {
       const token = authHeader.split(" ")[1];
@@ -321,7 +321,7 @@ export const listarComentarios = async (req: Request, res: Response) => {
           verifyJwtToken(token);
           const session = await findActiveSessionByToken(token);
           if (session) {
-            usuario_id = session.usuario.id;
+            usuarioId = session.usuario.id;
           }
         } catch (err) {
           console.error("Error al extraer sesion para comentarios:", err);
@@ -331,7 +331,7 @@ export const listarComentarios = async (req: Request, res: Response) => {
 
     const comentarios = await comentariosService.listarPorBlog(
       blog_id,
-      usuario_id,
+      usuarioId,
       page ? Number(page) : 1,
       limit ? Number(limit) : 10,
     );

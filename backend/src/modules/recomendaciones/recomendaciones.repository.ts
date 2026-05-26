@@ -1,18 +1,18 @@
 import { prisma } from '../../lib/prisma.client.js'
 
 export class RecomendacionesRepository {
-  async getHistorialVistas(usuario_id: number, diasLimite: number = 90) {
+  async getHistorialVistas(usuarioId: number, diasLimite: number = 90) {
     const fechaLimite = new Date()
     fechaLimite.setDate(fechaLimite.getDate() - diasLimite)
 
     const vistas = await prisma.propiedad_vista.findMany({
       where: {
-        usuario_id,
-        vista_en: { gte: fechaLimite }
+        usuarioId,
+        vistaEn: { gte: fechaLimite }
       },
       select: {
-        inmueble_id: true,
-        vista_en: true,
+        inmuebleId: true,
+        vistaEn: true,
         inmueble: {
           select: {
             id: true,
@@ -25,30 +25,30 @@ export class RecomendacionesRepository {
           }
         }
       },
-      orderBy: { vista_en: 'desc' }
+      orderBy: { vistaEn: 'desc' }
     })
 
     const hoy = new Date()
     return vistas.map((vista) => {
       const diasDiferencia = Math.floor(
-        (hoy.getTime() - new Date(vista.vista_en).getTime()) / (1000 * 3600 * 24)
+        (hoy.getTime() - new Date(vista.vistaEn).getTime()) / (1000 * 3600 * 24)
       )
       let peso = 0.3
       if (diasDiferencia <= 7) peso = 1.0
       else if (diasDiferencia <= 14) peso = 0.7
 
       return {
-        inmueble_id: vista.inmueble_id,
-        vista_en: vista.vista_en,
+        inmuebleId: vista.inmuebleId,
+        vistaEn: vista.vistaEn,
         peso,
         inmueble: vista.inmueble
       }
     })
   }
 
-  async getUltimasBusquedas(usuario_id: number, limite: number = 10) {
+  async getUltimasBusquedas(usuarioId: number, limite: number = 10) {
     const visitor = await prisma.visitor.findFirst({
-      where: { usuario_id: usuario_id },
+      where: { usuarioId: usuarioId },
       orderBy: { fecha_visita: 'desc' }
     })
 
@@ -60,22 +60,22 @@ export class RecomendacionesRepository {
     return busquedas.slice(-limite).reverse()
   }
 
-  async getFavoritos(usuario_id: number) {
+  async getFavoritos(usuarioId: number) {
     const favoritos = await prisma.favorito.findMany({
-      where: { usuario_id },
+      where: { usuarioId },
       include: {
         inmueble: {
           include: { publicaciones: true
           }
         }
       },
-      orderBy: { agregado_en: 'desc' }
+      orderBy: { agregadoEn: 'desc' }
     })
 
     return favoritos.map((f) => f.inmueble)
   }
 
-  async getInmueblesCandidatos(usuario_id: number, limit: number = 100) {
+  async getInmueblesCandidatos(usuarioId: number, limit: number = 100) {
     return await prisma.inmueble.findMany({
       where: {
         estado: 'ACTIVO'
@@ -114,13 +114,13 @@ export class RecomendacionesRepository {
     }
 
     const inmueblesConVisitas = await prisma.propiedad_vista.groupBy({
-      by: ['inmueble_id'],
-      _count: { inmueble_id: true },
-      orderBy: { _count: { inmueble_id: 'desc' } },
+      by: ['inmuebleId'],
+      _count: { inmuebleId: true },
+      orderBy: { _count: { inmuebleId: 'desc' } },
       take: limit
     })
 
-    const ids = inmueblesConVisitas.map((v) => v.inmueble_id)
+    const ids = inmueblesConVisitas.map((v) => v.inmuebleId)
 
     return await prisma.inmueble.findMany({
       where: { id: { in: ids } },
@@ -131,30 +131,30 @@ export class RecomendacionesRepository {
       }
     })
   }
-  async getInmueblesPopularesPorZona(zona: string, limit: number = 50, usuario_id?: number) {
+  async getInmueblesPopularesPorZona(zona: string, limit: number = 50, usuarioId?: number) {
     const fechaLimite = new Date()
     fechaLimite.setDate(fechaLimite.getDate() - 7)
 
     let idsExcluir: number[] = []
-    if (usuario_id) {
+    if (usuarioId) {
       const vistasPrevias = await prisma.propiedad_vista.findMany({
-        where: { usuario_id },
-        select: { inmueble_id: true }
+        where: { usuarioId },
+        select: { inmuebleId: true }
       })
-      idsExcluir = vistasPrevias.map((v) => v.inmueble_id)
+      idsExcluir = vistasPrevias.map((v) => v.inmuebleId)
     }
 
     const popularesPorZona = await prisma.propiedad_vista.groupBy({
-      by: ['inmueble_id'],
+      by: ['inmuebleId'],
       where: {
-        vista_en: { gte: fechaLimite }
+        vistaEn: { gte: fechaLimite }
       },
-      _count: { inmueble_id: true },
-      orderBy: { _count: { inmueble_id: 'desc' } },
+      _count: { inmuebleId: true },
+      orderBy: { _count: { inmuebleId: 'desc' } },
       take: limit * 2
     })
 
-    const ids = popularesPorZona.map((v) => v.inmueble_id)
+    const ids = popularesPorZona.map((v) => v.inmuebleId)
     if (ids.length === 0) return []
 
     const idsFinales = ids.filter((id) => !idsExcluir.includes(id))
@@ -177,9 +177,9 @@ export class RecomendacionesRepository {
     })
   }
 
-  async getZonaConexionUsuario(usuario_id: number): Promise<string | null> {
+  async getZonaConexionUsuario(usuarioId: number): Promise<string | null> {
     const usuario = await prisma.usuario.findUnique({
-      where: { id: usuario_id },
+      where: { id: usuarioId },
       select: { zona_conexion: true }
     })
 

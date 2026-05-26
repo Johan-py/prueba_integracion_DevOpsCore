@@ -333,38 +333,48 @@ export const propertiesRepository = {
     orderBy.push({ id: "asc" }); // Desempate default
 
     // ── EJECUCIÓN PRISMA ───────────────────────────────────────────────────
-    const inmuebles = await prisma.inmueble.findMany({
-      where,
-      orderBy,
-      include: { ubicacion: {
-          include: {
-            barrio: {
-              include: {
-                zona: {
-                  include: {
-                    municipio: {
-                      include: {
-                        provincia: {
-                          include: { departamento: true },
+    let inmuebles;
+
+    try {
+      inmuebles = await prisma.inmueble.findMany({
+        where,
+        orderBy,
+        include: {
+          ubicacion: {
+            include: {
+              barrio: {
+                include: {
+                  zona: {
+                    include: {
+                      municipio: {
+                        include: {
+                          provincia: {
+                            include: {
+                              departamento: true,
+                            },
+                          },
                         },
                       },
                     },
                   },
                 },
               },
+              ubicacion_maestra: true,
             },
-            ubicacion_maestra: true,
+          },
+          publicaciones: {
+            where: { estado: "ACTIVA" },
+            select: {
+              promoted: true,
+              multimedia: true,
+            },
           },
         },
-        publicaciones: {
-          where: { estado: "ACTIVA" },
-          select: {
-            promoted: true,
-            multimedia: true,
-          },
-        },
-      },
-    });
+      });
+    } catch (err) {
+      console.error("🔥 PRISMA ERROR:", err);
+      throw err;
+    }
 
     // Ordenamos en memoria por promoted (no es campo directo de inmueble)
     inmuebles.sort((a, b) => {
@@ -420,12 +430,12 @@ export const propertiesRepository = {
     if (filtros.fecha === "mas-populares") {
       console.log("🔥 Entrando al bloque mas-populares");
       const vistas = await prisma.propiedad_vista.groupBy({
-        by: ["inmueble_id"],
-        _count: { usuario_id: true }, // usuarios únicos por inmueble
-        orderBy: { _count: { usuario_id: "desc" } },
+        by: ["inmuebleId"],
+        _count: { usuarioId: true }, // usuarios únicos por inmueble
+        orderBy: { _count: { usuarioId: "desc" } },
       });
       const vistaMap = new Map(
-        vistas.map((v) => [v.inmueble_id, v._count.usuario_id ?? 0]),
+        vistas.map((v) => [v.inmuebleId, v._count.usuarioId ?? 0]),
       );
       return resultados.sort(
         (a, b) => (vistaMap.get(b.id) ?? 0) - (vistaMap.get(a.id) ?? 0),

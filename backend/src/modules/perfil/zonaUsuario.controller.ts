@@ -9,7 +9,7 @@ export const getZonasUsuario = async (req: Request, res: Response): Promise<Resp
 
     // ✅ CORREGIDO: usar camelCase según Prisma
     const zonas = await prisma.zona_usuario.findMany({
-      where: { usuario_id: usuario.id },
+      where: { usuarioId: usuario.id },
       orderBy: { creado_en: 'desc' }
     })
 
@@ -31,7 +31,7 @@ export const getZonaById = async (req: Request, res: Response): Promise<Response
     const zona = await prisma.zona_usuario.findFirst({
       where: {
         id: Number(id),
-        usuario_id: usuario.id
+        usuarioId: usuario.id
       }
     })
 
@@ -67,7 +67,7 @@ export const createZona = async (req: Request, res: Response): Promise<Response>
         descripcion,
         geometria,
         area,
-        usuario_id: usuario.id,
+        usuarioId: usuario.id,
         actualizado_en: new Date(),
         creado_en: new Date()
       }
@@ -93,7 +93,7 @@ export const updateZona = async (req: Request, res: Response): Promise<Response>
     const zona = await prisma.zona_usuario.findFirst({
       where: {
         id: Number(id),
-        usuario_id: usuario.id
+        usuarioId: usuario.id
       }
     });
 
@@ -131,7 +131,7 @@ export const deleteZona = async (req: Request, res: Response): Promise<Response>
     const zona = await prisma.zona_usuario.findFirst({
       where: {
         id: Number(id),
-        usuario_id: usuario.id
+        usuarioId: usuario.id
       }
     })
 
@@ -163,7 +163,7 @@ export const getPropiedadesEnZona = async (req: Request, res: Response): Promise
     const zona = await prisma.zona_usuario.findFirst({
       where: {
         id: zonaId,
-        usuario_id: usuario.id
+        usuarioId: usuario.id
       }
     })
 
@@ -177,7 +177,7 @@ export const getPropiedadesEnZona = async (req: Request, res: Response): Promise
     const inmueblesIds = await prisma.$queryRaw<{ id: number }[]>`
       SELECT DISTINCT i.id
       FROM "inmueble" i
-      INNER JOIN 'ubicacion' ui ON i.id = ui."inmueble_id"
+      INNER JOIN 'ubicacion' ui ON i.id = ui."inmuebleId"
       WHERE 
         ui.latitud IS NOT NULL 
         AND ui.longitud IS NOT NULL

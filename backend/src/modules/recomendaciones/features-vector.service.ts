@@ -10,7 +10,7 @@ export interface ContextoUsuario {
 }
 
 export interface FeatureVector {
-  inmueble_id: number
+  inmuebleId: number
   vector: number[]
   etiquetas: string[] // para saber qué representa cada posición
 }
@@ -19,11 +19,11 @@ export class FeaturesVectorService {
   /**
    * Construye el contexto del usuario desde su historial
    */
-  async obtenerContextoUsuario(usuario_id: number): Promise<ContextoUsuario> {
+  async obtenerContextoUsuario(usuarioId: number): Promise<ContextoUsuario> {
     // Últimas 50 vistas
     const vistas = await prisma.propiedad_vista.findMany({
-      where: { usuario_id },
-      orderBy: { vista_en: 'desc' },
+      where: { usuarioId },
+      orderBy: { vistaEn: 'desc' },
       take: 50,
       include: {
         inmueble: {
@@ -36,7 +36,7 @@ export class FeaturesVectorService {
     })
 
     const favoritos = await prisma.favorito.findMany({
-      where: { usuario_id },
+      where: { usuarioId },
       include: {
         inmueble: {
           include: { publicaciones: true,
@@ -113,9 +113,9 @@ export class FeaturesVectorService {
   /**
    * Extrae y normaliza el vector de features de un inmueble dado el contexto del usuario
    */
-  async extraerVector(inmueble_id: number, contexto: ContextoUsuario): Promise<FeatureVector> {
+  async extraerVector(inmuebleId: number, contexto: ContextoUsuario): Promise<FeatureVector> {
     const inmueble = await prisma.inmueble.findUnique({
-      where: { id: inmueble_id },
+      where: { id: inmuebleId },
       include: { publicaciones: true,
         inmueble_amenidad: true,
         inmueble_etiqueta: { include: { etiqueta: true } },
@@ -123,7 +123,7 @@ export class FeaturesVectorService {
       }
     })
 
-    if (!inmueble) throw new Error(`Inmueble ${inmueble_id} no encontrado`)
+    if (!inmueble) throw new Error(`Inmueble ${inmuebleId} no encontrado`)
 
     const categoriaMap: Record<string, number> = {
       CASA: 1,
@@ -200,7 +200,7 @@ export class FeaturesVectorService {
     ]
 
     return {
-      inmueble_id,
+      inmuebleId,
       vector,
       etiquetas: [
         'categoria',
@@ -223,8 +223,8 @@ export class FeaturesVectorService {
    * Extrae vectores para múltiples inmuebles usando el mismo contexto
    * (más eficiente que llamar extraerVector uno por uno)
    */
-  async extraerVectores(inmuebleIds: number[], usuario_id: number): Promise<FeatureVector[]> {
-    const contexto = await this.obtenerContextoUsuario(usuario_id)
+  async extraerVectores(inmuebleIds: number[], usuarioId: number): Promise<FeatureVector[]> {
+    const contexto = await this.obtenerContextoUsuario(usuarioId)
     return Promise.all(inmuebleIds.map((id) => this.extraerVector(id, contexto)))
   }
 }

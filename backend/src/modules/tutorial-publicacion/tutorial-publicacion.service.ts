@@ -17,9 +17,9 @@ export const getTutorialPublicacionContentService =
   };
 
 export const getTutorialPublicacionEstadoService = async ({
-  usuario_id,
+  usuarioId,
 }: GetTutorialEstadoInput): Promise<TutorialPublicacionEstado> => {
-  const estado = await findTutorialEstadoByUsuarioIdRepository(usuario_id);
+  const estado = await findTutorialEstadoByUsuarioIdRepository(usuarioId);
 
   if (!estado) {
     return {
@@ -39,9 +39,9 @@ export const getTutorialPublicacionEstadoService = async ({
 };
 
 export const confirmTutorialPublicacionService = async ({
-  usuario_id,
+  usuarioId,
 }: ConfirmTutorialInput): Promise<ConfirmTutorialResult> => {
-  const estado = await upsertTutorialConfirmadoRepository(usuario_id);
+  const estado = await upsertTutorialConfirmadoRepository(usuarioId);
 
   return {
     debeMostrarTutorial: false,

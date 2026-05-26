@@ -279,7 +279,7 @@ export const loginService = async (payload: LoginDTO) => {
     );
 
     await invalidateActive2FACodesByUserId(user.id);
-    await create2FACode({ usuario_id: user.id, codigo_hash, expira_en });
+    await create2FACode({ usuarioId: user.id, codigo_hash, expira_en });
 
     const emailResult = await enviarCodigo2FA({
       emailDestino: user.correo,
@@ -305,7 +305,7 @@ export const loginService = async (payload: LoginDTO) => {
   const token = generateToken(jwtPayload);
   const fecha_expiracion = new Date(Date.now() + 60 * 60 * 1000);
 
-  await createSession({ token, usuario_id: user.id, fecha_expiracion });
+  await createSession({ token, usuarioId: user.id, fecha_expiracion });
 
   return {
     requires2FA: false,
@@ -358,7 +358,7 @@ export const verify2FAService = async ({ userId, codigo }: Verify2FADTO) => {
   const token = generateToken(jwtPayload);
   const fecha_expiracion = new Date(Date.now() + 60 * 60 * 1000);
 
-  await createSession({ token, usuario_id: user.id, fecha_expiracion });
+  await createSession({ token, usuarioId: user.id, fecha_expiracion });
 
   return {
     user: {
@@ -458,7 +458,7 @@ export const verifyRegisterCodeService = async (
   const token = generateToken(jwtPayload);
   const fecha_expiracion = new Date(Date.now() + 60 * 60 * 1000);
 
-  await createSession({ token, usuario_id: newUser.id, fecha_expiracion });
+  await createSession({ token, usuarioId: newUser.id, fecha_expiracion });
 
   return {
     user: {
@@ -466,7 +466,7 @@ export const verifyRegisterCodeService = async (
       nombre: newUser.nombre,
       apellido: newUser.apellido,
       correo: newUser.correo,
-      telefono_telefono_usuario_idTousuario: newUser.telefonos,
+      telefono_telefono_usuarioIdTousuario: newUser.telefonos,
     },
     token,
   };
@@ -627,7 +627,7 @@ export const loginWithGoogleCodeService = async (code: string) => {
   const token = generateToken(jwtPayload);
   const fecha_expiracion = new Date(Date.now() + 60 * 60 * 1000);
 
-  await createSession({ token, usuario_id: user.id, fecha_expiracion });
+  await createSession({ token, usuarioId: user.id, fecha_expiracion });
 
   return {
     user: {
@@ -680,7 +680,7 @@ export const forgotPasswordService = async (payload: ForgotPasswordDTO) => {
 
   await desactivarRecuperacionesPasswordActivas(user.id);
   await createPasswordRecovery({
-    usuario_id: user.id,
+    usuarioId: user.id,
     token: resetToken,
     expira_en,
   });
@@ -759,11 +759,11 @@ export const resetPasswordService = async (payload: ResetPasswordDTO) => {
       data: { usado_en: new Date(), activo: false },
     }),
     prisma.usuario.update({
-      where: { id: recovery.usuario_id },
+      where: { id: recovery.usuarioId },
       data: { password },
     }),
     prisma.sesion.updateMany({
-      where: { usuario_id: recovery.usuario_id, estado: true },
+      where: { usuarioId: recovery.usuarioId, estado: true },
       data: { estado: false },
     }),
   ]);

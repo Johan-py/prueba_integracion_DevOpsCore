@@ -27,53 +27,53 @@ export type AggregateInmueble_etiqueta = {
 }
 
 export type Inmueble_etiquetaAvgAggregateOutputType = {
-  inmueble_id: number | null
+  inmuebleId: number | null
   etiqueta_id: number | null
 }
 
 export type Inmueble_etiquetaSumAggregateOutputType = {
-  inmueble_id: number | null
+  inmuebleId: number | null
   etiqueta_id: number | null
 }
 
 export type Inmueble_etiquetaMinAggregateOutputType = {
-  inmueble_id: number | null
+  inmuebleId: number | null
   etiqueta_id: number | null
 }
 
 export type Inmueble_etiquetaMaxAggregateOutputType = {
-  inmueble_id: number | null
+  inmuebleId: number | null
   etiqueta_id: number | null
 }
 
 export type Inmueble_etiquetaCountAggregateOutputType = {
-  inmueble_id: number
+  inmuebleId: number
   etiqueta_id: number
   _all: number
 }
 
 export type Inmueble_etiquetaAvgAggregateInputType = {
-  inmueble_id?: true
+  inmuebleId?: true
   etiqueta_id?: true
 }
 
 export type Inmueble_etiquetaSumAggregateInputType = {
-  inmueble_id?: true
+  inmuebleId?: true
   etiqueta_id?: true
 }
 
 export type Inmueble_etiquetaMinAggregateInputType = {
-  inmueble_id?: true
+  inmuebleId?: true
   etiqueta_id?: true
 }
 
 export type Inmueble_etiquetaMaxAggregateInputType = {
-  inmueble_id?: true
+  inmuebleId?: true
   etiqueta_id?: true
 }
 
 export type Inmueble_etiquetaCountAggregateInputType = {
-  inmueble_id?: true
+  inmuebleId?: true
   etiqueta_id?: true
   _all?: true
 }
@@ -170,7 +170,7 @@ export type inmueble_etiquetaGroupByArgs<
 }
 
 export type Inmueble_etiquetaGroupByOutputType = {
-  inmueble_id: number
+  inmuebleId: number
   etiqueta_id: number
   _count: Inmueble_etiquetaCountAggregateOutputType | null
   _avg: Inmueble_etiquetaAvgAggregateOutputType | null
@@ -196,14 +196,14 @@ export type inmueble_etiquetaWhereInput = {
   AND?: Prisma.inmueble_etiquetaWhereInput | Prisma.inmueble_etiquetaWhereInput[]
   OR?: Prisma.inmueble_etiquetaWhereInput[]
   NOT?: Prisma.inmueble_etiquetaWhereInput | Prisma.inmueble_etiquetaWhereInput[]
-  inmueble_id?: Prisma.IntFilter<'inmueble_etiqueta'> | number
+  inmuebleId?: Prisma.IntFilter<'inmueble_etiqueta'> | number
   etiqueta_id?: Prisma.IntFilter<'inmueble_etiqueta'> | number
   etiqueta?: Prisma.XOR<Prisma.EtiquetaScalarRelationFilter, Prisma.etiquetaWhereInput>
   inmueble?: Prisma.XOR<Prisma.InmuebleScalarRelationFilter, Prisma.inmuebleWhereInput>
 }
 
 export type inmueble_etiquetaOrderByWithRelationInput = {
-  inmueble_id?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
   etiqueta_id?: Prisma.SortOrder
   etiqueta?: Prisma.etiquetaOrderByWithRelationInput
   inmueble?: Prisma.inmuebleOrderByWithRelationInput
@@ -211,20 +211,20 @@ export type inmueble_etiquetaOrderByWithRelationInput = {
 
 export type inmueble_etiquetaWhereUniqueInput = Prisma.AtLeast<
   {
-    inmueble_id_etiqueta_id?: Prisma.inmueble_etiquetaInmueble_idEtiqueta_idCompoundUniqueInput
+    inmuebleId_etiqueta_id?: Prisma.inmueble_etiquetaInmueble_idEtiqueta_idCompoundUniqueInput
     AND?: Prisma.inmueble_etiquetaWhereInput | Prisma.inmueble_etiquetaWhereInput[]
     OR?: Prisma.inmueble_etiquetaWhereInput[]
     NOT?: Prisma.inmueble_etiquetaWhereInput | Prisma.inmueble_etiquetaWhereInput[]
-    inmueble_id?: Prisma.IntFilter<'inmueble_etiqueta'> | number
+    inmuebleId?: Prisma.IntFilter<'inmueble_etiqueta'> | number
     etiqueta_id?: Prisma.IntFilter<'inmueble_etiqueta'> | number
     etiqueta?: Prisma.XOR<Prisma.EtiquetaScalarRelationFilter, Prisma.etiquetaWhereInput>
     inmueble?: Prisma.XOR<Prisma.InmuebleScalarRelationFilter, Prisma.inmuebleWhereInput>
   },
-  'inmueble_id_etiqueta_id'
+  'inmuebleId_etiqueta_id'
 >
 
 export type inmueble_etiquetaOrderByWithAggregationInput = {
-  inmueble_id?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
   etiqueta_id?: Prisma.SortOrder
   _count?: Prisma.inmueble_etiquetaCountOrderByAggregateInput
   _avg?: Prisma.inmueble_etiquetaAvgOrderByAggregateInput
@@ -241,7 +241,7 @@ export type inmueble_etiquetaScalarWhereWithAggregatesInput = {
   NOT?:
     | Prisma.inmueble_etiquetaScalarWhereWithAggregatesInput
     | Prisma.inmueble_etiquetaScalarWhereWithAggregatesInput[]
-  inmueble_id?: Prisma.IntWithAggregatesFilter<'inmueble_etiqueta'> | number
+  inmuebleId?: Prisma.IntWithAggregatesFilter<'inmueble_etiqueta'> | number
   etiqueta_id?: Prisma.IntWithAggregatesFilter<'inmueble_etiqueta'> | number
 }
 
@@ -251,7 +251,7 @@ export type inmueble_etiquetaCreateInput = {
 }
 
 export type inmueble_etiquetaUncheckedCreateInput = {
-  inmueble_id: number
+  inmuebleId: number
   etiqueta_id: number
 }
 
@@ -261,19 +261,19 @@ export type inmueble_etiquetaUpdateInput = {
 }
 
 export type inmueble_etiquetaUncheckedUpdateInput = {
-  inmueble_id?: Prisma.IntFieldUpdateOperationsInput | number
+  inmuebleId?: Prisma.IntFieldUpdateOperationsInput | number
   etiqueta_id?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type inmueble_etiquetaCreateManyInput = {
-  inmueble_id: number
+  inmuebleId: number
   etiqueta_id: number
 }
 
 export type inmueble_etiquetaUpdateManyMutationInput = {}
 
 export type inmueble_etiquetaUncheckedUpdateManyInput = {
-  inmueble_id?: Prisma.IntFieldUpdateOperationsInput | number
+  inmuebleId?: Prisma.IntFieldUpdateOperationsInput | number
   etiqueta_id?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -288,32 +288,32 @@ export type inmueble_etiquetaOrderByRelationAggregateInput = {
 }
 
 export type inmueble_etiquetaInmueble_idEtiqueta_idCompoundUniqueInput = {
-  inmueble_id: number
+  inmuebleId: number
   etiqueta_id: number
 }
 
 export type inmueble_etiquetaCountOrderByAggregateInput = {
-  inmueble_id?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
   etiqueta_id?: Prisma.SortOrder
 }
 
 export type inmueble_etiquetaAvgOrderByAggregateInput = {
-  inmueble_id?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
   etiqueta_id?: Prisma.SortOrder
 }
 
 export type inmueble_etiquetaMaxOrderByAggregateInput = {
-  inmueble_id?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
   etiqueta_id?: Prisma.SortOrder
 }
 
 export type inmueble_etiquetaMinOrderByAggregateInput = {
-  inmueble_id?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
   etiqueta_id?: Prisma.SortOrder
 }
 
 export type inmueble_etiquetaSumOrderByAggregateInput = {
-  inmueble_id?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
   etiqueta_id?: Prisma.SortOrder
 }
 
@@ -494,7 +494,7 @@ export type inmueble_etiquetaCreateWithoutEtiquetaInput = {
 }
 
 export type inmueble_etiquetaUncheckedCreateWithoutEtiquetaInput = {
-  inmueble_id: number
+  inmuebleId: number
 }
 
 export type inmueble_etiquetaCreateOrConnectWithoutEtiquetaInput = {
@@ -544,7 +544,7 @@ export type inmueble_etiquetaScalarWhereInput = {
   AND?: Prisma.inmueble_etiquetaScalarWhereInput | Prisma.inmueble_etiquetaScalarWhereInput[]
   OR?: Prisma.inmueble_etiquetaScalarWhereInput[]
   NOT?: Prisma.inmueble_etiquetaScalarWhereInput | Prisma.inmueble_etiquetaScalarWhereInput[]
-  inmueble_id?: Prisma.IntFilter<'inmueble_etiqueta'> | number
+  inmuebleId?: Prisma.IntFilter<'inmueble_etiqueta'> | number
   etiqueta_id?: Prisma.IntFilter<'inmueble_etiqueta'> | number
 }
 
@@ -600,7 +600,7 @@ export type inmueble_etiquetaUpdateManyWithWhereWithoutInmuebleInput = {
 }
 
 export type inmueble_etiquetaCreateManyEtiquetaInput = {
-  inmueble_id: number
+  inmuebleId: number
 }
 
 export type inmueble_etiquetaUpdateWithoutEtiquetaInput = {
@@ -608,11 +608,11 @@ export type inmueble_etiquetaUpdateWithoutEtiquetaInput = {
 }
 
 export type inmueble_etiquetaUncheckedUpdateWithoutEtiquetaInput = {
-  inmueble_id?: Prisma.IntFieldUpdateOperationsInput | number
+  inmuebleId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type inmueble_etiquetaUncheckedUpdateManyWithoutEtiquetaInput = {
-  inmueble_id?: Prisma.IntFieldUpdateOperationsInput | number
+  inmuebleId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type inmueble_etiquetaCreateManyInmuebleInput = {
@@ -635,7 +635,7 @@ export type inmueble_etiquetaSelect<
   ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs
 > = runtime.Types.Extensions.GetSelect<
   {
-    inmueble_id?: boolean
+    inmuebleId?: boolean
     etiqueta_id?: boolean
     etiqueta?: boolean | Prisma.etiquetaDefaultArgs<ExtArgs>
     inmueble?: boolean | Prisma.inmuebleDefaultArgs<ExtArgs>
@@ -647,7 +647,7 @@ export type inmueble_etiquetaSelectCreateManyAndReturn<
   ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs
 > = runtime.Types.Extensions.GetSelect<
   {
-    inmueble_id?: boolean
+    inmuebleId?: boolean
     etiqueta_id?: boolean
     etiqueta?: boolean | Prisma.etiquetaDefaultArgs<ExtArgs>
     inmueble?: boolean | Prisma.inmuebleDefaultArgs<ExtArgs>
@@ -659,7 +659,7 @@ export type inmueble_etiquetaSelectUpdateManyAndReturn<
   ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs
 > = runtime.Types.Extensions.GetSelect<
   {
-    inmueble_id?: boolean
+    inmuebleId?: boolean
     etiqueta_id?: boolean
     etiqueta?: boolean | Prisma.etiquetaDefaultArgs<ExtArgs>
     inmueble?: boolean | Prisma.inmuebleDefaultArgs<ExtArgs>
@@ -668,14 +668,14 @@ export type inmueble_etiquetaSelectUpdateManyAndReturn<
 >
 
 export type inmueble_etiquetaSelectScalar = {
-  inmueble_id?: boolean
+  inmuebleId?: boolean
   etiqueta_id?: boolean
 }
 
 export type inmueble_etiquetaOmit<
   ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs
 > = runtime.Types.Extensions.GetOmit<
-  'inmueble_id' | 'etiqueta_id',
+  'inmuebleId' | 'etiqueta_id',
   ExtArgs['result']['inmueble_etiqueta']
 >
 export type inmueble_etiquetaInclude<
@@ -707,7 +707,7 @@ export type $inmueble_etiquetaPayload<
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<
     {
-      inmueble_id: number
+      inmuebleId: number
       etiqueta_id: number
     },
     ExtArgs['result']['inmueble_etiqueta']
@@ -851,8 +851,8 @@ export interface inmueble_etiquetaDelegate<
    * // Get first 10 Inmueble_etiquetas
    * const inmueble_etiquetas = await prisma.inmueble_etiqueta.findMany({ take: 10 })
    *
-   * // Only select the `inmueble_id`
-   * const inmueble_etiquetaWithInmueble_idOnly = await prisma.inmueble_etiqueta.findMany({ select: { inmueble_id: true } })
+   * // Only select the `inmuebleId`
+   * const inmueble_etiquetaWithInmueble_idOnly = await prisma.inmueble_etiqueta.findMany({ select: { inmuebleId: true } })
    *
    */
   findMany<T extends inmueble_etiquetaFindManyArgs>(
@@ -919,9 +919,9 @@ export interface inmueble_etiquetaDelegate<
    *   ]
    * })
    *
-   * // Create many Inmueble_etiquetas and only return the `inmueble_id`
+   * // Create many Inmueble_etiquetas and only return the `inmuebleId`
    * const inmueble_etiquetaWithInmueble_idOnly = await prisma.inmueble_etiqueta.createManyAndReturn({
-   *   select: { inmueble_id: true },
+   *   select: { inmuebleId: true },
    *   data: [
    *     // ... provide data here
    *   ]
@@ -1047,9 +1047,9 @@ export interface inmueble_etiquetaDelegate<
    *   ]
    * })
    *
-   * // Update zero or more Inmueble_etiquetas and only return the `inmueble_id`
+   * // Update zero or more Inmueble_etiquetas and only return the `inmuebleId`
    * const inmueble_etiquetaWithInmueble_idOnly = await prisma.inmueble_etiqueta.updateManyAndReturn({
-   *   select: { inmueble_id: true },
+   *   select: { inmuebleId: true },
    *   where: {
    *     // ... provide filter here
    *   },
@@ -1309,7 +1309,7 @@ export interface Prisma__inmueble_etiquetaClient<
  * Fields of the inmueble_etiqueta model
  */
 export interface inmueble_etiquetaFieldRefs {
-  readonly inmueble_id: Prisma.FieldRef<'inmueble_etiqueta', 'Int'>
+  readonly inmuebleId: Prisma.FieldRef<'inmueble_etiqueta', 'Int'>
   readonly etiqueta_id: Prisma.FieldRef<'inmueble_etiqueta', 'Int'>
 }
 

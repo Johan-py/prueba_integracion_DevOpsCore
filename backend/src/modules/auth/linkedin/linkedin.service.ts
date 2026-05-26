@@ -129,7 +129,7 @@ const buildLinkedInSessionResponse = async (
   const token = generateToken(jwtPayload)
   const fecha_expiracion = new Date(Date.now() + SESSION_DURATION_MS)
 
-  await createLinkedInSession({ token, usuario_id: user.id, fecha_expiracion })
+  await createLinkedInSession({ token, usuarioId: user.id, fecha_expiracion })
 
   return {
     message,
@@ -251,7 +251,7 @@ export const linkLinkedInToCurrentUserByCodeService = async (
 
   const existingLinkByExternalId = await findLinkedInLinkByExternalId(linkedinId)
 
-  if (existingLinkByExternalId && existingLinkByExternalId.usuario_id !== session.usuario.id) {
+  if (existingLinkByExternalId && existingLinkByExternalId.usuarioId !== session.usuario.id) {
     throw new LinkedInAuthError(
       'Esta cuenta de LinkedIn ya está vinculada a otro usuario.',
       'LINKEDIN_AUTH_FAILED',
@@ -280,7 +280,7 @@ export const linkLinkedInToCurrentUserByCodeService = async (
   }
 
   await createLinkedInLinkForUser({
-    usuario_id: session.usuario.id,
+    usuarioId: session.usuario.id,
     linkedinId,
     correo_proveedor,
     tokenStorage

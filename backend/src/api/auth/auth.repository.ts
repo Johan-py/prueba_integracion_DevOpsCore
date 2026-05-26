@@ -49,7 +49,7 @@ export const createUser = async (data: {
 // ─── SESIÓN ────────────────────────────────────────────
 export const createSession = async (data: {
   token: string;
-  usuario_id: number;
+  usuarioId: number;
   fecha_expiracion: Date;
 }) => {
   return prisma.sesion.create({ data });
@@ -71,7 +71,7 @@ export const desactiveSessionByToken = async (token: string) => {
 
 // ─── RECUPERACIÓN DE PASSWORD ──────────────────────────
 export const createPasswordRecovery = async (data: {
-  usuario_id: number;
+  usuarioId: number;
   token: string;
   expira_en: Date;
 }) => {
@@ -90,33 +90,33 @@ export const markPasswordRecoveryAsUsed = async (id: number) => {
 };
 
 export const desactivarRecuperacionesPasswordActivas = async (
-  usuario_id: number,
+  usuarioId: number,
 ) => {
   return prisma.recuperacion_password.updateMany({
-    where: { usuario_id, activo: true },
+    where: { usuarioId, activo: true },
     data: { activo: false },
   });
 };
 
 // ─── 2FA ───────────────────────────────────────────────
 export const create2FACode = async (data: {
-  usuario_id: number;
+  usuarioId: number;
   codigo_hash: string;
   expira_en: Date;
 }) => {
   return prisma.codigo_2fa.create({ data });
 };
 
-export const findActive2FACodeByUserId = async (usuario_id: number) => {
+export const findActive2FACodeByUserId = async (usuarioId: number) => {
   return prisma.codigo_2fa.findFirst({
-    where: { usuario_id, usado_en: null },
+    where: { usuarioId, usado_en: null },
     orderBy: { creado_en: "desc" },
   });
 };
 
-export const invalidateActive2FACodesByUserId = async (usuario_id: number) => {
+export const invalidateActive2FACodesByUserId = async (usuarioId: number) => {
   return prisma.codigo_2fa.updateMany({
-    where: { usuario_id, usado_en: null },
+    where: { usuarioId, usado_en: null },
     data: { usado_en: new Date() },
   });
 };

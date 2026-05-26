@@ -5,12 +5,12 @@ export const historialController = {
   // GET: Obtener historial real
   getHistorialVistas: async (req: Request, res: Response) => {
     try {
-      const usuario_id = (req as any).user?.id
-      if (!usuario_id) return res.status(401).json({ error: 'No autorizado' })
+      const usuarioId = (req as any).user?.id
+      if (!usuarioId) return res.status(401).json({ error: 'No autorizado' })
 
       const historial = await prisma.propiedad_vista.findMany({
         where: {
-          usuario_id: Number(usuario_id),
+          usuarioId: Number(usuarioId),
           activo: true // Solo mostramos los que no han sido "limpiados"
         },
         include: {
@@ -20,7 +20,7 @@ export const historialController = {
             }
           }
         },
-        orderBy: { vista_en: 'desc' }
+        orderBy: { vistaEn: 'desc' }
       })
 
       return res.json({
@@ -30,7 +30,7 @@ export const historialController = {
           title: item.inmueble?.titulo || 'Sin título',
           price: item.inmueble?.precio,
           location: item.inmueble?.ubicacion?.ciudad,
-          viewedDate: item.vista_en,
+          viewedDate: item.vistaEn,
           imageUrl: item.inmueble?.publicaciones[0]?.multimedia[0]?.url || null,
           activo: (item as any).activo // Mostramos el estado
         }))
@@ -43,12 +43,12 @@ export const historialController = {
   // PATCH: Limpiar historial (Borrado lógico)
   deleteHistorial: async (req: Request, res: Response) => {
     try {
-      const usuario_id = (req as any).user?.id
-      if (!usuario_id) return res.status(401).json({ error: 'No autorizado' })
+      const usuarioId = (req as any).user?.id
+      if (!usuarioId) return res.status(401).json({ error: 'No autorizado' })
 
       // Actualizamos todos los registros del usuario a activo = false
       const resultado = await prisma.propiedad_vista.updateMany({
-        where: { usuario_id: Number(usuario_id) },
+        where: { usuarioId: Number(usuarioId) },
         data: { activo: false } as any // El 'as any' evita errores de tipado si Prisma aún no se refrescó
       })
 

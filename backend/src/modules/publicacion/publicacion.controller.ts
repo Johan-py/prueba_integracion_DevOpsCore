@@ -28,11 +28,11 @@ export const listarMisPublicacionesController = async (
   req: AuthRequest,
   res: Response,
 ) => {
-  const usuario_id = req.user?.id;
+  const usuarioId = req.user?.id;
 
   try {
     const publicaciones = await listarMisPublicacionesService(
-      Number(usuario_id),
+      Number(usuarioId),
     );
 
     return res.status(200).json({
@@ -316,11 +316,11 @@ export const obtenerDetallePublicacionPorInmuebleController = async (
   req: Request,
   res: Response,
 ) => {
-  const inmueble_id = Number(req.params.inmueble_id);
+  const inmuebleId = Number(req.params.inmuebleId);
 
   try {
     const detalle =
-      await obtenerDetallePublicacionPorInmuebleService(inmueble_id);
+      await obtenerDetallePublicacionPorInmuebleService(inmuebleId);
 
     return res.status(200).json({
       ok: true,
@@ -529,12 +529,12 @@ export const iniciarPublicidadController = async (
   res: Response
 ) => {
   const publicacionId = Number(req.params.id);
-  const usuario_id = req.user?.id;
+  const usuarioId = req.user?.id;
 
   try {
     const resultado = await iniciarPublicidadService(
       publicacionId,
-      Number(usuario_id)
+      Number(usuarioId)
     );
 
     return res.status(200).json({
@@ -592,13 +592,13 @@ export const confirmarPublicidadController = async (
   res: Response
 ) => {
   const publicacionId = Number(req.params.id);
-  const usuario_id = req.user?.id;
+  const usuarioId = req.user?.id;
   const { paymentIntentId, planId } = req.body;
 
   try {
     const resultado = await confirmarPublicidadService(
       publicacionId,
-      Number(usuario_id),
+      Number(usuarioId),
       paymentIntentId,
       planId
     );
@@ -658,12 +658,12 @@ export const cancelarPublicidadController = async (
   res: Response
 ) => {
   const publicacionId = Number(req.params.id);
-  const usuario_id = req.user?.id;
+  const usuarioId = req.user?.id;
 
   try {
     const resultado = await cancelarPublicidadService(
       publicacionId,
-      Number(usuario_id)
+      Number(usuarioId)
     );
 
     return res.status(200).json({

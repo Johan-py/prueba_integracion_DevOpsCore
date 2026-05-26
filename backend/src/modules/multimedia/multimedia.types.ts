@@ -10,18 +10,18 @@ export interface MultimediaRecord {
 
 export interface PublicacionRecord {
   id: number;
-  usuario_id: number;
+  usuarioId: number;
   titulo: string;
 }
 
 export interface GetPublicationMultimediaInput {
   publicacion_id: number;
-  usuario_id: number;
+  usuarioId: number;
 }
 
 export interface RegisterVideoLinkInput {
   publicacion_id: number;
-  usuario_id: number;
+  usuarioId: number;
   videoUrl: string;
 }
 
@@ -33,7 +33,7 @@ export interface ImageUploadItemInput {
 
 export interface RegisterImagesInput {
   publicacion_id: number;
-  usuario_id: number;
+  usuarioId: number;
   images: ImageUploadItemInput[];
 }
 

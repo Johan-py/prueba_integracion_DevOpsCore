@@ -27,12 +27,12 @@ export type AggregateSesion = {
 
 export type SesionAvgAggregateOutputType = {
   id: number | null
-  usuario_id: number | null
+  usuarioId: number | null
 }
 
 export type SesionSumAggregateOutputType = {
   id: number | null
-  usuario_id: number | null
+  usuarioId: number | null
 }
 
 export type SesionMinAggregateOutputType = {
@@ -41,7 +41,7 @@ export type SesionMinAggregateOutputType = {
   fecha_inicio: Date | null
   fecha_expiracion: Date | null
   estado: boolean | null
-  usuario_id: number | null
+  usuarioId: number | null
 }
 
 export type SesionMaxAggregateOutputType = {
@@ -50,7 +50,7 @@ export type SesionMaxAggregateOutputType = {
   fecha_inicio: Date | null
   fecha_expiracion: Date | null
   estado: boolean | null
-  usuario_id: number | null
+  usuarioId: number | null
 }
 
 export type SesionCountAggregateOutputType = {
@@ -59,18 +59,18 @@ export type SesionCountAggregateOutputType = {
   fecha_inicio: number
   fecha_expiracion: number
   estado: number
-  usuario_id: number
+  usuarioId: number
   _all: number
 }
 
 export type SesionAvgAggregateInputType = {
   id?: true
-  usuario_id?: true
+  usuarioId?: true
 }
 
 export type SesionSumAggregateInputType = {
   id?: true
-  usuario_id?: true
+  usuarioId?: true
 }
 
 export type SesionMinAggregateInputType = {
@@ -79,7 +79,7 @@ export type SesionMinAggregateInputType = {
   fecha_inicio?: true
   fecha_expiracion?: true
   estado?: true
-  usuario_id?: true
+  usuarioId?: true
 }
 
 export type SesionMaxAggregateInputType = {
@@ -88,7 +88,7 @@ export type SesionMaxAggregateInputType = {
   fecha_inicio?: true
   fecha_expiracion?: true
   estado?: true
-  usuario_id?: true
+  usuarioId?: true
 }
 
 export type SesionCountAggregateInputType = {
@@ -97,7 +97,7 @@ export type SesionCountAggregateInputType = {
   fecha_inicio?: true
   fecha_expiracion?: true
   estado?: true
-  usuario_id?: true
+  usuarioId?: true
   _all?: true
 }
 
@@ -194,7 +194,7 @@ export type SesionGroupByOutputType = {
   fecha_inicio: Date | null
   fecha_expiracion: Date
   estado: boolean | null
-  usuario_id: number
+  usuarioId: number
   _count: SesionCountAggregateOutputType | null
   _avg: SesionAvgAggregateOutputType | null
   _sum: SesionSumAggregateOutputType | null
@@ -223,7 +223,7 @@ export type sesionWhereInput = {
   fecha_inicio?: Prisma.DateTimeNullableFilter<'sesion'> | Date | string | null
   fecha_expiracion?: Prisma.DateTimeFilter<'sesion'> | Date | string
   estado?: Prisma.BoolNullableFilter<'sesion'> | boolean | null
-  usuario_id?: Prisma.IntFilter<'sesion'> | number
+  usuarioId?: Prisma.IntFilter<'sesion'> | number
   usuario?: Prisma.XOR<Prisma.UsuarioScalarRelationFilter, Prisma.usuarioWhereInput>
 }
 
@@ -233,7 +233,7 @@ export type sesionOrderByWithRelationInput = {
   fecha_inicio?: Prisma.SortOrderInput | Prisma.SortOrder
   fecha_expiracion?: Prisma.SortOrder
   estado?: Prisma.SortOrderInput | Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
   usuario?: Prisma.usuarioOrderByWithRelationInput
 }
 
@@ -247,7 +247,7 @@ export type sesionWhereUniqueInput = Prisma.AtLeast<
     fecha_inicio?: Prisma.DateTimeNullableFilter<'sesion'> | Date | string | null
     fecha_expiracion?: Prisma.DateTimeFilter<'sesion'> | Date | string
     estado?: Prisma.BoolNullableFilter<'sesion'> | boolean | null
-    usuario_id?: Prisma.IntFilter<'sesion'> | number
+    usuarioId?: Prisma.IntFilter<'sesion'> | number
     usuario?: Prisma.XOR<Prisma.UsuarioScalarRelationFilter, Prisma.usuarioWhereInput>
   },
   'id' | 'token'
@@ -259,7 +259,7 @@ export type sesionOrderByWithAggregationInput = {
   fecha_inicio?: Prisma.SortOrderInput | Prisma.SortOrder
   fecha_expiracion?: Prisma.SortOrder
   estado?: Prisma.SortOrderInput | Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
   _count?: Prisma.sesionCountOrderByAggregateInput
   _avg?: Prisma.sesionAvgOrderByAggregateInput
   _max?: Prisma.sesionMaxOrderByAggregateInput
@@ -276,7 +276,7 @@ export type sesionScalarWhereWithAggregatesInput = {
   fecha_inicio?: Prisma.DateTimeNullableWithAggregatesFilter<'sesion'> | Date | string | null
   fecha_expiracion?: Prisma.DateTimeWithAggregatesFilter<'sesion'> | Date | string
   estado?: Prisma.BoolNullableWithAggregatesFilter<'sesion'> | boolean | null
-  usuario_id?: Prisma.IntWithAggregatesFilter<'sesion'> | number
+  usuarioId?: Prisma.IntWithAggregatesFilter<'sesion'> | number
 }
 
 export type sesionCreateInput = {
@@ -293,7 +293,7 @@ export type sesionUncheckedCreateInput = {
   fecha_inicio?: Date | string | null
   fecha_expiracion: Date | string
   estado?: boolean | null
-  usuario_id: number
+  usuarioId: number
 }
 
 export type sesionUpdateInput = {
@@ -310,7 +310,7 @@ export type sesionUncheckedUpdateInput = {
   fecha_inicio?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   fecha_expiracion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   estado?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  usuario_id?: Prisma.IntFieldUpdateOperationsInput | number
+  usuarioId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type sesionCreateManyInput = {
@@ -319,7 +319,7 @@ export type sesionCreateManyInput = {
   fecha_inicio?: Date | string | null
   fecha_expiracion: Date | string
   estado?: boolean | null
-  usuario_id: number
+  usuarioId: number
 }
 
 export type sesionUpdateManyMutationInput = {
@@ -335,7 +335,7 @@ export type sesionUncheckedUpdateManyInput = {
   fecha_inicio?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   fecha_expiracion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   estado?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  usuario_id?: Prisma.IntFieldUpdateOperationsInput | number
+  usuarioId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type sesionCountOrderByAggregateInput = {
@@ -344,12 +344,12 @@ export type sesionCountOrderByAggregateInput = {
   fecha_inicio?: Prisma.SortOrder
   fecha_expiracion?: Prisma.SortOrder
   estado?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type sesionAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type sesionMaxOrderByAggregateInput = {
@@ -358,7 +358,7 @@ export type sesionMaxOrderByAggregateInput = {
   fecha_inicio?: Prisma.SortOrder
   fecha_expiracion?: Prisma.SortOrder
   estado?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type sesionMinOrderByAggregateInput = {
@@ -367,12 +367,12 @@ export type sesionMinOrderByAggregateInput = {
   fecha_inicio?: Prisma.SortOrder
   fecha_expiracion?: Prisma.SortOrder
   estado?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type sesionSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type SesionListRelationFilter = {
@@ -536,7 +536,7 @@ export type sesionScalarWhereInput = {
   fecha_inicio?: Prisma.DateTimeNullableFilter<'sesion'> | Date | string | null
   fecha_expiracion?: Prisma.DateTimeFilter<'sesion'> | Date | string
   estado?: Prisma.BoolNullableFilter<'sesion'> | boolean | null
-  usuario_id?: Prisma.IntFilter<'sesion'> | number
+  usuarioId?: Prisma.IntFilter<'sesion'> | number
 }
 
 export type sesionCreateManyUsuarioInput = {
@@ -579,7 +579,7 @@ export type sesionSelect<
     fecha_inicio?: boolean
     fecha_expiracion?: boolean
     estado?: boolean
-    usuario_id?: boolean
+    usuarioId?: boolean
     usuario?: boolean | Prisma.usuarioDefaultArgs<ExtArgs>
   },
   ExtArgs['result']['sesion']
@@ -594,7 +594,7 @@ export type sesionSelectCreateManyAndReturn<
     fecha_inicio?: boolean
     fecha_expiracion?: boolean
     estado?: boolean
-    usuario_id?: boolean
+    usuarioId?: boolean
     usuario?: boolean | Prisma.usuarioDefaultArgs<ExtArgs>
   },
   ExtArgs['result']['sesion']
@@ -609,7 +609,7 @@ export type sesionSelectUpdateManyAndReturn<
     fecha_inicio?: boolean
     fecha_expiracion?: boolean
     estado?: boolean
-    usuario_id?: boolean
+    usuarioId?: boolean
     usuario?: boolean | Prisma.usuarioDefaultArgs<ExtArgs>
   },
   ExtArgs['result']['sesion']
@@ -621,13 +621,13 @@ export type sesionSelectScalar = {
   fecha_inicio?: boolean
   fecha_expiracion?: boolean
   estado?: boolean
-  usuario_id?: boolean
+  usuarioId?: boolean
 }
 
 export type sesionOmit<
   ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs
 > = runtime.Types.Extensions.GetOmit<
-  'id' | 'token' | 'fecha_inicio' | 'fecha_expiracion' | 'estado' | 'usuario_id',
+  'id' | 'token' | 'fecha_inicio' | 'fecha_expiracion' | 'estado' | 'usuarioId',
   ExtArgs['result']['sesion']
 >
 export type sesionInclude<
@@ -660,7 +660,7 @@ export type $sesionPayload<
       fecha_inicio: Date | null
       fecha_expiracion: Date
       estado: boolean | null
-      usuario_id: number
+      usuarioId: number
     },
     ExtArgs['result']['sesion']
   >
@@ -1221,7 +1221,7 @@ export interface sesionFieldRefs {
   readonly fecha_inicio: Prisma.FieldRef<'sesion', 'DateTime'>
   readonly fecha_expiracion: Prisma.FieldRef<'sesion', 'DateTime'>
   readonly estado: Prisma.FieldRef<'sesion', 'Boolean'>
-  readonly usuario_id: Prisma.FieldRef<'sesion', 'Int'>
+  readonly usuarioId: Prisma.FieldRef<'sesion', 'Int'>
 }
 
 // Custom InputTypes

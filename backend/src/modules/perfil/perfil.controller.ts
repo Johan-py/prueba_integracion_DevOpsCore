@@ -13,14 +13,14 @@ interface AuthRequest extends Request {
 // Obtener perfil completo del usuario
 export const obtenerPerfil = async (req: AuthRequest, res: Response) => {
   try {
-    const usuario_id = req.usuario?.id;
+    const usuarioId = req.usuario?.id;
 
-    if (!usuario_id) {
+    if (!usuarioId) {
       return res.status(401).json({ ok: false, msg: "No hay token válido" });
     }
 
     const usuario = await prisma.usuario.findUnique({
-      where: { id: usuario_id },
+      where: { id: usuarioId },
       select: {
         id: true,
         nombre: true,
@@ -29,7 +29,7 @@ export const obtenerPerfil = async (req: AuthRequest, res: Response) => {
         pais: true,
         genero: true,
         direccion: true,
-        telefono_telefono_usuario_idTousuario: true,
+        telefono_telefono_usuarioIdTousuario: true,
         fecha_nacimiento: true,
       },
     });
@@ -65,10 +65,10 @@ export const obtenerPerfil = async (req: AuthRequest, res: Response) => {
 // Editar nombre
 export const editarNombre = async (req: AuthRequest, res: Response) => {
   try {
-    const usuario_id = req.usuario?.id;
+    const usuarioId = req.usuario?.id;
     const { nombre } = req.body;
 
-    if (!usuario_id) {
+    if (!usuarioId) {
       return res.status(401).json({ ok: false, msg: "No hay token válido" });
     }
 
@@ -77,7 +77,7 @@ export const editarNombre = async (req: AuthRequest, res: Response) => {
     }
 
     const usuarioActualizado = await prisma.usuario.update({
-      where: { id: usuario_id },
+      where: { id: usuarioId },
       data: { nombre: nombre.trim() },
     });
 
@@ -98,10 +98,10 @@ export const editarNombre = async (req: AuthRequest, res: Response) => {
 // Editar país
 export const editarPais = async (req: AuthRequest, res: Response) => {
   try {
-    const usuario_id = req.usuario?.id;
+    const usuarioId = req.usuario?.id;
     const { pais } = req.body;
 
-    if (!usuario_id) {
+    if (!usuarioId) {
       return res.status(401).json({ ok: false, msg: "No hay token válido" });
     }
 
@@ -109,7 +109,7 @@ export const editarPais = async (req: AuthRequest, res: Response) => {
     const paisActualizado = pais && pais.trim() !== "" ? pais : null;
 
     const usuarioActualizado = await prisma.usuario.update({
-      where: { id: usuario_id },
+      where: { id: usuarioId },
       data: { pais: paisActualizado },
     });
 
@@ -130,10 +130,10 @@ export const editarPais = async (req: AuthRequest, res: Response) => {
 // Editar género - también devuelve el valor mapeado
 export const editarGenero = async (req: AuthRequest, res: Response) => {
   try {
-    const usuario_id = req.usuario?.id;
+    const usuarioId = req.usuario?.id;
     const { genero } = req.body;
 
-    if (!usuario_id) {
+    if (!usuarioId) {
       return res.status(401).json({ ok: false, msg: "No hay token válido" });
     }
 
@@ -156,7 +156,7 @@ export const editarGenero = async (req: AuthRequest, res: Response) => {
     }
 
     const usuarioActualizado = await prisma.usuario.update({
-      where: { id: usuario_id },
+      where: { id: usuarioId },
       data: { genero: generoActualizado as any },
     });
 
@@ -187,10 +187,10 @@ export const editarGenero = async (req: AuthRequest, res: Response) => {
 // Editar dirección
 export const editarDireccion = async (req: AuthRequest, res: Response) => {
   try {
-    const usuario_id = req.usuario?.id;
+    const usuarioId = req.usuario?.id;
     const { direccion } = req.body;
 
-    if (!usuario_id) {
+    if (!usuarioId) {
       return res.status(401).json({ ok: false, msg: "No hay token válido" });
     }
 
@@ -199,7 +199,7 @@ export const editarDireccion = async (req: AuthRequest, res: Response) => {
       direccion && direccion.trim() !== "" ? direccion : null;
 
     const usuarioActualizado = await prisma.usuario.update({
-      where: { id: usuario_id },
+      where: { id: usuarioId },
       data: { direccion: direccionActualizada },
     });
 
@@ -220,9 +220,9 @@ export const editarDireccion = async (req: AuthRequest, res: Response) => {
 // Editar foto de perfil
 export const editarFotoPerfil = async (req: AuthRequest, res: Response) => {
   try {
-    const usuario_id = req.usuario?.id;
+    const usuarioId = req.usuario?.id;
 
-    if (!usuario_id) {
+    if (!usuarioId) {
       return res.status(401).json({ ok: false, msg: "No hay token válido" });
     }
 
@@ -237,7 +237,7 @@ export const editarFotoPerfil = async (req: AuthRequest, res: Response) => {
     const fotoUrl = `${baseUrl}/uploads/avatars/${req.file.filename}`;
 
     const usuarioActualizado = await prisma.usuario.update({
-      where: { id: usuario_id },
+      where: { id: usuarioId },
       data: { avatar: fotoUrl },
     });
 
@@ -258,10 +258,10 @@ export const editarFotoPerfil = async (req: AuthRequest, res: Response) => {
 // Editar teléfonos
 export const editarTelefonos = async (req: AuthRequest, res: Response) => {
   try {
-    const usuario_id = req.usuario?.id;
+    const usuarioId = req.usuario?.id;
     const { telefonos } = req.body;
 
-    if (!usuario_id) {
+    if (!usuarioId) {
       return res.status(401).json({ ok: false, msg: "No hay token válido" });
     }
 
@@ -297,7 +297,7 @@ export const editarTelefonos = async (req: AuthRequest, res: Response) => {
 
     await prisma.$transaction(async (tx) => {
       await tx.telefono.deleteMany({
-        where: { usuarioId: usuario_id },
+        where: { usuarioId: usuarioId },
       });
 
       await tx.telefono.createMany({
@@ -305,7 +305,7 @@ export const editarTelefonos = async (req: AuthRequest, res: Response) => {
           codigoPais: tel.codigoPais,
           numero: tel.numero,
           principal: tel.principal,
-          usuarioId: usuario_id,
+          usuarioId: usuarioId,
         })),
       });
     });
@@ -330,9 +330,9 @@ export const listarMisPublicaciones = async (
   res: Response,
 ) => {
   try {
-    const usuario_id = req.usuario?.id;
+    const usuarioId = req.usuario?.id;
 
-    if (!usuario_id) {
+    if (!usuarioId) {
       return res.status(401).json({
         ok: false,
         msg: "No hay token válido",
@@ -341,19 +341,19 @@ export const listarMisPublicaciones = async (
 
     // Obtener las publicaciones del usuario
     const publicaciones =
-      await publicacionesService.listarMisPublicaciones(usuario_id);
+      await publicacionesService.listarMisPublicaciones(usuarioId);
 
     // Agregar métricas a cada publicación
     const publicacionesConMetricas = await Promise.all(
       publicaciones.map(async (pub: any) => ({
         ...pub,
-        metricas: await publicacionesService.obtenerMetricasPorInmueble(pub.inmueble_id)
+        metricas: await publicacionesService.obtenerMetricasPorInmueble(pub.inmuebleId)
       }))
     );
 
     // Obtener estadísticas de publicaciones y suscripción
     const estadisticas =
-      await publicacionesService.obtenerEstadisticasPublicaciones(usuario_id);
+      await publicacionesService.obtenerEstadisticasPublicaciones(usuarioId);
 
     return res.json({
       ok: true,
@@ -371,10 +371,10 @@ export const listarMisPublicaciones = async (
 
 export const eliminarPublicacion = async (req: AuthRequest, res: Response) => {
   try {
-    const usuario_id = req.usuario?.id;
+    const usuarioId = req.usuario?.id;
     const { id } = req.params;
 
-    if (!usuario_id) {
+    if (!usuarioId) {
       return res.status(401).json({ ok: false, msg: "No hay token válido" });
     }
 
@@ -386,7 +386,7 @@ export const eliminarPublicacion = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ ok: false, msg: "ID inválido" });
     }
 
-    await publicacionesService.eliminar(publicacionId, usuario_id);
+    await publicacionesService.eliminar(publicacionId, usuarioId);
 
     return res.json({ ok: true, msg: "Publicación eliminada correctamente" });
   } catch (error: any) {
@@ -405,11 +405,11 @@ export const eliminarPublicacion = async (req: AuthRequest, res: Response) => {
 
 export const togglePublicacionEstado = async (req: AuthRequest, res: Response) => {
   try {
-    const usuario_id = req.usuario?.id;
+    const usuarioId = req.usuario?.id;
     const { id } = req.params;
     const { activa } = req.body;
 
-    if (!usuario_id) {
+    if (!usuarioId) {
       return res.status(401).json({ ok: false, msg: "No hay token válido" });
     }
 
@@ -425,7 +425,7 @@ export const togglePublicacionEstado = async (req: AuthRequest, res: Response) =
       return res.status(400).json({ ok: false, msg: "ID inválido" });
     }
 
-    await publicacionesService.cambiarEstado(publicacionId, usuario_id, activa);
+    await publicacionesService.cambiarEstado(publicacionId, usuarioId, activa);
 
     return res.json({
       ok: true,
@@ -448,15 +448,15 @@ export const togglePublicacionEstado = async (req: AuthRequest, res: Response) =
 
 export const obtenerPreferenciasNotificacion = async (req: AuthRequest, res: Response) => {
   try {
-    const usuario_id = req.usuario?.id
-    if (!usuario_id) return res.status(401).json({ ok: false, msg: 'No hay token válido' })
+    const usuarioId = req.usuario?.id
+    if (!usuarioId) return res.status(401).json({ ok: false, msg: 'No hay token válido' })
     const usuario = await prisma.usuario.findUnique({
-      where: { id: usuario_id },
+      where: { id: usuarioId },
       select: {
         notificacion_email: true,
         notificacion_whatsapp: true,
         correo: true,
-        telefono_telefono_usuario_idTousuario: {
+        telefono_telefono_usuarioIdTousuario: {
           take: 1,
           select: { numero: true }
         }
@@ -470,7 +470,7 @@ export const obtenerPreferenciasNotificacion = async (req: AuthRequest, res: Res
         whatsapp: usuario.notificacion_whatsapp ?? false
       },
       tieneCorreo: !!usuario.correo,
-      tieneTelefono: usuario.telefono_telefono_usuario_idTousuario.length > 0
+      tieneTelefono: usuario.telefono_telefono_usuarioIdTousuario.length > 0
     })
   } catch (error) {
     console.error('Error en obtenerPreferenciasNotificacion:', error)
@@ -479,14 +479,14 @@ export const obtenerPreferenciasNotificacion = async (req: AuthRequest, res: Res
 }
 export const actualizarPreferenciasNotificacion = async (req: AuthRequest, res: Response) => {
   try {
-    const usuario_id = req.usuario?.id
-    if (!usuario_id) return res.status(401).json({ ok: false, msg: 'No hay token válido' })
+    const usuarioId = req.usuario?.id
+    if (!usuarioId) return res.status(401).json({ ok: false, msg: 'No hay token válido' })
     const { email, whatsapp } = req.body
     if (typeof email !== 'boolean' || typeof whatsapp !== 'boolean') {
       return res.status(400).json({ ok: false, msg: 'Los valores deben ser booleanos' })
     }
     await prisma.usuario.update({
-      where: { id: usuario_id },
+      where: { id: usuarioId },
       data: {
         notificacion_email: email,
         notificacion_whatsapp: whatsapp
@@ -505,10 +505,10 @@ export const actualizarPreferenciasNotificacion = async (req: AuthRequest, res: 
 // Editar fecha de nacimiento
 export const editarFechaNacimiento = async (req: AuthRequest, res: Response) => {
   try {
-    const usuario_id = req.usuario?.id;
+    const usuarioId = req.usuario?.id;
     const { fecha_nacimiento } = req.body;
 
-    if (!usuario_id) {
+    if (!usuarioId) {
       return res.status(401).json({ ok: false, msg: "No hay token válido" });
     }
 
@@ -552,7 +552,7 @@ export const editarFechaNacimiento = async (req: AuthRequest, res: Response) => 
 
     // Actualizar la fecha de nacimiento
     const usuarioActualizado = await prisma.usuario.update({
-      where: { id: usuario_id },
+      where: { id: usuarioId },
       data: {
         fecha_nacimiento: fechaDate,
         updatedAt: new Date()
@@ -581,14 +581,14 @@ export const editarFechaNacimiento = async (req: AuthRequest, res: Response) => 
 // Obtener fecha de nacimiento
 export const obtenerFechaNacimiento = async (req: AuthRequest, res: Response) => {
   try {
-    const usuario_id = req.usuario?.id;
+    const usuarioId = req.usuario?.id;
 
-    if (!usuario_id) {
+    if (!usuarioId) {
       return res.status(401).json({ ok: false, msg: "No hay token válido" });
     }
 
     const usuario = await prisma.usuario.findUnique({
-      where: { id: usuario_id },
+      where: { id: usuarioId },
       select: {
         id: true,
         nombre: true,

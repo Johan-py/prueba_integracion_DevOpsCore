@@ -2470,7 +2470,7 @@ export const Cambio_emailScalarFieldEnum = {
   expira_en: 'expira_en',
   creado_en: 'creado_en',
   completado_en: 'completado_en',
-  usuario_id: 'usuario_id'
+  usuarioId: 'usuarioId'
 } as const
 
 export type Cambio_emailScalarFieldEnum =
@@ -2527,7 +2527,7 @@ export type InmuebleScalarFieldEnum =
   (typeof InmuebleScalarFieldEnum)[keyof typeof InmuebleScalarFieldEnum]
 
 export const Inmueble_etiquetaScalarFieldEnum = {
-  inmueble_id: 'inmueble_id',
+  inmuebleId: 'inmuebleId',
   etiqueta_id: 'etiqueta_id'
 } as const
 
@@ -2553,7 +2553,7 @@ export const Marcador_mapaScalarFieldEnum = {
   tipo: 'tipo',
   es_visible: 'es_visible',
   nivel_z: 'nivel_z',
-  inmueble_id: 'inmueble_id',
+  inmuebleId: 'inmuebleId',
   ubicacion_id: 'ubicacion_id'
 } as const
 
@@ -2580,7 +2580,7 @@ export const NotificacionScalarFieldEnum = {
   fecha_lectura: 'fecha_lectura',
   eliminada: 'eliminada',
   archivada: 'archivada',
-  usuario_id: 'usuario_id'
+  usuarioId: 'usuarioId'
 } as const
 
 export type NotificacionScalarFieldEnum =
@@ -2590,7 +2590,7 @@ export const PerfilScalarFieldEnum = {
   id: 'id',
   nombre_completo: 'nombre_completo',
   datos: 'datos',
-  usuario_id: 'usuario_id'
+  usuarioId: 'usuarioId'
 } as const
 
 export type PerfilScalarFieldEnum =
@@ -2615,8 +2615,8 @@ export const PublicacionScalarFieldEnum = {
   descripcion: 'descripcion',
   estado: 'estado',
   fecha_publicacion: 'fecha_publicacion',
-  usuario_id: 'usuario_id',
-  inmueble_id: 'inmueble_id'
+  usuarioId: 'usuarioId',
+  inmuebleId: 'inmuebleId'
 } as const
 
 export type PublicacionScalarFieldEnum =
@@ -2635,7 +2635,7 @@ export const SesionScalarFieldEnum = {
   fecha_inicio: 'fecha_inicio',
   fecha_expiracion: 'fecha_expiracion',
   estado: 'estado',
-  usuario_id: 'usuario_id'
+  usuarioId: 'usuarioId'
 } as const
 
 export type SesionScalarFieldEnum =
@@ -2676,7 +2676,7 @@ export const TelefonoScalarFieldEnum = {
   codigo_pais: 'codigo_pais',
   numero: 'numero',
   principal: 'principal',
-  usuario_id: 'usuario_id'
+  usuarioId: 'usuarioId'
 } as const
 
 export type TelefonoScalarFieldEnum =
@@ -2708,7 +2708,7 @@ export const Ubicacion_inmuebleScalarFieldEnum = {
   direccion: 'direccion',
   ciudad: 'ciudad',
   zona: 'zona',
-  inmueble_id: 'inmueble_id',
+  inmuebleId: 'inmuebleId',
   ubicacion_maestra_id: 'ubicacion_maestra_id'
 } as const
 
@@ -2765,7 +2765,7 @@ export const VisitorScalarFieldEnum = {
   ip: 'ip',
   meta_data: 'meta_data',
   fecha_visita: 'fecha_visita',
-  usuario_id: 'usuario_id'
+  usuarioId: 'usuarioId'
 } as const
 
 export type VisitorScalarFieldEnum =

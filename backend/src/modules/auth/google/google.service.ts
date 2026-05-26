@@ -133,7 +133,7 @@ const buildGoogleSessionResponse = async (
 
   await createGoogleSession({
     token,
-    usuario_id: user.id,
+    usuarioId: user.id,
     fecha_expiracion
   })
 
@@ -287,7 +287,7 @@ export const linkGoogleToCurrentUserByCodeService = async (
 
   const existingLinkByExternalId = await findGoogleLinkByExternalId(googleId)
 
-  if (existingLinkByExternalId && existingLinkByExternalId.usuario_id !== session.usuario.id) {
+  if (existingLinkByExternalId && existingLinkByExternalId.usuarioId !== session.usuario.id) {
     throw new GoogleAuthError(
       'Esta cuenta de Google ya está vinculada a otro usuario.',
       'GOOGLE_AUTH_FAILED',
@@ -314,7 +314,7 @@ export const linkGoogleToCurrentUserByCodeService = async (
   }
 
   await createGoogleLinkForUser({
-    usuario_id: session.usuario.id,
+    usuarioId: session.usuario.id,
     googleId,
     correo_proveedor
   })

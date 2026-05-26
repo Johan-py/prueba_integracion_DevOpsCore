@@ -12,8 +12,8 @@ const toMessage = (e: unknown) => (e instanceof Error ? e.message : 'Error inter
 
 export const crearPagoUsdt = async (req: AuthRequest, res: Response) => {
   try {
-    const usuario_id = req.user?.id
-    if (!usuario_id) return res.status(401).json({ error: 'No autenticado' })
+    const usuarioId = req.user?.id
+    if (!usuarioId) return res.status(401).json({ error: 'No autenticado' })
 
     const { transaccionId } = req.body
     if (!transaccionId) return res.status(400).json({ error: 'Falta transaccionId' })
@@ -23,7 +23,7 @@ export const crearPagoUsdt = async (req: AuthRequest, res: Response) => {
       include: { plan_suscripcion: true },
     })
     if (!transaccion) return res.status(404).json({ error: 'Transacción no encontrada' })
-    if (transaccion.id_usuario !== usuario_id) return res.status(403).json({ error: 'Sin permiso' })
+    if (transaccion.id_usuario !== usuarioId) return res.status(403).json({ error: 'Sin permiso' })
     if (transaccion.estado !== 'PENDIENTE') {
       return res.status(409).json({ error: 'La transacción ya no está pendiente' })
     }

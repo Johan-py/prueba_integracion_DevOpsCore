@@ -3,15 +3,15 @@ import { prisma } from '../../lib/prisma.client.js';
 
 export const getHistorialBusqueda = async (req: Request, res: Response) => {
     try {
-        const usuario_id = req.user?.id;
+        const usuarioId = req.user?.id;
 
-        if (!usuario_id) {
+        if (!usuarioId) {
             return res.status(401).json({ message: "No autorizado" });
         }
 
         // Buscamos los últimos registros (traemos más de 10 por si hay duplicados en DB)
         const historial = await prisma.historial_busqueda.findMany({
-            where: { usuario_id: usuario_id },
+            where: { usuarioId: usuarioId },
             orderBy: { creado_en: 'desc' },
             take: 50 
         });
@@ -37,17 +37,17 @@ export const getHistorialBusqueda = async (req: Request, res: Response) => {
 
 export const guardarBusqueda = async (req: Request, res: Response) => {
     try {
-        const usuario_id = req.user?.id;
+        const usuarioId = req.user?.id;
         const { termino } = req.body;
 
-        if (!usuario_id || !termino) {
+        if (!usuarioId || !termino) {
             return res.status(400).json({ message: "Usuario o término faltante" });
         }
 
         // CONTROL DE DUPLICIDAD: Buscar si ya existe el término para este usuario
         const existing = await prisma.historial_busqueda.findFirst({
             where: {
-                usuario_id: usuario_id,
+                usuarioId: usuarioId,
                 termino: termino
             }
         });
@@ -64,7 +64,7 @@ export const guardarBusqueda = async (req: Request, res: Response) => {
         // Si no existe, creamos uno nuevo
         const nuevaBusqueda = await prisma.historial_busqueda.create({
             data: {
-                usuario_id: usuario_id,
+                usuarioId: usuarioId,
                 termino: termino
             }
         });
@@ -78,16 +78,16 @@ export const guardarBusqueda = async (req: Request, res: Response) => {
 
 export const eliminarBusqueda = async (req: Request, res: Response) => {
     try {
-        const usuario_id = req.user?.id;
+        const usuarioId = req.user?.id;
         const termino = req.params.termino as string;
 
-        if (!usuario_id || !termino) {
+        if (!usuarioId || !termino) {
             return res.status(400).json({ message: "Usuario o término faltante" });
         }
 
         await prisma.historial_busqueda.deleteMany({
             where: {
-                usuario_id: usuario_id,
+                usuarioId: usuarioId,
                 termino: termino
             }
         });

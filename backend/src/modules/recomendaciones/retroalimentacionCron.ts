@@ -9,8 +9,8 @@ export async function ejecutarRetroalimentacion(): Promise<void> {
       where: { retroalimentacion: null },
       select: {
         id: true,
-        usuario_id: true,
-        inmueble_id: true,
+        usuarioId: true,
+        inmuebleId: true,
         fecha_evento: true,
       },
     });
@@ -30,9 +30,9 @@ export async function ejecutarRetroalimentacion(): Promise<void> {
       // Verificar si el usuario favoritó el inmueble
       const esFavorito = await prisma.favorito.findUnique({
         where: {
-          usuario_id_inmueble_id: {
-            usuario_id: registro.usuario_id,
-            inmueble_id: registro.inmueble_id,
+          usuarioId_inmuebleId: {
+            usuarioId: registro.usuarioId,
+            inmuebleId: registro.inmuebleId,
           },
         },
       });
@@ -40,9 +40,9 @@ export async function ejecutarRetroalimentacion(): Promise<void> {
       // Verificar si volvió a ver el inmueble (veces_visto > 1)
       const vistaRepetida = await prisma.propiedad_vista.findUnique({
         where: {
-          usuario_id_inmueble_id: {
-            usuario_id: registro.usuario_id,
-            inmueble_id: registro.inmueble_id,
+          usuarioId_inmuebleId: {
+            usuarioId: registro.usuarioId,
+            inmuebleId: registro.inmuebleId,
           },
         },
         select: { veces_visto: true },
