@@ -321,7 +321,7 @@ export const listarComentarios = async (req: Request, res: Response) => {
           verifyJwtToken(token);
           const session = await findActiveSessionByToken(token);
           if (session) {
-            usuarioId = session.usuario.id;
+            usuarioId = session.usuarioId;
           }
         } catch (err) {
           console.error("Error al extraer sesion para comentarios:", err);

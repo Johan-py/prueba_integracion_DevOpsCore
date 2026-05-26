@@ -29,7 +29,7 @@ export class TelemetriaRepository {
       return await prisma.visitor.create({
         data: {
           ip: ip,
-          usuarioId: usuarioId,
+          usuario_id: usuarioId,
           meta_data: {
             busquedas: [metaData],
             primeraVisita: new Date().toISOString()
@@ -69,7 +69,7 @@ export class TelemetriaRepository {
     // Guardar en entrenamiento_ml de forma asíncrona (no bloquea la respuesta)
     prisma.entrenamiento_ml.create({
       data: {
-        usuarioId: usuarioId,
+        usuario_id: usuarioId,
         inmuebleId: inmuebleId,
         tipo_evento: 'CLICK',
         score_real,

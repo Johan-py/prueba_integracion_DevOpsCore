@@ -35,7 +35,7 @@ export const testimoniosRepository = {
       categoria: t.categoria,
       fecha_creacion: t.fecha_creacion,
       usuario: {
-        id: t.usuario.id,
+        id: t.usuario_id,
         nombre: t.usuario.nombre,
         apellido: t.usuario.apellido,
         avatar: t.usuario.avatar,
@@ -44,7 +44,7 @@ export const testimoniosRepository = {
       },
       totalLikes: t.testimonio_like.length,
       meGusta: usuarioId
-        ? t.testimonio_like.some((l) => l.usuarioId === usuarioId)
+        ? t.testimonio_like.some((l) => l.usuario_id === usuarioId)
         : false,
     }));
   },
@@ -56,7 +56,7 @@ export const testimoniosRepository = {
   async findLike(testimonioId: number, usuarioId: number) {
     return prisma.testimonio_like.findUnique({
       where: {
-        testimonio_id_usuarioId: {
+        testimonio_id_usuario_id: {
           testimonio_id: testimonioId,
           usuarioId: usuarioId,
         },
@@ -66,7 +66,7 @@ export const testimoniosRepository = {
 
   async createLike(testimonioId: number, usuarioId: number) {
     return prisma.testimonio_like.create({
-      data: { testimonio_id: testimonioId, usuarioId: usuarioId },
+      data: { testimonio_id: testimonioId, usuario_id: usuarioId },
     });
   },
 

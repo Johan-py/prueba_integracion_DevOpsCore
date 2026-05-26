@@ -97,7 +97,7 @@ export const telemetriaController = {
 
       // Actualizar usuario con datos de telemetría
       const usuarioActualizado = await prisma.usuario.update({
-        where: { id: usuario.id },
+        where: { id: usuario },
         data: {
           ...(genero && { genero }),
           ...(fechaNacimientoDate && { fecha_nacimiento: fechaNacimientoDate }),
@@ -125,7 +125,7 @@ export const telemetriaController = {
             tipo: "usuario_logueado"
           },
           fecha_visita: new Date(),
-          usuarioId: usuario.id
+          usuario_id: usuario
         }
       });
 
@@ -133,7 +133,7 @@ export const telemetriaController = {
         success: true,
         message: "¡Gracias! Telemetría aceptada",
         data: {
-          usuarioId: usuario.id,
+          usuario_id: usuario,
           email: usuario.correo,
           genero: genero || usuario.genero,
           edad: edad,
@@ -177,7 +177,7 @@ export const telemetriaController = {
             telemetria_aceptada: true
           },
           fecha_visita: new Date(),
-          usuarioId: null
+          usuario_id: null
         }
       });
 

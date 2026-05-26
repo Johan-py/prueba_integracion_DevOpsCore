@@ -50,7 +50,7 @@ export const createUser = async (data: {
 export const createSession = async (data: {
   token: string;
   usuarioId: number;
-  fecha_expiracion: Date;
+  fechaExpiracion: Date; // era: fecha_expiracion
 }) => {
   return prisma.sesion.create({ data });
 };
@@ -73,7 +73,7 @@ export const desactiveSessionByToken = async (token: string) => {
 export const createPasswordRecovery = async (data: {
   usuarioId: number;
   token: string;
-  expira_en: Date;
+  expiraEn: Date; // era: expira_en
 }) => {
   return prisma.recuperacion_password.create({ data });
 };
@@ -85,7 +85,7 @@ export const findPasswordRecoveryByToken = async (token: string) => {
 export const markPasswordRecoveryAsUsed = async (id: number) => {
   return prisma.recuperacion_password.update({
     where: { id },
-    data: { usado_en: new Date(), activo: false },
+    data: { usadoEn: new Date(), activo: false },
   });
 };
 
@@ -101,30 +101,30 @@ export const desactivarRecuperacionesPasswordActivas = async (
 // ─── 2FA ───────────────────────────────────────────────
 export const create2FACode = async (data: {
   usuarioId: number;
-  codigo_hash: string;
-  expira_en: Date;
+  codigoHash: string; // era: codigo_hash
+  expiraEn: Date;     // era: expira_en
 }) => {
   return prisma.codigo_2fa.create({ data });
 };
 
 export const findActive2FACodeByUserId = async (usuarioId: number) => {
   return prisma.codigo_2fa.findFirst({
-    where: { usuarioId, usado_en: null },
-    orderBy: { creado_en: "desc" },
+    where: { usuarioId, usadoEn: null },
+    orderBy: { creadoEn: "desc" },
   });
 };
 
 export const invalidateActive2FACodesByUserId = async (usuarioId: number) => {
   return prisma.codigo_2fa.updateMany({
-    where: { usuarioId, usado_en: null },
-    data: { usado_en: new Date() },
+    where: { usuarioId, usadoEn: null },
+    data: { usadoEn: new Date() },
   });
 };
 
 export const expire2FACode = async (id: number) => {
   return prisma.codigo_2fa.update({
     where: { id },
-    data: { usado_en: new Date() },
+    data: { usadoEn: new Date() },
   });
 };
 
@@ -141,7 +141,7 @@ export const increment2FACodeAttempts = async (
 export const mark2FACodeAsUsed = async (id: number) => {
   return prisma.codigo_2fa.update({
     where: { id },
-    data: { usado_en: new Date() },
+    data: { usadoEn: new Date() },
   });
 };
 
@@ -158,4 +158,3 @@ export const deactivate2FAByUserId = async (id: number) => {
     data: { two_factor_activo: false },
   });
 };
-

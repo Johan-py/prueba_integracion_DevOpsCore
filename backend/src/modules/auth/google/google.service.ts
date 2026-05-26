@@ -287,7 +287,7 @@ export const linkGoogleToCurrentUserByCodeService = async (
 
   const existingLinkByExternalId = await findGoogleLinkByExternalId(googleId)
 
-  if (existingLinkByExternalId && existingLinkByExternalId.usuarioId !== session.usuario.id) {
+  if (existingLinkByExternalId && existingLinkByExternalId.usuarioId !== session.usuarioId) {
     throw new GoogleAuthError(
       'Esta cuenta de Google ya está vinculada a otro usuario.',
       'GOOGLE_AUTH_FAILED',
@@ -295,14 +295,14 @@ export const linkGoogleToCurrentUserByCodeService = async (
     )
   }
 
-  const existingLinkByUser = await findGoogleLinkByUserId(session.usuario.id)
+  const existingLinkByUser = await findGoogleLinkByUserId(session.usuarioId)
 
   if (existingLinkByUser) {
-    if (existingLinkByUser.id_externo === googleId) {
+    if (existingLinkByUser.idExterno === googleId) {
       return {
         message: 'Tu cuenta de Google ya estaba vinculada.',
         provider: 'google',
-        linkedEmail: existingLinkByUser.correo_proveedor ?? correo_proveedor
+        linkedEmail: existingLinkByUser.correoProveedor ?? correo_proveedor
       }
     }
 
@@ -314,7 +314,7 @@ export const linkGoogleToCurrentUserByCodeService = async (
   }
 
   await createGoogleLinkForUser({
-    usuarioId: session.usuario.id,
+    usuarioId: session.usuarioId,
     googleId,
     correo_proveedor
   })

@@ -11,8 +11,8 @@ export const getHistorialBusqueda = async (req: Request, res: Response) => {
 
         // Buscamos los últimos registros (traemos más de 10 por si hay duplicados en DB)
         const historial = await prisma.historial_busqueda.findMany({
-            where: { usuarioId: usuarioId },
-            orderBy: { creado_en: 'desc' },
+            where: { usuarioid: usuarioId },
+            orderBy: { creadoEn: 'desc' },
             take: 50 
         });
 
@@ -47,7 +47,7 @@ export const guardarBusqueda = async (req: Request, res: Response) => {
         // CONTROL DE DUPLICIDAD: Buscar si ya existe el término para este usuario
         const existing = await prisma.historial_busqueda.findFirst({
             where: {
-                usuarioId: usuarioId,
+                usuarioid: usuarioId,
                 termino: termino
             }
         });
@@ -56,7 +56,7 @@ export const guardarBusqueda = async (req: Request, res: Response) => {
             // Si existe, actualizamos la fecha para que suba en el historial
             const actualizada = await prisma.historial_busqueda.update({
                 where: { id: existing.id },
-                data: { creado_en: new Date() }
+                data: { creadoen: new Date() }
             });
             return res.json(actualizada);
         }
@@ -64,7 +64,7 @@ export const guardarBusqueda = async (req: Request, res: Response) => {
         // Si no existe, creamos uno nuevo
         const nuevaBusqueda = await prisma.historial_busqueda.create({
             data: {
-                usuarioId: usuarioId,
+                usuarioid: usuarioId,
                 termino: termino
             }
         });
@@ -87,7 +87,7 @@ export const eliminarBusqueda = async (req: Request, res: Response) => {
 
         await prisma.historial_busqueda.deleteMany({
             where: {
-                usuarioId: usuarioId,
+                usuarioid: usuarioId,
                 termino: termino
             }
         });

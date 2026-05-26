@@ -48,7 +48,7 @@ export class RecomendacionesRepository {
 
   async getUltimasBusquedas(usuarioId: number, limite: number = 10) {
     const visitor = await prisma.visitor.findFirst({
-      where: { usuarioId: usuarioId },
+      where: { usuario_id: usuarioId },
       orderBy: { fecha_visita: 'desc' }
     })
 

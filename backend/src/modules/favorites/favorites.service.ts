@@ -64,8 +64,8 @@ export class FavoritesService {
         try {
           await prisma.entrenamiento_ml.create({
             data: {
-              usuarioId: usuarioId,
-              inmuebleId: inmuebleId,
+              usuario_id: usuarioId,
+              inmueble_id: inmuebleId,
               tipo_evento: "FAVORITO",
               score_real: 1.0,
               features: {

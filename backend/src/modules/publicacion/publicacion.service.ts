@@ -207,7 +207,7 @@ export const editarPublicacionService = async (
     throw new Error("PUBLICACION_NO_EXISTE");
   }
 
-  if (publicacion.usuarioId !== usuarioSolicitanteId) {
+  if (publicacion.usuario_id !== usuarioSolicitanteId) {
     throw new Error("NO_AUTORIZADO");
   }
 
@@ -314,7 +314,7 @@ export const eliminarPublicacionService = async (
     throw new Error("PUBLICACION_NO_EXISTE");
   }
 
-  if (publicacion.usuarioId !== usuarioSolicitanteId) {
+  if (publicacion.usuario_id !== usuarioSolicitanteId) {
     throw new Error("NO_AUTORIZADO");
   }
 
@@ -324,7 +324,7 @@ export const eliminarPublicacionService = async (
 
   await eliminarLogicamentePublicacionRepository(
     publicacion.id,
-    publicacion.inmuebleId,
+    publicacion.inmueble_id,
   );
 
   return {
@@ -351,7 +351,7 @@ export const obtenerResumenFinalService = async (
     throw new Error("PUBLICACION_NO_EXISTE");
   }
 
-  if (resumen.usuarioId !== usuarioSolicitanteId) {
+  if (resumen.usuario_id !== usuarioSolicitanteId) {
     throw new Error("NO_AUTORIZADO");
   }
 
@@ -397,7 +397,7 @@ export const obtenerResumenFinalService = async (
   return {
     id: resumen.id,
     publicacionId: resumen.id,
-    inmuebleId: resumen.inmuebleId,
+    inmuebleId: resumen.inmueble_id,
 
     publicaciones: {
       titulo: resumen.titulo ?? resumen.inmueble?.titulo ?? null,
@@ -461,8 +461,8 @@ export const obtenerDetallePublicacionService = async (
   }
 
   const telefonoPrincipal =
-    publicacion.usuario.telefono_telefono_usuarioIdTousuario.find((item) => item.principal) ??
-    publicacion.usuario.telefono_telefono_usuarioIdTousuario[0];
+    publicacion.usuario.telefono_telefono_usuario_idTousuario.find((item) => item.principal) ??
+    publicacion.usuario.telefono_telefono_usuario_idTousuario[0];
 
   return {
     id: publicacion.id,
@@ -541,8 +541,8 @@ export const obtenerDetallePublicacionPorInmuebleService = async (
   }
 
   const telefonoPrincipal =
-    publicacion.usuario.telefono_telefono_usuarioIdTousuario.find((item) => item.principal) ??
-    publicacion.usuario.telefono_telefono_usuarioIdTousuario[0];
+    publicacion.usuario.telefono_telefono_usuario_idTousuario.find((item) => item.principal) ??
+    publicacion.usuario.telefono_telefono_usuario_idTousuario[0];
 
   return {
     id: publicacion.id,
@@ -630,7 +630,7 @@ export const confirmarPublicacionService = async (
     throw new Error("PUBLICACION_NO_EXISTE");
   }
 
-  if (publicacion.usuarioId !== usuarioSolicitanteId) {
+  if (publicacion.usuario_id !== usuarioSolicitanteId) {
     throw new Error("NO_AUTORIZADO");
   }
 
@@ -736,7 +736,7 @@ export const editarMultimediaPublicacionService = async (
     throw new Error("PUBLICACION_NO_EXISTE");
   }
 
-  if (publicacion.usuarioId !== usuarioSolicitanteId) {
+  if (publicacion.usuario_id !== usuarioSolicitanteId) {
     throw new Error("NO_AUTORIZADO");
   }
 
@@ -910,7 +910,7 @@ export const iniciarPublicidadService = async (
     throw new Error("PUBLICACION_NO_EXISTE");
   }
 
-  if (publicacion.usuarioId !== usuarioId) {
+  if (publicacion.usuario_id !== usuarioId) {
     throw new Error("NO_AUTORIZADO");
   }
 
@@ -958,7 +958,7 @@ export const confirmarPublicidadService = async (
     throw new Error("PUBLICACION_NO_EXISTE");
   }
 
-  if (publicacion.usuarioId !== usuarioId) {
+  if (publicacion.usuario_id !== usuarioId) {
     throw new Error("NO_AUTORIZADO");
   }
 
@@ -982,8 +982,8 @@ export const confirmarPublicidadService = async (
   return {
     id: publicacionActualizada.id,
     promoted: publicacionActualizada.promoted,
-    promoted_at: publicacionActualizada.promoted_at,
-    promoted_expires_at: publicacionActualizada.promoted_expires_at,
+    promoted_at: publicacionActualizada.promotedAt,
+    promoted_expires_at: publicacionActualizada.promotedExpiresAt,
     message: `Publicidad activada correctamente por ${duracionDias} días`,
   };
 };
@@ -1006,7 +1006,7 @@ export const cancelarPublicidadService = async (
     throw new Error("PUBLICACION_NO_EXISTE");
   }
 
-  if (publicacion.usuarioId !== usuarioId) {
+  if (publicacion.usuario_id !== usuarioId) {
     throw new Error("NO_AUTORIZADO");
   }
 
@@ -1045,14 +1045,14 @@ export const obtenerEstadoPublicidadService = async (publicacionId: number) => {
 
   const activa =
     publicacion.promoted === true &&
-    publicacion.promoted_expires_at !== null &&
-    new Date(publicacion.promoted_expires_at) > new Date();
+    publicacion.promotedExpiresAt !== null &&
+    new Date(publicacion.promotedExpiresAt) > new Date();
 
   return {
     id: publicacion.id,
     promoted: activa,
-    promoted_at: activa ? publicacion.promoted_at : null,
-    promoted_expires_at: activa ? publicacion.promoted_expires_at : null,
+    promoted_at: activa ? publicacion.promotedAt : null,
+    promoted_expires_at: activa ? publicacion.promotedExpiresAt : null,
   };
 };
 

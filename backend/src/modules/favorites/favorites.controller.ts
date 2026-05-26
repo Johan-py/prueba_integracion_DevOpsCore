@@ -12,7 +12,7 @@ export class FavoritesController {
         return res.status(401).json({ message: 'Usuario no autenticado' });
       }
       
-      const usuarioId = usuario.id;  // ← Tomar el id del usuario
+      const usuarioId = usuario.usuarioId;  // ← Tomar el id del usuario
       const page = parseInt(req.query.page as string) || 1
       const perPage = parseInt(req.query.per_page as string) || 8
 
@@ -40,7 +40,7 @@ export class FavoritesController {
         return res.status(401).json({ message: 'Usuario no autenticado' });
       }
       
-      const usuarioId = usuario.id;
+      const usuarioId = usuarioId;
       const { inmuebleId } = req.body
       
       if (!inmuebleId) {
@@ -81,7 +81,7 @@ export class FavoritesController {
         return res.status(401).json({ message: 'Usuario no autenticado' });
       }
       
-      const usuarioId = usuario.id;
+      const usuarioId = usuarioId;
       const inmuebleId = parseInt(String(req.params.inmuebleId))
 
       if (isNaN(inmuebleId)) {
@@ -107,7 +107,7 @@ export class FavoritesController {
         return res.status(401).json({ message: 'Usuario no autenticado' });
       }
       
-      const usuarioId = usuario.id;
+      const usuarioId = usuarioId;
       const inmuebleId = parseInt(String(req.params.inmuebleId))
 
       if (isNaN(inmuebleId)) {

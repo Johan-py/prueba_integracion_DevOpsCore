@@ -20,13 +20,13 @@ export const sesionController = {
           estado: true // ← Agregar este filtro
         },
         orderBy: {
-          fecha_inicio: 'desc'
+          fechaInicio: 'desc'
         },
         select: {
           id: true,
           token: true,
-          fecha_inicio: true,
-          fecha_expiracion: true,
+          fechaInicio: true,
+          fechaExpiracion: true,
           estado: true,
           metodo_auth: true
         }
@@ -38,8 +38,8 @@ export const sesionController = {
       const sesionesFormateadas = sesiones.map((sesion) => ({
         id: sesion.id,
         token: sesion.token.substring(0, 20) + '...',
-        fecha_inicio: sesion.fecha_inicio,
-        fecha_expiracion: sesion.fecha_expiracion,
+        fecha_inicio: sesion.fechaInicio,
+        fecha_expiracion: sesion.fechaExpiracion,
         estado: sesion.estado,
         metodoAuth: sesion.metodo_auth,
         esActual: sesion.token === tokenActual
@@ -76,8 +76,8 @@ export const sesionController = {
         select: {
           id: true,
           token: true,
-          fecha_inicio: true,
-          fecha_expiracion: true,
+          fechaInicio: true,
+          fechaExpiracion: true,
           estado: true,
           metodo_auth: true
         }

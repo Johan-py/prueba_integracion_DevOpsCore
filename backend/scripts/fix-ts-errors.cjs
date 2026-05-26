@@ -28,7 +28,7 @@ function fixContent(content) {
     ['correoProveedor', 'correo_proveedor'],
     ['vinculadoEn', 'vinculado_en'],
     ['passwordHash', 'password_hash'],
-    ['telefono_telefono_usuarioIdTousuario', 'telefono_telefono_usuario_idTousuario'],
+    ['telefono_telefono_usuarioidTousuario', 'telefono_telefono_usuario_idTousuario'],
     ['promotedAt', 'promoted_at'],
     ['promotedExpiresAt', 'promoted_expires_at'],
   ];

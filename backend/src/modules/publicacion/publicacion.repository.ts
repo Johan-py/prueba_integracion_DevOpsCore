@@ -23,7 +23,7 @@ export const buscarPublicacionesPorUsuarioRepository = async (
 ) => {
   return prisma.publicacion.findMany({
     where: {
-      usuarioId: usuarioId,
+      usuario_id: usuarioId,
       estado: {
         not: ESTADO_PUBLICACION_ELIMINADA,
       },
@@ -37,7 +37,7 @@ export const buscarPublicacionesPorUsuarioRepository = async (
               direccion: true,
               latitud: true,
               longitud: true,
-              inmuebleId: true,
+              inmueble_id: true,
               ubicacion_maestra_id: true,
             },
           },
@@ -74,8 +74,8 @@ export const buscarResumenFinalPorIdRepository = async (
       descripcion: true,
       estado: true,
       fecha_publicacion: true,
-      usuarioId: true,
-      inmuebleId: true,
+      usuario_id: true,
+      inmueble_id: true,
       inmueble: {
         select: {
           id: true,
@@ -241,7 +241,7 @@ export const buscarDetallePublicacionPorIdRepository = async (
       descripcion: true,
       estado: true,
       fecha_publicacion: true,
-      usuarioId: true,
+      usuario_id: true,
       inmuebleId: true,
       usuario: {
         select: {
@@ -249,7 +249,7 @@ export const buscarDetallePublicacionPorIdRepository = async (
           nombre: true,
           apellido: true,
           correo: true,
-          telefono_telefono_usuarioIdTousuario: {
+          telefono_telefono_usuario_idTousuario: {
             select: {
               codigoPais: true,
               numero: true,
@@ -275,7 +275,7 @@ export const buscarDetallePublicacionPorIdRepository = async (
               direccion: true,
               latitud: true,
               longitud: true,
-              inmuebleId: true,
+              inmueble_id: true,
               ubicacion_maestra_id: true,
             },
           },
@@ -311,7 +311,7 @@ export const buscarDetallePublicacionPorInmuebleIdRepository = async (
 ) => {
   return prisma.publicacion.findFirst({
     where: {
-      inmuebleId: inmuebleId,
+      inmueble_id: inmuebleId,
       estado: {
         not: "ELIMINADA",
       },
@@ -322,15 +322,15 @@ export const buscarDetallePublicacionPorInmuebleIdRepository = async (
       descripcion: true,
       estado: true,
       fecha_publicacion: true,
-      usuarioId: true,
-      inmuebleId: true,
+      usuario_id: true,
+      inmueble_id: true,
       usuario: {
         select: {
           id: true,
           nombre: true,
           apellido: true,
           correo: true,
-          telefono_telefono_usuarioIdTousuario: {
+          telefono_telefono_usuario_idTousuario: {
             select: {
               codigoPais: true,
               numero: true,
@@ -475,12 +475,12 @@ export const activarPublicidadRepository = async (
   return prisma.publicacion.update({
     where: {
       id: publicacionId,
-      usuarioId: usuarioId,
+      usuario_id: usuarioId,
     },
     data: {
       promoted: true,
-      promoted_at: fecha_inicio,
-      promoted_expires_at: fecha_expiracion,
+      promotedAt: fecha_inicio,
+      promotedExpiresAt: fecha_expiracion,
       payment_intent_id: paymentIntentId,
     },
   });
@@ -493,12 +493,12 @@ export const cancelarPublicidadRepository = async (
   return prisma.publicacion.update({
     where: {
       id: publicacionId,
-      usuarioId: usuarioId,
+      usuario_id: usuarioId,
     },
     data: {
       promoted: false,
-      promoted_at: null,
-      promoted_expires_at: null,
+      promotedAt: null,
+      promotedExpiresAt: null,
       payment_intent_id: null,
     },
   });
@@ -512,8 +512,8 @@ export const buscarPublicacionPorIdSimpleRepository = async (
     select: {
       id: true,
       promoted: true,
-      promoted_at: true,
-      promoted_expires_at: true,
+      promotedAt: true,
+      promotedExpiresAt: true,
     },
   });
 };
@@ -525,7 +525,7 @@ export const verificarPublicidadActivaRepository = async (
     where: { id: publicacionId },
     select: {
       promoted: true,
-      promoted_expires_at: true,
+      promotedExpiresAt: true,
     },
   });
 
@@ -533,8 +533,8 @@ export const verificarPublicidadActivaRepository = async (
 
   return (
     publicacion.promoted === true &&
-    publicacion.promoted_expires_at !== null &&
-    new Date(publicacion.promoted_expires_at) > new Date()
+    publicacion.promotedExpiresAt !== null &&
+    new Date(publicacion.promotedExpiresAt) > new Date()
   );
 };
 

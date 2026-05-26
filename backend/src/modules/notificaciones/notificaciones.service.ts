@@ -148,7 +148,7 @@ export const getNotificationByIdService = async ({
     description: notification.mensaje,
     status: notification.leida ? "leida" : "no leida",
     archivada: notification.archivada,
-    fecha_creacion: notification.fecha_creacion,
+    fecha_creacion: notification.fechaCreacion,
     tipo: notification.tipo ?? "GENERAL",
     blogId: notification.blog_id ?? null,
   };
@@ -256,7 +256,7 @@ export const markNotificationAsReadService = async (
     await markNotificationAsReadRepository({
       id,
       usuarioId,
-      fecha_lectura: new Date(),
+      fechaLectura: new Date(),
     });
 
     emitNotificationEvent(usuarioId, "read", id);
@@ -277,7 +277,7 @@ export const markNotificationAsReadService = async (
 export const markAllNotificationsAsReadService = async (usuarioId: number) => {
   const result = await markAllNotificationsAsReadRepository({
     usuarioId,
-    fecha_lectura: new Date(),
+    fechaLectura: new Date(),
   });
 
   if (result.count > 0) {

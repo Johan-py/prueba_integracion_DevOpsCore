@@ -52,7 +52,7 @@ const exchangeCodeForTokens = async (code: string) => {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-      'User-Agent': 'PropBol/1.0 (https://propbol-tsiq.onrender.com)' // ← Agregado para evitar bloqueo de Cloudflare
+      'User-Agent': 'PropBol/1.0 (https://propbol-tsiq.onrender.com)'
     },
     body: params.toString()
   })
@@ -60,10 +60,8 @@ const exchangeCodeForTokens = async (code: string) => {
   console.log('[Discord] Response status:', response.status)
   console.log('[Discord] Response Content-Type:', response.headers.get('content-type'))
 
-  // Verificar si la respuesta es JSON antes de parsear
   const contentType = response.headers.get('content-type')
 
-  // Manejo específico para rate limiting
   if (response.status === 429) {
     const textResponse = await response.text()
     console.error('[Discord] Rate limit hit (429)')
@@ -159,12 +157,11 @@ const buildDiscordSessionResponse = async (
   }
 
   const token = generateToken(jwtPayload)
-  const fecha_expiracion = new Date(Date.now() + SESSION_DURATION_MS)
 
   await createDiscordSession({
     token,
     usuarioId: user.id,
-    fecha_expiracion
+    fechaExpiracion: new Date(Date.now() + SESSION_DURATION_MS), // era: fecha_expiracion
   })
 
   return {
@@ -202,7 +199,6 @@ const authenticateWithDiscord = async (
     )
   }
 
-  // Primero busca por ID de Discord en autenticacion_social
   const userByDiscordId = await findUserByDiscordId(discordId)
 
   if (mode === 'register') {
@@ -214,11 +210,9 @@ const authenticateWithDiscord = async (
       )
     }
 
-    // Verifica si ya existe un usuario con ese correo (se registró con email)
     const existingUserByEmail = await findUserByDiscordEmail(correo)
 
     if (existingUserByEmail) {
-      // Ya tiene cuenta con ese correo → solo vincula Discord
       await linkDiscordToUser(existingUserByEmail.id, discordId, correo)
 
       return await buildDiscordSessionResponse(
@@ -227,7 +221,6 @@ const authenticateWithDiscord = async (
       )
     }
 
-    // Usuario nuevo → crea cuenta y vincula Discord
     const { nombre, apellido } = resolveDiscordNames(discordUser)
 
     const createdUser = await createDiscordUser(
@@ -257,11 +250,9 @@ const authenticateWithDiscord = async (
     )
   }
 
-  // No tiene Discord vinculado → verifica si tiene cuenta con ese correo
   const existingUserByEmail = await findUserByDiscordEmail(correo)
 
   if (existingUserByEmail) {
-    // Tiene cuenta pero no tiene Discord vinculado → lo vincula automáticamente
     await linkDiscordToUser(existingUserByEmail.id, discordId, correo)
 
     return await buildDiscordSessionResponse(
@@ -311,7 +302,7 @@ export const linkDiscordToCurrentUserByCodeService = async (
 
   const session = await findUserByDiscordSessionToken(sessionToken)
 
-  if (!session?.usuario) {
+  if (!session?.usuarioId) {
     throw new DiscordAuthError(
       'Tu sesión ya no es válida. Vuelve a iniciar sesión en PropBol.',
       'DISCORD_AUTH_FAILED',
@@ -335,7 +326,7 @@ export const linkDiscordToCurrentUserByCodeService = async (
 
   const existingLinkByExternalId = await findDiscordLinkByExternalId(discordId)
 
-  if (existingLinkByExternalId && existingLinkByExternalId.usuarioId !== session.usuario.id) {
+  if (existingLinkByExternalId && existingLinkByExternalId.usuarioId !== session.usuarioId) {
     throw new DiscordAuthError(
       'Esta cuenta de Discord ya está vinculada a otro usuario.',
       'DISCORD_AUTH_FAILED',
@@ -343,14 +334,14 @@ export const linkDiscordToCurrentUserByCodeService = async (
     )
   }
 
-  const existingLinkByUser = await findDiscordLinkByUserId(session.usuario.id)
+  const existingLinkByUser = await findDiscordLinkByUserId(session.usuarioId)
 
   if (existingLinkByUser) {
-    if (existingLinkByUser.id_externo === discordId) {
+    if (existingLinkByUser.idExterno === discordId) {
       return {
         message: 'Tu cuenta de Discord ya estaba vinculada.',
         provider: 'discord',
-        linkedEmail: existingLinkByUser.correo_proveedor ?? correo_proveedor
+        linkedEmail: existingLinkByUser.correoProveedor ?? correo_proveedor
       }
     }
 
@@ -362,7 +353,7 @@ export const linkDiscordToCurrentUserByCodeService = async (
   }
 
   await createDiscordLinkForUser({
-    usuarioId: session.usuario.id,
+    usuarioId: session.usuarioId,
     discordId,
     correo_proveedor
   })
@@ -373,4 +364,3 @@ export const linkDiscordToCurrentUserByCodeService = async (
     linkedEmail: correo_proveedor
   }
 }
-

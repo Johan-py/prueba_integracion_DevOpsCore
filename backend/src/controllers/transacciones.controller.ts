@@ -30,7 +30,7 @@ export const generarPagoQr = async (req: Request, res: Response): Promise<void> 
 
     const nuevoPago = await prisma.transacciones.create({
       data: {
-        id_usuario: usuario.id,
+        id_usuario: usuario.id, // era: usuario
         id_suscripcion: plan.id,
         subtotal,
         iva_porcentaje,
@@ -187,4 +187,3 @@ export const actualizarEstadoPago = async (req: Request, res: Response): Promise
     res.status(500).json({ error: 'Error al actualizar el estado del pago' })
   }
 }
-

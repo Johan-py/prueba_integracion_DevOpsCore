@@ -65,7 +65,7 @@ export class EstadisticasPublicacionService {
       data: {
         token: nuevoToken,
         ip,
-        usuarioId: usuarioId || null,
+        usuario_id: usuarioId || null,
         meta_data: {
           userAgent: userAgent || null,
           tipo: usuarioId ? "USUARIO_REGISTRADO" : "VISITANTE",
@@ -88,7 +88,7 @@ export class EstadisticasPublicacionService {
       select: {
         id: true,
         estado: true,
-        inmuebleId: true,
+        inmueble_id: true,
       },
     });
 
@@ -115,7 +115,7 @@ export class EstadisticasPublicacionService {
       await tx.publicacion_vista.create({
         data: {
           publicacion_id: publicacionId,
-          usuarioId: usuarioId || null,
+          usuario_id: usuarioId || null,
           visitor_id: visitor.id,
           ip,
           user_agent: userAgent || null,
@@ -148,7 +148,7 @@ export class EstadisticasPublicacionService {
           where: {
             usuarioId_inmuebleId: {
         usuarioId: usuarioId,
-              inmuebleId: publicacion.inmuebleId,
+              inmuebleId: publicacion.inmueble_id,
             },
           },
           update: {
@@ -160,7 +160,7 @@ export class EstadisticasPublicacionService {
           },
           create: {
             usuarioId: usuarioId,
-            inmuebleId: publicacion.inmuebleId,
+            inmuebleId: publicacion.inmueble_id,
             veces_visto: 1,
             activo: true,
           },
@@ -184,7 +184,7 @@ export class EstadisticasPublicacionService {
   }: RegistrarVistaPorInmuebleParams) {
     const publicacion = await prisma.publicacion.findFirst({
       where: {
-        inmuebleId: inmuebleId,
+        inmueble_id: inmuebleId,
         estado: EstadoPublicacion.ACTIVA,
       },
       select: {
@@ -235,7 +235,7 @@ export class EstadisticasPublicacionService {
       await tx.publicacion_compartido.create({
         data: {
           publicacion_id: publicacionId,
-          usuarioId: usuarioId,
+          usuario_id: usuarioId,
           medio: medio || "GENERAL",
         },
       });
@@ -271,7 +271,7 @@ export class EstadisticasPublicacionService {
   }: RegistrarCompartidoPorInmuebleParams) {
     const publicacion = await prisma.publicacion.findFirst({
       where: {
-        inmuebleId: inmuebleId,
+        inmueble_id: inmuebleId,
         estado: EstadoPublicacion.ACTIVA,
       },
       select: {
@@ -302,7 +302,7 @@ export class EstadisticasPublicacionService {
         id: true,
         titulo: true,
         estado: true,
-        usuarioId: true,
+        usuario_id: true,
       },
     });
 
@@ -310,7 +310,7 @@ export class EstadisticasPublicacionService {
       throw new Error("PUBLICACION_NO_EXISTE");
     }
 
-    if (publicacion.usuarioId !== usuarioId) {
+    if (publicacion.usuario_id !== usuarioId) {
       throw new Error("NO_ES_PROPIETARIO");
     }
 

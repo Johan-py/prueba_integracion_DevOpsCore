@@ -9,8 +9,8 @@ export const getZonasUsuario = async (req: Request, res: Response): Promise<Resp
 
     // ✅ CORREGIDO: usar camelCase según Prisma
     const zonas = await prisma.zona_usuario.findMany({
-      where: { usuarioId: usuario.id },
-      orderBy: { creado_en: 'desc' }
+      where: { usuarioId: usuario },
+      orderBy: { creadoEn: 'desc' }
     })
 
     return res.json(zonas)
@@ -31,7 +31,7 @@ export const getZonaById = async (req: Request, res: Response): Promise<Response
     const zona = await prisma.zona_usuario.findFirst({
       where: {
         id: Number(id),
-        usuarioId: usuario.id
+        usuarioId: usuario
       }
     })
 
@@ -67,9 +67,9 @@ export const createZona = async (req: Request, res: Response): Promise<Response>
         descripcion,
         geometria,
         area,
-        usuarioId: usuario.id,
-        actualizado_en: new Date(),
-        creado_en: new Date()
+        usuarioId: usuario,
+        actualizadoEn: new Date(),
+        creadoEn: new Date()
       }
     })
 
@@ -93,7 +93,7 @@ export const updateZona = async (req: Request, res: Response): Promise<Response>
     const zona = await prisma.zona_usuario.findFirst({
       where: {
         id: Number(id),
-        usuarioId: usuario.id
+        usuarioId: usuario
       }
     });
 
@@ -109,7 +109,7 @@ export const updateZona = async (req: Request, res: Response): Promise<Response>
         descripcion,
         geometria,
         area,
-        actualizado_en: new Date()
+        actualizadoEn: new Date()
       }
     });
 
@@ -131,7 +131,7 @@ export const deleteZona = async (req: Request, res: Response): Promise<Response>
     const zona = await prisma.zona_usuario.findFirst({
       where: {
         id: Number(id),
-        usuarioId: usuario.id
+        usuarioId: usuario
       }
     })
 
@@ -163,7 +163,7 @@ export const getPropiedadesEnZona = async (req: Request, res: Response): Promise
     const zona = await prisma.zona_usuario.findFirst({
       where: {
         id: zonaId,
-        usuarioId: usuario.id
+        usuarioId: usuario
       }
     })
 

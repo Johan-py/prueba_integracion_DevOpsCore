@@ -28,7 +28,7 @@ export const comparacionController = {
           }
         },
         orderBy: {
-          creado_en: 'desc'
+          creadoEn: 'desc'
         }
       })
 
@@ -36,7 +36,7 @@ export const comparacionController = {
       const historialFormateado = comparaciones.map((comp) => ({
         id: comp.id,
         nombre: comp.nombre,
-        fecha: comp.creado_en,
+        fecha: comp.creadoEn,
         propiedades: comp.detalle_comparacion.map((detalle) => ({
           id: detalle.inmueble.id,
           titulo: detalle.inmueble.titulo,
@@ -65,15 +65,15 @@ export const comparacionController = {
       const usuarioId = req.usuario?.id
 
       // ✅ Asegurar que id es string
-      const comparacion_id = Array.isArray(id) ? id[0] : id
+      const comparacionId = Array.isArray(id) ? id[0] : id
 
-      if (!comparacion_id) {
+      if (!comparacionId) {
         return res.status(400).json({ error: 'ID no válido' })
       }
 
       const comparacion = await prisma.comparacion.findFirst({
         where: {
-          id: parseInt(comparacion_id),
+          id: parseInt(comparacionId),
           usuarioId
         },
         include: {
@@ -166,15 +166,15 @@ export const comparacionController = {
       const usuarioId = req.usuario?.id
 
       // ✅ Asegurar que id es string
-      const comparacion_id = Array.isArray(id) ? id[0] : id
+      const comparacionId = Array.isArray(id) ? id[0] : id
 
-      if (!comparacion_id) {
+      if (!comparacionId) {
         return res.status(400).json({ error: 'ID no válido' })
       }
 
       const comparacion = await prisma.comparacion.findFirst({
         where: {
-          id: parseInt(comparacion_id),
+          id: parseInt(comparacionId),
           usuarioId
         }
       })
@@ -184,7 +184,7 @@ export const comparacionController = {
       }
 
       await prisma.comparacion.delete({
-        where: { id: parseInt(comparacion_id) }
+        where: { id: parseInt(comparacionId) }
       })
 
       res.status(200).json({ message: 'Comparación eliminada exitosamente' })
@@ -202,15 +202,15 @@ export const comparacionController = {
       const usuarioId = req.usuario?.id
 
       // ✅ Asegurar que id es string
-      const comparacion_id = Array.isArray(id) ? id[0] : id
+      const comparacionId = Array.isArray(id) ? id[0] : id
 
-      if (!comparacion_id) {
+      if (!comparacionId) {
         return res.status(400).json({ error: 'ID no válido' })
       }
 
       const comparacion = await prisma.comparacion.findFirst({
         where: {
-          id: parseInt(comparacion_id),
+          id: parseInt(comparacionId),
           usuarioId
         },
         include: {
@@ -235,7 +235,7 @@ export const comparacionController = {
 
       const detalleActualizado = await prisma.detalle_comparacion.create({
         data: {
-          comparacion_id: parseInt(comparacion_id),
+          comparacionId: parseInt(comparacionId),
           inmuebleId: parseInt(inmuebleId),
           orden: nuevoOrden
         },
@@ -258,16 +258,16 @@ export const comparacionController = {
       const usuarioId = req.usuario?.id
 
       // ✅ Asegurar que los IDs son strings
-      const comparacion_id = Array.isArray(id) ? id[0] : id
+      const comparacionId = Array.isArray(id) ? id[0] : id
       const propiedadIdValue = Array.isArray(propiedadId) ? propiedadId[0] : propiedadId
 
-      if (!comparacion_id || !propiedadIdValue) {
+      if (!comparacionId || !propiedadIdValue) {
         return res.status(400).json({ error: 'IDs no válidos' })
       }
 
       const comparacion = await prisma.comparacion.findFirst({
         where: {
-          id: parseInt(comparacion_id),
+          id: parseInt(comparacionId),
           usuarioId
         }
       })
@@ -278,7 +278,7 @@ export const comparacionController = {
 
       await prisma.detalle_comparacion.deleteMany({
         where: {
-          comparacion_id: parseInt(comparacion_id),
+          comparacionId: parseInt(comparacionId),
           inmuebleId: parseInt(propiedadIdValue)
         }
       })
@@ -330,7 +330,7 @@ export const comparacionController = {
           }
         },
         orderBy: {
-          creado_en: 'desc'
+          creadoEn: 'desc'
         }
       })
 
@@ -363,7 +363,7 @@ export const comparacionController = {
           }
         },
         orderBy: {
-          creado_en: 'desc'
+          creadoEn: 'desc'
         }
       })
 
@@ -383,7 +383,7 @@ export const comparacionController = {
           acc[categoriaKey].push({
             id: comp.id,
             nombre: comp.nombre,
-            fecha: comp.creado_en,
+            fecha: comp.creadoEn,
             propiedades: comp.detalle_comparacion.map((detalle) => ({
               id: detalle.inmueble.id,
               ubicacion:
