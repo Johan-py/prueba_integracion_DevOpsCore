@@ -84,7 +84,7 @@ const findPublicationOwner = async (publicacionId: number) => {
     where: { id: publicacionId },
     select: {
       id: true,
-      usuario_id: true
+      usuarioId: true
     }
   })
 }

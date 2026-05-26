@@ -30,14 +30,14 @@ const createProperty = async (data: any, userId: number) => {
       data: {
         titulo: data.titulo,
         descripcion: data.descripcion,
-        usuario_id: userId,
-        inmueble_id: inmueble.id
+        usuarioId: userId,
+        inmuebleId: inmueble.id
       }
     })
 
     await tx.ubicacion_inmueble.create({
       data: {
-        inmueble_id: inmueble.id,
+        inmuebleId: inmueble.id,
         direccion: data.direccion,
         latitud: new Prisma.Decimal(data.latitud ?? 0),
         longitud: new Prisma.Decimal(data.longitud ?? 0),

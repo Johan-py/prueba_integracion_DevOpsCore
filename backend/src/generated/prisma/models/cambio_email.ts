@@ -27,12 +27,12 @@ export type AggregateCambio_email = {
 
 export type Cambio_emailAvgAggregateOutputType = {
   id: number | null
-  usuario_id: number | null
+  usuarioId: number | null
 }
 
 export type Cambio_emailSumAggregateOutputType = {
   id: number | null
-  usuario_id: number | null
+  usuarioId: number | null
 }
 
 export type Cambio_emailMinAggregateOutputType = {
@@ -42,7 +42,7 @@ export type Cambio_emailMinAggregateOutputType = {
   expira_en: Date | null
   creado_en: Date | null
   completado_en: Date | null
-  usuario_id: number | null
+  usuarioId: number | null
 }
 
 export type Cambio_emailMaxAggregateOutputType = {
@@ -52,7 +52,7 @@ export type Cambio_emailMaxAggregateOutputType = {
   expira_en: Date | null
   creado_en: Date | null
   completado_en: Date | null
-  usuario_id: number | null
+  usuarioId: number | null
 }
 
 export type Cambio_emailCountAggregateOutputType = {
@@ -62,18 +62,18 @@ export type Cambio_emailCountAggregateOutputType = {
   expira_en: number
   creado_en: number
   completado_en: number
-  usuario_id: number
+  usuarioId: number
   _all: number
 }
 
 export type Cambio_emailAvgAggregateInputType = {
   id?: true
-  usuario_id?: true
+  usuarioId?: true
 }
 
 export type Cambio_emailSumAggregateInputType = {
   id?: true
-  usuario_id?: true
+  usuarioId?: true
 }
 
 export type Cambio_emailMinAggregateInputType = {
@@ -83,7 +83,7 @@ export type Cambio_emailMinAggregateInputType = {
   expira_en?: true
   creado_en?: true
   completado_en?: true
-  usuario_id?: true
+  usuarioId?: true
 }
 
 export type Cambio_emailMaxAggregateInputType = {
@@ -93,7 +93,7 @@ export type Cambio_emailMaxAggregateInputType = {
   expira_en?: true
   creado_en?: true
   completado_en?: true
-  usuario_id?: true
+  usuarioId?: true
 }
 
 export type Cambio_emailCountAggregateInputType = {
@@ -103,7 +103,7 @@ export type Cambio_emailCountAggregateInputType = {
   expira_en?: true
   creado_en?: true
   completado_en?: true
-  usuario_id?: true
+  usuarioId?: true
   _all?: true
 }
 
@@ -205,7 +205,7 @@ export type Cambio_emailGroupByOutputType = {
   expira_en: Date
   creado_en: Date | null
   completado_en: Date | null
-  usuario_id: number
+  usuarioId: number
   _count: Cambio_emailCountAggregateOutputType | null
   _avg: Cambio_emailAvgAggregateOutputType | null
   _sum: Cambio_emailSumAggregateOutputType | null
@@ -235,7 +235,7 @@ export type cambio_emailWhereInput = {
   expira_en?: Prisma.DateTimeFilter<'cambio_email'> | Date | string
   creado_en?: Prisma.DateTimeNullableFilter<'cambio_email'> | Date | string | null
   completado_en?: Prisma.DateTimeNullableFilter<'cambio_email'> | Date | string | null
-  usuario_id?: Prisma.IntFilter<'cambio_email'> | number
+  usuarioId?: Prisma.IntFilter<'cambio_email'> | number
   usuario?: Prisma.XOR<Prisma.UsuarioScalarRelationFilter, Prisma.usuarioWhereInput>
 }
 
@@ -246,7 +246,7 @@ export type cambio_emailOrderByWithRelationInput = {
   expira_en?: Prisma.SortOrder
   creado_en?: Prisma.SortOrderInput | Prisma.SortOrder
   completado_en?: Prisma.SortOrderInput | Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
   usuario?: Prisma.usuarioOrderByWithRelationInput
 }
 
@@ -261,7 +261,7 @@ export type cambio_emailWhereUniqueInput = Prisma.AtLeast<
     expira_en?: Prisma.DateTimeFilter<'cambio_email'> | Date | string
     creado_en?: Prisma.DateTimeNullableFilter<'cambio_email'> | Date | string | null
     completado_en?: Prisma.DateTimeNullableFilter<'cambio_email'> | Date | string | null
-    usuario_id?: Prisma.IntFilter<'cambio_email'> | number
+    usuarioId?: Prisma.IntFilter<'cambio_email'> | number
     usuario?: Prisma.XOR<Prisma.UsuarioScalarRelationFilter, Prisma.usuarioWhereInput>
   },
   'id' | 'token'
@@ -274,7 +274,7 @@ export type cambio_emailOrderByWithAggregationInput = {
   expira_en?: Prisma.SortOrder
   creado_en?: Prisma.SortOrderInput | Prisma.SortOrder
   completado_en?: Prisma.SortOrderInput | Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
   _count?: Prisma.cambio_emailCountOrderByAggregateInput
   _avg?: Prisma.cambio_emailAvgOrderByAggregateInput
   _max?: Prisma.cambio_emailMaxOrderByAggregateInput
@@ -296,7 +296,7 @@ export type cambio_emailScalarWhereWithAggregatesInput = {
   expira_en?: Prisma.DateTimeWithAggregatesFilter<'cambio_email'> | Date | string
   creado_en?: Prisma.DateTimeNullableWithAggregatesFilter<'cambio_email'> | Date | string | null
   completado_en?: Prisma.DateTimeNullableWithAggregatesFilter<'cambio_email'> | Date | string | null
-  usuario_id?: Prisma.IntWithAggregatesFilter<'cambio_email'> | number
+  usuarioId?: Prisma.IntWithAggregatesFilter<'cambio_email'> | number
 }
 
 export type cambio_emailCreateInput = {
@@ -315,7 +315,7 @@ export type cambio_emailUncheckedCreateInput = {
   expira_en: Date | string
   creado_en?: Date | string | null
   completado_en?: Date | string | null
-  usuario_id: number
+  usuarioId: number
 }
 
 export type cambio_emailUpdateInput = {
@@ -334,7 +334,7 @@ export type cambio_emailUncheckedUpdateInput = {
   expira_en?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   creado_en?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completado_en?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  usuario_id?: Prisma.IntFieldUpdateOperationsInput | number
+  usuarioId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type cambio_emailCreateManyInput = {
@@ -344,7 +344,7 @@ export type cambio_emailCreateManyInput = {
   expira_en: Date | string
   creado_en?: Date | string | null
   completado_en?: Date | string | null
-  usuario_id: number
+  usuarioId: number
 }
 
 export type cambio_emailUpdateManyMutationInput = {
@@ -362,7 +362,7 @@ export type cambio_emailUncheckedUpdateManyInput = {
   expira_en?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   creado_en?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completado_en?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  usuario_id?: Prisma.IntFieldUpdateOperationsInput | number
+  usuarioId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type cambio_emailCountOrderByAggregateInput = {
@@ -372,12 +372,12 @@ export type cambio_emailCountOrderByAggregateInput = {
   expira_en?: Prisma.SortOrder
   creado_en?: Prisma.SortOrder
   completado_en?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type cambio_emailAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type cambio_emailMaxOrderByAggregateInput = {
@@ -387,7 +387,7 @@ export type cambio_emailMaxOrderByAggregateInput = {
   expira_en?: Prisma.SortOrder
   creado_en?: Prisma.SortOrder
   completado_en?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type cambio_emailMinOrderByAggregateInput = {
@@ -397,12 +397,12 @@ export type cambio_emailMinOrderByAggregateInput = {
   expira_en?: Prisma.SortOrder
   creado_en?: Prisma.SortOrder
   completado_en?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type cambio_emailSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type Cambio_emailListRelationFilter = {
@@ -573,7 +573,7 @@ export type cambio_emailScalarWhereInput = {
   expira_en?: Prisma.DateTimeFilter<'cambio_email'> | Date | string
   creado_en?: Prisma.DateTimeNullableFilter<'cambio_email'> | Date | string | null
   completado_en?: Prisma.DateTimeNullableFilter<'cambio_email'> | Date | string | null
-  usuario_id?: Prisma.IntFilter<'cambio_email'> | number
+  usuarioId?: Prisma.IntFilter<'cambio_email'> | number
 }
 
 export type cambio_emailCreateManyUsuarioInput = {
@@ -621,7 +621,7 @@ export type cambio_emailSelect<
     expira_en?: boolean
     creado_en?: boolean
     completado_en?: boolean
-    usuario_id?: boolean
+    usuarioId?: boolean
     usuario?: boolean | Prisma.usuarioDefaultArgs<ExtArgs>
   },
   ExtArgs['result']['cambio_email']
@@ -637,7 +637,7 @@ export type cambio_emailSelectCreateManyAndReturn<
     expira_en?: boolean
     creado_en?: boolean
     completado_en?: boolean
-    usuario_id?: boolean
+    usuarioId?: boolean
     usuario?: boolean | Prisma.usuarioDefaultArgs<ExtArgs>
   },
   ExtArgs['result']['cambio_email']
@@ -653,7 +653,7 @@ export type cambio_emailSelectUpdateManyAndReturn<
     expira_en?: boolean
     creado_en?: boolean
     completado_en?: boolean
-    usuario_id?: boolean
+    usuarioId?: boolean
     usuario?: boolean | Prisma.usuarioDefaultArgs<ExtArgs>
   },
   ExtArgs['result']['cambio_email']
@@ -666,13 +666,13 @@ export type cambio_emailSelectScalar = {
   expira_en?: boolean
   creado_en?: boolean
   completado_en?: boolean
-  usuario_id?: boolean
+  usuarioId?: boolean
 }
 
 export type cambio_emailOmit<
   ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs
 > = runtime.Types.Extensions.GetOmit<
-  'id' | 'email_nuevo' | 'token' | 'expira_en' | 'creado_en' | 'completado_en' | 'usuario_id',
+  'id' | 'email_nuevo' | 'token' | 'expira_en' | 'creado_en' | 'completado_en' | 'usuarioId',
   ExtArgs['result']['cambio_email']
 >
 export type cambio_emailInclude<
@@ -706,7 +706,7 @@ export type $cambio_emailPayload<
       expira_en: Date
       creado_en: Date | null
       completado_en: Date | null
-      usuario_id: number
+      usuarioId: number
     },
     ExtArgs['result']['cambio_email']
   >
@@ -1296,7 +1296,7 @@ export interface cambio_emailFieldRefs {
   readonly expira_en: Prisma.FieldRef<'cambio_email', 'DateTime'>
   readonly creado_en: Prisma.FieldRef<'cambio_email', 'DateTime'>
   readonly completado_en: Prisma.FieldRef<'cambio_email', 'DateTime'>
-  readonly usuario_id: Prisma.FieldRef<'cambio_email', 'Int'>
+  readonly usuarioId: Prisma.FieldRef<'cambio_email', 'Int'>
 }
 
 // Custom InputTypes

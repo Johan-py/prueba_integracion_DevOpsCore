@@ -10,7 +10,7 @@ export const getAdminTestimonios = async (req: Request, res: Response) => {
         u.apellido as u_apellido,
         COUNT(tl.id)::int as total_likes
       FROM "testimonio" t
-      LEFT JOIN "usuario" u ON t.usuario_id = u.id
+      LEFT JOIN "usuario" u ON t.usuarioId = u.id
       LEFT JOIN "testimonio_like" tl ON t.id = tl.testimonio_id
       WHERE t."eliminado" = false 
       GROUP BY t.id, u.id, u.nombre, u.apellido
@@ -18,7 +18,7 @@ export const getAdminTestimonios = async (req: Request, res: Response) => {
     `;
 
     const testimonios = data.map((t) => {
-      let nombreAMostrar = t.usuario_id;
+      let nombreAMostrar = t.usuarioId;
       if (t.u_nombre) {
         nombreAMostrar = `${t.u_nombre} ${t.u_apellido || ""}`.trim();
       }
@@ -105,7 +105,7 @@ export const createAdminTestimonio = async (req: Request, res: Response) => {
 
     // 2. Crear el testimonio
     const result: any[] = await prisma.$queryRaw`
-      INSERT INTO "testimonio" ("comentario", "ciudad", "zona", "categoria", "visible", "eliminado", "usuario_id", "calificacion", "fecha_creacion")
+      INSERT INTO "testimonio" ("comentario", "ciudad", "zona", "categoria", "visible", "eliminado", "usuarioId", "calificacion", "fecha_creacion")
       VALUES (
         ${comentario.trim()}, 
         ${ciudad.trim()}, 
@@ -184,7 +184,7 @@ export const updateAdminTestimonio = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Testimonio no encontrado" });
     }
 
-    let uId = Number(testimonio.usuario_id);
+    let uId = Number(testimonio.usuarioId);
     const nombreLimpio = nombreAutor?.trim();
     const apellidoLimpio = apellidoAutor?.trim();
 
@@ -227,7 +227,7 @@ export const updateAdminTestimonio = async (req: Request, res: Response) => {
         "categoria" = ${categoria?.trim() || testimonio.categoria},
         "visible" = ${visible ?? testimonio.visible},
         "calificacion" = ${calificacion ? Number(calificacion) : testimonio.calificacion || 5},
-        "usuario_id" = ${uId}
+        "usuarioId" = ${uId}
       WHERE "id" = ${Number(id)}
       RETURNING *
     `;

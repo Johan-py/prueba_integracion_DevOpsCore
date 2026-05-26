@@ -25,7 +25,7 @@ export const getPlanLimit = async (req: Request, res: Response) => {
 
     const publicacionesMes = await prisma.publicacion.count({
       where: {
-        usuario_id: Number(userId),
+        usuarioId: Number(userId),
       },
     });
 

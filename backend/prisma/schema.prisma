@@ -11,7 +11,6 @@ model rol {
   id       Int       @id @default(autoincrement())
   nombre   RolNombre @unique
   usuarios usuario[]
-
 }
 
 model usuario {
@@ -58,12 +57,12 @@ model usuario {
   historial_password                    historial_password[]
   inmuebles                             inmueble[]
   magic_link                            magic_link[]
-  notificaciones                        notificacion[]
+  notificacion                          notificacion[]
   perfil                                perfil?
   propiedad_vista                       propiedad_vista[]
   publicaciones                         publicacion[]
   recuperacion_password                 recuperacion_password[]
-  sesiones                              sesion[]
+  sesion                                sesion[]
   suscripciones_activas                 suscripciones_activas[]
   telefonos                             telefono[]
   telefono_telefono_usuario_idTousuario telefono[]                    @relation("telefono_usuario_idTousuario")
@@ -98,13 +97,12 @@ model telefono {
 model sesion {
   id              Int       @id @default(autoincrement())
   token           String    @unique
-  fecha_inicio     DateTime? @default(now()) @db.Timestamp(6)
-  fecha_expiracion DateTime  @db.Timestamp(6)
+  fechaInicio     DateTime? @default(now()) @db.Timestamp(6)
+  fechaExpiracion DateTime  @db.Timestamp(6)
   estado          Boolean?  @default(true)
-  usuario_id       Int
+  usuarioId       Int
   metodo_auth     String?   @default("email") @db.VarChar(30)
-  usuario         usuario   @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "sesion_usuario_id_fkey")
-
+  usuario         usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "sesion_usuario_id_fkey")
 }
 
 model notificacion {
@@ -112,18 +110,18 @@ model notificacion {
   titulo        String
   mensaje       String
   leida         Boolean   @default(false)
-  fecha_creacion DateTime? @default(now()) @db.Timestamp(6)
-  fecha_lectura  DateTime? @db.Timestamp(6)
+  fechaCreacion DateTime? @default(now()) @db.Timestamp(6)
+  fechaLectura  DateTime? @db.Timestamp(6)
   eliminada     Boolean   @default(false)
   archivada     Boolean   @default(false)
-  usuario_id     Int
+  usuarioId     Int
   tipo          String    @default("GENERAL") @db.VarChar(30)
   blog_id       Int?
   blog          blog?     @relation(fields: [blog_id], references: [id], onUpdate: NoAction, map: "notificacion_blog_fk")
-  usuario       usuario   @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "notificacion_usuario_id_fkey")
+  usuario       usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "notificacion_usuario_id_fkey")
 
   @@index([blog_id], map: "idx_notificacion_blog")
-  @@index([usuario_id, leida], map: "idx_notificacion_usuario_leida")
+  @@index([usuarioId, leida], map: "idx_notificacion_usuario_leida")
 }
 
 model cambio_email {
@@ -135,7 +133,6 @@ model cambio_email {
   completado_en DateTime? @db.Timestamp(6)
   usuario_id    Int
   usuario       usuario   @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
 }
 
 model perfil {
@@ -144,24 +141,23 @@ model perfil {
   datos           Json?
   usuario_id      Int     @unique
   usuario         usuario @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
 }
 
 model inmueble {
   id                  Int                   @id @default(autoincrement())
   titulo              String
-  tipo_accion          tipo_accion
+  tipo_accion         tipo_accion
   categoria           categoria?            @map("categoria")
   precio              Decimal               @db.Decimal(12, 2)
-  superficie_m2        Decimal? @db.Decimal(10, 2)
-  nro_cuartos          Int?
-  nro_banos            Int?
+  superficie_m2       Decimal?              @db.Decimal(10, 2)
+  nro_cuartos         Int?
+  nro_banos           Int?
   descripcion         String?
-  estado              estado_inmueble?       @default(ACTIVO) @map("estado")
-  fecha_publicacion    DateTime?             @default(now()) @db.Timestamp(6)
-  created_at           DateTime?             @default(now()) @db.Timestamp(6)
-  updated_at           DateTime?             @default(now()) @updatedAt @db.Timestamp(6)
-  propietario_id       Int
+  estado              estado_inmueble?      @default(ACTIVO) @map("estado")
+  fecha_publicacion   DateTime?             @default(now()) @db.Timestamp(6)
+  created_at          DateTime?             @default(now()) @db.Timestamp(6)
+  updated_at          DateTime?             @default(now()) @updatedAt @db.Timestamp(6)
+  propietario_id      Int
   banoCompartido      Boolean?              @default(false)
   precio_anterior     Decimal?              @db.Decimal(12, 2)
   fecha_reduccion     DateTime?             @db.Timestamp(6)
@@ -175,7 +171,6 @@ model inmueble {
   propiedad_vista     propiedad_vista[]
   publicaciones       publicacion[]
   ubicacion           ubicacion_inmueble?
-  puntosDeInteres     punto_interes[]
 
   @@index([propietario_id], map: "idx_inmueble_propietario")
   @@index([estado], map: "idx_inmueble_estado")
@@ -183,29 +178,28 @@ model inmueble {
 }
 
 model ubicacion_inmueble {
-  id                 Int                @id @default(autoincrement())
-  latitud            Decimal            @db.Decimal(10, 7)
-  longitud           Decimal            @db.Decimal(10, 7)
-  direccion          String?
-  ciudad             String?
-  zona               String?
-  inmueble_id         Int                @unique
+  id                   Int                @id @default(autoincrement())
+  latitud              Decimal            @db.Decimal(10, 7)
+  longitud             Decimal            @db.Decimal(10, 7)
+  direccion            String?
+  ciudad               String?
+  zona                 String?
+  inmueble_id          Int                @unique
   ubicacion_maestra_id Int?
-  barrio_id          Int?
-  vertices_difuminado Json?
-  marcador_mapa      marcador_mapa[]
-  barrio             barrio?            @relation(fields: [barrio_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  inmueble           inmueble           @relation(fields: [inmueble_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "ubicacion_inmueble_fk")
-  ubicacion_maestra  ubicacion_maestra? @relation(fields: [ubicacion_maestra_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  barrio_id            Int?
+  vertices_difuminado  Json?
+  marcador_mapa        marcador_mapa[]
+  barrio               barrio?            @relation(fields: [barrio_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  inmueble             inmueble           @relation(fields: [inmueble_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "ubicacion_inmueble_fk")
+  ubicacion_maestra    ubicacion_maestra? @relation(fields: [ubicacion_maestra_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([ubicacion_maestra_id], map: "idx_ubicacion_maestra")
 }
 
 model etiqueta {
-  id                Int                @id @default(autoincrement())
-  nombre            String             @unique
+  id                Int                 @id @default(autoincrement())
+  nombre            String              @unique
   inmueble_etiqueta inmueble_etiqueta[]
-
 }
 
 model inmueble_etiqueta {
@@ -221,14 +215,14 @@ model publicacion {
   id                    Int                     @id @default(autoincrement())
   titulo                String
   descripcion           String?
-  estado                estado_publicacion?      @default(ACTIVA) @map("estado")
-  fecha_publicacion      DateTime?               @default(now()) @db.Timestamp(6)
-  usuario_id             Int
-  inmueble_id            Int
-  payment_intent_id       String?
-  promoted              Boolean                 @default(false)
-  promoted_at            DateTime? @db.Timestamp(6)
-  promoted_expires_at     DateTime? @db.Timestamp(6)
+  estado                estado_publicacion?     @default(ACTIVA) @map("estado")
+  fecha_publicacion     DateTime?               @default(now()) @db.Timestamp(6)
+  usuario_id            Int
+  inmueble_id           Int
+  payment_intent_id     String?
+  promoted              Boolean?                @default(false)
+  promotedAt            DateTime?               @db.Timestamp(6)
+  promotedExpiresAt     DateTime?               @db.Timestamp(6)
   multimedia            multimedia[]
   inmueble              inmueble                @relation(fields: [inmueble_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "publicacion_inmueble_fk")
   usuario               usuario                 @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "publicacion_usuario_fk")
@@ -238,45 +232,42 @@ model publicacion {
   @@index([estado], map: "idx_publicacion_estado")
   @@index([inmueble_id], map: "idx_publicacion_inmueble")
   @@index([usuario_id], map: "idx_publicacion_usuario")
-  @@index([promoted], map: "idx_publicacion_promoted")
 }
 
 model multimedia {
-  id            Int            @id @default(autoincrement())
-  url           String
-  tipo          tipo_multimedia
-  peso_mb        Decimal? @db.Decimal(8, 2)
+  id             Int             @id @default(autoincrement())
+  url            String
+  tipo           tipo_multimedia
+  peso_mb        Decimal?        @db.Decimal(8, 2)
   publicacion_id Int
-  publicacion   publicacion    @relation(fields: [publicacion_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "multimedia_publicacion_fk")
+  publicacion    publicacion     @relation(fields: [publicacion_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "multimedia_publicacion_fk")
 
   @@index([publicacion_id], map: "idx_multimedia_publicacion")
 }
 
 model marcador_mapa {
-  id                 Int               @id @default(autoincrement())
+  id                 Int                @id @default(autoincrement())
   tipo               tipo_marcador
-  es_visible         Boolean?          @default(true)
+  es_visible         Boolean?           @default(true)
   nivel_z            Int?
   inmueble_id        Int
   ubicacion_id       Int
   detalle_grupo      detalle_grupo[]
   interaccion_mapa   interaccion_mapa[]
-  inmueble           inmueble          @relation(fields: [inmueble_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  inmueble           inmueble           @relation(fields: [inmueble_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   ubicacion_inmueble ubicacion_inmueble @relation(fields: [ubicacion_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
 }
 
 model grupo_marcadores {
-  id                 Int            @id @default(autoincrement())
-  latitud_centro     Decimal        @db.Decimal(10, 7)
-  longitud_centro    Decimal        @db.Decimal(10, 7)
+  id                 Int             @id @default(autoincrement())
+  latitud_centro     Decimal         @db.Decimal(10, 7)
+  longitud_centro    Decimal         @db.Decimal(10, 7)
   cantidad_inmuebles Int
   nivel_color        String?
   nivel_zoom         Int
-  radio_km           Decimal?       @db.Decimal(10, 2)
-  actualizado_en     DateTime?      @default(now()) @db.Timestamp(6)
+  radio_km           Decimal?        @db.Decimal(10, 2)
+  actualizado_en     DateTime?       @default(now()) @db.Timestamp(6)
   detalle_grupo      detalle_grupo[]
-
 }
 
 model detalle_grupo {
@@ -289,33 +280,31 @@ model detalle_grupo {
 }
 
 model sesion_mapa {
-  id               Int               @id @default(autoincrement())
-  token            String            @unique
-  limite_norte     Decimal?          @db.Decimal(10, 7)
-  limite_sur       Decimal?          @db.Decimal(10, 7)
-  limite_este      Decimal?          @db.Decimal(10, 7)
-  limite_oeste     Decimal?          @db.Decimal(10, 7)
+  id               Int                @id @default(autoincrement())
+  token            String             @unique
+  limite_norte     Decimal?           @db.Decimal(10, 7)
+  limite_sur       Decimal?           @db.Decimal(10, 7)
+  limite_este      Decimal?           @db.Decimal(10, 7)
+  limite_oeste     Decimal?           @db.Decimal(10, 7)
   nivel_zoom       Int
-  latitud_centro   Decimal?          @db.Decimal(10, 7)
-  longitud_centro  Decimal?          @db.Decimal(10, 7)
-  iniciado_en      DateTime?         @default(now()) @db.Timestamp(6)
-  ultima_actividad DateTime?         @default(now()) @db.Timestamp(6)
+  latitud_centro   Decimal?           @db.Decimal(10, 7)
+  longitud_centro  Decimal?           @db.Decimal(10, 7)
+  iniciado_en      DateTime?          @default(now()) @db.Timestamp(6)
+  ultima_actividad DateTime?          @default(now()) @db.Timestamp(6)
   interaccion_mapa interaccion_mapa[]
-
 }
 
 model interaccion_mapa {
-  id               Int             @id @default(autoincrement())
+  id               Int              @id @default(autoincrement())
   tipo             tipo_interaccion
-  latitud_momento  Decimal?        @db.Decimal(10, 7)
-  longitud_momento Decimal?        @db.Decimal(10, 7)
+  latitud_momento  Decimal?         @db.Decimal(10, 7)
+  longitud_momento Decimal?         @db.Decimal(10, 7)
   zoom_momento     Int?
-  ocurrio_en       DateTime?       @default(now()) @db.Timestamp(6)
+  ocurrio_en       DateTime?        @default(now()) @db.Timestamp(6)
   sesion_id        Int?
   marcador_id      Int?
   marcador_mapa    marcador_mapa?   @relation(fields: [marcador_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   sesion_mapa      sesion_mapa?     @relation(fields: [sesion_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
 }
 
 model banner_home {
@@ -326,7 +315,6 @@ model banner_home {
   fecha_creacion DateTime? @default(now()) @db.Timestamp(6)
   titulo         String?
   subtitulo      String?
-
 }
 
 model visitor {
@@ -337,18 +325,17 @@ model visitor {
   usuario_id   Int?
   token        String?   @unique
   usuario      usuario?  @relation(fields: [usuario_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
 }
 
 model ubicacion_maestra {
-  id                 Int                 @id @default(autoincrement())
+  id                 Int                  @id @default(autoincrement())
   departamento       String
   provincia          String?
   municipio          String?
   nombre             String
-  latitud            Decimal             @db.Decimal(10, 7)
-  longitud           Decimal             @db.Decimal(10, 7)
-  popularidad        Int?                @default(0)
+  latitud            Decimal              @db.Decimal(10, 7)
+  longitud           Decimal              @db.Decimal(10, 7)
+  popularidad        Int?                 @default(0)
   ubicacion_inmueble ubicacion_inmueble[]
 
   @@index([nombre], map: "idx_ubicacion_nombre")
@@ -439,8 +426,7 @@ model zona_predefinida {
   coordenadas Json
   color       String   @default("#ea580c")
   activa      Boolean  @default(true)
-  creado_en    DateTime @default(now())
-
+  creadoEn    DateTime @default(now())
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -454,103 +440,103 @@ model audit_log {
 
 model autenticacion_social {
   id                   Int       @id @default(autoincrement())
-  usuario_id            Int
+  usuarioId            Int
   proveedor            String    @db.VarChar(30)
-  correo_proveedor      String?   @db.VarChar(100)
-  id_externo            String    @db.VarChar(150)
-  vinculado_en          DateTime? @default(now()) @db.Timestamp(6)
+  correoProveedor      String?   @db.VarChar(100)
+  idExterno            String    @db.VarChar(150)
+  vinculadoEn          DateTime? @default(now()) @db.Timestamp(6)
   activo               Boolean?  @default(true)
   token_acceso_cifrado String?
   token_expira_en      DateTime? @db.Timestamptz(6)
   ultimo_uso_en        DateTime? @db.Timestamptz(6)
-  usuario              usuario   @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  usuario              usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@unique([proveedor, id_externo], map: "autenticacion_social_proveedor_id_externo_key")
-  @@unique([usuario_id, proveedor], map: "autenticacion_social_usuario_proveedor_key")
+  @@unique([usuarioId, proveedor], map: "autenticacion_social_usuario_proveedor_key")
+  @@unique([proveedor, idExterno], map: "autenticacion_social_proveedor_idexterno_key")
 }
 
 model codigo_2fa {
   id         Int       @id @default(autoincrement())
-  usuario_id  Int
-  codigo_hash String    @db.VarChar(255)
-  creado_en   DateTime? @default(now()) @db.Timestamp(6)
-  expira_en   DateTime  @db.Timestamp(6)
-  usado_en    DateTime? @db.Timestamp(6)
+  usuarioId  Int
+  codigoHash String    @db.VarChar(255)
+  creadoEn   DateTime? @default(now()) @db.Timestamp(6)
+  expiraEn   DateTime  @db.Timestamp(6)
+  usadoEn    DateTime? @db.Timestamp(6)
   intentos   Int?      @default(0)
   activo     Boolean?  @default(true)
-  usuario    usuario   @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  usuario    usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@index([usuario_id, creado_en], map: "codigo_2fa_usuario_fecha_idx")
+  @@index([usuarioId, creadoEn], map: "codigo_2fa_usuario_fecha_idx")
 }
 
 model comparacion {
   id                  Int                   @id @default(autoincrement())
   nombre              String?               @db.VarChar(100)
-  creado_en            DateTime              @default(now())
-  usuario_id           Int
+  creadoEn            DateTime              @default(now())
+  usuarioId           Int
   activo              Boolean               @default(true)
-  usuario             usuario               @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+  usuario             usuario               @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   detalle_comparacion detalle_comparacion[]
 }
 
 model detalle_comparacion {
   id            Int         @id @default(autoincrement())
-  comparacion_id Int
-  inmueble_id    Int
+  comparacionId Int
+  inmuebleId    Int
   orden         Int         @default(0)
-  comparacion   comparacion @relation(fields: [comparacion_id], references: [id], onDelete: Cascade)
-  inmueble      inmueble    @relation(fields: [inmueble_id], references: [id], onDelete: Cascade)
+  comparacion   comparacion @relation(fields: [comparacionId], references: [id], onDelete: Cascade)
+  inmueble      inmueble    @relation(fields: [inmuebleId], references: [id], onDelete: Cascade)
 
-  @@unique([comparacion_id, inmueble_id])
+  @@unique([comparacionId, inmuebleId])
 }
 
 model favorito {
   id         Int      @id @default(autoincrement())
-  usuario_id  Int
-  inmueble_id Int
-  agregado_en DateTime @default(now())
-  inmueble   inmueble @relation(fields: [inmueble_id], references: [id], onDelete: Cascade)
-  usuario    usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+  usuarioId  Int
+  inmuebleId Int
+  agregadoEn DateTime @default(now())
+  inmueble   inmueble @relation(fields: [inmuebleId], references: [id], onDelete: Cascade)
+  usuario    usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
-  @@unique([usuario_id, inmueble_id])
+  @@unique([usuarioId, inmuebleId])
 }
 
 model historial_password {
   id           Int       @id @default(autoincrement())
-  usuario_id    Int
-  password_hash String    @db.VarChar(255)
-  creado_en     DateTime? @default(now()) @db.Timestamp(6)
-  usuario      usuario   @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  usuarioId    Int
+  passwordHash String    @db.VarChar(255)
+  creadoEn     DateTime? @default(now()) @db.Timestamp(6)
+  usuario      usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@index([usuario_id, creado_en], map: "historial_password_usuario_fecha_idx")
+  @@index([usuarioId, creadoEn], map: "historial_password_usuario_fecha_idx")
 }
 
 model propiedad_vista {
   id          Int      @id @default(autoincrement())
-  usuario_id   Int
-  inmueble_id  Int
-  vista_en     DateTime @default(now())
+  usuarioId   Int
+  inmuebleId  Int
+  vistaEn     DateTime @default(now())
   veces_visto Int?     @default(1) @db.SmallInt
   activo      Boolean? @default(true)
-  inmueble    inmueble @relation(fields: [inmueble_id], references: [id], onDelete: Cascade)
-  usuario     usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+  inmueble    inmueble @relation(fields: [inmuebleId], references: [id], onDelete: Cascade)
+  usuario     usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
-  @@unique([usuario_id, inmueble_id])
-  @@index([usuario_id, vista_en])
+  @@unique([usuarioId, inmuebleId])
+  @@index([usuarioId, vistaEn])
 }
 
 model recuperacion_password {
   id        Int       @id @default(autoincrement())
-  usuario_id Int
+  usuarioId Int
   token     String    @unique @db.VarChar(255)
-  expira_en  DateTime  @db.Timestamp(6)
-  creado_en  DateTime? @default(now()) @db.Timestamp(6)
-  usado_en   DateTime? @db.Timestamp(6)
+  expiraEn  DateTime  @db.Timestamp(6)
+  creadoEn  DateTime? @default(now()) @db.Timestamp(6)
+  usadoEn   DateTime? @db.Timestamp(6)
   intentos  Int?      @default(0)
   activo    Boolean?  @default(true)
-  usuario   usuario   @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  usuario   usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@index([usuario_id, creado_en], map: "recuperacion_password_usuario_fecha_idx")
+  @@index([usuarioId, creadoEn], map: "recuperacion_password_usuario_fecha_idx")
 }
 
 model zona_usuario {
@@ -559,10 +545,10 @@ model zona_usuario {
   descripcion   String?
   geometria     Json
   area          Decimal? @db.Decimal(12, 4)
-  creado_en      DateTime @default(now())
-  actualizado_en DateTime
-  usuario_id     Int
-  usuario       usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+  creadoEn      DateTime @default(now())
+  actualizadoEn DateTime
+  usuarioId     Int
+  usuario       usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 }
 
 model ciudad {
@@ -599,10 +585,10 @@ model cupon {
 
 model historial_busqueda {
   id        Int       @id @default(autoincrement())
-  usuario_id Int
+  usuarioid Int
   termino   String
-  creado_en  DateTime? @default(now()) @db.Timestamp(6)
-  usuario   usuario   @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "historial_usuario_fkey")
+  creadoen  DateTime? @default(now()) @db.Timestamp(6)
+  usuario   usuario   @relation(fields: [usuarioid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "historial_usuario_fkey")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -647,10 +633,10 @@ model amenidad {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model barrio {
-  id                 Int                 @id @default(autoincrement())
-  nombre             String              @db.VarChar(255)
+  id                 Int                  @id @default(autoincrement())
+  nombre             String               @db.VarChar(255)
   zona_id            Int
-  zona               zona_geografica     @relation(fields: [zona_id], references: [id], onUpdate: NoAction, map: "barrio_zona_fk")
+  zona               zona_geografica      @relation(fields: [zona_id], references: [id], onUpdate: NoAction, map: "barrio_zona_fk")
   ubicacion_inmueble ubicacion_inmueble[]
 
   @@unique([nombre, zona_id], map: "barrio_nombre_zona_unique")
@@ -859,12 +845,11 @@ model publicacion_vista {
 }
 
 model punto_interes {
-  id          Int      @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   nombre      String
-  latitud     Decimal  @db.Decimal(10, 7)
-  longitud    Decimal  @db.Decimal(10, 7)
+  latitud     Decimal @db.Decimal(10, 7)
+  longitud    Decimal @db.Decimal(10, 7)
   inmueble_id Int
-  inmueble    inmueble @relation(fields: [inmueble_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([inmueble_id], map: "idx_punto_interes_inmueble")
 }
@@ -909,7 +894,6 @@ model tag {
   nombre          String            @unique @db.VarChar(30)
   creado_en       DateTime?         @default(now()) @db.Timestamptz(6)
   publicacion_tag publicacion_tag[]
-
 }
 
 model publicacion_tag {
@@ -923,7 +907,7 @@ model publicacion_tag {
   @@index([tag_id])
 }
 
-model chat {
+model Chat {
   id             String    @id
   remoteJid      String    @db.VarChar(100)
   labels         Json?
@@ -932,13 +916,13 @@ model chat {
   instanceId     String
   name           String?   @db.VarChar(100)
   unreadMessages Int       @default(0)
-  instance       instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  Instance       Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
 
   @@index([instanceId])
   @@index([remoteJid])
 }
 
-model chatwoot {
+model Chatwoot {
   id                      String    @id
   enabled                 Boolean?  @default(true)
   accountId               String?   @db.VarChar(100)
@@ -960,10 +944,10 @@ model chatwoot {
   logo                    String?   @db.VarChar(500)
   organization            String?   @db.VarChar(100)
   ignoreJids              Json?
-  instance                instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  Instance                Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
 }
 
-model contact {
+model Contact {
   id            String    @id
   remoteJid     String    @db.VarChar(100)
   pushName      String?   @db.VarChar(100)
@@ -971,14 +955,14 @@ model contact {
   createdAt     DateTime? @default(now()) @db.Timestamp(6)
   updatedAt     DateTime? @db.Timestamp(6)
   instanceId    String
-  instance      instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  Instance      Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
 
   @@unique([remoteJid, instanceId])
   @@index([instanceId])
   @@index([remoteJid])
 }
 
-model dify {
+model Dify {
   id              String           @id
   enabled         Boolean          @default(true)
   botType         DifyBotType
@@ -1002,11 +986,11 @@ model dify {
   description     String?          @db.VarChar(255)
   splitMessages   Boolean?         @default(false)
   timePerChar     Int?             @default(50)
-  instance        instance         @relation(fields: [instanceId], references: [id], onDelete: Cascade)
-  dify_setting     dify_setting[]
+  Instance        Instance         @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  DifySetting     DifySetting[]
 }
 
-model dify_setting {
+model DifySetting {
   id              String    @id
   expire          Int?      @default(0)
   keywordFinish   String?   @db.VarChar(100)
@@ -1023,11 +1007,11 @@ model dify_setting {
   instanceId      String    @unique
   splitMessages   Boolean?  @default(false)
   timePerChar     Int?      @default(50)
-  dify            dify?     @relation(fields: [difyIdFallback], references: [id])
-  instance        instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  Dify            Dify?     @relation(fields: [difyIdFallback], references: [id])
+  Instance        Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
 }
 
-model evolution_bot {
+model EvolutionBot {
   id                  String                @id
   enabled             Boolean               @default(true)
   description         String?               @db.VarChar(255)
@@ -1050,11 +1034,11 @@ model evolution_bot {
   instanceId          String
   splitMessages       Boolean?              @default(false)
   timePerChar         Int?                  @default(50)
-  instance            instance              @relation(fields: [instanceId], references: [id], onDelete: Cascade)
-  evolution_bot_setting evolution_bot_setting[]
+  Instance            Instance              @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  EvolutionBotSetting EvolutionBotSetting[]
 }
 
-model evolution_bot_setting {
+model EvolutionBotSetting {
   id              String        @id
   expire          Int?          @default(0)
   keywordFinish   String?       @db.VarChar(100)
@@ -1071,11 +1055,11 @@ model evolution_bot_setting {
   instanceId      String        @unique
   splitMessages   Boolean?      @default(false)
   timePerChar     Int?          @default(50)
-  evolution_bot    evolution_bot? @relation(fields: [botIdFallback], references: [id])
-  instance        instance      @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  EvolutionBot    EvolutionBot? @relation(fields: [botIdFallback], references: [id])
+  Instance        Instance      @relation(fields: [instanceId], references: [id], onDelete: Cascade)
 }
 
-model flowise {
+model Flowise {
   id              String           @id
   enabled         Boolean          @default(true)
   description     String?          @db.VarChar(255)
@@ -1098,11 +1082,11 @@ model flowise {
   instanceId      String
   splitMessages   Boolean?         @default(false)
   timePerChar     Int?             @default(50)
-  instance        instance         @relation(fields: [instanceId], references: [id], onDelete: Cascade)
-  flowise_setting  flowise_setting[]
+  Instance        Instance         @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  FlowiseSetting  FlowiseSetting[]
 }
 
-model flowise_setting {
+model FlowiseSetting {
   id                String    @id
   expire            Int?      @default(0)
   keywordFinish     String?   @db.VarChar(100)
@@ -1119,11 +1103,11 @@ model flowise_setting {
   instanceId        String    @unique
   splitMessages     Boolean?  @default(false)
   timePerChar       Int?      @default(50)
-  flowise           flowise?  @relation(fields: [flowiseIdFallback], references: [id])
-  instance          instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  Flowise           Flowise?  @relation(fields: [flowiseIdFallback], references: [id])
+  Instance          Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
 }
 
-model instance {
+model Instance {
   id                      String                   @id
   name                    String                   @unique @db.VarChar(255)
   connectionStatus        InstanceConnectionStatus @default(open)
@@ -1140,37 +1124,37 @@ model instance {
   disconnectionAt         DateTime?                @db.Timestamp(6)
   disconnectionObject     Json?
   disconnectionReasonCode Int?
-  chat                    chat[]
-  chatwoot                chatwoot?
-  contact                 contact[]
-  dify                    dify[]
-  dify_setting             dify_setting?
-  evolution_bot            evolution_bot[]
-  evolution_bot_setting     evolution_bot_setting?
-  flowise                 flowise[]
-  flowise_setting          flowise_setting?
-  integration_session      integration_session[]
-  label                   label[]
-  media                   media[]
-  message                 message[]
-  message_update           message_update[]
-  openai_bot               openai_bot[]
-  openai_creds             openai_creds[]
-  openai_setting           openai_setting?
-  proxy                   proxy?
-  pusher                  pusher?
-  rabbitmq                rabbitmq?
-  session                 session?
-  setting                 setting?
-  sqs                     sqs?
-  template                template[]
-  typebot                 typebot[]
-  typebot_setting          typebot_setting?
-  webhook                 webhook?
-  websocket               websocket?
+  Chat                    Chat[]
+  Chatwoot                Chatwoot?
+  Contact                 Contact[]
+  Dify                    Dify[]
+  DifySetting             DifySetting?
+  EvolutionBot            EvolutionBot[]
+  EvolutionBotSetting     EvolutionBotSetting?
+  Flowise                 Flowise[]
+  FlowiseSetting          FlowiseSetting?
+  IntegrationSession      IntegrationSession[]
+  Label                   Label[]
+  Media                   Media[]
+  Message                 Message[]
+  MessageUpdate           MessageUpdate[]
+  OpenaiBot               OpenaiBot[]
+  OpenaiCreds             OpenaiCreds[]
+  OpenaiSetting           OpenaiSetting?
+  Proxy                   Proxy?
+  Pusher                  Pusher?
+  Rabbitmq                Rabbitmq?
+  Session                 Session?
+  Setting                 Setting?
+  Sqs                     Sqs?
+  Template                Template[]
+  Typebot                 Typebot[]
+  TypebotSetting          TypebotSetting?
+  Webhook                 Webhook?
+  Websocket               Websocket?
 }
 
-model integration_session {
+model IntegrationSession {
   id         String        @id
   sessionId  String        @db.VarChar(255)
   remoteJid  String        @db.VarChar(100)
@@ -1184,11 +1168,11 @@ model integration_session {
   context    Json?
   botId      String?
   type       String?       @db.VarChar(100)
-  instance   instance      @relation(fields: [instanceId], references: [id], onDelete: Cascade)
-  message    message[]
+  Instance   Instance      @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  Message    Message[]
 }
 
-model is_on_whatsapp {
+model IsOnWhatsapp {
   id         String   @id
   remoteJid  String   @unique @db.VarChar(100)
   jidOptions String
@@ -1196,7 +1180,7 @@ model is_on_whatsapp {
   updatedAt  DateTime @db.Timestamp(6)
 }
 
-model label {
+model Label {
   id           String    @id
   labelId      String?   @db.VarChar(100)
   name         String    @db.VarChar(100)
@@ -1205,12 +1189,12 @@ model label {
   createdAt    DateTime? @default(now()) @db.Timestamp(6)
   updatedAt    DateTime  @db.Timestamp(6)
   instanceId   String
-  instance     instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  Instance     Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
 
   @@unique([labelId, instanceId])
 }
 
-model media {
+model Media {
   id         String    @id
   fileName   String    @unique @db.VarChar(500)
   type       String    @db.VarChar(100)
@@ -1218,11 +1202,11 @@ model media {
   createdAt  DateTime? @default(now()) @db.Date
   messageId  String    @unique
   instanceId String
-  instance   instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
-  message    message   @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  Instance   Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  Message    Message   @relation(fields: [messageId], references: [id], onDelete: Cascade)
 }
 
-model message {
+model Message {
   id                           String              @id
   key                          Json
   pushName                     String?             @db.VarChar(100)
@@ -1241,15 +1225,15 @@ model message {
   webhookUrl                   String?             @db.VarChar(500)
   sessionId                    String?
   status                       String?             @db.VarChar(30)
-  media                        media?
-  instance                     instance            @relation(fields: [instanceId], references: [id], onDelete: Cascade)
-  integration_session           integration_session? @relation(fields: [sessionId], references: [id])
-  message_update                message_update[]
+  Media                        Media?
+  Instance                     Instance            @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  IntegrationSession           IntegrationSession? @relation(fields: [sessionId], references: [id])
+  MessageUpdate                MessageUpdate[]
 
   @@index([instanceId])
 }
 
-model message_update {
+model MessageUpdate {
   id          String   @id
   keyId       String   @db.VarChar(100)
   remoteJid   String   @db.VarChar(100)
@@ -1259,14 +1243,14 @@ model message_update {
   status      String   @db.VarChar(30)
   messageId   String
   instanceId  String
-  instance    instance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
-  message     message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  Instance    Instance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  Message     Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
 
   @@index([instanceId])
   @@index([messageId])
 }
 
-model openai_bot {
+model OpenaiBot {
   id                String           @id
   assistantId       String?          @db.VarChar(255)
   model             String?          @db.VarChar(100)
@@ -1296,24 +1280,24 @@ model openai_bot {
   functionUrl       String?          @db.VarChar(500)
   splitMessages     Boolean?         @default(false)
   timePerChar       Int?             @default(50)
-  instance          instance         @relation(fields: [instanceId], references: [id], onDelete: Cascade)
-  openai_creds       openai_creds      @relation(fields: [openaiCredsId], references: [id], onDelete: Cascade)
-  openai_setting     openai_setting[]
+  Instance          Instance         @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  OpenaiCreds       OpenaiCreds      @relation(fields: [openaiCredsId], references: [id], onDelete: Cascade)
+  OpenaiSetting     OpenaiSetting[]
 }
 
-model openai_creds {
+model OpenaiCreds {
   id            String         @id
   apiKey        String?        @unique @db.VarChar(255)
   createdAt     DateTime?      @default(now()) @db.Timestamp(6)
   updatedAt     DateTime       @db.Timestamp(6)
   instanceId    String
   name          String?        @unique @db.VarChar(255)
-  openai_bot     openai_bot[]
-  instance      instance       @relation(fields: [instanceId], references: [id], onDelete: Cascade)
-  openai_setting openai_setting?
+  OpenaiBot     OpenaiBot[]
+  Instance      Instance       @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  OpenaiSetting OpenaiSetting?
 }
 
-model openai_setting {
+model OpenaiSetting {
   id               String      @id
   expire           Int?        @default(0)
   keywordFinish    String?     @db.VarChar(100)
@@ -1332,12 +1316,12 @@ model openai_setting {
   speechToText     Boolean?    @default(false)
   splitMessages    Boolean?    @default(false)
   timePerChar      Int?        @default(50)
-  instance         instance    @relation(fields: [instanceId], references: [id], onDelete: Cascade)
-  openai_creds      openai_creds @relation(fields: [openaiCredsId], references: [id])
-  openai_bot        openai_bot?  @relation(fields: [openaiIdFallback], references: [id])
+  Instance         Instance    @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  OpenaiCreds      OpenaiCreds @relation(fields: [openaiCredsId], references: [id])
+  OpenaiBot        OpenaiBot?  @relation(fields: [openaiIdFallback], references: [id])
 }
 
-model proxy {
+model Proxy {
   id         String    @id
   enabled    Boolean   @default(false)
   host       String    @db.VarChar(100)
@@ -1348,10 +1332,10 @@ model proxy {
   createdAt  DateTime? @default(now()) @db.Timestamp(6)
   updatedAt  DateTime  @db.Timestamp(6)
   instanceId String    @unique
-  instance   instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  Instance   Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
 }
 
-model pusher {
+model Pusher {
   id         String    @id
   enabled    Boolean   @default(false)
   appId      String    @db.VarChar(100)
@@ -1363,28 +1347,28 @@ model pusher {
   createdAt  DateTime? @default(now()) @db.Timestamp(6)
   updatedAt  DateTime  @db.Timestamp(6)
   instanceId String    @unique
-  instance   instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  Instance   Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
 }
 
-model rabbitmq {
+model Rabbitmq {
   id         String    @id
   enabled    Boolean   @default(false)
   events     Json
   createdAt  DateTime? @default(now()) @db.Timestamp(6)
   updatedAt  DateTime  @db.Timestamp(6)
   instanceId String    @unique
-  instance   instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  Instance   Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
 }
 
-model session {
+model Session {
   id        String   @id
   sessionId String   @unique
   creds     String?
   createdAt DateTime @default(now()) @db.Timestamp(6)
-  instance  instance @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  Instance  Instance @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 }
 
-model setting {
+model Setting {
   id              String    @id
   rejectCall      Boolean   @default(false)
   msgCall         String?   @db.VarChar(100)
@@ -1397,22 +1381,22 @@ model setting {
   updatedAt       DateTime  @db.Timestamp(6)
   instanceId      String    @unique
   wavoipToken     String?   @db.VarChar(100)
-  instance        instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  Instance        Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
 
   @@index([instanceId])
 }
 
-model sqs {
+model Sqs {
   id         String    @id
   enabled    Boolean   @default(false)
   events     Json
   createdAt  DateTime? @default(now()) @db.Timestamp(6)
   updatedAt  DateTime  @db.Timestamp(6)
   instanceId String    @unique
-  instance   instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  Instance   Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
 }
 
-model template {
+model Template {
   id         String    @id
   templateId String    @unique @db.VarChar(255)
   name       String    @unique @db.VarChar(255)
@@ -1421,10 +1405,10 @@ model template {
   updatedAt  DateTime  @db.Timestamp(6)
   instanceId String
   webhookUrl String?   @db.VarChar(500)
-  instance   instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  Instance   Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
 }
 
-model typebot {
+model Typebot {
   id              String           @id
   enabled         Boolean          @default(true)
   url             String           @db.VarChar(500)
@@ -1445,11 +1429,11 @@ model typebot {
   debounceTime    Int?
   ignoreJids      Json?
   description     String?          @db.VarChar(255)
-  instance        instance         @relation(fields: [instanceId], references: [id], onDelete: Cascade)
-  typebot_setting  typebot_setting[]
+  Instance        Instance         @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  TypebotSetting  TypebotSetting[]
 }
 
-model typebot_setting {
+model TypebotSetting {
   id                String    @id
   expire            Int?      @default(0)
   keywordFinish     String?   @db.VarChar(100)
@@ -1464,11 +1448,11 @@ model typebot_setting {
   debounceTime      Int?
   typebotIdFallback String?   @db.VarChar(100)
   ignoreJids        Json?
-  instance          instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
-  typebot           typebot?  @relation(fields: [typebotIdFallback], references: [id])
+  Instance          Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  Typebot           Typebot?  @relation(fields: [typebotIdFallback], references: [id])
 }
 
-model webhook {
+model Webhook {
   id              String    @id
   url             String    @db.VarChar(500)
   enabled         Boolean?  @default(true)
@@ -1479,19 +1463,19 @@ model webhook {
   updatedAt       DateTime  @db.Timestamp(6)
   instanceId      String    @unique
   headers         Json?
-  instance        instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  Instance        Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
 
   @@index([instanceId])
 }
 
-model websocket {
+model Websocket {
   id         String    @id
   enabled    Boolean   @default(false)
   events     Json
   createdAt  DateTime? @default(now()) @db.Timestamp(6)
   updatedAt  DateTime  @db.Timestamp(6)
   instanceId String    @unique
-  instance   instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  Instance   Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
 }
 
 enum genero {
@@ -1499,14 +1483,12 @@ enum genero {
   FEMENINO
   OTRO
   PREFIERO_NO_DECIR
-
 }
 
 enum tipo_accion {
   VENTA
   ALQUILER
   ANTICRETO
-
 }
 
 enum estado_inmueble {
@@ -1515,14 +1497,12 @@ enum estado_inmueble {
   VENDIDO
   ALQUILADO
   RESERVADO
-
 }
 
 enum estado_publicacion {
   ACTIVA
   PAUSADA
   ELIMINADA
-
 }
 
 enum categoria {
@@ -1532,7 +1512,6 @@ enum categoria {
   OFICINA
   CUARTO
   TERRENO_MORTUORIO
-
 }
 
 enum RolNombre {
@@ -1545,14 +1524,12 @@ enum RolNombre {
 enum tipo_multimedia {
   IMAGEN
   VIDEO
-
 }
 
 enum tipo_marcador {
   NORMAL
   DESTACADO
   CLUSTER
-
 }
 
 enum tipo_interaccion {
@@ -1560,7 +1537,6 @@ enum tipo_interaccion {
   HOVER
   ZOOM
   DRAG
-
 }
 
 enum Categoria {
@@ -1570,7 +1546,6 @@ enum Categoria {
   OFICINA
   CUARTO
   TERRENO_MORTUORIO
-
 }
 
 enum EstadoBlog {
@@ -1586,14 +1561,12 @@ enum EstadoInmueble {
   VENDIDO
   ALQUILADO
   RESERVADO
-
 }
 
 enum EstadoPublicacion {
   ACTIVA
   PAUSADA
   ELIMINADA
-
 }
 
 enum Genero {
@@ -1601,14 +1574,12 @@ enum Genero {
   FEMENINO
   OTRO
   PREFIERO_NO_DECIR
-
 }
 
 enum TipoAccion {
   VENTA
   ALQUILER
   ANTICRETO
-
 }
 
 enum TipoInteraccion {
@@ -1616,20 +1587,17 @@ enum TipoInteraccion {
   HOVER
   ZOOM
   DRAG
-
 }
 
 enum TipoMarcador {
   NORMAL
   DESTACADO
   CLUSTER
-
 }
 
 enum TipoMultimedia {
   IMAGEN
   VIDEO
-
 }
 
 enum estado_blog {
@@ -1685,6 +1653,3 @@ enum TriggerType {
   none
   advanced
 }
-
-
-

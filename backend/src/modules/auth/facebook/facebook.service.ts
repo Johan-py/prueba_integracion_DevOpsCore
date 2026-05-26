@@ -119,7 +119,7 @@ const buildFacebookSessionResponse = async (
 
   await createFacebookSession({
     token,
-    usuario_id: user.id,
+    usuarioId: user.id,
     fecha_expiracion
   })
 
@@ -302,7 +302,7 @@ export const linkFacebookToCurrentUserByCodeService = async (
 
   const existingLinkByExternalId = await findFacebookLinkByExternalId(facebookId)
 
-  if (existingLinkByExternalId && existingLinkByExternalId.usuario_id !== session.usuario.id) {
+  if (existingLinkByExternalId && existingLinkByExternalId.usuarioId !== session.usuario.id) {
     throw new FacebookAuthError(
       'Esta cuenta de Facebook ya está vinculada a otro usuario.',
       'FACEBOOK_AUTH_FAILED',
@@ -329,7 +329,7 @@ export const linkFacebookToCurrentUserByCodeService = async (
   }
 
   await createFacebookLinkForUser({
-    usuario_id: session.usuario.id,
+    usuarioId: session.usuario.id,
     facebookId,
     correo_proveedor
   })

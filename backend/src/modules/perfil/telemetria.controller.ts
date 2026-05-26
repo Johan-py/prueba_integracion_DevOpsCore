@@ -125,7 +125,7 @@ export const telemetriaController = {
             tipo: "usuario_logueado"
           },
           fecha_visita: new Date(),
-          usuario_id: usuario.id
+          usuarioId: usuario.id
         }
       });
 
@@ -133,7 +133,7 @@ export const telemetriaController = {
         success: true,
         message: "¡Gracias! Telemetría aceptada",
         data: {
-          usuario_id: usuario.id,
+          usuarioId: usuario.id,
           email: usuario.correo,
           genero: genero || usuario.genero,
           edad: edad,
@@ -177,7 +177,7 @@ export const telemetriaController = {
             telemetria_aceptada: true
           },
           fecha_visita: new Date(),
-          usuario_id: null
+          usuarioId: null
         }
       });
 

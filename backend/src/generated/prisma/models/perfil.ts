@@ -27,61 +27,61 @@ export type AggregatePerfil = {
 
 export type PerfilAvgAggregateOutputType = {
   id: number | null
-  usuario_id: number | null
+  usuarioId: number | null
 }
 
 export type PerfilSumAggregateOutputType = {
   id: number | null
-  usuario_id: number | null
+  usuarioId: number | null
 }
 
 export type PerfilMinAggregateOutputType = {
   id: number | null
   nombre_completo: string | null
-  usuario_id: number | null
+  usuarioId: number | null
 }
 
 export type PerfilMaxAggregateOutputType = {
   id: number | null
   nombre_completo: string | null
-  usuario_id: number | null
+  usuarioId: number | null
 }
 
 export type PerfilCountAggregateOutputType = {
   id: number
   nombre_completo: number
   datos: number
-  usuario_id: number
+  usuarioId: number
   _all: number
 }
 
 export type PerfilAvgAggregateInputType = {
   id?: true
-  usuario_id?: true
+  usuarioId?: true
 }
 
 export type PerfilSumAggregateInputType = {
   id?: true
-  usuario_id?: true
+  usuarioId?: true
 }
 
 export type PerfilMinAggregateInputType = {
   id?: true
   nombre_completo?: true
-  usuario_id?: true
+  usuarioId?: true
 }
 
 export type PerfilMaxAggregateInputType = {
   id?: true
   nombre_completo?: true
-  usuario_id?: true
+  usuarioId?: true
 }
 
 export type PerfilCountAggregateInputType = {
   id?: true
   nombre_completo?: true
   datos?: true
-  usuario_id?: true
+  usuarioId?: true
   _all?: true
 }
 
@@ -176,7 +176,7 @@ export type PerfilGroupByOutputType = {
   id: number
   nombre_completo: string
   datos: runtime.JsonValue | null
-  usuario_id: number
+  usuarioId: number
   _count: PerfilCountAggregateOutputType | null
   _avg: PerfilAvgAggregateOutputType | null
   _sum: PerfilSumAggregateOutputType | null
@@ -203,7 +203,7 @@ export type perfilWhereInput = {
   id?: Prisma.IntFilter<'perfil'> | number
   nombre_completo?: Prisma.StringFilter<'perfil'> | string
   datos?: Prisma.JsonNullableFilter<'perfil'>
-  usuario_id?: Prisma.IntFilter<'perfil'> | number
+  usuarioId?: Prisma.IntFilter<'perfil'> | number
   usuario?: Prisma.XOR<Prisma.UsuarioScalarRelationFilter, Prisma.usuarioWhereInput>
 }
 
@@ -211,14 +211,14 @@ export type perfilOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   nombre_completo?: Prisma.SortOrder
   datos?: Prisma.SortOrderInput | Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
   usuario?: Prisma.usuarioOrderByWithRelationInput
 }
 
 export type perfilWhereUniqueInput = Prisma.AtLeast<
   {
     id?: number
-    usuario_id?: number
+    usuarioId?: number
     AND?: Prisma.perfilWhereInput | Prisma.perfilWhereInput[]
     OR?: Prisma.perfilWhereInput[]
     NOT?: Prisma.perfilWhereInput | Prisma.perfilWhereInput[]
@@ -226,14 +226,14 @@ export type perfilWhereUniqueInput = Prisma.AtLeast<
     datos?: Prisma.JsonNullableFilter<'perfil'>
     usuario?: Prisma.XOR<Prisma.UsuarioScalarRelationFilter, Prisma.usuarioWhereInput>
   },
-  'id' | 'usuario_id'
+  'id' | 'usuarioId'
 >
 
 export type perfilOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   nombre_completo?: Prisma.SortOrder
   datos?: Prisma.SortOrderInput | Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
   _count?: Prisma.perfilCountOrderByAggregateInput
   _avg?: Prisma.perfilAvgOrderByAggregateInput
   _max?: Prisma.perfilMaxOrderByAggregateInput
@@ -248,7 +248,7 @@ export type perfilScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<'perfil'> | number
   nombre_completo?: Prisma.StringWithAggregatesFilter<'perfil'> | string
   datos?: Prisma.JsonNullableWithAggregatesFilter<'perfil'>
-  usuario_id?: Prisma.IntWithAggregatesFilter<'perfil'> | number
+  usuarioId?: Prisma.IntWithAggregatesFilter<'perfil'> | number
 }
 
 export type perfilCreateInput = {
@@ -261,7 +261,7 @@ export type perfilUncheckedCreateInput = {
   id?: number
   nombre_completo: string
   datos?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  usuario_id: number
+  usuarioId: number
 }
 
 export type perfilUpdateInput = {
@@ -274,14 +274,14 @@ export type perfilUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   nombre_completo?: Prisma.StringFieldUpdateOperationsInput | string
   datos?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  usuario_id?: Prisma.IntFieldUpdateOperationsInput | number
+  usuarioId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type perfilCreateManyInput = {
   id?: number
   nombre_completo: string
   datos?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  usuario_id: number
+  usuarioId: number
 }
 
 export type perfilUpdateManyMutationInput = {
@@ -293,36 +293,36 @@ export type perfilUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   nombre_completo?: Prisma.StringFieldUpdateOperationsInput | string
   datos?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  usuario_id?: Prisma.IntFieldUpdateOperationsInput | number
+  usuarioId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type perfilCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   nombre_completo?: Prisma.SortOrder
   datos?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type perfilAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type perfilMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   nombre_completo?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type perfilMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   nombre_completo?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type perfilSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type PerfilNullableScalarRelationFilter = {
@@ -443,7 +443,7 @@ export type perfilSelect<
     id?: boolean
     nombre_completo?: boolean
     datos?: boolean
-    usuario_id?: boolean
+    usuarioId?: boolean
     usuario?: boolean | Prisma.usuarioDefaultArgs<ExtArgs>
   },
   ExtArgs['result']['perfil']
@@ -456,7 +456,7 @@ export type perfilSelectCreateManyAndReturn<
     id?: boolean
     nombre_completo?: boolean
     datos?: boolean
-    usuario_id?: boolean
+    usuarioId?: boolean
     usuario?: boolean | Prisma.usuarioDefaultArgs<ExtArgs>
   },
   ExtArgs['result']['perfil']
@@ -469,7 +469,7 @@ export type perfilSelectUpdateManyAndReturn<
     id?: boolean
     nombre_completo?: boolean
     datos?: boolean
-    usuario_id?: boolean
+    usuarioId?: boolean
     usuario?: boolean | Prisma.usuarioDefaultArgs<ExtArgs>
   },
   ExtArgs['result']['perfil']
@@ -479,13 +479,13 @@ export type perfilSelectScalar = {
   id?: boolean
   nombre_completo?: boolean
   datos?: boolean
-  usuario_id?: boolean
+  usuarioId?: boolean
 }
 
 export type perfilOmit<
   ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs
 > = runtime.Types.Extensions.GetOmit<
-  'id' | 'nombre_completo' | 'datos' | 'usuario_id',
+  'id' | 'nombre_completo' | 'datos' | 'usuarioId',
   ExtArgs['result']['perfil']
 >
 export type perfilInclude<
@@ -516,7 +516,7 @@ export type $perfilPayload<
       id: number
       nombre_completo: string
       datos: runtime.JsonValue | null
-      usuario_id: number
+      usuarioId: number
     },
     ExtArgs['result']['perfil']
   >
@@ -1075,7 +1075,7 @@ export interface perfilFieldRefs {
   readonly id: Prisma.FieldRef<'perfil', 'Int'>
   readonly nombre_completo: Prisma.FieldRef<'perfil', 'String'>
   readonly datos: Prisma.FieldRef<'perfil', 'Json'>
-  readonly usuario_id: Prisma.FieldRef<'perfil', 'Int'>
+  readonly usuarioId: Prisma.FieldRef<'perfil', 'Int'>
 }
 
 // Custom InputTypes

@@ -55,11 +55,11 @@ export const generarPagoQr = async (req: Request, res: Response): Promise<void> 
 // Obtener pago pendiente
 export const obtenerPagoPendiente = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { usuario_id } = req.params
+    const { usuarioId } = req.params
 
     const pagoPendiente = await prisma.transacciones.findFirst({
       where: {
-        id_usuario: Number(usuario_id),
+        id_usuario: Number(usuarioId),
         estado: 'PENDIENTE'
       },
       orderBy: { fecha_intento: 'desc' }

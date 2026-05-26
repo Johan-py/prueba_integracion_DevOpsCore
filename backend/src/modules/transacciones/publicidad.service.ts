@@ -28,7 +28,7 @@ const r2 = (n: number): number => Math.round(n * 100) / 100
  * Devuelve la referencia + QR para el flujo manual de pago.
  */
 export async function crearOrdenPublicidad(
-  usuario_id: number,
+  usuarioId: number,
   publicacionId: number,
   planId: number,
 ) {
@@ -37,10 +37,10 @@ export async function crearOrdenPublicidad(
 
   const publicacion = await prisma.publicacion.findUnique({
     where: { id: publicacionId },
-    select: { id: true, usuario_id: true, estado: true, promoted: true },
+    select: { id: true, usuarioId: true, estado: true, promoted: true },
   })
   if (!publicacion) throw new Error('PUBLICACION_NO_EXISTE')
-  if (publicacion.usuario_id !== usuario_id) throw new Error('NO_AUTORIZADO')
+  if (publicacion.usuarioId !== usuarioId) throw new Error('NO_AUTORIZADO')
   if (publicacion.estado === 'ELIMINADA') throw new Error('PUBLICACION_YA_ELIMINADA')
   if (publicacion.promoted) throw new Error('PUBLICACION_YA_PUBLICITADA')
 
@@ -64,7 +64,7 @@ export async function crearOrdenPublicidad(
 
   const transaccion = await prisma.transacciones.create({
     data: {
-      id_usuario: usuario_id,
+      id_usuario: usuarioId,
       id_suscripcion: planFK.id,
       subtotal,
       iva_porcentaje: ivaPorcentaje,
@@ -78,7 +78,7 @@ export async function crearOrdenPublicidad(
 
   await prisma.bitacora_pagos.create({
     data: {
-      id_usuario: usuario_id,
+      id_usuario: usuarioId,
       id_transaccion: transaccion.id,
       evento: EVENTO_PUBLICIDAD,
       mensaje: JSON.stringify({ publicacionId, planId }),

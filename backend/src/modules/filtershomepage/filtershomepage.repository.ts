@@ -40,7 +40,7 @@ export class FiltersHomepageRepository {
         longitud: { not: 0 },
       },
       select: {
-        inmueble_id: true,
+        inmuebleId: true,
         ciudad: true,
         ubicacion_maestra: { select: { departamento: true } },
         inmueble: {
@@ -70,7 +70,7 @@ export class FiltersHomepageRepository {
 
     for (const u of ubicaciones) {
       const rawDept = u.ubicacion_maestra?.departamento ?? u.ciudad ?? null;
-      if (!rawDept || !u.inmueble_id) continue;
+      if (!rawDept || !u.inmuebleId) continue;
 
       const dept = resolverDepartamento(rawDept);
 
@@ -79,7 +79,7 @@ export class FiltersHomepageRepository {
       }
 
       const entry = deptMap.get(dept)!;
-      entry.ids.add(u.inmueble_id);
+      entry.ids.add(u.inmuebleId);
       
       const inmueble = u.inmueble;
 

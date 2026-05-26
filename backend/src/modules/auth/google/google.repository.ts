@@ -59,7 +59,7 @@ export const createGoogleUser = async (
 
     await tx.autenticacion_social.create({
       data: {
-        usuario_id: user.id,
+        usuarioId: user.id,
         proveedor: 'google',
         id_externo: googleId,
         correo_proveedor,
@@ -72,12 +72,12 @@ export const createGoogleUser = async (
 }
 
 export const linkGoogleToUser = async (
-  usuario_id: number,
+  usuarioId: number,
   googleId: string,
   correo_proveedor: string
 ) => {
   return await createSocialLink({
-    usuario_id,
+    usuarioId,
     proveedor: 'google',
     id_externo: googleId,
     correo_proveedor
@@ -86,16 +86,16 @@ export const linkGoogleToUser = async (
 
 export const createGoogleSession = async ({
   token,
-  usuario_id,
+  usuarioId,
   fecha_expiracion
 }: {
   token: string
-  usuario_id: number
+  usuarioId: number
   fecha_expiracion: Date
 }) => {
   return await createSession({
     token,
-    usuario_id,
+    usuarioId,
     fecha_expiracion
   })
 }
@@ -104,21 +104,21 @@ export const findGoogleLinkByExternalId = async (googleId: string) => {
   return await findSocialLinkByProviderAndExternalId('google', googleId)
 }
 
-export const findGoogleLinkByUserId = async (usuario_id: number) => {
-  return await findSocialLinkByUserAndProvider(usuario_id, 'google')
+export const findGoogleLinkByUserId = async (usuarioId: number) => {
+  return await findSocialLinkByUserAndProvider(usuarioId, 'google')
 }
 
 export const createGoogleLinkForUser = async ({
-  usuario_id,
+  usuarioId,
   googleId,
   correo_proveedor
 }: {
-  usuario_id: number
+  usuarioId: number
   googleId: string
   correo_proveedor?: string | null
 }) => {
   return await createSocialLink({
-    usuario_id,
+    usuarioId,
     proveedor: 'google',
     id_externo: googleId,
     correo_proveedor
@@ -129,10 +129,10 @@ export const findUserByGoogleSessionToken = async (sessionToken: string) => {
   return await findUserByActiveSessionTokenForSocialLink(sessionToken)
 }
 
-export const updateGoogleLastUsage = async (usuario_id: number, googleId: string) => {
+export const updateGoogleLastUsage = async (usuarioId: number, googleId: string) => {
   return await prisma.autenticacion_social.updateMany({
     where: {
-      usuario_id,
+      usuarioId,
       proveedor: 'google',
       id_externo: googleId,
       activo: true

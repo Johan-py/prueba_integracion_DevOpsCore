@@ -3,9 +3,9 @@ import { prisma } from '../../lib/prisma.client.js'
 import { Prisma } from '@prisma/client'
 
 export const crearPoi = async (req: Request, res: Response) => {
-  const inmueble_id = parseInt(req.params.inmueble_id as string)
+  const inmuebleId = parseInt(req.params.inmuebleId as string)
 
-  if (isNaN(inmueble_id)) {
+  if (isNaN(inmuebleId)) {
     return res.status(400).json({ mensaje: 'ID de inmueble inválido' })
   }
 
@@ -21,7 +21,7 @@ export const crearPoi = async (req: Request, res: Response) => {
         nombre,
         latitud: new Prisma.Decimal(latitud),
         longitud: new Prisma.Decimal(longitud),
-        inmueble_id: inmueble_id
+        inmuebleId: inmuebleId
       }
     })
 

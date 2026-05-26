@@ -15,40 +15,40 @@ interface InmuebleConScore {
 export class FeaturesService {
   /**
    * Recomienda inmuebles para un usuario usando similitud de coseno
-   * @param usuario_id ID del usuario
+   * @param usuarioId ID del usuario
    * @param limit Número máximo de resultados
    * @returns Lista de inmuebles con score y razones
    */
   async recomendar(
-    usuario_id: number,
+    usuarioId: number,
     limit: number = 20,
     filtrosActivos?: { modoInmueble?: string[]; query?: string }
   ): Promise<InmuebleConScore[]> {
     try {
       // 1. Obtener el historial de interacciones del usuario
       const historial = await prisma.propiedad_vista.findMany({
-        where: { usuario_id: usuario_id },
-        select: { inmueble_id: true, vista_en: true },
-        orderBy: { vista_en: 'desc' },
+        where: { usuarioId: usuarioId },
+        select: { inmuebleId: true, vistaEn: true },
+        orderBy: { vistaEn: 'desc' },
         take: 50 // últimas 50 vistas
       })
 
       const favoritos = await prisma.favorito.findMany({
-        where: { usuario_id: usuario_id },
-        select: { inmueble_id: true }
+        where: { usuarioId: usuarioId },
+        select: { inmuebleId: true }
       })
 
       // Combinar interacciones (dar más peso a favoritos)
 
-      const interacciones = new Map<number, number>() // inmueble_id -> peso
+      const interacciones = new Map<number, number>() // inmuebleId -> peso
       const ahora = new Date()
       for (const v of historial) {
-        const horasDiff = (ahora.getTime() - new Date(v.vista_en).getTime()) / (1000 * 3600)
+        const horasDiff = (ahora.getTime() - new Date(v.vistaEn).getTime()) / (1000 * 3600)
         const pesoRecencia = horasDiff < 1 ? 8 : horasDiff < 24 ? 4 : horasDiff < 168 ? 2 : 1
-        interacciones.set(v.inmueble_id, (interacciones.get(v.inmueble_id) || 0) + pesoRecencia)
+        interacciones.set(v.inmuebleId, (interacciones.get(v.inmuebleId) || 0) + pesoRecencia)
       }
       for (const f of favoritos) {
-        interacciones.set(f.inmueble_id, (interacciones.get(f.inmueble_id) || 0) + 5) // favoritos suman más
+        interacciones.set(f.inmuebleId, (interacciones.get(f.inmuebleId) || 0) + 5) // favoritos suman más
       }
       console.log('[ML] Interacciones totales:', interacciones.size)
       console.log('[ML] IDs en interacciones:', Array.from(interacciones.keys()))

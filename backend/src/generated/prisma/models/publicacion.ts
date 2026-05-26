@@ -27,14 +27,14 @@ export type AggregatePublicacion = {
 
 export type PublicacionAvgAggregateOutputType = {
   id: number | null
-  usuario_id: number | null
-  inmueble_id: number | null
+  usuarioId: number | null
+  inmuebleId: number | null
 }
 
 export type PublicacionSumAggregateOutputType = {
   id: number | null
-  usuario_id: number | null
-  inmueble_id: number | null
+  usuarioId: number | null
+  inmuebleId: number | null
 }
 
 export type PublicacionMinAggregateOutputType = {
@@ -43,8 +43,8 @@ export type PublicacionMinAggregateOutputType = {
   descripcion: string | null
   estado: $Enums.estado_publicacion | null
   fecha_publicacion: Date | null
-  usuario_id: number | null
-  inmueble_id: number | null
+  usuarioId: number | null
+  inmuebleId: number | null
 }
 
 export type PublicacionMaxAggregateOutputType = {
@@ -53,8 +53,8 @@ export type PublicacionMaxAggregateOutputType = {
   descripcion: string | null
   estado: $Enums.estado_publicacion | null
   fecha_publicacion: Date | null
-  usuario_id: number | null
-  inmueble_id: number | null
+  usuarioId: number | null
+  inmuebleId: number | null
 }
 
 export type PublicacionCountAggregateOutputType = {
@@ -63,21 +63,21 @@ export type PublicacionCountAggregateOutputType = {
   descripcion: number
   estado: number
   fecha_publicacion: number
-  usuario_id: number
-  inmueble_id: number
+  usuarioId: number
+  inmuebleId: number
   _all: number
 }
 
 export type PublicacionAvgAggregateInputType = {
   id?: true
-  usuario_id?: true
-  inmueble_id?: true
+  usuarioId?: true
+  inmuebleId?: true
 }
 
 export type PublicacionSumAggregateInputType = {
   id?: true
-  usuario_id?: true
-  inmueble_id?: true
+  usuarioId?: true
+  inmuebleId?: true
 }
 
 export type PublicacionMinAggregateInputType = {
@@ -86,8 +86,8 @@ export type PublicacionMinAggregateInputType = {
   descripcion?: true
   estado?: true
   fecha_publicacion?: true
-  usuario_id?: true
-  inmueble_id?: true
+  usuarioId?: true
+  inmuebleId?: true
 }
 
 export type PublicacionMaxAggregateInputType = {
@@ -96,8 +96,8 @@ export type PublicacionMaxAggregateInputType = {
   descripcion?: true
   estado?: true
   fecha_publicacion?: true
-  usuario_id?: true
-  inmueble_id?: true
+  usuarioId?: true
+  inmuebleId?: true
 }
 
 export type PublicacionCountAggregateInputType = {
@@ -106,8 +106,8 @@ export type PublicacionCountAggregateInputType = {
   descripcion?: true
   estado?: true
   fecha_publicacion?: true
-  usuario_id?: true
-  inmueble_id?: true
+  usuarioId?: true
+  inmuebleId?: true
   _all?: true
 }
 
@@ -208,8 +208,8 @@ export type PublicacionGroupByOutputType = {
   descripcion: string | null
   estado: $Enums.estado_publicacion | null
   fecha_publicacion: Date | null
-  usuario_id: number
-  inmueble_id: number
+  usuarioId: number
+  inmuebleId: number
   _count: PublicacionCountAggregateOutputType | null
   _avg: PublicacionAvgAggregateOutputType | null
   _sum: PublicacionSumAggregateOutputType | null
@@ -241,8 +241,8 @@ export type publicacionWhereInput = {
     | $Enums.estado_publicacion
     | null
   fecha_publicacion?: Prisma.DateTimeNullableFilter<'publicacion'> | Date | string | null
-  usuario_id?: Prisma.IntFilter<'publicacion'> | number
-  inmueble_id?: Prisma.IntFilter<'publicacion'> | number
+  usuarioId?: Prisma.IntFilter<'publicacion'> | number
+  inmuebleId?: Prisma.IntFilter<'publicacion'> | number
   multimedia?: Prisma.MultimediaListRelationFilter
   inmueble?: Prisma.XOR<Prisma.InmuebleScalarRelationFilter, Prisma.inmuebleWhereInput>
   usuario?: Prisma.XOR<Prisma.UsuarioScalarRelationFilter, Prisma.usuarioWhereInput>
@@ -254,8 +254,8 @@ export type publicacionOrderByWithRelationInput = {
   descripcion?: Prisma.SortOrderInput | Prisma.SortOrder
   estado?: Prisma.SortOrderInput | Prisma.SortOrder
   fecha_publicacion?: Prisma.SortOrderInput | Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
-  inmueble_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
   multimedia?: Prisma.multimediaOrderByRelationAggregateInput
   inmueble?: Prisma.inmuebleOrderByWithRelationInput
   usuario?: Prisma.usuarioOrderByWithRelationInput
@@ -274,8 +274,8 @@ export type publicacionWhereUniqueInput = Prisma.AtLeast<
       | $Enums.estado_publicacion
       | null
     fecha_publicacion?: Prisma.DateTimeNullableFilter<'publicacion'> | Date | string | null
-    usuario_id?: Prisma.IntFilter<'publicacion'> | number
-    inmueble_id?: Prisma.IntFilter<'publicacion'> | number
+    usuarioId?: Prisma.IntFilter<'publicacion'> | number
+    inmuebleId?: Prisma.IntFilter<'publicacion'> | number
     multimedia?: Prisma.MultimediaListRelationFilter
     inmueble?: Prisma.XOR<Prisma.InmuebleScalarRelationFilter, Prisma.inmuebleWhereInput>
     usuario?: Prisma.XOR<Prisma.UsuarioScalarRelationFilter, Prisma.usuarioWhereInput>
@@ -289,8 +289,8 @@ export type publicacionOrderByWithAggregationInput = {
   descripcion?: Prisma.SortOrderInput | Prisma.SortOrder
   estado?: Prisma.SortOrderInput | Prisma.SortOrder
   fecha_publicacion?: Prisma.SortOrderInput | Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
-  inmueble_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
   _count?: Prisma.publicacionCountOrderByAggregateInput
   _avg?: Prisma.publicacionAvgOrderByAggregateInput
   _max?: Prisma.publicacionMaxOrderByAggregateInput
@@ -318,8 +318,8 @@ export type publicacionScalarWhereWithAggregatesInput = {
     | Date
     | string
     | null
-  usuario_id?: Prisma.IntWithAggregatesFilter<'publicacion'> | number
-  inmueble_id?: Prisma.IntWithAggregatesFilter<'publicacion'> | number
+  usuarioId?: Prisma.IntWithAggregatesFilter<'publicacion'> | number
+  inmuebleId?: Prisma.IntWithAggregatesFilter<'publicacion'> | number
 }
 
 export type publicacionCreateInput = {
@@ -338,8 +338,8 @@ export type publicacionUncheckedCreateInput = {
   descripcion?: string | null
   estado?: $Enums.estado_publicacion | null
   fecha_publicacion?: Date | string | null
-  usuario_id: number
-  inmueble_id: number
+  usuarioId: number
+  inmuebleId: number
   multimedia?: Prisma.multimediaUncheckedCreateNestedManyWithoutPublicacionInput
 }
 
@@ -365,8 +365,8 @@ export type publicacionUncheckedUpdateInput = {
     | $Enums.estado_publicacion
     | null
   fecha_publicacion?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  usuario_id?: Prisma.IntFieldUpdateOperationsInput | number
-  inmueble_id?: Prisma.IntFieldUpdateOperationsInput | number
+  usuarioId?: Prisma.IntFieldUpdateOperationsInput | number
+  inmuebleId?: Prisma.IntFieldUpdateOperationsInput | number
   multimedia?: Prisma.multimediaUncheckedUpdateManyWithoutPublicacionNestedInput
 }
 
@@ -376,8 +376,8 @@ export type publicacionCreateManyInput = {
   descripcion?: string | null
   estado?: $Enums.estado_publicacion | null
   fecha_publicacion?: Date | string | null
-  usuario_id: number
-  inmueble_id: number
+  usuarioId: number
+  inmuebleId: number
 }
 
 export type publicacionUpdateManyMutationInput = {
@@ -399,8 +399,8 @@ export type publicacionUncheckedUpdateManyInput = {
     | $Enums.estado_publicacion
     | null
   fecha_publicacion?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  usuario_id?: Prisma.IntFieldUpdateOperationsInput | number
-  inmueble_id?: Prisma.IntFieldUpdateOperationsInput | number
+  usuarioId?: Prisma.IntFieldUpdateOperationsInput | number
+  inmuebleId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type PublicacionListRelationFilter = {
@@ -424,14 +424,14 @@ export type publicacionCountOrderByAggregateInput = {
   descripcion?: Prisma.SortOrder
   estado?: Prisma.SortOrder
   fecha_publicacion?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
-  inmueble_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
 }
 
 export type publicacionAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
-  inmueble_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
 }
 
 export type publicacionMaxOrderByAggregateInput = {
@@ -440,8 +440,8 @@ export type publicacionMaxOrderByAggregateInput = {
   descripcion?: Prisma.SortOrder
   estado?: Prisma.SortOrder
   fecha_publicacion?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
-  inmueble_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
 }
 
 export type publicacionMinOrderByAggregateInput = {
@@ -450,14 +450,14 @@ export type publicacionMinOrderByAggregateInput = {
   descripcion?: Prisma.SortOrder
   estado?: Prisma.SortOrder
   fecha_publicacion?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
-  inmueble_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
 }
 
 export type publicacionSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
-  inmueble_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
 }
 
 export type publicacionCreateNestedManyWithoutInmuebleInput = {
@@ -677,7 +677,7 @@ export type publicacionUncheckedCreateWithoutInmuebleInput = {
   descripcion?: string | null
   estado?: $Enums.estado_publicacion | null
   fecha_publicacion?: Date | string | null
-  usuario_id: number
+  usuarioId: number
   multimedia?: Prisma.multimediaUncheckedCreateNestedManyWithoutPublicacionInput
 }
 
@@ -734,8 +734,8 @@ export type publicacionScalarWhereInput = {
     | $Enums.estado_publicacion
     | null
   fecha_publicacion?: Prisma.DateTimeNullableFilter<'publicacion'> | Date | string | null
-  usuario_id?: Prisma.IntFilter<'publicacion'> | number
-  inmueble_id?: Prisma.IntFilter<'publicacion'> | number
+  usuarioId?: Prisma.IntFilter<'publicacion'> | number
+  inmuebleId?: Prisma.IntFilter<'publicacion'> | number
 }
 
 export type publicacionCreateWithoutMultimediaInput = {
@@ -753,8 +753,8 @@ export type publicacionUncheckedCreateWithoutMultimediaInput = {
   descripcion?: string | null
   estado?: $Enums.estado_publicacion | null
   fecha_publicacion?: Date | string | null
-  usuario_id: number
-  inmueble_id: number
+  usuarioId: number
+  inmuebleId: number
 }
 
 export type publicacionCreateOrConnectWithoutMultimediaInput = {
@@ -806,8 +806,8 @@ export type publicacionUncheckedUpdateWithoutMultimediaInput = {
     | $Enums.estado_publicacion
     | null
   fecha_publicacion?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  usuario_id?: Prisma.IntFieldUpdateOperationsInput | number
-  inmueble_id?: Prisma.IntFieldUpdateOperationsInput | number
+  usuarioId?: Prisma.IntFieldUpdateOperationsInput | number
+  inmuebleId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type publicacionCreateWithoutUsuarioInput = {
@@ -825,7 +825,7 @@ export type publicacionUncheckedCreateWithoutUsuarioInput = {
   descripcion?: string | null
   estado?: $Enums.estado_publicacion | null
   fecha_publicacion?: Date | string | null
-  inmueble_id: number
+  inmuebleId: number
   multimedia?: Prisma.multimediaUncheckedCreateNestedManyWithoutPublicacionInput
 }
 
@@ -876,7 +876,7 @@ export type publicacionCreateManyInmuebleInput = {
   descripcion?: string | null
   estado?: $Enums.estado_publicacion | null
   fecha_publicacion?: Date | string | null
-  usuario_id: number
+  usuarioId: number
 }
 
 export type publicacionUpdateWithoutInmuebleInput = {
@@ -900,7 +900,7 @@ export type publicacionUncheckedUpdateWithoutInmuebleInput = {
     | $Enums.estado_publicacion
     | null
   fecha_publicacion?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  usuario_id?: Prisma.IntFieldUpdateOperationsInput | number
+  usuarioId?: Prisma.IntFieldUpdateOperationsInput | number
   multimedia?: Prisma.multimediaUncheckedUpdateManyWithoutPublicacionNestedInput
 }
 
@@ -913,7 +913,7 @@ export type publicacionUncheckedUpdateManyWithoutInmuebleInput = {
     | $Enums.estado_publicacion
     | null
   fecha_publicacion?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  usuario_id?: Prisma.IntFieldUpdateOperationsInput | number
+  usuarioId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type publicacionCreateManyUsuarioInput = {
@@ -922,7 +922,7 @@ export type publicacionCreateManyUsuarioInput = {
   descripcion?: string | null
   estado?: $Enums.estado_publicacion | null
   fecha_publicacion?: Date | string | null
-  inmueble_id: number
+  inmuebleId: number
 }
 
 export type publicacionUpdateWithoutUsuarioInput = {
@@ -946,7 +946,7 @@ export type publicacionUncheckedUpdateWithoutUsuarioInput = {
     | $Enums.estado_publicacion
     | null
   fecha_publicacion?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  inmueble_id?: Prisma.IntFieldUpdateOperationsInput | number
+  inmuebleId?: Prisma.IntFieldUpdateOperationsInput | number
   multimedia?: Prisma.multimediaUncheckedUpdateManyWithoutPublicacionNestedInput
 }
 
@@ -959,7 +959,7 @@ export type publicacionUncheckedUpdateManyWithoutUsuarioInput = {
     | $Enums.estado_publicacion
     | null
   fecha_publicacion?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  inmueble_id?: Prisma.IntFieldUpdateOperationsInput | number
+  inmuebleId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 /**
@@ -1006,8 +1006,8 @@ export type publicacionSelect<
     descripcion?: boolean
     estado?: boolean
     fecha_publicacion?: boolean
-    usuario_id?: boolean
-    inmueble_id?: boolean
+    usuarioId?: boolean
+    inmuebleId?: boolean
     multimedia?: boolean | Prisma.publicacion$multimediaArgs<ExtArgs>
     inmueble?: boolean | Prisma.inmuebleDefaultArgs<ExtArgs>
     usuario?: boolean | Prisma.usuarioDefaultArgs<ExtArgs>
@@ -1025,8 +1025,8 @@ export type publicacionSelectCreateManyAndReturn<
     descripcion?: boolean
     estado?: boolean
     fecha_publicacion?: boolean
-    usuario_id?: boolean
-    inmueble_id?: boolean
+    usuarioId?: boolean
+    inmuebleId?: boolean
     inmueble?: boolean | Prisma.inmuebleDefaultArgs<ExtArgs>
     usuario?: boolean | Prisma.usuarioDefaultArgs<ExtArgs>
   },
@@ -1042,8 +1042,8 @@ export type publicacionSelectUpdateManyAndReturn<
     descripcion?: boolean
     estado?: boolean
     fecha_publicacion?: boolean
-    usuario_id?: boolean
-    inmueble_id?: boolean
+    usuarioId?: boolean
+    inmuebleId?: boolean
     inmueble?: boolean | Prisma.inmuebleDefaultArgs<ExtArgs>
     usuario?: boolean | Prisma.usuarioDefaultArgs<ExtArgs>
   },
@@ -1056,14 +1056,14 @@ export type publicacionSelectScalar = {
   descripcion?: boolean
   estado?: boolean
   fecha_publicacion?: boolean
-  usuario_id?: boolean
-  inmueble_id?: boolean
+  usuarioId?: boolean
+  inmuebleId?: boolean
 }
 
 export type publicacionOmit<
   ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs
 > = runtime.Types.Extensions.GetOmit<
-  'id' | 'titulo' | 'descripcion' | 'estado' | 'fecha_publicacion' | 'usuario_id' | 'inmueble_id',
+  'id' | 'titulo' | 'descripcion' | 'estado' | 'fecha_publicacion' | 'usuarioId' | 'inmuebleId',
   ExtArgs['result']['publicacion']
 >
 export type publicacionInclude<
@@ -1103,8 +1103,8 @@ export type $publicacionPayload<
       descripcion: string | null
       estado: $Enums.estado_publicacion | null
       fecha_publicacion: Date | null
-      usuario_id: number
-      inmueble_id: number
+      usuarioId: number
+      inmuebleId: number
     },
     ExtArgs['result']['publicacion']
   >
@@ -1718,8 +1718,8 @@ export interface publicacionFieldRefs {
   readonly descripcion: Prisma.FieldRef<'publicacion', 'String'>
   readonly estado: Prisma.FieldRef<'publicacion', 'estado_publicacion'>
   readonly fecha_publicacion: Prisma.FieldRef<'publicacion', 'DateTime'>
-  readonly usuario_id: Prisma.FieldRef<'publicacion', 'Int'>
-  readonly inmueble_id: Prisma.FieldRef<'publicacion', 'Int'>
+  readonly usuarioId: Prisma.FieldRef<'publicacion', 'Int'>
+  readonly inmuebleId: Prisma.FieldRef<'publicacion', 'Int'>
 }
 
 // Custom InputTypes

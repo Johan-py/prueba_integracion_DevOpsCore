@@ -22,7 +22,7 @@ const router = Router();
 router.get("/mias", requireAuth, listarMisPublicacionesController);
 router.get("/:id/resumen-final", requireAuth, obtenerResumenFinalController);
 router.get(
-  "/inmueble/:inmueble_id/detalle",
+  "/inmueble/:inmuebleId/detalle",
   obtenerDetallePublicacionPorInmuebleController,
 );
 router.get("/:id/detalle", obtenerDetallePublicacionController);

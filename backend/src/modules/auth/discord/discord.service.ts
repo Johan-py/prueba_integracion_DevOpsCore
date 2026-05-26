@@ -163,7 +163,7 @@ const buildDiscordSessionResponse = async (
 
   await createDiscordSession({
     token,
-    usuario_id: user.id,
+    usuarioId: user.id,
     fecha_expiracion
   })
 
@@ -335,7 +335,7 @@ export const linkDiscordToCurrentUserByCodeService = async (
 
   const existingLinkByExternalId = await findDiscordLinkByExternalId(discordId)
 
-  if (existingLinkByExternalId && existingLinkByExternalId.usuario_id !== session.usuario.id) {
+  if (existingLinkByExternalId && existingLinkByExternalId.usuarioId !== session.usuario.id) {
     throw new DiscordAuthError(
       'Esta cuenta de Discord ya está vinculada a otro usuario.',
       'DISCORD_AUTH_FAILED',
@@ -362,7 +362,7 @@ export const linkDiscordToCurrentUserByCodeService = async (
   }
 
   await createDiscordLinkForUser({
-    usuario_id: session.usuario.id,
+    usuarioId: session.usuario.id,
     discordId,
     correo_proveedor
   })

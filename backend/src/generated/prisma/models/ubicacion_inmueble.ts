@@ -30,7 +30,7 @@ export type Ubicacion_inmuebleAvgAggregateOutputType = {
   id: number | null
   latitud: runtime.Decimal | null
   longitud: runtime.Decimal | null
-  inmueble_id: number | null
+  inmuebleId: number | null
   ubicacion_maestra_id: number | null
 }
 
@@ -38,7 +38,7 @@ export type Ubicacion_inmuebleSumAggregateOutputType = {
   id: number | null
   latitud: runtime.Decimal | null
   longitud: runtime.Decimal | null
-  inmueble_id: number | null
+  inmuebleId: number | null
   ubicacion_maestra_id: number | null
 }
 
@@ -49,7 +49,7 @@ export type Ubicacion_inmuebleMinAggregateOutputType = {
   direccion: string | null
   ciudad: string | null
   zona: string | null
-  inmueble_id: number | null
+  inmuebleId: number | null
   ubicacion_maestra_id: number | null
 }
 
@@ -60,7 +60,7 @@ export type Ubicacion_inmuebleMaxAggregateOutputType = {
   direccion: string | null
   ciudad: string | null
   zona: string | null
-  inmueble_id: number | null
+  inmuebleId: number | null
   ubicacion_maestra_id: number | null
 }
 
@@ -71,7 +71,7 @@ export type Ubicacion_inmuebleCountAggregateOutputType = {
   direccion: number
   ciudad: number
   zona: number
-  inmueble_id: number
+  inmuebleId: number
   ubicacion_maestra_id: number
   _all: number
 }
@@ -80,7 +80,7 @@ export type Ubicacion_inmuebleAvgAggregateInputType = {
   id?: true
   latitud?: true
   longitud?: true
-  inmueble_id?: true
+  inmuebleId?: true
   ubicacion_maestra_id?: true
 }
 
@@ -88,7 +88,7 @@ export type Ubicacion_inmuebleSumAggregateInputType = {
   id?: true
   latitud?: true
   longitud?: true
-  inmueble_id?: true
+  inmuebleId?: true
   ubicacion_maestra_id?: true
 }
 
@@ -99,7 +99,7 @@ export type Ubicacion_inmuebleMinAggregateInputType = {
   direccion?: true
   ciudad?: true
   zona?: true
-  inmueble_id?: true
+  inmuebleId?: true
   ubicacion_maestra_id?: true
 }
 
@@ -110,7 +110,7 @@ export type Ubicacion_inmuebleMaxAggregateInputType = {
   direccion?: true
   ciudad?: true
   zona?: true
-  inmueble_id?: true
+  inmuebleId?: true
   ubicacion_maestra_id?: true
 }
 
@@ -121,7 +121,7 @@ export type Ubicacion_inmuebleCountAggregateInputType = {
   direccion?: true
   ciudad?: true
   zona?: true
-  inmueble_id?: true
+  inmuebleId?: true
   ubicacion_maestra_id?: true
   _all?: true
 }
@@ -224,7 +224,7 @@ export type Ubicacion_inmuebleGroupByOutputType = {
   direccion: string | null
   ciudad: string | null
   zona: string | null
-  inmueble_id: number
+  inmuebleId: number
   ubicacion_maestra_id: number | null
   _count: Ubicacion_inmuebleCountAggregateOutputType | null
   _avg: Ubicacion_inmuebleAvgAggregateOutputType | null
@@ -266,7 +266,7 @@ export type ubicacion_inmuebleWhereInput = {
   direccion?: Prisma.StringNullableFilter<'ubicacion_inmueble'> | string | null
   ciudad?: Prisma.StringNullableFilter<'ubicacion_inmueble'> | string | null
   zona?: Prisma.StringNullableFilter<'ubicacion_inmueble'> | string | null
-  inmueble_id?: Prisma.IntFilter<'ubicacion_inmueble'> | number
+  inmuebleId?: Prisma.IntFilter<'ubicacion_inmueble'> | number
   ubicacion_maestra_id?: Prisma.IntNullableFilter<'ubicacion_inmueble'> | number | null
   marcador_mapa?: Prisma.Marcador_mapaListRelationFilter
   inmueble?: Prisma.XOR<Prisma.InmuebleScalarRelationFilter, Prisma.inmuebleWhereInput>
@@ -283,7 +283,7 @@ export type ubicacion_inmuebleOrderByWithRelationInput = {
   direccion?: Prisma.SortOrderInput | Prisma.SortOrder
   ciudad?: Prisma.SortOrderInput | Prisma.SortOrder
   zona?: Prisma.SortOrderInput | Prisma.SortOrder
-  inmueble_id?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
   ubicacion_maestra_id?: Prisma.SortOrderInput | Prisma.SortOrder
   marcador_mapa?: Prisma.marcador_mapaOrderByRelationAggregateInput
   inmueble?: Prisma.inmuebleOrderByWithRelationInput
@@ -293,7 +293,7 @@ export type ubicacion_inmuebleOrderByWithRelationInput = {
 export type ubicacion_inmuebleWhereUniqueInput = Prisma.AtLeast<
   {
     id?: number
-    inmueble_id?: number
+    inmuebleId?: number
     AND?: Prisma.ubicacion_inmuebleWhereInput | Prisma.ubicacion_inmuebleWhereInput[]
     OR?: Prisma.ubicacion_inmuebleWhereInput[]
     NOT?: Prisma.ubicacion_inmuebleWhereInput | Prisma.ubicacion_inmuebleWhereInput[]
@@ -320,7 +320,7 @@ export type ubicacion_inmuebleWhereUniqueInput = Prisma.AtLeast<
       Prisma.ubicacion_maestraWhereInput
     > | null
   },
-  'id' | 'inmueble_id'
+  'id' | 'inmuebleId'
 >
 
 export type ubicacion_inmuebleOrderByWithAggregationInput = {
@@ -330,7 +330,7 @@ export type ubicacion_inmuebleOrderByWithAggregationInput = {
   direccion?: Prisma.SortOrderInput | Prisma.SortOrder
   ciudad?: Prisma.SortOrderInput | Prisma.SortOrder
   zona?: Prisma.SortOrderInput | Prisma.SortOrder
-  inmueble_id?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
   ubicacion_maestra_id?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ubicacion_inmuebleCountOrderByAggregateInput
   _avg?: Prisma.ubicacion_inmuebleAvgOrderByAggregateInput
@@ -363,7 +363,7 @@ export type ubicacion_inmuebleScalarWhereWithAggregatesInput = {
   direccion?: Prisma.StringNullableWithAggregatesFilter<'ubicacion_inmueble'> | string | null
   ciudad?: Prisma.StringNullableWithAggregatesFilter<'ubicacion_inmueble'> | string | null
   zona?: Prisma.StringNullableWithAggregatesFilter<'ubicacion_inmueble'> | string | null
-  inmueble_id?: Prisma.IntWithAggregatesFilter<'ubicacion_inmueble'> | number
+  inmuebleId?: Prisma.IntWithAggregatesFilter<'ubicacion_inmueble'> | number
   ubicacion_maestra_id?:
     | Prisma.IntNullableWithAggregatesFilter<'ubicacion_inmueble'>
     | number
@@ -388,7 +388,7 @@ export type ubicacion_inmuebleUncheckedCreateInput = {
   direccion?: string | null
   ciudad?: string | null
   zona?: string | null
-  inmueble_id: number
+  inmuebleId: number
   ubicacion_maestra_id?: number | null
   marcador_mapa?: Prisma.marcador_mapaUncheckedCreateNestedManyWithoutUbicacion_inmuebleInput
 }
@@ -431,7 +431,7 @@ export type ubicacion_inmuebleUncheckedUpdateInput = {
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ciudad?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  inmueble_id?: Prisma.IntFieldUpdateOperationsInput | number
+  inmuebleId?: Prisma.IntFieldUpdateOperationsInput | number
   ubicacion_maestra_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   marcador_mapa?: Prisma.marcador_mapaUncheckedUpdateManyWithoutUbicacion_inmuebleNestedInput
 }
@@ -443,7 +443,7 @@ export type ubicacion_inmuebleCreateManyInput = {
   direccion?: string | null
   ciudad?: string | null
   zona?: string | null
-  inmueble_id: number
+  inmuebleId: number
   ubicacion_maestra_id?: number | null
 }
 
@@ -482,7 +482,7 @@ export type ubicacion_inmuebleUncheckedUpdateManyInput = {
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ciudad?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  inmueble_id?: Prisma.IntFieldUpdateOperationsInput | number
+  inmuebleId?: Prisma.IntFieldUpdateOperationsInput | number
   ubicacion_maestra_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
@@ -503,7 +503,7 @@ export type ubicacion_inmuebleCountOrderByAggregateInput = {
   direccion?: Prisma.SortOrder
   ciudad?: Prisma.SortOrder
   zona?: Prisma.SortOrder
-  inmueble_id?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
   ubicacion_maestra_id?: Prisma.SortOrder
 }
 
@@ -511,7 +511,7 @@ export type ubicacion_inmuebleAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   latitud?: Prisma.SortOrder
   longitud?: Prisma.SortOrder
-  inmueble_id?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
   ubicacion_maestra_id?: Prisma.SortOrder
 }
 
@@ -522,7 +522,7 @@ export type ubicacion_inmuebleMaxOrderByAggregateInput = {
   direccion?: Prisma.SortOrder
   ciudad?: Prisma.SortOrder
   zona?: Prisma.SortOrder
-  inmueble_id?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
   ubicacion_maestra_id?: Prisma.SortOrder
 }
 
@@ -533,7 +533,7 @@ export type ubicacion_inmuebleMinOrderByAggregateInput = {
   direccion?: Prisma.SortOrder
   ciudad?: Prisma.SortOrder
   zona?: Prisma.SortOrder
-  inmueble_id?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
   ubicacion_maestra_id?: Prisma.SortOrder
 }
 
@@ -541,7 +541,7 @@ export type ubicacion_inmuebleSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   latitud?: Prisma.SortOrder
   longitud?: Prisma.SortOrder
-  inmueble_id?: Prisma.SortOrder
+  inmuebleId?: Prisma.SortOrder
   ubicacion_maestra_id?: Prisma.SortOrder
 }
 
@@ -838,7 +838,7 @@ export type ubicacion_inmuebleUncheckedCreateWithoutMarcador_mapaInput = {
   direccion?: string | null
   ciudad?: string | null
   zona?: string | null
-  inmueble_id: number
+  inmuebleId: number
   ubicacion_maestra_id?: number | null
 }
 
@@ -907,7 +907,7 @@ export type ubicacion_inmuebleUncheckedUpdateWithoutMarcador_mapaInput = {
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ciudad?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  inmueble_id?: Prisma.IntFieldUpdateOperationsInput | number
+  inmuebleId?: Prisma.IntFieldUpdateOperationsInput | number
   ubicacion_maestra_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
@@ -928,7 +928,7 @@ export type ubicacion_inmuebleUncheckedCreateWithoutUbicacion_maestraInput = {
   direccion?: string | null
   ciudad?: string | null
   zona?: string | null
-  inmueble_id: number
+  inmuebleId: number
   marcador_mapa?: Prisma.marcador_mapaUncheckedCreateNestedManyWithoutUbicacion_inmuebleInput
 }
 
@@ -995,7 +995,7 @@ export type ubicacion_inmuebleScalarWhereInput = {
   direccion?: Prisma.StringNullableFilter<'ubicacion_inmueble'> | string | null
   ciudad?: Prisma.StringNullableFilter<'ubicacion_inmueble'> | string | null
   zona?: Prisma.StringNullableFilter<'ubicacion_inmueble'> | string | null
-  inmueble_id?: Prisma.IntFilter<'ubicacion_inmueble'> | number
+  inmuebleId?: Prisma.IntFilter<'ubicacion_inmueble'> | number
   ubicacion_maestra_id?: Prisma.IntNullableFilter<'ubicacion_inmueble'> | number | null
 }
 
@@ -1006,7 +1006,7 @@ export type ubicacion_inmuebleCreateManyUbicacion_maestraInput = {
   direccion?: string | null
   ciudad?: string | null
   zona?: string | null
-  inmueble_id: number
+  inmuebleId: number
 }
 
 export type ubicacion_inmuebleUpdateWithoutUbicacion_maestraInput = {
@@ -1046,7 +1046,7 @@ export type ubicacion_inmuebleUncheckedUpdateWithoutUbicacion_maestraInput = {
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ciudad?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  inmueble_id?: Prisma.IntFieldUpdateOperationsInput | number
+  inmuebleId?: Prisma.IntFieldUpdateOperationsInput | number
   marcador_mapa?: Prisma.marcador_mapaUncheckedUpdateManyWithoutUbicacion_inmuebleNestedInput
 }
 
@@ -1067,7 +1067,7 @@ export type ubicacion_inmuebleUncheckedUpdateManyWithoutUbicacion_maestraInput =
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ciudad?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  inmueble_id?: Prisma.IntFieldUpdateOperationsInput | number
+  inmuebleId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 /**
@@ -1115,7 +1115,7 @@ export type ubicacion_inmuebleSelect<
     direccion?: boolean
     ciudad?: boolean
     zona?: boolean
-    inmueble_id?: boolean
+    inmuebleId?: boolean
     ubicacion_maestra_id?: boolean
     marcador_mapa?: boolean | Prisma.ubicacion_inmueble$marcador_mapaArgs<ExtArgs>
     inmueble?: boolean | Prisma.inmuebleDefaultArgs<ExtArgs>
@@ -1135,7 +1135,7 @@ export type ubicacion_inmuebleSelectCreateManyAndReturn<
     direccion?: boolean
     ciudad?: boolean
     zona?: boolean
-    inmueble_id?: boolean
+    inmuebleId?: boolean
     ubicacion_maestra_id?: boolean
     inmueble?: boolean | Prisma.inmuebleDefaultArgs<ExtArgs>
     ubicacion_maestra?: boolean | Prisma.ubicacion_inmueble$ubicacion_maestraArgs<ExtArgs>
@@ -1153,7 +1153,7 @@ export type ubicacion_inmuebleSelectUpdateManyAndReturn<
     direccion?: boolean
     ciudad?: boolean
     zona?: boolean
-    inmueble_id?: boolean
+    inmuebleId?: boolean
     ubicacion_maestra_id?: boolean
     inmueble?: boolean | Prisma.inmuebleDefaultArgs<ExtArgs>
     ubicacion_maestra?: boolean | Prisma.ubicacion_inmueble$ubicacion_maestraArgs<ExtArgs>
@@ -1168,7 +1168,7 @@ export type ubicacion_inmuebleSelectScalar = {
   direccion?: boolean
   ciudad?: boolean
   zona?: boolean
-  inmueble_id?: boolean
+  inmuebleId?: boolean
   ubicacion_maestra_id?: boolean
 }
 
@@ -1181,7 +1181,7 @@ export type ubicacion_inmuebleOmit<
   | 'direccion'
   | 'ciudad'
   | 'zona'
-  | 'inmueble_id'
+  | 'inmuebleId'
   | 'ubicacion_maestra_id',
   ExtArgs['result']['ubicacion_inmueble']
 >
@@ -1223,7 +1223,7 @@ export type $ubicacion_inmueblePayload<
       direccion: string | null
       ciudad: string | null
       zona: string | null
-      inmueble_id: number
+      inmuebleId: number
       ubicacion_maestra_id: number | null
     },
     ExtArgs['result']['ubicacion_inmueble']
@@ -1841,7 +1841,7 @@ export interface ubicacion_inmuebleFieldRefs {
   readonly direccion: Prisma.FieldRef<'ubicacion_inmueble', 'String'>
   readonly ciudad: Prisma.FieldRef<'ubicacion_inmueble', 'String'>
   readonly zona: Prisma.FieldRef<'ubicacion_inmueble', 'String'>
-  readonly inmueble_id: Prisma.FieldRef<'ubicacion_inmueble', 'Int'>
+  readonly inmuebleId: Prisma.FieldRef<'ubicacion_inmueble', 'Int'>
   readonly ubicacion_maestra_id: Prisma.FieldRef<'ubicacion_inmueble', 'Int'>
 }
 

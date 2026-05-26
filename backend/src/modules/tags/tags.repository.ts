@@ -86,7 +86,7 @@ const findByPublicacionId = async (publicacionId: number) => {
   return prisma.publicacion_tag.findMany({
     where: { publicacion_id: publicacionId },
     include: { tag: true },
-    orderBy: { agregado_en: 'asc' }
+    orderBy: { agregadoEn: 'asc' }
   })
 }
 
@@ -116,7 +116,7 @@ const replacePublicacionTags = async (publicacionId: number, tagIds: number[]) =
 const findPublicacionOwner = async (publicacionId: number) => {
   return prisma.publicacion.findUnique({
     where: { id: publicacionId },
-    select: { id: true, usuario_id: true }
+    select: { id: true, usuarioId: true }
   })
 }
 

@@ -27,12 +27,12 @@ export type AggregateTelefono = {
 
 export type TelefonoAvgAggregateOutputType = {
   id: number | null
-  usuario_id: number | null
+  usuarioId: number | null
 }
 
 export type TelefonoSumAggregateOutputType = {
   id: number | null
-  usuario_id: number | null
+  usuarioId: number | null
 }
 
 export type TelefonoMinAggregateOutputType = {
@@ -40,7 +40,7 @@ export type TelefonoMinAggregateOutputType = {
   codigo_pais: string | null
   numero: string | null
   principal: boolean | null
-  usuario_id: number | null
+  usuarioId: number | null
 }
 
 export type TelefonoMaxAggregateOutputType = {
@@ -48,7 +48,7 @@ export type TelefonoMaxAggregateOutputType = {
   codigo_pais: string | null
   numero: string | null
   principal: boolean | null
-  usuario_id: number | null
+  usuarioId: number | null
 }
 
 export type TelefonoCountAggregateOutputType = {
@@ -56,18 +56,18 @@ export type TelefonoCountAggregateOutputType = {
   codigo_pais: number
   numero: number
   principal: number
-  usuario_id: number
+  usuarioId: number
   _all: number
 }
 
 export type TelefonoAvgAggregateInputType = {
   id?: true
-  usuario_id?: true
+  usuarioId?: true
 }
 
 export type TelefonoSumAggregateInputType = {
   id?: true
-  usuario_id?: true
+  usuarioId?: true
 }
 
 export type TelefonoMinAggregateInputType = {
@@ -75,7 +75,7 @@ export type TelefonoMinAggregateInputType = {
   codigo_pais?: true
   numero?: true
   principal?: true
-  usuario_id?: true
+  usuarioId?: true
 }
 
 export type TelefonoMaxAggregateInputType = {
@@ -83,7 +83,7 @@ export type TelefonoMaxAggregateInputType = {
   codigo_pais?: true
   numero?: true
   principal?: true
-  usuario_id?: true
+  usuarioId?: true
 }
 
 export type TelefonoCountAggregateInputType = {
@@ -91,7 +91,7 @@ export type TelefonoCountAggregateInputType = {
   codigo_pais?: true
   numero?: true
   principal?: true
-  usuario_id?: true
+  usuarioId?: true
   _all?: true
 }
 
@@ -189,7 +189,7 @@ export type TelefonoGroupByOutputType = {
   codigo_pais: string
   numero: string
   principal: boolean | null
-  usuario_id: number
+  usuarioId: number
   _count: TelefonoCountAggregateOutputType | null
   _avg: TelefonoAvgAggregateOutputType | null
   _sum: TelefonoSumAggregateOutputType | null
@@ -217,7 +217,7 @@ export type telefonoWhereInput = {
   codigo_pais?: Prisma.StringFilter<'telefono'> | string
   numero?: Prisma.StringFilter<'telefono'> | string
   principal?: Prisma.BoolNullableFilter<'telefono'> | boolean | null
-  usuario_id?: Prisma.IntFilter<'telefono'> | number
+  usuarioId?: Prisma.IntFilter<'telefono'> | number
   usuario?: Prisma.XOR<Prisma.UsuarioScalarRelationFilter, Prisma.usuarioWhereInput>
 }
 
@@ -226,7 +226,7 @@ export type telefonoOrderByWithRelationInput = {
   codigo_pais?: Prisma.SortOrder
   numero?: Prisma.SortOrder
   principal?: Prisma.SortOrderInput | Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
   usuario?: Prisma.usuarioOrderByWithRelationInput
 }
 
@@ -239,7 +239,7 @@ export type telefonoWhereUniqueInput = Prisma.AtLeast<
     codigo_pais?: Prisma.StringFilter<'telefono'> | string
     numero?: Prisma.StringFilter<'telefono'> | string
     principal?: Prisma.BoolNullableFilter<'telefono'> | boolean | null
-    usuario_id?: Prisma.IntFilter<'telefono'> | number
+    usuarioId?: Prisma.IntFilter<'telefono'> | number
     usuario?: Prisma.XOR<Prisma.UsuarioScalarRelationFilter, Prisma.usuarioWhereInput>
   },
   'id'
@@ -250,7 +250,7 @@ export type telefonoOrderByWithAggregationInput = {
   codigo_pais?: Prisma.SortOrder
   numero?: Prisma.SortOrder
   principal?: Prisma.SortOrderInput | Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
   _count?: Prisma.telefonoCountOrderByAggregateInput
   _avg?: Prisma.telefonoAvgOrderByAggregateInput
   _max?: Prisma.telefonoMaxOrderByAggregateInput
@@ -270,7 +270,7 @@ export type telefonoScalarWhereWithAggregatesInput = {
   codigo_pais?: Prisma.StringWithAggregatesFilter<'telefono'> | string
   numero?: Prisma.StringWithAggregatesFilter<'telefono'> | string
   principal?: Prisma.BoolNullableWithAggregatesFilter<'telefono'> | boolean | null
-  usuario_id?: Prisma.IntWithAggregatesFilter<'telefono'> | number
+  usuarioId?: Prisma.IntWithAggregatesFilter<'telefono'> | number
 }
 
 export type telefonoCreateInput = {
@@ -285,7 +285,7 @@ export type telefonoUncheckedCreateInput = {
   codigo_pais: string
   numero: string
   principal?: boolean | null
-  usuario_id: number
+  usuarioId: number
 }
 
 export type telefonoUpdateInput = {
@@ -300,7 +300,7 @@ export type telefonoUncheckedUpdateInput = {
   codigo_pais?: Prisma.StringFieldUpdateOperationsInput | string
   numero?: Prisma.StringFieldUpdateOperationsInput | string
   principal?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  usuario_id?: Prisma.IntFieldUpdateOperationsInput | number
+  usuarioId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type telefonoCreateManyInput = {
@@ -308,7 +308,7 @@ export type telefonoCreateManyInput = {
   codigo_pais: string
   numero: string
   principal?: boolean | null
-  usuario_id: number
+  usuarioId: number
 }
 
 export type telefonoUpdateManyMutationInput = {
@@ -322,7 +322,7 @@ export type telefonoUncheckedUpdateManyInput = {
   codigo_pais?: Prisma.StringFieldUpdateOperationsInput | string
   numero?: Prisma.StringFieldUpdateOperationsInput | string
   principal?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  usuario_id?: Prisma.IntFieldUpdateOperationsInput | number
+  usuarioId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type telefonoCountOrderByAggregateInput = {
@@ -330,12 +330,12 @@ export type telefonoCountOrderByAggregateInput = {
   codigo_pais?: Prisma.SortOrder
   numero?: Prisma.SortOrder
   principal?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type telefonoAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type telefonoMaxOrderByAggregateInput = {
@@ -343,7 +343,7 @@ export type telefonoMaxOrderByAggregateInput = {
   codigo_pais?: Prisma.SortOrder
   numero?: Prisma.SortOrder
   principal?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type telefonoMinOrderByAggregateInput = {
@@ -351,12 +351,12 @@ export type telefonoMinOrderByAggregateInput = {
   codigo_pais?: Prisma.SortOrder
   numero?: Prisma.SortOrder
   principal?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type telefonoSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type TelefonoListRelationFilter = {
@@ -517,7 +517,7 @@ export type telefonoScalarWhereInput = {
   codigo_pais?: Prisma.StringFilter<'telefono'> | string
   numero?: Prisma.StringFilter<'telefono'> | string
   principal?: Prisma.BoolNullableFilter<'telefono'> | boolean | null
-  usuario_id?: Prisma.IntFilter<'telefono'> | number
+  usuarioId?: Prisma.IntFilter<'telefono'> | number
 }
 
 export type telefonoCreateManyUsuarioInput = {
@@ -555,7 +555,7 @@ export type telefonoSelect<
     codigo_pais?: boolean
     numero?: boolean
     principal?: boolean
-    usuario_id?: boolean
+    usuarioId?: boolean
     usuario?: boolean | Prisma.usuarioDefaultArgs<ExtArgs>
   },
   ExtArgs['result']['telefono']
@@ -569,7 +569,7 @@ export type telefonoSelectCreateManyAndReturn<
     codigo_pais?: boolean
     numero?: boolean
     principal?: boolean
-    usuario_id?: boolean
+    usuarioId?: boolean
     usuario?: boolean | Prisma.usuarioDefaultArgs<ExtArgs>
   },
   ExtArgs['result']['telefono']
@@ -583,7 +583,7 @@ export type telefonoSelectUpdateManyAndReturn<
     codigo_pais?: boolean
     numero?: boolean
     principal?: boolean
-    usuario_id?: boolean
+    usuarioId?: boolean
     usuario?: boolean | Prisma.usuarioDefaultArgs<ExtArgs>
   },
   ExtArgs['result']['telefono']
@@ -594,13 +594,13 @@ export type telefonoSelectScalar = {
   codigo_pais?: boolean
   numero?: boolean
   principal?: boolean
-  usuario_id?: boolean
+  usuarioId?: boolean
 }
 
 export type telefonoOmit<
   ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs
 > = runtime.Types.Extensions.GetOmit<
-  'id' | 'codigo_pais' | 'numero' | 'principal' | 'usuario_id',
+  'id' | 'codigo_pais' | 'numero' | 'principal' | 'usuarioId',
   ExtArgs['result']['telefono']
 >
 export type telefonoInclude<
@@ -632,7 +632,7 @@ export type $telefonoPayload<
       codigo_pais: string
       numero: string
       principal: boolean | null
-      usuario_id: number
+      usuarioId: number
     },
     ExtArgs['result']['telefono']
   >
@@ -1217,7 +1217,7 @@ export interface telefonoFieldRefs {
   readonly codigo_pais: Prisma.FieldRef<'telefono', 'String'>
   readonly numero: Prisma.FieldRef<'telefono', 'String'>
   readonly principal: Prisma.FieldRef<'telefono', 'Boolean'>
-  readonly usuario_id: Prisma.FieldRef<'telefono', 'Int'>
+  readonly usuarioId: Prisma.FieldRef<'telefono', 'Int'>
 }
 
 // Custom InputTypes

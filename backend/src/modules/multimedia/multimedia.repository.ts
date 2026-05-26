@@ -8,12 +8,12 @@ import type {
 
 const mapPublicationRecord = (publication: {
   id: number;
-  usuario_id: number;
+  usuarioId: number;
   titulo: string;
 }): PublicacionRecord => {
   return {
     id: publication.id,
-    usuario_id: publication.usuario_id,
+    usuarioId: publication.usuarioId,
     titulo: publication.titulo,
   };
 };
@@ -44,7 +44,7 @@ export const findPublicationByIdRepository = async (
     where: { id: publicacionId },
     select: {
       id: true,
-      usuario_id: true,
+      usuarioId: true,
       titulo: true,
     },
   });

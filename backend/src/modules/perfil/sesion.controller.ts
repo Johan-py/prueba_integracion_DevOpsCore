@@ -7,16 +7,16 @@ export const sesionController = {
   // Obtener todas las sesiones activas del usuario autenticado
   async getMisSesiones(req: AuthRequest, res: Response) {
     try {
-      const usuario_id = req.usuario?.id
+      const usuarioId = req.usuario?.id
 
-      if (!usuario_id) {
+      if (!usuarioId) {
         return res.status(401).json({ error: 'Usuario no autenticado' })
       }
 
       // ✅ Obtener SOLO sesiones activas (estado = true)
       const sesiones = await prisma.sesion.findMany({
         where: {
-          usuario_id,
+          usuarioId,
           estado: true // ← Agregar este filtro
         },
         orderBy: {
@@ -60,7 +60,7 @@ export const sesionController = {
   async getSesionById(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params
-      const usuario_id = req.usuario?.id
+      const usuarioId = req.usuario?.id
 
       const sesionId = Array.isArray(id) ? id[0] : id
 
@@ -71,7 +71,7 @@ export const sesionController = {
       const sesion = await prisma.sesion.findFirst({
         where: {
           id: parseInt(sesionId),
-          usuario_id
+          usuarioId
         },
         select: {
           id: true,
@@ -98,7 +98,7 @@ export const sesionController = {
   async cerrarSesion(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params
-      const usuario_id = req.usuario?.id
+      const usuarioId = req.usuario?.id
 
       const sesionId = Array.isArray(id) ? id[0] : id
 
@@ -110,7 +110,7 @@ export const sesionController = {
       const sesion = await prisma.sesion.findFirst({
         where: {
           id: parseInt(sesionId),
-          usuario_id
+          usuarioId
         }
       })
 
@@ -145,16 +145,16 @@ export const sesionController = {
   // Cerrar todas las sesiones excepto la actual
   async cerrarTodasSesionesExceptoActual(req: AuthRequest, res: Response) {
     try {
-      const usuario_id = req.usuario?.id
+      const usuarioId = req.usuario?.id
       const tokenActual = req.headers.authorization?.split(' ')[1]
 
-      if (!usuario_id) {
+      if (!usuarioId) {
         return res.status(401).json({ error: 'Usuario no autenticado' })
       }
 
       const result = await prisma.sesion.updateMany({
         where: {
-          usuario_id,
+          usuarioId,
           token: { not: tokenActual },
           estado: true
         },

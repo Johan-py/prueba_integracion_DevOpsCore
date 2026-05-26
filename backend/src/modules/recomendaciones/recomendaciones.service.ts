@@ -12,8 +12,8 @@ export class RecomendacionesService {
     this.scoreCalculator = new ScoreCalculator()
   }
 
-  async getRecomendacionesPorPopularidad(zona: string, limit: number = 20, usuario_id?: number) {
-    const populares = await this.repository.getInmueblesPopularesPorZona(zona, limit, usuario_id)
+  async getRecomendacionesPorPopularidad(zona: string, limit: number = 20, usuarioId?: number) {
+    const populares = await this.repository.getInmueblesPopularesPorZona(zona, limit, usuarioId)
     return populares.map((p) => ({
       id: p.id,
       titulo: p.titulo,
@@ -29,17 +29,17 @@ export class RecomendacionesService {
   async getRecomendacionesGlobales(
     params: RecomendacionesParams & { ia?: boolean }
   ): Promise<InmuebleConScore[]> {
-    const { usuario_id, limit = 20, excludeIds = [], zonaForzada, ia, ...filtros } = params
-    if (!usuario_id) {
+    const { usuarioId, limit = 20, excludeIds = [], zonaForzada, ia, ...filtros } = params
+    if (!usuarioId) {
       const zonaAEvaluar = zonaForzada || 'Cochabamba'
       return this.getRecomendacionesPorPopularidad(zonaAEvaluar, limit)
     }
 
     if (ia) {
-      console.log(`[ML] Solicitando recomendaciones con ML para usuario ${usuario_id}`)
+      console.log(`[ML] Solicitando recomendaciones con ML para usuario ${usuarioId}`)
 
       const resultadosML = await featuresService.recomendar(
-        Number(usuario_id), // 1er argumento: usuario_id
+        Number(usuarioId), // 1er argumento: usuarioId
         limit, // 2do argumento: limit
         {
           // 3er argumento: objeto de filtros
@@ -58,20 +58,20 @@ export class RecomendacionesService {
       console.log('[ML] Sin resultados suficientes, usando fallback')
     }
 
-    const cacheKey = `recomendaciones_globales_usuario_${usuario_id}_limit_${limit}_zona_${zonaForzada || 'none'}`
+    const cacheKey = `recomendaciones_globales_usuario_${usuarioId}_limit_${limit}_zona_${zonaForzada || 'none'}`
     const cached = cache.get<InmuebleConScore[]>(cacheKey)
     if (cached) {
-      console.log(`[Cache] Hit para usuario ${usuario_id}`)
+      console.log(`[Cache] Hit para usuario ${usuarioId}`)
       return cached
     }
-    console.log(`[Cache] Miss para usuario ${usuario_id}, calculando...`)
-    const zonaConexion = await this.repository.getZonaConexionUsuario(usuario_id)
-    const historialVistas = await this.repository.getHistorialVistas(usuario_id)
-    const ultimasBusquedas = await this.repository.getUltimasBusquedas(usuario_id)
-    const favoritos = await this.repository.getFavoritos(usuario_id)
+    console.log(`[Cache] Miss para usuario ${usuarioId}, calculando...`)
+    const zonaConexion = await this.repository.getZonaConexionUsuario(usuarioId)
+    const historialVistas = await this.repository.getHistorialVistas(usuarioId)
+    const ultimasBusquedas = await this.repository.getUltimasBusquedas(usuarioId)
+    const favoritos = await this.repository.getFavoritos(usuarioId)
     const favoritosIds = favoritos.map((f: any) => f.id)
     const totalClics = historialVistas.length
-    console.log('usuario_id:', usuario_id)
+    console.log('usuarioId:', usuarioId)
     console.log('historialVistas.length:', historialVistas.length)
     console.log('favoritos.length:', favoritos.length)
     console.log('zonaConexion:', zonaConexion)
@@ -79,7 +79,7 @@ export class RecomendacionesService {
     if (historialVistas.length === 0 && favoritos.length === 0) {
       const zonaAEvaluar = zonaForzada || zonaConexion
       if (zonaAEvaluar) {
-        return await this.getRecomendacionesPorPopularidad(zonaAEvaluar, limit, usuario_id)
+        return await this.getRecomendacionesPorPopularidad(zonaAEvaluar, limit, usuarioId)
       }
       const populares = await this.repository.getInmueblesPopulares(limit)
       return populares.map((p) => ({
@@ -100,7 +100,7 @@ export class RecomendacionesService {
       favoritos
     )
 
-    let candidatos = await this.repository.getInmueblesCandidatos(usuario_id, 100)
+    let candidatos = await this.repository.getInmueblesCandidatos(usuarioId, 100)
 
     if (zonaConexion) {
       const totalRequeridos = limit
@@ -168,10 +168,10 @@ export class RecomendacionesService {
     return resultado
   }
 
-  async ordenarPorAfinidad(inmuebleIds: number[], usuario_id: number): Promise<InmuebleConScore[]> {
-    const historialVistas = await this.repository.getHistorialVistas(usuario_id)
-    const ultimasBusquedas = await this.repository.getUltimasBusquedas(usuario_id)
-    const favoritos = await this.repository.getFavoritos(usuario_id)
+  async ordenarPorAfinidad(inmuebleIds: number[], usuarioId: number): Promise<InmuebleConScore[]> {
+    const historialVistas = await this.repository.getHistorialVistas(usuarioId)
+    const ultimasBusquedas = await this.repository.getUltimasBusquedas(usuarioId)
+    const favoritos = await this.repository.getFavoritos(usuarioId)
     const totalClics = historialVistas.length
     const inmuebles = await this.repository.getInmueblesPorIds(inmuebleIds)
 
@@ -218,8 +218,8 @@ export class RecomendacionesService {
     return resultado
   }
   async getRecomendacionesGlobalesML(params: RecomendacionesParams): Promise<InmuebleConScore[]> {
-    const { usuario_id, limit, zonaForzada } = params
-    if (!usuario_id) {
+    const { usuarioId, limit, zonaForzada } = params
+    if (!usuarioId) {
       const zona = zonaForzada || 'Cochabamba'
       return this.getRecomendacionesPorPopularidad(zona, limit)
     }

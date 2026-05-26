@@ -5,7 +5,7 @@ function redondearADos(numero: number): number {
 }
 
 export async function crearTransaccion(
-  usuario_id: number,
+  usuarioId: number,
   idSuscripcion: number,
 ) {
   const plan = await prisma.plan_suscripcion.findUnique({
@@ -21,7 +21,7 @@ export async function crearTransaccion(
 
   const transaccion = await prisma.transacciones.create({
     data: {
-      id_usuario: usuario_id,
+      id_usuario: usuarioId,
       id_suscripcion: idSuscripcion,
       subtotal,
       iva_porcentaje: ivaPorcentaje,
@@ -36,7 +36,7 @@ export async function crearTransaccion(
 
   await prisma.bitacora_pagos.create({
     data: {
-      id_usuario: usuario_id,
+      id_usuario: usuarioId,
       id_suscripcion: idSuscripcion,
       evento: "TRANSACCION_CREADA",
       mensaje: `Transacción creada para plan ${plan.nombre_plan}, total ${total}`,

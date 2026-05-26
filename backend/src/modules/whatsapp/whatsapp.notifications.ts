@@ -11,13 +11,13 @@ interface NotificacionWhatsappResult {
  * Obtiene el teléfono principal del usuario y verifica
  * si tiene activadas las notificaciones por WhatsApp.
  */
-const obtenerDatosWhatsapp = async (usuario_id: number) => {
+const obtenerDatosWhatsapp = async (usuarioId: number) => {
   const usuario = await prisma.usuario.findUnique({
-    where: { id: usuario_id },
+    where: { id: usuarioId },
     select: {
       nombre: true,
       notificacion_whatsapp: true,
-      telefono_telefono_usuario_idTousuario: {
+      telefono_telefono_usuarioIdTousuario: {
         where: { principal: true },
         take: 1,
       },
@@ -26,9 +26,9 @@ const obtenerDatosWhatsapp = async (usuario_id: number) => {
 
   if (!usuario) return null;
   if (!usuario.notificacion_whatsapp) return null;  // No quiere notificaciones WA
-  if (usuario.telefono_telefono_usuario_idTousuario.length === 0) return null;  // No tiene teléfono registrado
+  if (usuario.telefono_telefono_usuarioIdTousuario.length === 0) return null;  // No tiene teléfono registrado
 
-  const tel = usuario.telefono_telefono_usuario_idTousuario[0];
+  const tel = usuario.telefono_telefono_usuarioIdTousuario[0];
   const telefono = formatearTelefono(tel.codigoPais, tel.numero);
 
   return { nombre: usuario.nombre, telefono };
@@ -36,9 +36,9 @@ const obtenerDatosWhatsapp = async (usuario_id: number) => {
 
 // ─── Notificación de bienvenida tras registro ──────────────────────────────
 export const notificarRegistroExitoso = async (
-  usuario_id: number
+  usuarioId: number
 ): Promise<NotificacionWhatsappResult> => {
-  const datos = await obtenerDatosWhatsapp(usuario_id);
+  const datos = await obtenerDatosWhatsapp(usuarioId);
   if (!datos) return { success: false, omitido: true };
 
   const mensaje =
@@ -52,10 +52,10 @@ export const notificarRegistroExitoso = async (
 
 // ─── Notificación cuando se publica un inmueble ────────────────────────────
 export const notificarNuevaPublicacion = async (
-  usuario_id: number,
+  usuarioId: number,
   tituloInmueble: string
 ): Promise<NotificacionWhatsappResult> => {
-  const datos = await obtenerDatosWhatsapp(usuario_id);
+  const datos = await obtenerDatosWhatsapp(usuarioId);
   if (!datos) return { success: false, omitido: true };
 
   const mensaje =
@@ -69,10 +69,10 @@ export const notificarNuevaPublicacion = async (
 
 // ─── Notificación de pago/suscripción confirmado ───────────────────────────
 export const notificarPagoConfirmado = async (
-  usuario_id: number,
+  usuarioId: number,
   nombrePlan: string
 ): Promise<NotificacionWhatsappResult> => {
-  const datos = await obtenerDatosWhatsapp(usuario_id);
+  const datos = await obtenerDatosWhatsapp(usuarioId);
   if (!datos) return { success: false, omitido: true };
 
   const mensaje =
@@ -86,9 +86,9 @@ export const notificarPagoConfirmado = async (
 };
 
 export const notificarCambioPassword = async (
-  usuario_id: number
+  usuarioId: number
 ): Promise<NotificacionWhatsappResult> => {
-  const datos = await obtenerDatosWhatsapp(usuario_id);
+  const datos = await obtenerDatosWhatsapp(usuarioId);
   if (!datos) return { success: false, omitido: true };
 
   const mensaje =
@@ -102,11 +102,11 @@ export const notificarCambioPassword = async (
 
 // ─── Notificación genérica (para cualquier otro evento) ───────────────────
 export const notificarMensajeGenerico = async (
-  usuario_id: number,
+  usuarioId: number,
   titulo: string,
   cuerpo: string
 ): Promise<NotificacionWhatsappResult> => {
-  const datos = await obtenerDatosWhatsapp(usuario_id);
+  const datos = await obtenerDatosWhatsapp(usuarioId);
   if (!datos) return { success: false, omitido: true };
 
   const mensaje =

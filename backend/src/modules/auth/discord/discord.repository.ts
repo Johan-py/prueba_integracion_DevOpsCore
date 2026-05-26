@@ -51,7 +51,7 @@ export const createDiscordUser = async (
   })
 
   await createSocialLink({
-    usuario_id: user.id,
+    usuarioId: user.id,
     proveedor: 'discord',
     id_externo: discordId,
     correo_proveedor
@@ -62,12 +62,12 @@ export const createDiscordUser = async (
 
 // Vincula Discord a un usuario existente (si se registró con email y luego vincula Discord)
 export const linkDiscordToUser = async (
-  usuario_id: number,
+  usuarioId: number,
   discordId: string,
   correo_proveedor: string
 ) => {
   return await createSocialLink({
-    usuario_id,
+    usuarioId,
     proveedor: 'discord',
     id_externo: discordId,
     correo_proveedor
@@ -76,16 +76,16 @@ export const linkDiscordToUser = async (
 
 export const createDiscordSession = async ({
   token,
-  usuario_id,
+  usuarioId,
   fecha_expiracion
 }: {
   token: string
-  usuario_id: number
+  usuarioId: number
   fecha_expiracion: Date
 }) => {
   return await createSession({
     token,
-    usuario_id,
+    usuarioId,
     fecha_expiracion
   })
 }
@@ -94,21 +94,21 @@ export const findDiscordLinkByExternalId = async (discordId: string) => {
   return await findSocialLinkByProviderAndExternalId('discord', discordId)
 }
 
-export const findDiscordLinkByUserId = async (usuario_id: number) => {
-  return await findSocialLinkByUserAndProvider(usuario_id, 'discord')
+export const findDiscordLinkByUserId = async (usuarioId: number) => {
+  return await findSocialLinkByUserAndProvider(usuarioId, 'discord')
 }
 
 export const createDiscordLinkForUser = async ({
-  usuario_id,
+  usuarioId,
   discordId,
   correo_proveedor
 }: {
-  usuario_id: number
+  usuarioId: number
   discordId: string
   correo_proveedor?: string | null
 }) => {
   return await createSocialLink({
-    usuario_id,
+    usuarioId,
     proveedor: 'discord',
     id_externo: discordId,
     correo_proveedor
@@ -119,10 +119,10 @@ export const findUserByDiscordSessionToken = async (sessionToken: string) => {
   return await findUserByActiveSessionTokenForSocialLink(sessionToken)
 }
 
-export const updateDiscordLastUsage = async (usuario_id: number, discordId: string) => {
+export const updateDiscordLastUsage = async (usuarioId: number, discordId: string) => {
   return await prisma.autenticacion_social.updateMany({
     where: {
-      usuario_id,
+      usuarioId,
       proveedor: 'discord',
       id_externo: discordId,
       activo: true

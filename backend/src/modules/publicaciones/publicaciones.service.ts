@@ -47,7 +47,7 @@ export const publicacionesService = {
       throw new Error('LIMIT_REACHED')
     }
 
-    return publicacionesRepository.create(userId, data as Omit<publicacion, 'id' | 'usuario_id'>)
+    return publicacionesRepository.create(userId, data as Omit<publicacion, 'id' | 'usuarioId'>)
   },
 
   async validarFlujo(userId: number): Promise<string> {
@@ -69,7 +69,7 @@ export const publicacionesService = {
       throw new Error('PUBLICACION_NOT_FOUND')
     }
 
-    if (publicacion.usuario_id !== userId) {
+    if (publicacion.usuarioId !== userId) {
       throw new Error('UNAUTHORIZED')
     }
 
@@ -83,7 +83,7 @@ export const publicacionesService = {
       throw new Error('PUBLICACION_NOT_FOUND')
     }
 
-    if (publicacion.usuario_id !== userId) {
+    if (publicacion.usuarioId !== userId) {
       throw new Error('UNAUTHORIZED')
     }
 
@@ -102,17 +102,17 @@ export const publicacionesService = {
     }
   },
 
-  async obtenerMetricasPorInmueble(inmueble_id: number): Promise<{
+  async obtenerMetricasPorInmueble(inmuebleId: number): Promise<{
     visitas: number
     favoritos: number
     contactos: number
   }> {
     const [visitas, favoritos] = await Promise.all([
       prisma.propiedad_vista.count({
-        where: { inmueble_id }
+        where: { inmuebleId }
       }),
       prisma.favorito.count({
-        where: { inmueble_id }
+        where: { inmuebleId }
       })
     ])
 

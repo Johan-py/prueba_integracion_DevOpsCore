@@ -27,26 +27,26 @@ export type AggregateVisitor = {
 
 export type VisitorAvgAggregateOutputType = {
   id: number | null
-  usuario_id: number | null
+  usuarioId: number | null
 }
 
 export type VisitorSumAggregateOutputType = {
   id: number | null
-  usuario_id: number | null
+  usuarioId: number | null
 }
 
 export type VisitorMinAggregateOutputType = {
   id: number | null
   ip: string | null
   fecha_visita: Date | null
-  usuario_id: number | null
+  usuarioId: number | null
 }
 
 export type VisitorMaxAggregateOutputType = {
   id: number | null
   ip: string | null
   fecha_visita: Date | null
-  usuario_id: number | null
+  usuarioId: number | null
 }
 
 export type VisitorCountAggregateOutputType = {
@@ -54,32 +54,32 @@ export type VisitorCountAggregateOutputType = {
   ip: number
   meta_data: number
   fecha_visita: number
-  usuario_id: number
+  usuarioId: number
   _all: number
 }
 
 export type VisitorAvgAggregateInputType = {
   id?: true
-  usuario_id?: true
+  usuarioId?: true
 }
 
 export type VisitorSumAggregateInputType = {
   id?: true
-  usuario_id?: true
+  usuarioId?: true
 }
 
 export type VisitorMinAggregateInputType = {
   id?: true
   ip?: true
   fecha_visita?: true
-  usuario_id?: true
+  usuarioId?: true
 }
 
 export type VisitorMaxAggregateInputType = {
   id?: true
   ip?: true
   fecha_visita?: true
-  usuario_id?: true
+  usuarioId?: true
 }
 
 export type VisitorCountAggregateInputType = {
@@ -87,7 +87,7 @@ export type VisitorCountAggregateInputType = {
   ip?: true
   meta_data?: true
   fecha_visita?: true
-  usuario_id?: true
+  usuarioId?: true
   _all?: true
 }
 
@@ -183,7 +183,7 @@ export type VisitorGroupByOutputType = {
   ip: string
   meta_data: runtime.JsonValue | null
   fecha_visita: Date | null
-  usuario_id: number | null
+  usuarioId: number | null
   _count: VisitorCountAggregateOutputType | null
   _avg: VisitorAvgAggregateOutputType | null
   _sum: VisitorSumAggregateOutputType | null
@@ -211,7 +211,7 @@ export type visitorWhereInput = {
   ip?: Prisma.StringFilter<'visitor'> | string
   meta_data?: Prisma.JsonNullableFilter<'visitor'>
   fecha_visita?: Prisma.DateTimeNullableFilter<'visitor'> | Date | string | null
-  usuario_id?: Prisma.IntNullableFilter<'visitor'> | number | null
+  usuarioId?: Prisma.IntNullableFilter<'visitor'> | number | null
   usuario?: Prisma.XOR<Prisma.UsuarioNullableScalarRelationFilter, Prisma.usuarioWhereInput> | null
 }
 
@@ -220,7 +220,7 @@ export type visitorOrderByWithRelationInput = {
   ip?: Prisma.SortOrder
   meta_data?: Prisma.SortOrderInput | Prisma.SortOrder
   fecha_visita?: Prisma.SortOrderInput | Prisma.SortOrder
-  usuario_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  usuarioId?: Prisma.SortOrderInput | Prisma.SortOrder
   usuario?: Prisma.usuarioOrderByWithRelationInput
 }
 
@@ -233,7 +233,7 @@ export type visitorWhereUniqueInput = Prisma.AtLeast<
     ip?: Prisma.StringFilter<'visitor'> | string
     meta_data?: Prisma.JsonNullableFilter<'visitor'>
     fecha_visita?: Prisma.DateTimeNullableFilter<'visitor'> | Date | string | null
-    usuario_id?: Prisma.IntNullableFilter<'visitor'> | number | null
+    usuarioId?: Prisma.IntNullableFilter<'visitor'> | number | null
     usuario?: Prisma.XOR<
       Prisma.UsuarioNullableScalarRelationFilter,
       Prisma.usuarioWhereInput
@@ -247,7 +247,7 @@ export type visitorOrderByWithAggregationInput = {
   ip?: Prisma.SortOrder
   meta_data?: Prisma.SortOrderInput | Prisma.SortOrder
   fecha_visita?: Prisma.SortOrderInput | Prisma.SortOrder
-  usuario_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  usuarioId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.visitorCountOrderByAggregateInput
   _avg?: Prisma.visitorAvgOrderByAggregateInput
   _max?: Prisma.visitorMaxOrderByAggregateInput
@@ -267,7 +267,7 @@ export type visitorScalarWhereWithAggregatesInput = {
   ip?: Prisma.StringWithAggregatesFilter<'visitor'> | string
   meta_data?: Prisma.JsonNullableWithAggregatesFilter<'visitor'>
   fecha_visita?: Prisma.DateTimeNullableWithAggregatesFilter<'visitor'> | Date | string | null
-  usuario_id?: Prisma.IntNullableWithAggregatesFilter<'visitor'> | number | null
+  usuarioId?: Prisma.IntNullableWithAggregatesFilter<'visitor'> | number | null
 }
 
 export type visitorCreateInput = {
@@ -282,7 +282,7 @@ export type visitorUncheckedCreateInput = {
   ip: string
   meta_data?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fecha_visita?: Date | string | null
-  usuario_id?: number | null
+  usuarioId?: number | null
 }
 
 export type visitorUpdateInput = {
@@ -297,7 +297,7 @@ export type visitorUncheckedUpdateInput = {
   ip?: Prisma.StringFieldUpdateOperationsInput | string
   meta_data?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fecha_visita?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  usuario_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  usuarioId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type visitorCreateManyInput = {
@@ -305,7 +305,7 @@ export type visitorCreateManyInput = {
   ip: string
   meta_data?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fecha_visita?: Date | string | null
-  usuario_id?: number | null
+  usuarioId?: number | null
 }
 
 export type visitorUpdateManyMutationInput = {
@@ -319,7 +319,7 @@ export type visitorUncheckedUpdateManyInput = {
   ip?: Prisma.StringFieldUpdateOperationsInput | string
   meta_data?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fecha_visita?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  usuario_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  usuarioId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type VisitorListRelationFilter = {
@@ -337,31 +337,31 @@ export type visitorCountOrderByAggregateInput = {
   ip?: Prisma.SortOrder
   meta_data?: Prisma.SortOrder
   fecha_visita?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type visitorAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type visitorMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   ip?: Prisma.SortOrder
   fecha_visita?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type visitorMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   ip?: Prisma.SortOrder
   fecha_visita?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type visitorSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type visitorCreateNestedManyWithoutUsuarioInput = {
@@ -512,7 +512,7 @@ export type visitorScalarWhereInput = {
   ip?: Prisma.StringFilter<'visitor'> | string
   meta_data?: Prisma.JsonNullableFilter<'visitor'>
   fecha_visita?: Prisma.DateTimeNullableFilter<'visitor'> | Date | string | null
-  usuario_id?: Prisma.IntNullableFilter<'visitor'> | number | null
+  usuarioId?: Prisma.IntNullableFilter<'visitor'> | number | null
 }
 
 export type visitorCreateManyUsuarioInput = {
@@ -550,7 +550,7 @@ export type visitorSelect<
     ip?: boolean
     meta_data?: boolean
     fecha_visita?: boolean
-    usuario_id?: boolean
+    usuarioId?: boolean
     usuario?: boolean | Prisma.visitor$usuarioArgs<ExtArgs>
   },
   ExtArgs['result']['visitor']
@@ -564,7 +564,7 @@ export type visitorSelectCreateManyAndReturn<
     ip?: boolean
     meta_data?: boolean
     fecha_visita?: boolean
-    usuario_id?: boolean
+    usuarioId?: boolean
     usuario?: boolean | Prisma.visitor$usuarioArgs<ExtArgs>
   },
   ExtArgs['result']['visitor']
@@ -578,7 +578,7 @@ export type visitorSelectUpdateManyAndReturn<
     ip?: boolean
     meta_data?: boolean
     fecha_visita?: boolean
-    usuario_id?: boolean
+    usuarioId?: boolean
     usuario?: boolean | Prisma.visitor$usuarioArgs<ExtArgs>
   },
   ExtArgs['result']['visitor']
@@ -589,13 +589,13 @@ export type visitorSelectScalar = {
   ip?: boolean
   meta_data?: boolean
   fecha_visita?: boolean
-  usuario_id?: boolean
+  usuarioId?: boolean
 }
 
 export type visitorOmit<
   ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs
 > = runtime.Types.Extensions.GetOmit<
-  'id' | 'ip' | 'meta_data' | 'fecha_visita' | 'usuario_id',
+  'id' | 'ip' | 'meta_data' | 'fecha_visita' | 'usuarioId',
   ExtArgs['result']['visitor']
 >
 export type visitorInclude<
@@ -627,7 +627,7 @@ export type $visitorPayload<
       ip: string
       meta_data: runtime.JsonValue | null
       fecha_visita: Date | null
-      usuario_id: number | null
+      usuarioId: number | null
     },
     ExtArgs['result']['visitor']
   >
@@ -1191,7 +1191,7 @@ export interface visitorFieldRefs {
   readonly ip: Prisma.FieldRef<'visitor', 'String'>
   readonly meta_data: Prisma.FieldRef<'visitor', 'Json'>
   readonly fecha_visita: Prisma.FieldRef<'visitor', 'DateTime'>
-  readonly usuario_id: Prisma.FieldRef<'visitor', 'Int'>
+  readonly usuarioId: Prisma.FieldRef<'visitor', 'Int'>
 }
 
 // Custom InputTypes

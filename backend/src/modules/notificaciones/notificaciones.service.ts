@@ -29,7 +29,7 @@ type GetNotificationsParams = {
 
 type GetNotificationByIdParams = {
   id: number;
-  usuario_id: number;
+  usuarioId: number;
 };
 
 type CreateNotificationParams = {
@@ -103,7 +103,7 @@ const mapNotificationToFrontend = (notification: {
 };
 
 export const getNotificationsService = async (
-  usuario_id: number,
+  usuarioId: number,
   params: GetNotificationsParams,
 ) => {
   const filter = normalizeFilter(params.filter);
@@ -112,13 +112,13 @@ export const getNotificationsService = async (
 
   const [notifications, total] = await Promise.all([
     findNotificationsByUserRepository({
-      usuario_id,
+      usuarioId,
       filter,
       limit,
       offset,
     }),
     countNotificationsByUserRepository({
-      usuario_id,
+      usuarioId,
       filter,
     }),
   ]);
@@ -133,11 +133,11 @@ export const getNotificationsService = async (
 
 export const getNotificationByIdService = async ({
   id,
-  usuario_id,
+  usuarioId,
 }: GetNotificationByIdParams) => {
   const notification = await findNotificationByIdRepository({
     id,
-    usuario_id,
+    usuarioId,
   });
 
   if (!notification) return null;
@@ -154,8 +154,8 @@ export const getNotificationByIdService = async ({
   };
 };
 
-export const getUnreadCountService = async (usuario_id: number) => {
-  const unreadCount = await countUnreadNotificationsRepository(usuario_id);
+export const getUnreadCountService = async (usuarioId: number) => {
+  const unreadCount = await countUnreadNotificationsRepository(usuarioId);
   return {
     unreadCount,
   };
@@ -190,7 +190,7 @@ export const createNotificationService = async ({
   }
 
   const notification = await createNotificationRepository({
-    usuario_id: user.id,
+    usuarioId: user.id,
     titulo: normalizedTitle,
     mensaje: normalizedMessage,
     tipo,
@@ -239,13 +239,13 @@ export const createNotificationService = async ({
 
 export const markNotificationAsReadService = async (
   id: number,
-  usuario_id: number,
+  usuarioId: number,
 ) => {
   validateNotificationId(id);
 
   const notification = await findNotificationByIdRepository({
     id,
-    usuario_id,
+    usuarioId,
   });
 
   if (!notification) {
@@ -255,11 +255,11 @@ export const markNotificationAsReadService = async (
   if (!notification.leida) {
     await markNotificationAsReadRepository({
       id,
-      usuario_id,
+      usuarioId,
       fecha_lectura: new Date(),
     });
 
-    emitNotificationEvent(usuario_id, "read", id);
+    emitNotificationEvent(usuarioId, "read", id);
   }
 
   return {
@@ -274,14 +274,14 @@ export const markNotificationAsReadService = async (
   };
 };
 
-export const markAllNotificationsAsReadService = async (usuario_id: number) => {
+export const markAllNotificationsAsReadService = async (usuarioId: number) => {
   const result = await markAllNotificationsAsReadRepository({
-    usuario_id,
+    usuarioId,
     fecha_lectura: new Date(),
   });
 
   if (result.count > 0) {
-    emitNotificationEvent(usuario_id, "read-all");
+    emitNotificationEvent(usuarioId, "read-all");
   }
 
   return {
@@ -292,13 +292,13 @@ export const markAllNotificationsAsReadService = async (usuario_id: number) => {
 
 export const deleteNotificationService = async (
   id: number,
-  usuario_id: number,
+  usuarioId: number,
 ) => {
   validateNotificationId(id);
 
   const notification = await findNotificationByIdRepository({
     id,
-    usuario_id,
+    usuarioId,
   });
 
   if (!notification) {
@@ -307,10 +307,10 @@ export const deleteNotificationService = async (
 
   await softDeleteNotificationRepository({
     id,
-    usuario_id,
+    usuarioId,
   });
 
-  emitNotificationEvent(usuario_id, "deleted", id);
+  emitNotificationEvent(usuarioId, "deleted", id);
 
   return {
     message: "Notificación eliminada correctamente",
@@ -318,7 +318,7 @@ export const deleteNotificationService = async (
 };
 
 type CreateBlogNotificationParams = {
-  usuario_id: number;
+  usuarioId: number;
   blog_id: number;
   blogTitulo: string;
   tipo: Extract<TipoNotificacion, "BLOG_APROBADO" | "BLOG_RECHAZADO">;
@@ -326,7 +326,7 @@ type CreateBlogNotificationParams = {
 };
 
 export const createBlogNotificationService = async ({
-  usuario_id,
+  usuarioId,
   blog_id,
   blogTitulo,
   tipo,
@@ -343,14 +343,14 @@ export const createBlogNotificationService = async ({
       : (razonRechazo ?? "Tu blog fue rechazado por el administrador.");
 
   const notification = await createNotificationRepository({
-    usuario_id,
+    usuarioId,
     titulo,
     mensaje,
     tipo,
     blog_id,
   });
 
-  emitNotificationEvent(usuario_id, "created", notification.id);
+  emitNotificationEvent(usuarioId, "created", notification.id);
 
   return notification;
 };
@@ -372,7 +372,7 @@ export const createAdminBlogPendingNotificationService = async ({
   await Promise.all(
     admins.map(async (admin) => {
       const notification = await createNotificationRepository({
-        usuario_id: admin.id,
+        usuarioId: admin.id,
         titulo: "Blog pendiente de revisión",
         mensaje: `El blog "${blogTitulo}" está esperando tu revisión.`,
         tipo: "BLOG_PENDIENTE",
@@ -385,13 +385,13 @@ export const createAdminBlogPendingNotificationService = async ({
 
 export const archiveNotificationService = async (
   id: number,
-  usuario_id: number,
+  usuarioId: number,
 ) => {
   validateNotificationId(id);
 
   const notification = await findNotificationByIdRepository({
     id,
-    usuario_id,
+    usuarioId,
   });
 
   if (!notification) {
@@ -405,8 +405,8 @@ export const archiveNotificationService = async (
     };
   }
 
-  await archiveNotificationRepository({ id, usuario_id });
-  emitNotificationEvent(usuario_id, "archived", id);
+  await archiveNotificationRepository({ id, usuarioId });
+  emitNotificationEvent(usuarioId, "archived", id);
 
   return {
     message: "Notificación archivada correctamente",

@@ -149,7 +149,7 @@ const replacePublicacionTags = async (publicacionId: number, userId: number, nom
   const publicacion = await tagsRepository.findPublicacionOwner(publicacionId)
 
   if (!publicacion) throw new Error('PUBLICATION_NOT_FOUND')
-  if (publicacion.usuario_id !== userId) throw new Error('FORBIDDEN')
+  if (publicacion.usuarioId !== userId) throw new Error('FORBIDDEN')
 
   const nombresNormalizados = [...new Set(nombres.map((tag) => tag.trim().toLowerCase()))]
 

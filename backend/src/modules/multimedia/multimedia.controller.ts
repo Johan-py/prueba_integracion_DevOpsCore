@@ -27,13 +27,13 @@ const parsePublicacionId = (req: Request): number => {
 }
 
 const getAuthenticatedUserId = (req: AuthenticatedRequest): number => {
-  const usuario_id = Number(req.user?.id)
+  const usuarioId = Number(req.user?.id)
 
-  if (!Number.isInteger(usuario_id) || usuario_id <= 0) {
+  if (!Number.isInteger(usuarioId) || usuarioId <= 0) {
     throw new Error('Usuario no autenticado')
   }
 
-  return usuario_id
+  return usuarioId
 }
 
 const getErrorStatus = (message: string): number => {
@@ -82,11 +82,11 @@ const handleControllerError = (error: unknown, res: Response) => {
 export const getPublicationMultimediaController = async (req: Request, res: Response) => {
   try {
     const publicacion_id = parsePublicacionId(req)
-    const usuario_id = getAuthenticatedUserId(req as AuthenticatedRequest)
+    const usuarioId = getAuthenticatedUserId(req as AuthenticatedRequest)
 
     const result = await getPublicationMultimediaService({
       publicacion_id,
-      usuario_id
+      usuarioId
     })
 
     return res.json({
@@ -101,12 +101,12 @@ export const getPublicationMultimediaController = async (req: Request, res: Resp
 export const registerVideoLinkController = async (req: Request, res: Response) => {
   try {
     const publicacion_id = parsePublicacionId(req)
-    const usuario_id = getAuthenticatedUserId(req as AuthenticatedRequest)
+    const usuarioId = getAuthenticatedUserId(req as AuthenticatedRequest)
     const { videoUrl } = req.body as Partial<RegisterVideoLinkBody>
 
     const result = await registerVideoLinkService({
       publicacion_id,
-      usuario_id,
+      usuarioId,
       videoUrl: typeof videoUrl === 'string' ? videoUrl : ''
     })
 
@@ -122,7 +122,7 @@ export const registerVideoLinkController = async (req: Request, res: Response) =
 export const registerImagesController = async (req: Request, res: Response) => {
   try {
     const publicacion_id = parsePublicacionId(req)
-    const usuario_id = getAuthenticatedUserId(req as AuthenticatedRequest)
+    const usuarioId = getAuthenticatedUserId(req as AuthenticatedRequest)
     const files = (req as AuthenticatedRequest).files ?? []
 
     if (files.length === 0) {
@@ -144,7 +144,7 @@ export const registerImagesController = async (req: Request, res: Response) => {
 
     const result = await registerImagesService({
       publicacion_id,
-      usuario_id,
+      usuarioId,
       images: normalizedImages
     })
 

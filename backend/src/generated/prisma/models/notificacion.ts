@@ -27,12 +27,12 @@ export type AggregateNotificacion = {
 
 export type NotificacionAvgAggregateOutputType = {
   id: number | null
-  usuario_id: number | null
+  usuarioId: number | null
 }
 
 export type NotificacionSumAggregateOutputType = {
   id: number | null
-  usuario_id: number | null
+  usuarioId: number | null
 }
 
 export type NotificacionMinAggregateOutputType = {
@@ -44,7 +44,7 @@ export type NotificacionMinAggregateOutputType = {
   fecha_lectura: Date | null
   eliminada: boolean | null
   archivada: boolean | null
-  usuario_id: number | null
+  usuarioId: number | null
 }
 
 export type NotificacionMaxAggregateOutputType = {
@@ -56,7 +56,7 @@ export type NotificacionMaxAggregateOutputType = {
   fecha_lectura: Date | null
   eliminada: boolean | null
   archivada: boolean | null
-  usuario_id: number | null
+  usuarioId: number | null
 }
 
 export type NotificacionCountAggregateOutputType = {
@@ -68,18 +68,18 @@ export type NotificacionCountAggregateOutputType = {
   fecha_lectura: number
   eliminada: number
   archivada: number
-  usuario_id: number
+  usuarioId: number
   _all: number
 }
 
 export type NotificacionAvgAggregateInputType = {
   id?: true
-  usuario_id?: true
+  usuarioId?: true
 }
 
 export type NotificacionSumAggregateInputType = {
   id?: true
-  usuario_id?: true
+  usuarioId?: true
 }
 
 export type NotificacionMinAggregateInputType = {
@@ -91,7 +91,7 @@ export type NotificacionMinAggregateInputType = {
   fecha_lectura?: true
   eliminada?: true
   archivada?: true
-  usuario_id?: true
+  usuarioId?: true
 }
 
 export type NotificacionMaxAggregateInputType = {
@@ -103,7 +103,7 @@ export type NotificacionMaxAggregateInputType = {
   fecha_lectura?: true
   eliminada?: true
   archivada?: true
-  usuario_id?: true
+  usuarioId?: true
 }
 
 export type NotificacionCountAggregateInputType = {
@@ -115,7 +115,7 @@ export type NotificacionCountAggregateInputType = {
   fecha_lectura?: true
   eliminada?: true
   archivada?: true
-  usuario_id?: true
+  usuarioId?: true
   _all?: true
 }
 
@@ -219,7 +219,7 @@ export type NotificacionGroupByOutputType = {
   fecha_lectura: Date | null
   eliminada: boolean | null
   archivada: boolean | null
-  usuario_id: number
+  usuarioId: number
   _count: NotificacionCountAggregateOutputType | null
   _avg: NotificacionAvgAggregateOutputType | null
   _sum: NotificacionSumAggregateOutputType | null
@@ -251,7 +251,7 @@ export type notificacionWhereInput = {
   fecha_lectura?: Prisma.DateTimeNullableFilter<'notificacion'> | Date | string | null
   eliminada?: Prisma.BoolNullableFilter<'notificacion'> | boolean | null
   archivada?: Prisma.BoolNullableFilter<'notificacion'> | boolean | null
-  usuario_id?: Prisma.IntFilter<'notificacion'> | number
+  usuarioId?: Prisma.IntFilter<'notificacion'> | number
   usuario?: Prisma.XOR<Prisma.UsuarioScalarRelationFilter, Prisma.usuarioWhereInput>
 }
 
@@ -264,7 +264,7 @@ export type notificacionOrderByWithRelationInput = {
   fecha_lectura?: Prisma.SortOrderInput | Prisma.SortOrder
   eliminada?: Prisma.SortOrderInput | Prisma.SortOrder
   archivada?: Prisma.SortOrderInput | Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
   usuario?: Prisma.usuarioOrderByWithRelationInput
 }
 
@@ -281,7 +281,7 @@ export type notificacionWhereUniqueInput = Prisma.AtLeast<
     fecha_lectura?: Prisma.DateTimeNullableFilter<'notificacion'> | Date | string | null
     eliminada?: Prisma.BoolNullableFilter<'notificacion'> | boolean | null
     archivada?: Prisma.BoolNullableFilter<'notificacion'> | boolean | null
-    usuario_id?: Prisma.IntFilter<'notificacion'> | number
+    usuarioId?: Prisma.IntFilter<'notificacion'> | number
     usuario?: Prisma.XOR<Prisma.UsuarioScalarRelationFilter, Prisma.usuarioWhereInput>
   },
   'id'
@@ -296,7 +296,7 @@ export type notificacionOrderByWithAggregationInput = {
   fecha_lectura?: Prisma.SortOrderInput | Prisma.SortOrder
   eliminada?: Prisma.SortOrderInput | Prisma.SortOrder
   archivada?: Prisma.SortOrderInput | Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
   _count?: Prisma.notificacionCountOrderByAggregateInput
   _avg?: Prisma.notificacionAvgOrderByAggregateInput
   _max?: Prisma.notificacionMaxOrderByAggregateInput
@@ -324,7 +324,7 @@ export type notificacionScalarWhereWithAggregatesInput = {
   fecha_lectura?: Prisma.DateTimeNullableWithAggregatesFilter<'notificacion'> | Date | string | null
   eliminada?: Prisma.BoolNullableWithAggregatesFilter<'notificacion'> | boolean | null
   archivada?: Prisma.BoolNullableWithAggregatesFilter<'notificacion'> | boolean | null
-  usuario_id?: Prisma.IntWithAggregatesFilter<'notificacion'> | number
+  usuarioId?: Prisma.IntWithAggregatesFilter<'notificacion'> | number
 }
 
 export type notificacionCreateInput = {
@@ -347,7 +347,7 @@ export type notificacionUncheckedCreateInput = {
   fecha_lectura?: Date | string | null
   eliminada?: boolean | null
   archivada?: boolean | null
-  usuario_id: number
+  usuarioId: number
 }
 
 export type notificacionUpdateInput = {
@@ -370,7 +370,7 @@ export type notificacionUncheckedUpdateInput = {
   fecha_lectura?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   eliminada?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   archivada?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  usuario_id?: Prisma.IntFieldUpdateOperationsInput | number
+  usuarioId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type notificacionCreateManyInput = {
@@ -382,7 +382,7 @@ export type notificacionCreateManyInput = {
   fecha_lectura?: Date | string | null
   eliminada?: boolean | null
   archivada?: boolean | null
-  usuario_id: number
+  usuarioId: number
 }
 
 export type notificacionUpdateManyMutationInput = {
@@ -404,7 +404,7 @@ export type notificacionUncheckedUpdateManyInput = {
   fecha_lectura?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   eliminada?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   archivada?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  usuario_id?: Prisma.IntFieldUpdateOperationsInput | number
+  usuarioId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type notificacionCountOrderByAggregateInput = {
@@ -416,12 +416,12 @@ export type notificacionCountOrderByAggregateInput = {
   fecha_lectura?: Prisma.SortOrder
   eliminada?: Prisma.SortOrder
   archivada?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type notificacionAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type notificacionMaxOrderByAggregateInput = {
@@ -433,7 +433,7 @@ export type notificacionMaxOrderByAggregateInput = {
   fecha_lectura?: Prisma.SortOrder
   eliminada?: Prisma.SortOrder
   archivada?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type notificacionMinOrderByAggregateInput = {
@@ -445,12 +445,12 @@ export type notificacionMinOrderByAggregateInput = {
   fecha_lectura?: Prisma.SortOrder
   eliminada?: Prisma.SortOrder
   archivada?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type notificacionSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  usuario_id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
 }
 
 export type NotificacionListRelationFilter = {
@@ -623,7 +623,7 @@ export type notificacionScalarWhereInput = {
   fecha_lectura?: Prisma.DateTimeNullableFilter<'notificacion'> | Date | string | null
   eliminada?: Prisma.BoolNullableFilter<'notificacion'> | boolean | null
   archivada?: Prisma.BoolNullableFilter<'notificacion'> | boolean | null
-  usuario_id?: Prisma.IntFilter<'notificacion'> | number
+  usuarioId?: Prisma.IntFilter<'notificacion'> | number
 }
 
 export type notificacionCreateManyUsuarioInput = {
@@ -681,7 +681,7 @@ export type notificacionSelect<
     fecha_lectura?: boolean
     eliminada?: boolean
     archivada?: boolean
-    usuario_id?: boolean
+    usuarioId?: boolean
     usuario?: boolean | Prisma.usuarioDefaultArgs<ExtArgs>
   },
   ExtArgs['result']['notificacion']
@@ -699,7 +699,7 @@ export type notificacionSelectCreateManyAndReturn<
     fecha_lectura?: boolean
     eliminada?: boolean
     archivada?: boolean
-    usuario_id?: boolean
+    usuarioId?: boolean
     usuario?: boolean | Prisma.usuarioDefaultArgs<ExtArgs>
   },
   ExtArgs['result']['notificacion']
@@ -717,7 +717,7 @@ export type notificacionSelectUpdateManyAndReturn<
     fecha_lectura?: boolean
     eliminada?: boolean
     archivada?: boolean
-    usuario_id?: boolean
+    usuarioId?: boolean
     usuario?: boolean | Prisma.usuarioDefaultArgs<ExtArgs>
   },
   ExtArgs['result']['notificacion']
@@ -732,7 +732,7 @@ export type notificacionSelectScalar = {
   fecha_lectura?: boolean
   eliminada?: boolean
   archivada?: boolean
-  usuario_id?: boolean
+  usuarioId?: boolean
 }
 
 export type notificacionOmit<
@@ -746,7 +746,7 @@ export type notificacionOmit<
   | 'fecha_lectura'
   | 'eliminada'
   | 'archivada'
-  | 'usuario_id',
+  | 'usuarioId',
   ExtArgs['result']['notificacion']
 >
 export type notificacionInclude<
@@ -782,7 +782,7 @@ export type $notificacionPayload<
       fecha_lectura: Date | null
       eliminada: boolean | null
       archivada: boolean | null
-      usuario_id: number
+      usuarioId: number
     },
     ExtArgs['result']['notificacion']
   >
@@ -1374,7 +1374,7 @@ export interface notificacionFieldRefs {
   readonly fecha_lectura: Prisma.FieldRef<'notificacion', 'DateTime'>
   readonly eliminada: Prisma.FieldRef<'notificacion', 'Boolean'>
   readonly archivada: Prisma.FieldRef<'notificacion', 'Boolean'>
-  readonly usuario_id: Prisma.FieldRef<'notificacion', 'Int'>
+  readonly usuarioId: Prisma.FieldRef<'notificacion', 'Int'>
 }
 
 // Custom InputTypes

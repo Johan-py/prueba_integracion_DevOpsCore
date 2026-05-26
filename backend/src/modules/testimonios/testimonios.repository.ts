@@ -1,8 +1,8 @@
 import { prisma } from "../../lib/prisma.client.js";
 
 export const testimoniosRepository = {
-  async findAll(params: { ciudad?: string; usuario_id?: number }) {
-    const { ciudad, usuario_id } = params;
+  async findAll(params: { ciudad?: string; usuarioId?: number }) {
+    const { ciudad, usuarioId } = params;
 
     const where = {
       visible: true,
@@ -43,8 +43,8 @@ export const testimoniosRepository = {
           `${t.usuario.nombre[0] ?? ""}${t.usuario.apellido[0] ?? ""}`.toUpperCase(),
       },
       totalLikes: t.testimonio_like.length,
-      meGusta: usuario_id
-        ? t.testimonio_like.some((l) => l.usuario_id === usuario_id)
+      meGusta: usuarioId
+        ? t.testimonio_like.some((l) => l.usuarioId === usuarioId)
         : false,
     }));
   },
@@ -53,20 +53,20 @@ export const testimoniosRepository = {
     return prisma.testimonio.findUnique({ where: { id } });
   },
 
-  async findLike(testimonioId: number, usuario_id: number) {
+  async findLike(testimonioId: number, usuarioId: number) {
     return prisma.testimonio_like.findUnique({
       where: {
-        testimonio_id_usuario_id: {
+        testimonio_id_usuarioId: {
           testimonio_id: testimonioId,
-          usuario_id: usuario_id,
+          usuarioId: usuarioId,
         },
       },
     });
   },
 
-  async createLike(testimonioId: number, usuario_id: number) {
+  async createLike(testimonioId: number, usuarioId: number) {
     return prisma.testimonio_like.create({
-      data: { testimonio_id: testimonioId, usuario_id: usuario_id },
+      data: { testimonio_id: testimonioId, usuarioId: usuarioId },
     });
   },
 

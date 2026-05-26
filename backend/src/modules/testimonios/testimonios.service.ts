@@ -1,11 +1,11 @@
 import { testimoniosRepository } from './testimonios.repository.js'
 
 export const testimoniosService = {
-  async listar(ciudad?: string, usuario_id?: number) {
-    return testimoniosRepository.findAll({ ciudad, usuario_id })
+  async listar(ciudad?: string, usuarioId?: number) {
+    return testimoniosRepository.findAll({ ciudad, usuarioId })
   },
 
-  async toggleLike(testimonioId: number, usuario_id: number) {
+  async toggleLike(testimonioId: number, usuarioId: number) {
     const testimonio = await testimoniosRepository.findById(testimonioId)
 
     if (!testimonio || testimonio.eliminado) {
@@ -14,13 +14,13 @@ export const testimoniosService = {
 
     const likeExistente = await testimoniosRepository.findLike(
       testimonioId,
-      usuario_id
+      usuarioId
     )
 
     if (likeExistente) {
       await testimoniosRepository.deleteLike(likeExistente.id)
     } else {
-      await testimoniosRepository.createLike(testimonioId, usuario_id)
+      await testimoniosRepository.createLike(testimonioId, usuarioId)
     }
 
     const totalLikes = await testimoniosRepository.countLikes(testimonioId)

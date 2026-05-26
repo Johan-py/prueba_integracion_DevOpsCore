@@ -14,8 +14,8 @@ export interface InmuebleConScore {
 }
 
 export interface HistorialVista {
-  inmueble_id: number
-  vista_en: Date
+  inmuebleId: number
+  vistaEn: Date
   peso: number // 1.0 para últimos 7 días, menor para más antiguos
 }
 
@@ -29,7 +29,7 @@ export interface PreferenciasUsuario {
 }
 
 export interface RecomendacionesParams {
-  usuario_id?: number
+  usuarioId?: number
   limit?: number
   excludeIds?: number[] // Inmuebles a excluir
   zonaForzada?: string // Para forzar 60% de una zona

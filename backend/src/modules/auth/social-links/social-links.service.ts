@@ -8,8 +8,8 @@ import {
 
 const SUPPORTED_PROVIDERS = ['facebook', 'discord', 'google', 'linkedin'] as const
 
-export const getSocialLinksService = async (usuario_id: number) => {
-  const links = await listSocialLinksByUser(usuario_id)
+export const getSocialLinksService = async (usuarioId: number) => {
+  const links = await listSocialLinksByUser(usuarioId)
 
   const facebook = links.find((item) => item.proveedor === 'facebook')
   const discord = links.find((item) => item.proveedor === 'discord')
@@ -52,7 +52,7 @@ export const getSocialLinksService = async (usuario_id: number) => {
 }
 
 export const unlinkSocialProviderService = async (
-  usuario_id: number,
+  usuarioId: number,
   provider: string,
   currentToken: string
 ) => {
@@ -60,22 +60,22 @@ export const unlinkSocialProviderService = async (
     throw new Error('Proveedor no soportado.')
   }
 
-  const existingLink = await findSocialLinkByUserAndProvider(usuario_id, provider)
+  const existingLink = await findSocialLinkByUserAndProvider(usuarioId, provider)
 
   if (!existingLink) {
     throw new Error('La red social no está vinculada.')
   }
 
-  const activeLinksCount = await countActiveSocialLinksByUser(usuario_id)
+  const activeLinksCount = await countActiveSocialLinksByUser(usuarioId)
 
   if (activeLinksCount <= 1) {
     throw new Error('No puedes desvincular esta red porque es tu único método de acceso activo.')
   }
 
-  await deactivateSocialLinkByUserAndProvider(usuario_id, provider)
+  await deactivateSocialLinkByUserAndProvider(usuarioId, provider)
 
   if (provider === 'linkedin') {
-    await invalidateOtherSessionsByAuthMethod(usuario_id, 'linkedin', currentToken)
+    await invalidateOtherSessionsByAuthMethod(usuarioId, 'linkedin', currentToken)
   }
 
   return {
@@ -84,8 +84,8 @@ export const unlinkSocialProviderService = async (
   }
 }
 
-export const getLinkedInOriginalEmail = async (usuario_id: number) => {
-  const link = await findSocialLinkByUserAndProvider(usuario_id, 'linkedin')
+export const getLinkedInOriginalEmail = async (usuarioId: number) => {
+  const link = await findSocialLinkByUserAndProvider(usuarioId, 'linkedin')
   if (!link) return null
   return link.correo_proveedor ?? null
 }

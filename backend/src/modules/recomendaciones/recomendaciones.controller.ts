@@ -6,9 +6,9 @@ const recomendacionesService = new RecomendacionesService()
 
 export const getRecomendacionesGlobales = async (req: Request, res: Response) => {
   try {
-    const usuario_id = (req as any).usuario?.id
+    const usuarioId = (req as any).usuario?.id
 
-    if (!usuario_id) {
+    if (!usuarioId) {
       return res.status(401).json({ success: false, error: 'Usuario no autenticado' })
     }
 
@@ -16,7 +16,7 @@ export const getRecomendacionesGlobales = async (req: Request, res: Response) =>
     const zonaForzada = req.query.zona as string | undefined
 
     const recomendaciones = await recomendacionesService.getRecomendacionesGlobales({
-      usuario_id,
+      usuarioId,
       limit,
       zonaForzada
     })
@@ -29,8 +29,8 @@ export const getRecomendacionesGlobales = async (req: Request, res: Response) =>
 }
 export const getInmueblesRecomendados = async (req: Request, res: Response) => {
   try {
-    const usuario_id = (req as any).usuario?.id
-    console.log('usuario_id recibido en recomendaciones:', usuario_id) //pruebas
+    const usuarioId = (req as any).usuario?.id
+    console.log('usuarioId recibido en recomendaciones:', usuarioId) //pruebas
 
     const zona = req.query.zona as string | undefined
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 50
@@ -60,10 +60,10 @@ export const getInmueblesRecomendados = async (req: Request, res: Response) => {
 
     let resultados: any[] = []
 
-    if (usuario_id) {
+    if (usuarioId) {
       // CA 5, 6, 7: Si hay sesión, buscamos recomendaciones personalizadas por afinidad
       resultados = await recomendacionesService.getRecomendacionesGlobales({
-        usuario_id,
+        usuarioId,
         limit,
         zonaForzada: zona,
         ia,
@@ -95,8 +95,8 @@ export const getInmueblesRecomendados = async (req: Request, res: Response) => {
 
 export const ordenarPorAfinidad = async (req: Request, res: Response) => {
   try {
-    const usuario_id = (req as any).usuario?.id
-    if (!usuario_id) {
+    const usuarioId = (req as any).usuario?.id
+    if (!usuarioId) {
       return res.status(401).json({ success: false, error: 'Usuario no autenticado' })
     }
 
@@ -105,7 +105,7 @@ export const ordenarPorAfinidad = async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, error: 'inmuebleIds es requerido' })
     }
 
-    const resultado = await recomendacionesService.ordenarPorAfinidad(inmuebleIds, usuario_id)
+    const resultado = await recomendacionesService.ordenarPorAfinidad(inmuebleIds, usuarioId)
     res.status(200).json({ success: true, data: resultado })
   } catch (error) {
     console.error('Error en ordenarPorAfinidad:', error)
@@ -114,11 +114,11 @@ export const ordenarPorAfinidad = async (req: Request, res: Response) => {
 }
 export const invalidarCacheUsuario = async (req: Request, res: Response) => {
   try {
-    const usuario_id = (req as any).usuario?.id
-    if (!usuario_id) {
+    const usuarioId = (req as any).usuario?.id
+    if (!usuarioId) {
       return res.status(401).json({ success: false, error: 'Usuario no autenticado' })
     }
-    cache.invalidateUsuario(usuario_id)
+    cache.invalidateUsuario(usuarioId)
     res.status(200).json({ success: true, message: 'Caché invalidado' })
   } catch (error) {
     res.status(500).json({ success: false, error: 'Error al invalidar caché' })

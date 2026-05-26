@@ -104,9 +104,9 @@ const normalizeYoutubeUrl = (videoUrl: string): string => {
   return `https://www.youtube.com/watch?v=${videoId}`
 }
 
-const validatePublicationOwnership = async (publicacion_id: number, usuario_id: number) => {
+const validatePublicationOwnership = async (publicacion_id: number, usuarioId: number) => {
   validatePositiveInteger(publicacion_id, 'ID de publicación')
-  validatePositiveInteger(usuario_id, 'Usuario')
+  validatePositiveInteger(usuarioId, 'Usuario')
 
   const publication = await findPublicationByIdRepository(publicacion_id)
 
@@ -114,7 +114,7 @@ const validatePublicationOwnership = async (publicacion_id: number, usuario_id: 
     throw new Error('La publicación no existe')
   }
 
-  if (publication.usuario_id !== usuario_id) {
+  if (publication.usuarioId !== usuarioId) {
     throw new Error('La publicación no pertenece al usuario autenticado')
   }
 
@@ -171,9 +171,9 @@ const validateImagesInput = (images: RegisterImagesInput['images']) => {
 
 export const getPublicationMultimediaService = async ({
   publicacion_id,
-  usuario_id
+  usuarioId
 }: GetPublicationMultimediaInput) => {
-  const publication = await validatePublicationOwnership(publicacion_id, usuario_id)
+  const publication = await validatePublicationOwnership(publicacion_id, usuarioId)
 
   const multimedia = await getMultimediaByPublicationIdRepository(publicacion_id)
 
@@ -185,10 +185,10 @@ export const getPublicationMultimediaService = async ({
 
 export const registerVideoLinkService = async ({
   publicacion_id,
-  usuario_id,
+  usuarioId,
   videoUrl
 }: RegisterVideoLinkInput) => {
-  const publication = await validatePublicationOwnership(publicacion_id, usuario_id)
+  const publication = await validatePublicationOwnership(publicacion_id, usuarioId)
 
   if (typeof videoUrl !== 'string' || !videoUrl.trim()) {
     throw new Error('El enlace de video es obligatorio')
@@ -220,10 +220,10 @@ export const registerVideoLinkService = async ({
 
 export const registerImagesService = async ({
   publicacion_id,
-  usuario_id,
+  usuarioId,
   images
 }: RegisterImagesInput) => {
-  const publication = await validatePublicationOwnership(publicacion_id, usuario_id)
+  const publication = await validatePublicationOwnership(publicacion_id, usuarioId)
 
   const normalizedImages = validateImagesInput(images)
 

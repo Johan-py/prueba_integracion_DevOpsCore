@@ -9,11 +9,11 @@ export type AuthRequest = Request & {
 export const listarTestimonios = async (req: Request, res: Response) => {
   try {
     const { ciudad } = req.query
-    const usuario_id = (req as AuthRequest).user?.id
+    const usuarioId = (req as AuthRequest).user?.id
 
     const data = await testimoniosService.listar(
       ciudad as string | undefined,
-      usuario_id
+      usuarioId
     )
 
     return res.json({ data })
