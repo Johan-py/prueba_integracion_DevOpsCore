@@ -8,12 +8,12 @@ import type {
 
 const mapPublicationRecord = (publication: {
   id: number;
-  usuarioId: number;
+  usuario_id: number;
   titulo: string;
 }): PublicacionRecord => {
   return {
     id: publication.id,
-    usuarioId: publication.usuarioId,
+    usuarioId: publication.usuario_id,
     titulo: publication.titulo,
   };
 };

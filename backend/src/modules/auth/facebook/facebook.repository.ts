@@ -27,7 +27,7 @@ export const findUserByFacebookId = async (facebookId: string) => {
     }
   })
 
-  return social?.usuarioId ?? null
+  return social?.usuario ?? null
 }
 
 export const findUserByFacebookEmail = async (correo: string) => {
@@ -51,7 +51,7 @@ export const createFacebookUser = async (
       usuarioId: user.id,
       proveedor: 'facebook',
       idExterno: facebookId,
-      correoProveedor,
+      correoProveedor: correo_proveedor,
       activo: true
     }
   })
@@ -69,7 +69,7 @@ export const linkFacebookToUser = async (
       usuarioId,
       proveedor: 'facebook',
       idExterno: facebookId,
-      correoProveedor,
+      correoProveedor: correo_proveedor,
       activo: true
     }
   })
@@ -87,7 +87,7 @@ export const createFacebookSession = async ({
   return await createSession({
     token,
     usuarioId,
-    fecha_expiracion
+    fechaExpiracion: fecha_expiracion
   })
 }
 
@@ -112,7 +112,7 @@ export const createFacebookLinkForUser = async ({
     usuarioId,
     proveedor: 'facebook',
     idExterno: facebookId,
-    correoProveedor
+    correoProveedor: correo_proveedor
   })
 }
 
@@ -133,4 +133,3 @@ export const updateFacebookLastUsage = async (usuarioId: number, facebookId: str
     }
   })
 }
-

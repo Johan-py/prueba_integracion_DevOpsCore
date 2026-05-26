@@ -31,7 +31,7 @@ export const findUserByLinkedInId = async (linkedinId: string) => {
     include: { usuario: true }
   })
 
-  return social?.usuarioId ?? null
+  return social?.usuario ?? null
 }
 
 export const findUserByLinkedInEmail = async (correo: string) => {
@@ -41,7 +41,7 @@ export const findUserByLinkedInEmail = async (correo: string) => {
 export const createLinkedInUser = async (
   data: CreateLinkedInUserInput,
   linkedinId: string,
-  correo_proveedor: string,
+  correoProveedor: string,
   tokenStorage: LinkedInTokenStorageInput
 ) => {
   return await prisma.$transaction(async (tx) => {
@@ -83,7 +83,7 @@ export const createLinkedInUser = async (
 export const linkLinkedInToUser = async (
   usuarioId: number,
   linkedinId: string,
-  correo_proveedor: string,
+  correoProveedor: string,
   tokenStorage: LinkedInTokenStorageInput
 ) => {
   const existingLink = await prisma.autenticacion_social.findFirst({
@@ -137,7 +137,7 @@ export const createLinkedInSession = async ({
   return await createSession({
     token,
     usuarioId,
-    fecha_expiracion,
+    fechaExpiracion:fecha_expiracion,
     metodo_auth: 'linkedin'
   })
 }
@@ -153,15 +153,15 @@ export const findLinkedInLinkByUserId = async (usuarioId: number) => {
 export const createLinkedInLinkForUser = async ({
   usuarioId,
   linkedinId,
-  correo_proveedor,
+  correoProveedor,
   tokenStorage
 }: {
   usuarioId: number
   linkedinId: string
-  correo_proveedor?: string | null
+  correoProveedor?: string | null
   tokenStorage: LinkedInTokenStorageInput
 }) => {
-  return await linkLinkedInToUser(usuarioId, linkedinId, correo_proveedor ?? '', tokenStorage)
+  return await linkLinkedInToUser(usuarioId, linkedinId, correoProveedor ?? '', tokenStorage)
 }
 
 export const findUserByLinkedInSessionToken = async (sessionToken: string) => {

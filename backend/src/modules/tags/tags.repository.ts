@@ -86,7 +86,7 @@ const findByPublicacionId = async (publicacionId: number) => {
   return prisma.publicacion_tag.findMany({
     where: { publicacion_id: publicacionId },
     include: { tag: true },
-    orderBy: { agregadoEn: 'asc' }
+    orderBy: { agregado_en: 'asc' }
   })
 }
 

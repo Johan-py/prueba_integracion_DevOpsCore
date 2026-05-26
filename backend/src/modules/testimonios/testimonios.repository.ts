@@ -58,7 +58,7 @@ export const testimoniosRepository = {
       where: {
         testimonio_id_usuario_id: {
           testimonio_id: testimonioId,
-          usuarioId: usuarioId,
+          usuario_id: usuarioId,
         },
       },
     });

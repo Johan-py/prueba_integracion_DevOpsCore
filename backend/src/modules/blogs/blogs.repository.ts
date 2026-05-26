@@ -91,7 +91,7 @@ export const blogsRepository = {
 
   async findByUserId(usuarioId: number) {
     return prisma.blog.findMany({
-      where: { usuarioId, eliminado: false },
+      where: { usuario_id: usuarioId, eliminado: false },
       orderBy: { fecha_creacion: "desc" },
       include: {
         categoria_blog: { select: { id: true, nombre: true } },
@@ -121,16 +121,16 @@ export const blogsRepository = {
     imagen?: string;
     estado: estado_blog;
     categoria_id: number;
-    usuarioId: number;
+    usuario_id: number;
   }) {
     return prisma.blog.create({
       data: {
         ...data,
-        fecha_publicacion: data.estado === "PUBLICADO" ? new Date() : null,
+        fecha_publicacion:
+          data.estado === "PUBLICADO" ? new Date() : null,
       },
     });
   },
-
   async createPendingRevision(
     originalBlogId: number,
     data: {
@@ -138,7 +138,7 @@ export const blogsRepository = {
       contenido: string;
       imagen?: string;
       categoria_id: number;
-      usuarioId: number;
+      usuario_id: number;
     },
   ) {
     return prisma.$transaction(async (tx) => {
@@ -399,7 +399,7 @@ export const blogsRepository = {
 export const comentariosRepository = {
   async create(data: {
     contenido: string;
-    usuarioId: number;
+    usuario_id: number;
     blog_id: number;
     comentario_padre_id?: number;
   }) {
@@ -443,7 +443,7 @@ export const comentariosRepository = {
             select: { id: true, nombre: true, apellido: true, avatar: true },
           },
           _count: { select: { comentario_like: true } },
-          ...(usuarioId ? { comentario_like: { where: { usuarioId } } } : {}),
+          ...(usuarioId ? { comentario_like: { where: { usuario_id: usuarioId } } } : {}),
         },
       }),
       prisma.comentario.count({ where: { blog_id } }),
@@ -487,7 +487,7 @@ export const comentariosRepository = {
 
   async toggleLike(usuarioId: number, comentario_id: number) {
     const existing = await prisma.comentario_like.findUnique({
-      where: { usuario_id_comentario_id: { usuarioId, comentario_id } },
+      where: { usuario_id_comentario_id: { usuario_id: usuarioId, comentario_id } },
     });
 
     if (existing) {
@@ -495,7 +495,7 @@ export const comentariosRepository = {
       return { liked: false };
     } else {
       await prisma.comentario_like.create({
-        data: { usuarioId, comentario_id },
+        data: { usuario_id: usuarioId, comentario_id },
       });
       return { liked: true };
     }

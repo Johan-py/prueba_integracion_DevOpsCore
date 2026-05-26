@@ -523,7 +523,7 @@ export const confirmarCambioEmail = async (req: AuthRequest, res: Response) => {
         usuario_id: usuarioId,
         completado_en: null,
       },
-      orderBy: { creadoEn: "desc" },
+      orderBy: { creado_en: "desc" },
     });
 
     if (!solicitud) {

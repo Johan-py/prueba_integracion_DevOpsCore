@@ -8,7 +8,7 @@ const mapTutorialEstadoRecord = (record: {
   confirmado_en: Date | null;
 }): TutorialPublicacionEstadoRecord => ({
   id: record.id,
-  usuarioId: record.usuarioId,
+  usuarioId: record.usuario_id,
   confirmado: record.confirmado,
   confirmadoEn: record.confirmado_en,
 });

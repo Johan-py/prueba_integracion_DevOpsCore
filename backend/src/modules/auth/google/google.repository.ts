@@ -28,7 +28,7 @@ export const findUserByGoogleId = async (googleId: string) => {
     }
   })
 
-  return social?.usuarioId ?? null
+  return social?.usuario ?? null
 }
 
 export const findUserByGoogleEmail = async (correo: string) => {
@@ -62,7 +62,7 @@ export const createGoogleUser = async (
         usuarioId: user.id,
         proveedor: 'google',
         idExterno: googleId,
-        correoProveedor,
+        correoProveedor: correo_proveedor,
         activo: true
       }
     })
@@ -80,7 +80,7 @@ export const linkGoogleToUser = async (
     usuarioId,
     proveedor: 'google',
     idExterno: googleId,
-    correoProveedor
+    correoProveedor: correo_proveedor
   })
 }
 
@@ -96,7 +96,7 @@ export const createGoogleSession = async ({
   return await createSession({
     token,
     usuarioId,
-    fecha_expiracion
+    fechaExpiracion: fecha_expiracion
   })
 }
 
@@ -121,7 +121,7 @@ export const createGoogleLinkForUser = async ({
     usuarioId,
     proveedor: 'google',
     idExterno: googleId,
-    correoProveedor
+    correoProveedor: correo_proveedor
   })
 }
 

@@ -88,7 +88,7 @@ export const findNotificationsByUserRepository = async ({
 }: FindNotificationsParams) => {
   return prisma.notificacion.findMany({
     where: buildWhereClause({ usuarioId, filter }),
-    orderBy: { fecha_creacion: "desc" },
+    orderBy: { fechaCreacion: "desc" },
     take: limit,
     skip: offset,
   });

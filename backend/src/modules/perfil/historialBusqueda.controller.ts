@@ -12,7 +12,7 @@ export const getHistorialBusqueda = async (req: Request, res: Response) => {
         // Buscamos los últimos registros (traemos más de 10 por si hay duplicados en DB)
         const historial = await prisma.historial_busqueda.findMany({
             where: { usuarioid: usuarioId },
-            orderBy: { creadoEn: 'desc' },
+            orderBy: { creadoen: 'desc' },
             take: 50 
         });
 

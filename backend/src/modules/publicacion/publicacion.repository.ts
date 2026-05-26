@@ -242,7 +242,7 @@ export const buscarDetallePublicacionPorIdRepository = async (
       estado: true,
       fecha_publicacion: true,
       usuario_id: true,
-      inmuebleId: true,
+      inmueble_id: true,
       usuario: {
         select: {
           id: true,

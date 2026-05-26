@@ -417,15 +417,15 @@ function BusquedaMapaContent() {
         const coordenadas = extraerCoordenadasDeGeometria(zonaUsuario.geometria)
         if (coordenadas.length < 3) return null
 
-        return {
-          id: zonaUsuarioId,
-          nombre: zonaUsuario.nombre,
-          coordenadas,
-          activa: true,
-          creadoEn: new Date().toISOString(),
-          color: ZONA_COLORS.personalizada.fillActive,
-          tipo: 'personalizada' as const
-        }
+      return {
+        id: -zonaUsuario.id,
+        nombre: zonaUsuario.nombre,
+        coordenadas,
+        activa: true,
+        creadoEn: new Date().toISOString(),
+        color: ZONA_COLORS.personalizada.fillActive,
+        tipo: 'personalizada' as const
+      }
       })
       .filter((zona): zona is NonNullable<typeof zona> => Boolean(zona))
 

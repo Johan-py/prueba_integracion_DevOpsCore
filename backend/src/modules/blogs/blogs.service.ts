@@ -45,7 +45,7 @@ export const blogsService = {
       contenido: data.contenido,
       imagen: data.imagen,
       categoria_id: data.categoria_id,
-      usuarioId,
+      usuario_id: usuarioId,
       estado,
     });
 
@@ -95,7 +95,7 @@ export const blogsService = {
         contenido: data.contenido ?? blog.contenido,
         imagen: data.imagen ?? blog.imagen ?? undefined,
         categoria_id: data.categoria_id ?? blog.categoria_id,
-        usuarioId,
+        usuario_id: usuarioId
       });
 
       if (!revisionBlog) {
@@ -302,8 +302,15 @@ export const comentariosService = {
     blog_id: number;
     comentario_padre_id?: number;
   }) {
-    const nuevoComentario = await comentariosRepository.create(data);
+    const nuevoComentario = await comentariosRepository.create({
+      contenido: data.contenido,
+      usuario_id: data.usuarioId,
+      blog_id: data.blog_id,
+      comentario_padre_id: data.comentario_padre_id,
+    });
+
     getIO().emit(`blog:${data.blog_id}:nuevo_comentario`, nuevoComentario);
+
     return nuevoComentario;
   },
 

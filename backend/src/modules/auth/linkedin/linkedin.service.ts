@@ -282,7 +282,7 @@ export const linkLinkedInToCurrentUserByCodeService = async (
   await createLinkedInLinkForUser({
     usuarioId: session.usuarioId,
     linkedinId,
-    correo_proveedor,
+    correoProveedor: correo_proveedor,
     tokenStorage
   })
 

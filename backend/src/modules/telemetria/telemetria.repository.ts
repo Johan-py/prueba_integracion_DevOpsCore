@@ -70,7 +70,7 @@ export class TelemetriaRepository {
     prisma.entrenamiento_ml.create({
       data: {
         usuario_id: usuarioId,
-        inmuebleId: inmuebleId,
+        inmueble_id: inmuebleId,
         tipo_evento: 'CLICK',
         score_real,
         features: {
