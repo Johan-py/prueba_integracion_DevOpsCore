@@ -216,7 +216,8 @@ function FooterBottomBar() {
 
 export default function Footer() {
   const pathname = usePathname()
-  
+  // Si estamos en el mapa, no renderizamos el Footer.
+  if (pathname === '/busqueda_mapa') return null;
   return (
     <footer className="mt-auto border-t border-stone-200 bg-stone-50">
       <div className="mx-auto max-w-6xl px-6 py-10 sm:px-8 lg:px-10">
