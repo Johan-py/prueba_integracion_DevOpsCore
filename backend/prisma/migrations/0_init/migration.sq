@@ -1,0 +1,2140 @@
+-- CreateSchema
+CREATE SCHEMA IF NOT EXISTS "public";
+
+-- CreateEnum
+CREATE TYPE "genero" AS ENUM ('MASCULINO', 'FEMENINO', 'OTRO', 'PREFIERO_NO_DECIR');
+
+-- CreateEnum
+CREATE TYPE "tipo_accion" AS ENUM ('VENTA', 'ALQUILER', 'ANTICRETO');
+
+-- CreateEnum
+CREATE TYPE "estado_inmueble" AS ENUM ('ACTIVO', 'INACTIVO', 'VENDIDO', 'ALQUILADO', 'RESERVADO');
+
+-- CreateEnum
+CREATE TYPE "estado_publicacion" AS ENUM ('ACTIVA', 'PAUSADA', 'ELIMINADA');
+
+-- CreateEnum
+CREATE TYPE "categoria" AS ENUM ('CASA', 'DEPARTAMENTO', 'TERRENO', 'OFICINA', 'CUARTO', 'TERRENO_MORTUORIO');
+
+-- CreateEnum
+CREATE TYPE "RolNombre" AS ENUM ('ADMIN', 'PROPIETARIO', 'AGENTE', 'VISITANTE');
+
+-- CreateEnum
+CREATE TYPE "tipo_multimedia" AS ENUM ('IMAGEN', 'VIDEO');
+
+-- CreateEnum
+CREATE TYPE "tipo_marcador" AS ENUM ('NORMAL', 'DESTACADO', 'CLUSTER');
+
+-- CreateEnum
+CREATE TYPE "tipo_interaccion" AS ENUM ('CLICK', 'HOVER', 'ZOOM', 'DRAG');
+
+-- CreateEnum
+CREATE TYPE "Categoria" AS ENUM ('CASA', 'DEPARTAMENTO', 'TERRENO', 'OFICINA', 'CUARTO', 'TERRENO_MORTUORIO');
+
+-- CreateEnum
+CREATE TYPE "EstadoBlog" AS ENUM ('BORRADOR', 'PENDIENTE', 'PUBLICADO', 'RECHAZADO');
+
+-- CreateEnum
+CREATE TYPE "EstadoInmueble" AS ENUM ('ACTIVO', 'INACTIVO', 'VENDIDO', 'ALQUILADO', 'RESERVADO');
+
+-- CreateEnum
+CREATE TYPE "EstadoPublicacion" AS ENUM ('ACTIVA', 'PAUSADA', 'ELIMINADA');
+
+-- CreateEnum
+CREATE TYPE "Genero" AS ENUM ('MASCULINO', 'FEMENINO', 'OTRO', 'PREFIERO_NO_DECIR');
+
+-- CreateEnum
+CREATE TYPE "TipoAccion" AS ENUM ('VENTA', 'ALQUILER', 'ANTICRETO');
+
+-- CreateEnum
+CREATE TYPE "TipoInteraccion" AS ENUM ('CLICK', 'HOVER', 'ZOOM', 'DRAG');
+
+-- CreateEnum
+CREATE TYPE "TipoMarcador" AS ENUM ('NORMAL', 'DESTACADO', 'CLUSTER');
+
+-- CreateEnum
+CREATE TYPE "TipoMultimedia" AS ENUM ('IMAGEN', 'VIDEO');
+
+-- CreateEnum
+CREATE TYPE "estado_blog" AS ENUM ('BORRADOR', 'PENDIENTE', 'PUBLICADO', 'RECHAZADO');
+
+-- CreateEnum
+CREATE TYPE "DeviceMessage" AS ENUM ('ios', 'android', 'web', 'unknown', 'desktop');
+
+-- CreateEnum
+CREATE TYPE "DifyBotType" AS ENUM ('chatBot', 'textGenerator', 'agent', 'workflow');
+
+-- CreateEnum
+CREATE TYPE "InstanceConnectionStatus" AS ENUM ('open', 'close', 'connecting');
+
+-- CreateEnum
+CREATE TYPE "OpenaiBotType" AS ENUM ('assistant', 'chatCompletion');
+
+-- CreateEnum
+CREATE TYPE "SessionStatus" AS ENUM ('opened', 'closed', 'paused');
+
+-- CreateEnum
+CREATE TYPE "TriggerOperator" AS ENUM ('contains', 'equals', 'startsWith', 'endsWith', 'regex');
+
+-- CreateEnum
+CREATE TYPE "TriggerType" AS ENUM ('all', 'keyword', 'none', 'advanced');
+
+-- CreateTable
+CREATE TABLE "rol" (
+    "id" SERIAL NOT NULL,
+    "nombre" "RolNombre" NOT NULL,
+
+    CONSTRAINT "rol_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "usuario" (
+    "id" SERIAL NOT NULL,
+    "nombre" TEXT NOT NULL,
+    "apellido" TEXT NOT NULL,
+    "correo" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "pais" TEXT,
+    "avatar" TEXT,
+    "genero" "genero",
+    "direccion" TEXT,
+    "activo" BOOLEAN DEFAULT true,
+    "fechaRegistro" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "intentos_fallidos_cambio_password" INTEGER NOT NULL DEFAULT 0,
+    "bloqueo_cambio_password_hasta" TIMESTAMPTZ(6),
+    "password_actualizado_en" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "two_factor_activo" BOOLEAN NOT NULL DEFAULT false,
+    "two_factor_metodo" VARCHAR(20) NOT NULL DEFAULT 'email',
+    "two_factor_activado_en" TIMESTAMPTZ(6),
+    "controlador" BOOLEAN NOT NULL DEFAULT false,
+    "notificacionWhatsapp" BOOLEAN DEFAULT false,
+    "rolId" INTEGER,
+    "notificacion_email" BOOLEAN DEFAULT true,
+    "notificacion_whatsapp" BOOLEAN DEFAULT false,
+    "fecha_registro" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6),
+    "desactivado_en" TIMESTAMP(6),
+    "fecha_nacimiento" TIMESTAMP(6),
+    "telemetria_compartida" BOOLEAN DEFAULT false,
+    "zona_conexion" VARCHAR(100),
+
+    CONSTRAINT "usuario_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "telefono" (
+    "id" SERIAL NOT NULL,
+    "codigoPais" TEXT NOT NULL,
+    "numero" TEXT NOT NULL,
+    "principal" BOOLEAN DEFAULT false,
+    "usuarioId" INTEGER NOT NULL,
+    "codigo_pais" TEXT,
+    "usuario_id" INTEGER,
+
+    CONSTRAINT "telefono_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "sesion" (
+    "id" SERIAL NOT NULL,
+    "token" TEXT NOT NULL,
+    "fechaInicio" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "fechaExpiracion" TIMESTAMP(6) NOT NULL,
+    "estado" BOOLEAN DEFAULT true,
+    "usuarioId" INTEGER NOT NULL,
+    "metodo_auth" VARCHAR(30) DEFAULT 'email',
+
+    CONSTRAINT "sesion_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "notificacion" (
+    "id" SERIAL NOT NULL,
+    "titulo" TEXT NOT NULL,
+    "mensaje" TEXT NOT NULL,
+    "leida" BOOLEAN NOT NULL DEFAULT false,
+    "fechaCreacion" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "fechaLectura" TIMESTAMP(6),
+    "eliminada" BOOLEAN NOT NULL DEFAULT false,
+    "archivada" BOOLEAN NOT NULL DEFAULT false,
+    "usuarioId" INTEGER NOT NULL,
+    "tipo" VARCHAR(30) NOT NULL DEFAULT 'GENERAL',
+    "blog_id" INTEGER,
+
+    CONSTRAINT "notificacion_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "cambio_email" (
+    "id" SERIAL NOT NULL,
+    "email_nuevo" TEXT NOT NULL,
+    "token" TEXT NOT NULL,
+    "expira_en" TIMESTAMP(6) NOT NULL,
+    "creado_en" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "completado_en" TIMESTAMP(6),
+    "usuario_id" INTEGER NOT NULL,
+
+    CONSTRAINT "cambio_email_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "perfil" (
+    "id" SERIAL NOT NULL,
+    "nombre_completo" TEXT NOT NULL,
+    "datos" JSONB,
+    "usuario_id" INTEGER NOT NULL,
+
+    CONSTRAINT "perfil_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "inmueble" (
+    "id" SERIAL NOT NULL,
+    "titulo" TEXT NOT NULL,
+    "tipo_accion" "tipo_accion" NOT NULL,
+    "categoria" "categoria",
+    "precio" DECIMAL(12,2) NOT NULL,
+    "superficie_m2" DECIMAL(10,2),
+    "nro_cuartos" INTEGER,
+    "nro_banos" INTEGER,
+    "descripcion" TEXT,
+    "estado" "estado_inmueble" DEFAULT 'ACTIVO',
+    "fecha_publicacion" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "created_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "propietario_id" INTEGER NOT NULL,
+    "banoCompartido" BOOLEAN DEFAULT false,
+    "precio_anterior" DECIMAL(12,2),
+    "fecha_reduccion" TIMESTAMP(6),
+
+    CONSTRAINT "inmueble_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ubicacion_inmueble" (
+    "id" SERIAL NOT NULL,
+    "latitud" DECIMAL(10,7) NOT NULL,
+    "longitud" DECIMAL(10,7) NOT NULL,
+    "direccion" TEXT,
+    "ciudad" TEXT,
+    "zona" TEXT,
+    "inmueble_id" INTEGER NOT NULL,
+    "ubicacion_maestra_id" INTEGER,
+    "barrio_id" INTEGER,
+    "vertices_difuminado" JSONB,
+
+    CONSTRAINT "ubicacion_inmueble_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "etiqueta" (
+    "id" SERIAL NOT NULL,
+    "nombre" TEXT NOT NULL,
+
+    CONSTRAINT "etiqueta_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "inmueble_etiqueta" (
+    "inmueble_id" INTEGER NOT NULL,
+    "etiqueta_id" INTEGER NOT NULL,
+
+    CONSTRAINT "inmueble_etiqueta_pkey" PRIMARY KEY ("inmueble_id","etiqueta_id")
+);
+
+-- CreateTable
+CREATE TABLE "publicacion" (
+    "id" SERIAL NOT NULL,
+    "titulo" TEXT NOT NULL,
+    "descripcion" TEXT,
+    "estado" "estado_publicacion" DEFAULT 'ACTIVA',
+    "fecha_publicacion" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "usuario_id" INTEGER NOT NULL,
+    "inmueble_id" INTEGER NOT NULL,
+    "payment_intent_id" TEXT,
+    "promoted" BOOLEAN DEFAULT false,
+    "promotedAt" TIMESTAMP(6),
+    "promotedExpiresAt" TIMESTAMP(6),
+
+    CONSTRAINT "publicacion_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "multimedia" (
+    "id" SERIAL NOT NULL,
+    "url" TEXT NOT NULL,
+    "tipo" "tipo_multimedia" NOT NULL,
+    "peso_mb" DECIMAL(8,2),
+    "publicacion_id" INTEGER NOT NULL,
+
+    CONSTRAINT "multimedia_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "marcador_mapa" (
+    "id" SERIAL NOT NULL,
+    "tipo" "tipo_marcador" NOT NULL,
+    "es_visible" BOOLEAN DEFAULT true,
+    "nivel_z" INTEGER,
+    "inmueble_id" INTEGER NOT NULL,
+    "ubicacion_id" INTEGER NOT NULL,
+
+    CONSTRAINT "marcador_mapa_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "grupo_marcadores" (
+    "id" SERIAL NOT NULL,
+    "latitud_centro" DECIMAL(10,7) NOT NULL,
+    "longitud_centro" DECIMAL(10,7) NOT NULL,
+    "cantidad_inmuebles" INTEGER NOT NULL,
+    "nivel_color" TEXT,
+    "nivel_zoom" INTEGER NOT NULL,
+    "radio_km" DECIMAL(10,2),
+    "actualizado_en" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "grupo_marcadores_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "detalle_grupo" (
+    "grupo_id" INTEGER NOT NULL,
+    "marcador_id" INTEGER NOT NULL,
+
+    CONSTRAINT "detalle_grupo_pkey" PRIMARY KEY ("grupo_id","marcador_id")
+);
+
+-- CreateTable
+CREATE TABLE "sesion_mapa" (
+    "id" SERIAL NOT NULL,
+    "token" TEXT NOT NULL,
+    "limite_norte" DECIMAL(10,7),
+    "limite_sur" DECIMAL(10,7),
+    "limite_este" DECIMAL(10,7),
+    "limite_oeste" DECIMAL(10,7),
+    "nivel_zoom" INTEGER NOT NULL,
+    "latitud_centro" DECIMAL(10,7),
+    "longitud_centro" DECIMAL(10,7),
+    "iniciado_en" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "ultima_actividad" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "sesion_mapa_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "interaccion_mapa" (
+    "id" SERIAL NOT NULL,
+    "tipo" "tipo_interaccion" NOT NULL,
+    "latitud_momento" DECIMAL(10,7),
+    "longitud_momento" DECIMAL(10,7),
+    "zoom_momento" INTEGER,
+    "ocurrio_en" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "sesion_id" INTEGER,
+    "marcador_id" INTEGER,
+
+    CONSTRAINT "interaccion_mapa_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "banner_home" (
+    "id" SERIAL NOT NULL,
+    "url_imagen" TEXT NOT NULL,
+    "orden" INTEGER NOT NULL,
+    "activo" BOOLEAN DEFAULT true,
+    "fecha_creacion" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "titulo" TEXT,
+    "subtitulo" TEXT,
+
+    CONSTRAINT "banner_home_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "visitor" (
+    "id" SERIAL NOT NULL,
+    "ip" TEXT NOT NULL,
+    "meta_data" JSONB,
+    "fecha_visita" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "usuario_id" INTEGER,
+    "token" TEXT,
+
+    CONSTRAINT "visitor_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ubicacion_maestra" (
+    "id" SERIAL NOT NULL,
+    "departamento" TEXT NOT NULL,
+    "provincia" TEXT,
+    "municipio" TEXT,
+    "nombre" TEXT NOT NULL,
+    "latitud" DECIMAL(10,7) NOT NULL,
+    "longitud" DECIMAL(10,7) NOT NULL,
+    "popularidad" INTEGER DEFAULT 0,
+
+    CONSTRAINT "ubicacion_maestra_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "bitacora_pagos" (
+    "id" SERIAL NOT NULL,
+    "id_usuario" INTEGER,
+    "id_suscripcion" INTEGER,
+    "id_transaccion" INTEGER,
+    "evento" VARCHAR(100) NOT NULL,
+    "mensaje" TEXT,
+    "fecha_evento" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "bitacora_pagos_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "plan_suscripcion" (
+    "id" SERIAL NOT NULL,
+    "nombre_plan" VARCHAR(50),
+    "descripcion_plan" TEXT,
+    "precio_plan" DECIMAL(10,2),
+    "duracion_plan_dias" INTEGER,
+    "nro_publicaciones_plan" INTEGER,
+    "imagen_gr_url" VARCHAR(255),
+    "eliminado_en" TIMESTAMPTZ(6),
+
+    CONSTRAINT "plan_suscripcion_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "suscripciones_activas" (
+    "id" SERIAL NOT NULL,
+    "id_usuario" INTEGER,
+    "id_suscripcion" INTEGER,
+    "id_transaccion" INTEGER,
+    "fecha_inicio" TIMESTAMP(6) NOT NULL,
+    "fecha_fin" TIMESTAMP(6) NOT NULL,
+    "estado" VARCHAR(20) DEFAULT 'INACTIVA',
+
+    CONSTRAINT "suscripciones_activas_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "transacciones" (
+    "id" SERIAL NOT NULL,
+    "id_usuario" INTEGER NOT NULL,
+    "id_suscripcion" INTEGER NOT NULL,
+    "subtotal" DECIMAL(10,2) NOT NULL,
+    "iva_porcentaje" DECIMAL(5,2) NOT NULL,
+    "iva_monto" DECIMAL(10,2) NOT NULL,
+    "total" DECIMAL(10,2) NOT NULL,
+    "metodo_pago" VARCHAR(30) DEFAULT 'QR_BANCARIO',
+    "fecha_intento" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "fecha_completado" TIMESTAMP(6),
+    "estado" VARCHAR(20) DEFAULT 'PENDIENTE',
+    "verificacion_requerida" BOOLEAN DEFAULT true,
+    "tiempo_activacion" TIMESTAMP(6),
+    "cupon_id" INTEGER,
+    "monto_descuento" DECIMAL(10,2) DEFAULT 0,
+
+    CONSTRAINT "transacciones_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "verificacion_pago" (
+    "id" SERIAL NOT NULL,
+    "id_transaccion" INTEGER,
+    "id_admin" INTEGER NOT NULL,
+    "fecha_verificacion" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "resultado_verificacion" VARCHAR(20) DEFAULT 'VERIFICADO',
+
+    CONSTRAINT "verificacion_pago_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "zona_predefinida" (
+    "id" SERIAL NOT NULL,
+    "nombre" TEXT NOT NULL,
+    "coordenadas" JSONB NOT NULL,
+    "color" TEXT NOT NULL DEFAULT '#ea580c',
+    "activa" BOOLEAN NOT NULL DEFAULT true,
+    "creadoEn" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "zona_predefinida_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "audit_log" (
+    "id" SERIAL NOT NULL,
+    "query" TEXT,
+    "executed_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP
+);
+
+-- CreateTable
+CREATE TABLE "autenticacion_social" (
+    "id" SERIAL NOT NULL,
+    "usuarioId" INTEGER NOT NULL,
+    "proveedor" VARCHAR(30) NOT NULL,
+    "correoProveedor" VARCHAR(100),
+    "idExterno" VARCHAR(150) NOT NULL,
+    "vinculadoEn" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "activo" BOOLEAN DEFAULT true,
+    "token_acceso_cifrado" TEXT,
+    "token_expira_en" TIMESTAMPTZ(6),
+    "ultimo_uso_en" TIMESTAMPTZ(6),
+
+    CONSTRAINT "autenticacion_social_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "codigo_2fa" (
+    "id" SERIAL NOT NULL,
+    "usuarioId" INTEGER NOT NULL,
+    "codigoHash" VARCHAR(255) NOT NULL,
+    "creadoEn" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "expiraEn" TIMESTAMP(6) NOT NULL,
+    "usadoEn" TIMESTAMP(6),
+    "intentos" INTEGER DEFAULT 0,
+    "activo" BOOLEAN DEFAULT true,
+
+    CONSTRAINT "codigo_2fa_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "comparacion" (
+    "id" SERIAL NOT NULL,
+    "nombre" VARCHAR(100),
+    "creadoEn" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "usuarioId" INTEGER NOT NULL,
+    "activo" BOOLEAN NOT NULL DEFAULT true,
+
+    CONSTRAINT "comparacion_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "detalle_comparacion" (
+    "id" SERIAL NOT NULL,
+    "comparacionId" INTEGER NOT NULL,
+    "inmuebleId" INTEGER NOT NULL,
+    "orden" INTEGER NOT NULL DEFAULT 0,
+
+    CONSTRAINT "detalle_comparacion_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "favorito" (
+    "id" SERIAL NOT NULL,
+    "usuarioId" INTEGER NOT NULL,
+    "inmuebleId" INTEGER NOT NULL,
+    "agregadoEn" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "favorito_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "historial_password" (
+    "id" SERIAL NOT NULL,
+    "usuarioId" INTEGER NOT NULL,
+    "passwordHash" VARCHAR(255) NOT NULL,
+    "creadoEn" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "historial_password_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "propiedad_vista" (
+    "id" SERIAL NOT NULL,
+    "usuarioId" INTEGER NOT NULL,
+    "inmuebleId" INTEGER NOT NULL,
+    "vistaEn" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "veces_visto" SMALLINT DEFAULT 1,
+    "activo" BOOLEAN DEFAULT true,
+
+    CONSTRAINT "propiedad_vista_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "recuperacion_password" (
+    "id" SERIAL NOT NULL,
+    "usuarioId" INTEGER NOT NULL,
+    "token" VARCHAR(255) NOT NULL,
+    "expiraEn" TIMESTAMP(6) NOT NULL,
+    "creadoEn" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "usadoEn" TIMESTAMP(6),
+    "intentos" INTEGER DEFAULT 0,
+    "activo" BOOLEAN DEFAULT true,
+
+    CONSTRAINT "recuperacion_password_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "zona_usuario" (
+    "id" SERIAL NOT NULL,
+    "nombre" VARCHAR(100) NOT NULL,
+    "descripcion" TEXT,
+    "geometria" JSONB NOT NULL,
+    "area" DECIMAL(12,4),
+    "creadoEn" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "actualizadoEn" TIMESTAMP(3) NOT NULL,
+    "usuarioId" INTEGER NOT NULL,
+
+    CONSTRAINT "zona_usuario_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ciudad" (
+    "id" SERIAL NOT NULL,
+    "nombre" TEXT NOT NULL,
+    "slug" TEXT NOT NULL,
+    "descripcion" TEXT,
+    "popularidad" INTEGER DEFAULT 0,
+
+    CONSTRAINT "ciudad_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ciudad_imagen" (
+    "id" SERIAL NOT NULL,
+    "ciudadid" INTEGER NOT NULL,
+    "url" TEXT NOT NULL,
+    "orden" INTEGER DEFAULT 0,
+
+    CONSTRAINT "ciudad_imagen_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "cupon" (
+    "id" SERIAL NOT NULL,
+    "codigo" VARCHAR(50) NOT NULL,
+    "descripcion" TEXT,
+    "tipo_descuento" VARCHAR(10) NOT NULL DEFAULT 'PORCENTAJE',
+    "valor_descuento" DECIMAL(10,2) NOT NULL,
+    "max_usos" INTEGER NOT NULL DEFAULT 1,
+    "usos_actuales" INTEGER NOT NULL DEFAULT 0,
+    "fecha_inicio" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "fecha_fin" TIMESTAMPTZ(6) NOT NULL,
+    "activo" BOOLEAN DEFAULT true,
+    "fecha_creacion" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "cupon_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "historial_busqueda" (
+    "id" SERIAL NOT NULL,
+    "usuarioid" INTEGER NOT NULL,
+    "termino" TEXT NOT NULL,
+    "creadoen" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "historial_busqueda_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "parametros_personalizados" (
+    "id" SERIAL NOT NULL,
+    "nombre" VARCHAR(255),
+    "descripcion" TEXT,
+    "creado_en" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "parametros_personalizados_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "publicacion_parametro" (
+    "id" SERIAL NOT NULL,
+    "publicacion_id" INTEGER,
+    "parametro_id" INTEGER,
+    "valor" TEXT,
+    "creado_en" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "publicacion_parametro_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "amenidad" (
+    "id" SERIAL NOT NULL,
+    "nombre" VARCHAR(255) NOT NULL,
+
+    CONSTRAINT "amenidad_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "barrio" (
+    "id" SERIAL NOT NULL,
+    "nombre" VARCHAR(255) NOT NULL,
+    "zona_id" INTEGER NOT NULL,
+
+    CONSTRAINT "barrio_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "blog" (
+    "id" SERIAL NOT NULL,
+    "titulo" TEXT NOT NULL,
+    "contenido" TEXT NOT NULL,
+    "imagen" TEXT,
+    "estado" "estado_blog" NOT NULL,
+    "eliminado" BOOLEAN DEFAULT false,
+    "fecha_creacion" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "fecha_publicacion" TIMESTAMP(6),
+    "usuario_id" INTEGER NOT NULL,
+    "categoria_id" INTEGER NOT NULL,
+
+    CONSTRAINT "blog_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "blog_rechazo" (
+    "id" SERIAL NOT NULL,
+    "comentario" TEXT NOT NULL,
+    "fecha" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "blog_id" INTEGER NOT NULL,
+
+    CONSTRAINT "blog_rechazo_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "categoria_blog" (
+    "id" SERIAL NOT NULL,
+    "nombre" VARCHAR(100) NOT NULL,
+
+    CONSTRAINT "categoria_blog_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "comentario" (
+    "id" SERIAL NOT NULL,
+    "contenido" TEXT NOT NULL,
+    "fecha_creacion" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "usuario_id" INTEGER NOT NULL,
+    "blog_id" INTEGER NOT NULL,
+    "comentario_padre_id" INTEGER,
+
+    CONSTRAINT "comentario_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "comentario_like" (
+    "id" SERIAL NOT NULL,
+    "usuario_id" INTEGER NOT NULL,
+    "comentario_id" INTEGER NOT NULL,
+
+    CONSTRAINT "comentario_like_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "departamento" (
+    "id" SERIAL NOT NULL,
+    "nombre" VARCHAR(255) NOT NULL,
+
+    CONSTRAINT "departamento_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "inmueble_amenidad" (
+    "inmueble_id" INTEGER NOT NULL,
+    "amenidad_id" INTEGER NOT NULL,
+
+    CONSTRAINT "inmueble_amenidad_pkey" PRIMARY KEY ("inmueble_id","amenidad_id")
+);
+
+-- CreateTable
+CREATE TABLE "municipio" (
+    "id" SERIAL NOT NULL,
+    "nombre" VARCHAR(255) NOT NULL,
+    "provincia" INTEGER,
+
+    CONSTRAINT "municipio_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "provincia" (
+    "id" SERIAL NOT NULL,
+    "nombre" VARCHAR(255) NOT NULL,
+    "departamento" INTEGER NOT NULL,
+
+    CONSTRAINT "provincia_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "zona_geografica" (
+    "id" SERIAL NOT NULL,
+    "nombre" VARCHAR(255) NOT NULL,
+    "municipio" INTEGER NOT NULL,
+
+    CONSTRAINT "zona_geografica_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "entrenamiento_ml" (
+    "id" SERIAL NOT NULL,
+    "usuario_id" INTEGER NOT NULL,
+    "inmueble_id" INTEGER NOT NULL,
+    "tipo_evento" VARCHAR(20) NOT NULL DEFAULT 'CLICK',
+    "score_real" REAL NOT NULL DEFAULT 0,
+    "retroalimentacion" SMALLINT,
+    "features" JSONB,
+    "fecha_evento" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "usado_en_modelo" BOOLEAN NOT NULL DEFAULT false,
+    "version_modelo" VARCHAR(20),
+
+    CONSTRAINT "entrenamiento_ml_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "magic_link" (
+    "id" SERIAL NOT NULL,
+    "usuario_id" INTEGER NOT NULL,
+    "token_hash" VARCHAR(64) NOT NULL,
+    "correo" VARCHAR(255) NOT NULL,
+    "expira_en" TIMESTAMPTZ(6) NOT NULL,
+    "usado_en" TIMESTAMPTZ(6),
+    "activo" BOOLEAN DEFAULT true,
+    "creado_en" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    "intentos_reenvio" INTEGER DEFAULT 0,
+    "ultimo_reenvio_en" TIMESTAMPTZ(6),
+    "invalidado_en" TIMESTAMPTZ(6),
+
+    CONSTRAINT "magic_link_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "modelo_version" (
+    "id" SERIAL NOT NULL,
+    "version" VARCHAR(20) NOT NULL,
+    "archivo_path" VARCHAR(255) NOT NULL,
+    "algoritmo" VARCHAR(50) NOT NULL,
+    "precision" REAL,
+    "recall" REAL,
+    "datos_usados" INTEGER,
+    "activo" BOOLEAN NOT NULL DEFAULT false,
+    "entrenado_en" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "notas" TEXT,
+
+    CONSTRAINT "modelo_version_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "publicacion_compartido" (
+    "id" SERIAL NOT NULL,
+    "publicacion_id" INTEGER NOT NULL,
+    "usuario_id" INTEGER NOT NULL,
+    "medio" VARCHAR(50),
+    "creado_en" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "publicacion_compartido_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "publicacion_estadistica" (
+    "id" SERIAL NOT NULL,
+    "publicacion_id" INTEGER NOT NULL,
+    "total_visualizaciones" INTEGER NOT NULL DEFAULT 0,
+    "total_compartidos" INTEGER NOT NULL DEFAULT 0,
+    "actualizado_en" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "publicacion_estadistica_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "publicacion_vista" (
+    "id" SERIAL NOT NULL,
+    "publicacion_id" INTEGER NOT NULL,
+    "usuario_id" INTEGER,
+    "visitor_id" INTEGER,
+    "ip" TEXT,
+    "user_agent" TEXT,
+    "creado_en" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "publicacion_vista_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "punto_interes" (
+    "id" SERIAL NOT NULL,
+    "nombre" TEXT NOT NULL,
+    "latitud" DECIMAL(10,7) NOT NULL,
+    "longitud" DECIMAL(10,7) NOT NULL,
+    "inmueble_id" INTEGER NOT NULL,
+
+    CONSTRAINT "punto_interes_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "testimonio" (
+    "id" SERIAL NOT NULL,
+    "comentario" TEXT NOT NULL,
+    "calificacion" INTEGER,
+    "visible" BOOLEAN DEFAULT true,
+    "eliminado" BOOLEAN DEFAULT false,
+    "fecha_creacion" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "usuario_id" INTEGER NOT NULL,
+    "ciudad" VARCHAR(100),
+    "zona" VARCHAR(100),
+    "categoria" VARCHAR(255),
+
+    CONSTRAINT "testimonio_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "testimonio_like" (
+    "id" SERIAL NOT NULL,
+    "testimonio_id" INTEGER NOT NULL,
+    "usuario_id" INTEGER NOT NULL,
+    "creado_en" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "testimonio_like_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "tutorial_publicacion_usuario" (
+    "id" SERIAL NOT NULL,
+    "usuario_id" INTEGER NOT NULL,
+    "confirmado" BOOLEAN NOT NULL DEFAULT false,
+    "visto_en" TIMESTAMP(6),
+    "confirmado_en" TIMESTAMP(6),
+
+    CONSTRAINT "tutorial_publicacion_usuario_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "tag" (
+    "id" SERIAL NOT NULL,
+    "nombre" VARCHAR(30) NOT NULL,
+    "creado_en" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "tag_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "publicacion_tag" (
+    "publicacion_id" INTEGER NOT NULL,
+    "tag_id" INTEGER NOT NULL,
+    "agregado_en" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "publicacion_tag_pkey" PRIMARY KEY ("publicacion_id","tag_id")
+);
+
+-- CreateTable
+CREATE TABLE "Chat" (
+    "id" TEXT NOT NULL,
+    "remoteJid" VARCHAR(100) NOT NULL,
+    "labels" JSONB,
+    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6),
+    "instanceId" TEXT NOT NULL,
+    "name" VARCHAR(100),
+    "unreadMessages" INTEGER NOT NULL DEFAULT 0,
+
+    CONSTRAINT "Chat_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Chatwoot" (
+    "id" TEXT NOT NULL,
+    "enabled" BOOLEAN DEFAULT true,
+    "accountId" VARCHAR(100),
+    "token" VARCHAR(100),
+    "url" VARCHAR(500),
+    "nameInbox" VARCHAR(100),
+    "signMsg" BOOLEAN DEFAULT false,
+    "signDelimiter" VARCHAR(100),
+    "number" VARCHAR(100),
+    "reopenConversation" BOOLEAN DEFAULT false,
+    "conversationPending" BOOLEAN DEFAULT false,
+    "mergeBrazilContacts" BOOLEAN DEFAULT false,
+    "importContacts" BOOLEAN DEFAULT false,
+    "importMessages" BOOLEAN DEFAULT false,
+    "daysLimitImportMessages" INTEGER,
+    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6) NOT NULL,
+    "instanceId" TEXT NOT NULL,
+    "logo" VARCHAR(500),
+    "organization" VARCHAR(100),
+    "ignoreJids" JSONB,
+
+    CONSTRAINT "Chatwoot_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Contact" (
+    "id" TEXT NOT NULL,
+    "remoteJid" VARCHAR(100) NOT NULL,
+    "pushName" VARCHAR(100),
+    "profilePicUrl" VARCHAR(500),
+    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6),
+    "instanceId" TEXT NOT NULL,
+
+    CONSTRAINT "Contact_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Dify" (
+    "id" TEXT NOT NULL,
+    "enabled" BOOLEAN NOT NULL DEFAULT true,
+    "botType" "DifyBotType" NOT NULL,
+    "apiUrl" VARCHAR(255),
+    "apiKey" VARCHAR(255),
+    "expire" INTEGER DEFAULT 0,
+    "keywordFinish" VARCHAR(100),
+    "delayMessage" INTEGER,
+    "unknownMessage" VARCHAR(100),
+    "listeningFromMe" BOOLEAN DEFAULT false,
+    "stopBotFromMe" BOOLEAN DEFAULT false,
+    "keepOpen" BOOLEAN DEFAULT false,
+    "debounceTime" INTEGER,
+    "ignoreJids" JSONB,
+    "triggerType" "TriggerType",
+    "triggerOperator" "TriggerOperator",
+    "triggerValue" TEXT,
+    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6) NOT NULL,
+    "instanceId" TEXT NOT NULL,
+    "description" VARCHAR(255),
+    "splitMessages" BOOLEAN DEFAULT false,
+    "timePerChar" INTEGER DEFAULT 50,
+
+    CONSTRAINT "Dify_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "DifySetting" (
+    "id" TEXT NOT NULL,
+    "expire" INTEGER DEFAULT 0,
+    "keywordFinish" VARCHAR(100),
+    "delayMessage" INTEGER,
+    "unknownMessage" VARCHAR(100),
+    "listeningFromMe" BOOLEAN DEFAULT false,
+    "stopBotFromMe" BOOLEAN DEFAULT false,
+    "keepOpen" BOOLEAN DEFAULT false,
+    "debounceTime" INTEGER,
+    "ignoreJids" JSONB,
+    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6) NOT NULL,
+    "difyIdFallback" VARCHAR(100),
+    "instanceId" TEXT NOT NULL,
+    "splitMessages" BOOLEAN DEFAULT false,
+    "timePerChar" INTEGER DEFAULT 50,
+
+    CONSTRAINT "DifySetting_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "EvolutionBot" (
+    "id" TEXT NOT NULL,
+    "enabled" BOOLEAN NOT NULL DEFAULT true,
+    "description" VARCHAR(255),
+    "apiUrl" VARCHAR(255),
+    "apiKey" VARCHAR(255),
+    "expire" INTEGER DEFAULT 0,
+    "keywordFinish" VARCHAR(100),
+    "delayMessage" INTEGER,
+    "unknownMessage" VARCHAR(100),
+    "listeningFromMe" BOOLEAN DEFAULT false,
+    "stopBotFromMe" BOOLEAN DEFAULT false,
+    "keepOpen" BOOLEAN DEFAULT false,
+    "debounceTime" INTEGER,
+    "ignoreJids" JSONB,
+    "triggerType" "TriggerType",
+    "triggerOperator" "TriggerOperator",
+    "triggerValue" TEXT,
+    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6) NOT NULL,
+    "instanceId" TEXT NOT NULL,
+    "splitMessages" BOOLEAN DEFAULT false,
+    "timePerChar" INTEGER DEFAULT 50,
+
+    CONSTRAINT "EvolutionBot_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "EvolutionBotSetting" (
+    "id" TEXT NOT NULL,
+    "expire" INTEGER DEFAULT 0,
+    "keywordFinish" VARCHAR(100),
+    "delayMessage" INTEGER,
+    "unknownMessage" VARCHAR(100),
+    "listeningFromMe" BOOLEAN DEFAULT false,
+    "stopBotFromMe" BOOLEAN DEFAULT false,
+    "keepOpen" BOOLEAN DEFAULT false,
+    "debounceTime" INTEGER,
+    "ignoreJids" JSONB,
+    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6) NOT NULL,
+    "botIdFallback" VARCHAR(100),
+    "instanceId" TEXT NOT NULL,
+    "splitMessages" BOOLEAN DEFAULT false,
+    "timePerChar" INTEGER DEFAULT 50,
+
+    CONSTRAINT "EvolutionBotSetting_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Flowise" (
+    "id" TEXT NOT NULL,
+    "enabled" BOOLEAN NOT NULL DEFAULT true,
+    "description" VARCHAR(255),
+    "apiUrl" VARCHAR(255),
+    "apiKey" VARCHAR(255),
+    "expire" INTEGER DEFAULT 0,
+    "keywordFinish" VARCHAR(100),
+    "delayMessage" INTEGER,
+    "unknownMessage" VARCHAR(100),
+    "listeningFromMe" BOOLEAN DEFAULT false,
+    "stopBotFromMe" BOOLEAN DEFAULT false,
+    "keepOpen" BOOLEAN DEFAULT false,
+    "debounceTime" INTEGER,
+    "ignoreJids" JSONB,
+    "triggerType" "TriggerType",
+    "triggerOperator" "TriggerOperator",
+    "triggerValue" TEXT,
+    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6) NOT NULL,
+    "instanceId" TEXT NOT NULL,
+    "splitMessages" BOOLEAN DEFAULT false,
+    "timePerChar" INTEGER DEFAULT 50,
+
+    CONSTRAINT "Flowise_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "FlowiseSetting" (
+    "id" TEXT NOT NULL,
+    "expire" INTEGER DEFAULT 0,
+    "keywordFinish" VARCHAR(100),
+    "delayMessage" INTEGER,
+    "unknownMessage" VARCHAR(100),
+    "listeningFromMe" BOOLEAN DEFAULT false,
+    "stopBotFromMe" BOOLEAN DEFAULT false,
+    "keepOpen" BOOLEAN DEFAULT false,
+    "debounceTime" INTEGER,
+    "ignoreJids" JSONB,
+    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6) NOT NULL,
+    "flowiseIdFallback" VARCHAR(100),
+    "instanceId" TEXT NOT NULL,
+    "splitMessages" BOOLEAN DEFAULT false,
+    "timePerChar" INTEGER DEFAULT 50,
+
+    CONSTRAINT "FlowiseSetting_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Instance" (
+    "id" TEXT NOT NULL,
+    "name" VARCHAR(255) NOT NULL,
+    "connectionStatus" "InstanceConnectionStatus" NOT NULL DEFAULT 'open',
+    "ownerJid" VARCHAR(100),
+    "profilePicUrl" VARCHAR(500),
+    "integration" VARCHAR(100),
+    "number" VARCHAR(100),
+    "token" VARCHAR(255),
+    "clientName" VARCHAR(100),
+    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6),
+    "profileName" VARCHAR(100),
+    "businessId" VARCHAR(100),
+    "disconnectionAt" TIMESTAMP(6),
+    "disconnectionObject" JSONB,
+    "disconnectionReasonCode" INTEGER,
+
+    CONSTRAINT "Instance_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "IntegrationSession" (
+    "id" TEXT NOT NULL,
+    "sessionId" VARCHAR(255) NOT NULL,
+    "remoteJid" VARCHAR(100) NOT NULL,
+    "pushName" TEXT,
+    "status" "SessionStatus" NOT NULL,
+    "awaitUser" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6) NOT NULL,
+    "instanceId" TEXT NOT NULL,
+    "parameters" JSONB,
+    "context" JSONB,
+    "botId" TEXT,
+    "type" VARCHAR(100),
+
+    CONSTRAINT "IntegrationSession_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "IsOnWhatsapp" (
+    "id" TEXT NOT NULL,
+    "remoteJid" VARCHAR(100) NOT NULL,
+    "jidOptions" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6) NOT NULL,
+
+    CONSTRAINT "IsOnWhatsapp_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Label" (
+    "id" TEXT NOT NULL,
+    "labelId" VARCHAR(100),
+    "name" VARCHAR(100) NOT NULL,
+    "color" VARCHAR(100) NOT NULL,
+    "predefinedId" VARCHAR(100),
+    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6) NOT NULL,
+    "instanceId" TEXT NOT NULL,
+
+    CONSTRAINT "Label_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Media" (
+    "id" TEXT NOT NULL,
+    "fileName" VARCHAR(500) NOT NULL,
+    "type" VARCHAR(100) NOT NULL,
+    "mimetype" VARCHAR(100) NOT NULL,
+    "createdAt" DATE DEFAULT CURRENT_TIMESTAMP,
+    "messageId" TEXT NOT NULL,
+    "instanceId" TEXT NOT NULL,
+
+    CONSTRAINT "Media_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Message" (
+    "id" TEXT NOT NULL,
+    "key" JSONB NOT NULL,
+    "pushName" VARCHAR(100),
+    "participant" VARCHAR(100),
+    "messageType" VARCHAR(100) NOT NULL,
+    "message" JSONB NOT NULL,
+    "contextInfo" JSONB,
+    "source" "DeviceMessage" NOT NULL,
+    "messageTimestamp" INTEGER NOT NULL,
+    "chatwootMessageId" INTEGER,
+    "chatwootInboxId" INTEGER,
+    "chatwootConversationId" INTEGER,
+    "chatwootContactInboxSourceId" VARCHAR(100),
+    "chatwootIsRead" BOOLEAN,
+    "instanceId" TEXT NOT NULL,
+    "webhookUrl" VARCHAR(500),
+    "sessionId" TEXT,
+    "status" VARCHAR(30),
+
+    CONSTRAINT "Message_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "MessageUpdate" (
+    "id" TEXT NOT NULL,
+    "keyId" VARCHAR(100) NOT NULL,
+    "remoteJid" VARCHAR(100) NOT NULL,
+    "fromMe" BOOLEAN NOT NULL,
+    "participant" VARCHAR(100),
+    "pollUpdates" JSONB,
+    "status" VARCHAR(30) NOT NULL,
+    "messageId" TEXT NOT NULL,
+    "instanceId" TEXT NOT NULL,
+
+    CONSTRAINT "MessageUpdate_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "OpenaiBot" (
+    "id" TEXT NOT NULL,
+    "assistantId" VARCHAR(255),
+    "model" VARCHAR(100),
+    "systemMessages" JSONB,
+    "assistantMessages" JSONB,
+    "userMessages" JSONB,
+    "maxTokens" INTEGER,
+    "expire" INTEGER DEFAULT 0,
+    "keywordFinish" VARCHAR(100),
+    "delayMessage" INTEGER,
+    "unknownMessage" VARCHAR(100),
+    "listeningFromMe" BOOLEAN DEFAULT false,
+    "stopBotFromMe" BOOLEAN DEFAULT false,
+    "keepOpen" BOOLEAN DEFAULT false,
+    "debounceTime" INTEGER,
+    "ignoreJids" JSONB,
+    "triggerType" "TriggerType",
+    "triggerOperator" "TriggerOperator",
+    "triggerValue" TEXT,
+    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6) NOT NULL,
+    "openaiCredsId" TEXT NOT NULL,
+    "instanceId" TEXT NOT NULL,
+    "enabled" BOOLEAN NOT NULL DEFAULT true,
+    "botType" "OpenaiBotType" NOT NULL,
+    "description" VARCHAR(255),
+    "functionUrl" VARCHAR(500),
+    "splitMessages" BOOLEAN DEFAULT false,
+    "timePerChar" INTEGER DEFAULT 50,
+
+    CONSTRAINT "OpenaiBot_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "OpenaiCreds" (
+    "id" TEXT NOT NULL,
+    "apiKey" VARCHAR(255),
+    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6) NOT NULL,
+    "instanceId" TEXT NOT NULL,
+    "name" VARCHAR(255),
+
+    CONSTRAINT "OpenaiCreds_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "OpenaiSetting" (
+    "id" TEXT NOT NULL,
+    "expire" INTEGER DEFAULT 0,
+    "keywordFinish" VARCHAR(100),
+    "delayMessage" INTEGER,
+    "unknownMessage" VARCHAR(100),
+    "listeningFromMe" BOOLEAN DEFAULT false,
+    "stopBotFromMe" BOOLEAN DEFAULT false,
+    "keepOpen" BOOLEAN DEFAULT false,
+    "debounceTime" INTEGER,
+    "ignoreJids" JSONB,
+    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6) NOT NULL,
+    "openaiCredsId" TEXT NOT NULL,
+    "openaiIdFallback" VARCHAR(100),
+    "instanceId" TEXT NOT NULL,
+    "speechToText" BOOLEAN DEFAULT false,
+    "splitMessages" BOOLEAN DEFAULT false,
+    "timePerChar" INTEGER DEFAULT 50,
+
+    CONSTRAINT "OpenaiSetting_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Proxy" (
+    "id" TEXT NOT NULL,
+    "enabled" BOOLEAN NOT NULL DEFAULT false,
+    "host" VARCHAR(100) NOT NULL,
+    "port" VARCHAR(100) NOT NULL,
+    "protocol" VARCHAR(100) NOT NULL,
+    "username" VARCHAR(100) NOT NULL,
+    "password" VARCHAR(100) NOT NULL,
+    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6) NOT NULL,
+    "instanceId" TEXT NOT NULL,
+
+    CONSTRAINT "Proxy_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Pusher" (
+    "id" TEXT NOT NULL,
+    "enabled" BOOLEAN NOT NULL DEFAULT false,
+    "appId" VARCHAR(100) NOT NULL,
+    "key" VARCHAR(100) NOT NULL,
+    "secret" VARCHAR(100) NOT NULL,
+    "cluster" VARCHAR(100) NOT NULL,
+    "useTLS" BOOLEAN NOT NULL DEFAULT false,
+    "events" JSONB NOT NULL,
+    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6) NOT NULL,
+    "instanceId" TEXT NOT NULL,
+
+    CONSTRAINT "Pusher_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Rabbitmq" (
+    "id" TEXT NOT NULL,
+    "enabled" BOOLEAN NOT NULL DEFAULT false,
+    "events" JSONB NOT NULL,
+    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6) NOT NULL,
+    "instanceId" TEXT NOT NULL,
+
+    CONSTRAINT "Rabbitmq_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Session" (
+    "id" TEXT NOT NULL,
+    "sessionId" TEXT NOT NULL,
+    "creds" TEXT,
+    "createdAt" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Session_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Setting" (
+    "id" TEXT NOT NULL,
+    "rejectCall" BOOLEAN NOT NULL DEFAULT false,
+    "msgCall" VARCHAR(100),
+    "groupsIgnore" BOOLEAN NOT NULL DEFAULT false,
+    "alwaysOnline" BOOLEAN NOT NULL DEFAULT false,
+    "readMessages" BOOLEAN NOT NULL DEFAULT false,
+    "readStatus" BOOLEAN NOT NULL DEFAULT false,
+    "syncFullHistory" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6) NOT NULL,
+    "instanceId" TEXT NOT NULL,
+    "wavoipToken" VARCHAR(100),
+
+    CONSTRAINT "Setting_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Sqs" (
+    "id" TEXT NOT NULL,
+    "enabled" BOOLEAN NOT NULL DEFAULT false,
+    "events" JSONB NOT NULL,
+    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6) NOT NULL,
+    "instanceId" TEXT NOT NULL,
+
+    CONSTRAINT "Sqs_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Template" (
+    "id" TEXT NOT NULL,
+    "templateId" VARCHAR(255) NOT NULL,
+    "name" VARCHAR(255) NOT NULL,
+    "template" JSONB NOT NULL,
+    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6) NOT NULL,
+    "instanceId" TEXT NOT NULL,
+    "webhookUrl" VARCHAR(500),
+
+    CONSTRAINT "Template_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Typebot" (
+    "id" TEXT NOT NULL,
+    "enabled" BOOLEAN NOT NULL DEFAULT true,
+    "url" VARCHAR(500) NOT NULL,
+    "typebot" VARCHAR(100) NOT NULL,
+    "expire" INTEGER DEFAULT 0,
+    "keywordFinish" VARCHAR(100),
+    "delayMessage" INTEGER,
+    "unknownMessage" VARCHAR(100),
+    "listeningFromMe" BOOLEAN DEFAULT false,
+    "stopBotFromMe" BOOLEAN DEFAULT false,
+    "keepOpen" BOOLEAN DEFAULT false,
+    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6),
+    "triggerType" "TriggerType",
+    "triggerOperator" "TriggerOperator",
+    "triggerValue" TEXT,
+    "instanceId" TEXT NOT NULL,
+    "debounceTime" INTEGER,
+    "ignoreJids" JSONB,
+    "description" VARCHAR(255),
+
+    CONSTRAINT "Typebot_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "TypebotSetting" (
+    "id" TEXT NOT NULL,
+    "expire" INTEGER DEFAULT 0,
+    "keywordFinish" VARCHAR(100),
+    "delayMessage" INTEGER,
+    "unknownMessage" VARCHAR(100),
+    "listeningFromMe" BOOLEAN DEFAULT false,
+    "stopBotFromMe" BOOLEAN DEFAULT false,
+    "keepOpen" BOOLEAN DEFAULT false,
+    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6) NOT NULL,
+    "instanceId" TEXT NOT NULL,
+    "debounceTime" INTEGER,
+    "typebotIdFallback" VARCHAR(100),
+    "ignoreJids" JSONB,
+
+    CONSTRAINT "TypebotSetting_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Webhook" (
+    "id" TEXT NOT NULL,
+    "url" VARCHAR(500) NOT NULL,
+    "enabled" BOOLEAN DEFAULT true,
+    "events" JSONB,
+    "webhookByEvents" BOOLEAN DEFAULT false,
+    "webhookBase64" BOOLEAN DEFAULT false,
+    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6) NOT NULL,
+    "instanceId" TEXT NOT NULL,
+    "headers" JSONB,
+
+    CONSTRAINT "Webhook_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Websocket" (
+    "id" TEXT NOT NULL,
+    "enabled" BOOLEAN NOT NULL DEFAULT false,
+    "events" JSONB NOT NULL,
+    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6) NOT NULL,
+    "instanceId" TEXT NOT NULL,
+
+    CONSTRAINT "Websocket_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "rol_nombre_key" ON "rol"("nombre");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "usuario_correo_key" ON "usuario"("correo");
+
+-- CreateIndex
+CREATE INDEX "idx_usuario_correo" ON "usuario"("correo");
+
+-- CreateIndex
+CREATE INDEX "idx_usuario_rol" ON "usuario"("rolId");
+
+-- CreateIndex
+CREATE INDEX "idx_usuario_rol_id" ON "usuario"("rolId");
+
+-- CreateIndex
+CREATE INDEX "idx_telefono_usuario" ON "telefono"("usuario_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "sesion_token_key" ON "sesion"("token");
+
+-- CreateIndex
+CREATE INDEX "idx_notificacion_blog" ON "notificacion"("blog_id");
+
+-- CreateIndex
+CREATE INDEX "idx_notificacion_usuario_leida" ON "notificacion"("usuarioId", "leida");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "cambio_email_token_key" ON "cambio_email"("token");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "perfil_usuario_id_key" ON "perfil"("usuario_id");
+
+-- CreateIndex
+CREATE INDEX "idx_inmueble_propietario" ON "inmueble"("propietario_id");
+
+-- CreateIndex
+CREATE INDEX "idx_inmueble_estado" ON "inmueble"("estado");
+
+-- CreateIndex
+CREATE INDEX "idx_inmueble_tipo_accion" ON "inmueble"("tipo_accion");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ubicacion_inmueble_inmueble_id_key" ON "ubicacion_inmueble"("inmueble_id");
+
+-- CreateIndex
+CREATE INDEX "idx_ubicacion_maestra" ON "ubicacion_inmueble"("ubicacion_maestra_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "etiqueta_nombre_key" ON "etiqueta"("nombre");
+
+-- CreateIndex
+CREATE INDEX "idx_publicacion_estado" ON "publicacion"("estado");
+
+-- CreateIndex
+CREATE INDEX "idx_publicacion_inmueble" ON "publicacion"("inmueble_id");
+
+-- CreateIndex
+CREATE INDEX "idx_publicacion_usuario" ON "publicacion"("usuario_id");
+
+-- CreateIndex
+CREATE INDEX "idx_multimedia_publicacion" ON "multimedia"("publicacion_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "sesion_mapa_token_key" ON "sesion_mapa"("token");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "visitor_token_key" ON "visitor"("token");
+
+-- CreateIndex
+CREATE INDEX "idx_ubicacion_nombre" ON "ubicacion_maestra"("nombre");
+
+-- CreateIndex
+CREATE INDEX "idx_bitacora_fecha" ON "bitacora_pagos"("fecha_evento");
+
+-- CreateIndex
+CREATE INDEX "idx_transacciones_estado" ON "transacciones"("estado");
+
+-- CreateIndex
+CREATE INDEX "idx_transacciones_usuario" ON "transacciones"("id_usuario");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "autenticacion_social_usuario_proveedor_key" ON "autenticacion_social"("usuarioId", "proveedor");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "autenticacion_social_proveedor_idexterno_key" ON "autenticacion_social"("proveedor", "idExterno");
+
+-- CreateIndex
+CREATE INDEX "codigo_2fa_usuario_fecha_idx" ON "codigo_2fa"("usuarioId", "creadoEn");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "detalle_comparacion_comparacionId_inmuebleId_key" ON "detalle_comparacion"("comparacionId", "inmuebleId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "favorito_usuarioId_inmuebleId_key" ON "favorito"("usuarioId", "inmuebleId");
+
+-- CreateIndex
+CREATE INDEX "historial_password_usuario_fecha_idx" ON "historial_password"("usuarioId", "creadoEn");
+
+-- CreateIndex
+CREATE INDEX "propiedad_vista_usuarioId_vistaEn_idx" ON "propiedad_vista"("usuarioId", "vistaEn");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "propiedad_vista_usuarioId_inmuebleId_key" ON "propiedad_vista"("usuarioId", "inmuebleId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "recuperacion_password_token_key" ON "recuperacion_password"("token");
+
+-- CreateIndex
+CREATE INDEX "recuperacion_password_usuario_fecha_idx" ON "recuperacion_password"("usuarioId", "creadoEn");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ciudad_nombre_key" ON "ciudad"("nombre");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ciudad_slug_key" ON "ciudad"("slug");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "cupon_codigo_key" ON "cupon"("codigo");
+
+-- CreateIndex
+CREATE INDEX "idx_pub_param_parametro" ON "publicacion_parametro"("parametro_id");
+
+-- CreateIndex
+CREATE INDEX "idx_pub_param_publicacion" ON "publicacion_parametro"("publicacion_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "uq_publicacion_parametro" ON "publicacion_parametro"("publicacion_id", "parametro_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "amenidad_nombre_key" ON "amenidad"("nombre");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "barrio_nombre_zona_unique" ON "barrio"("nombre", "zona_id");
+
+-- CreateIndex
+CREATE INDEX "blog_estado_idx" ON "blog"("estado");
+
+-- CreateIndex
+CREATE INDEX "blog_usuario_idx" ON "blog"("usuario_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "categoria_blog_nombre_key" ON "categoria_blog"("nombre");
+
+-- CreateIndex
+CREATE INDEX "comentario_blog_idx" ON "comentario"("blog_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "comentario_like_unique" ON "comentario_like"("usuario_id", "comentario_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "departamento_nombre_key" ON "departamento"("nombre");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "municipio_nombre_provincia_unique" ON "municipio"("nombre", "provincia");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "provincia_nombre_departamento_unique" ON "provincia"("nombre", "departamento");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "zona_geografica_nombre_municipio_unique" ON "zona_geografica"("nombre", "municipio");
+
+-- CreateIndex
+CREATE INDEX "idx_ml_fecha" ON "entrenamiento_ml"("fecha_evento" DESC);
+
+-- CreateIndex
+CREATE INDEX "idx_ml_tipo_evento" ON "entrenamiento_ml"("tipo_evento");
+
+-- CreateIndex
+CREATE INDEX "idx_ml_usuario_usado" ON "entrenamiento_ml"("usuario_id", "usado_en_modelo");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "magic_link_token_hash_key" ON "magic_link"("token_hash");
+
+-- CreateIndex
+CREATE INDEX "idx_magic_link_token_hash" ON "magic_link"("token_hash");
+
+-- CreateIndex
+CREATE INDEX "idx_magic_link_usuario" ON "magic_link"("usuario_id");
+
+-- CreateIndex
+CREATE INDEX "idx_magic_link_usuario_activo" ON "magic_link"("usuario_id", "activo");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "modelo_version_version_key" ON "modelo_version"("version");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "idx_modelo_activo" ON "modelo_version"("activo") WHERE (activo = true);
+
+-- CreateIndex
+CREATE INDEX "idx_publicacion_compartido_publicacion" ON "publicacion_compartido"("publicacion_id");
+
+-- CreateIndex
+CREATE INDEX "idx_publicacion_compartido_usuario" ON "publicacion_compartido"("usuario_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "publicacion_estadistica_publicacion_id_key" ON "publicacion_estadistica"("publicacion_id");
+
+-- CreateIndex
+CREATE INDEX "idx_publicacion_vista_publicacion" ON "publicacion_vista"("publicacion_id");
+
+-- CreateIndex
+CREATE INDEX "idx_publicacion_vista_usuario" ON "publicacion_vista"("usuario_id");
+
+-- CreateIndex
+CREATE INDEX "idx_publicacion_vista_visitor" ON "publicacion_vista"("visitor_id");
+
+-- CreateIndex
+CREATE INDEX "idx_punto_interes_inmueble" ON "punto_interes"("inmueble_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "uq_testimonio_like" ON "testimonio_like"("testimonio_id", "usuario_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "tutorial_publicacion_usuario_usuario_id_key" ON "tutorial_publicacion_usuario"("usuario_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "tag_nombre_key" ON "tag"("nombre");
+
+-- CreateIndex
+CREATE INDEX "publicacion_tag_tag_id_idx" ON "publicacion_tag"("tag_id");
+
+-- CreateIndex
+CREATE INDEX "Chat_instanceId_idx" ON "Chat"("instanceId");
+
+-- CreateIndex
+CREATE INDEX "Chat_remoteJid_idx" ON "Chat"("remoteJid");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Chatwoot_instanceId_key" ON "Chatwoot"("instanceId");
+
+-- CreateIndex
+CREATE INDEX "Contact_instanceId_idx" ON "Contact"("instanceId");
+
+-- CreateIndex
+CREATE INDEX "Contact_remoteJid_idx" ON "Contact"("remoteJid");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Contact_remoteJid_instanceId_key" ON "Contact"("remoteJid", "instanceId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "DifySetting_instanceId_key" ON "DifySetting"("instanceId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "EvolutionBotSetting_instanceId_key" ON "EvolutionBotSetting"("instanceId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "FlowiseSetting_instanceId_key" ON "FlowiseSetting"("instanceId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Instance_name_key" ON "Instance"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "IsOnWhatsapp_remoteJid_key" ON "IsOnWhatsapp"("remoteJid");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Label_labelId_instanceId_key" ON "Label"("labelId", "instanceId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Media_fileName_key" ON "Media"("fileName");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Media_messageId_key" ON "Media"("messageId");
+
+-- CreateIndex
+CREATE INDEX "Message_instanceId_idx" ON "Message"("instanceId");
+
+-- CreateIndex
+CREATE INDEX "MessageUpdate_instanceId_idx" ON "MessageUpdate"("instanceId");
+
+-- CreateIndex
+CREATE INDEX "MessageUpdate_messageId_idx" ON "MessageUpdate"("messageId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "OpenaiCreds_apiKey_key" ON "OpenaiCreds"("apiKey");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "OpenaiCreds_name_key" ON "OpenaiCreds"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "OpenaiSetting_openaiCredsId_key" ON "OpenaiSetting"("openaiCredsId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "OpenaiSetting_instanceId_key" ON "OpenaiSetting"("instanceId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Proxy_instanceId_key" ON "Proxy"("instanceId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Pusher_instanceId_key" ON "Pusher"("instanceId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Rabbitmq_instanceId_key" ON "Rabbitmq"("instanceId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Session_sessionId_key" ON "Session"("sessionId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Setting_instanceId_key" ON "Setting"("instanceId");
+
+-- CreateIndex
+CREATE INDEX "Setting_instanceId_idx" ON "Setting"("instanceId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Sqs_instanceId_key" ON "Sqs"("instanceId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Template_templateId_key" ON "Template"("templateId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Template_name_key" ON "Template"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "TypebotSetting_instanceId_key" ON "TypebotSetting"("instanceId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Webhook_instanceId_key" ON "Webhook"("instanceId");
+
+-- CreateIndex
+CREATE INDEX "Webhook_instanceId_idx" ON "Webhook"("instanceId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Websocket_instanceId_key" ON "Websocket"("instanceId");
+
+-- AddForeignKey
+ALTER TABLE "usuario" ADD CONSTRAINT "usuario_rolId_fkey" FOREIGN KEY ("rolId") REFERENCES "rol"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "telefono" ADD CONSTRAINT "telefono_usuarioId_fkey" FOREIGN KEY ("usuarioId") REFERENCES "usuario"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "telefono" ADD CONSTRAINT "telefono_usuario_fk" FOREIGN KEY ("usuario_id") REFERENCES "usuario"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "sesion" ADD CONSTRAINT "sesion_usuario_id_fkey" FOREIGN KEY ("usuarioId") REFERENCES "usuario"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "notificacion" ADD CONSTRAINT "notificacion_blog_fk" FOREIGN KEY ("blog_id") REFERENCES "blog"("id") ON DELETE SET NULL ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "notificacion" ADD CONSTRAINT "notificacion_usuario_id_fkey" FOREIGN KEY ("usuarioId") REFERENCES "usuario"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "cambio_email" ADD CONSTRAINT "cambio_email_usuario_id_fkey" FOREIGN KEY ("usuario_id") REFERENCES "usuario"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "perfil" ADD CONSTRAINT "perfil_usuario_id_fkey" FOREIGN KEY ("usuario_id") REFERENCES "usuario"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "inmueble" ADD CONSTRAINT "inmueble_propietario_fk" FOREIGN KEY ("propietario_id") REFERENCES "usuario"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "ubicacion_inmueble" ADD CONSTRAINT "ubicacion_inmueble_barrio_id_fkey" FOREIGN KEY ("barrio_id") REFERENCES "barrio"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "ubicacion_inmueble" ADD CONSTRAINT "ubicacion_inmueble_fk" FOREIGN KEY ("inmueble_id") REFERENCES "inmueble"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "ubicacion_inmueble" ADD CONSTRAINT "ubicacion_inmueble_ubicacion_maestra_id_fkey" FOREIGN KEY ("ubicacion_maestra_id") REFERENCES "ubicacion_maestra"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "inmueble_etiqueta" ADD CONSTRAINT "inmueble_etiqueta_etiqueta_fk" FOREIGN KEY ("etiqueta_id") REFERENCES "etiqueta"("id") ON DELETE RESTRICT ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "inmueble_etiqueta" ADD CONSTRAINT "inmueble_etiqueta_inmueble_fk" FOREIGN KEY ("inmueble_id") REFERENCES "inmueble"("id") ON DELETE RESTRICT ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "publicacion" ADD CONSTRAINT "publicacion_inmueble_fk" FOREIGN KEY ("inmueble_id") REFERENCES "inmueble"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "publicacion" ADD CONSTRAINT "publicacion_usuario_fk" FOREIGN KEY ("usuario_id") REFERENCES "usuario"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "multimedia" ADD CONSTRAINT "multimedia_publicacion_fk" FOREIGN KEY ("publicacion_id") REFERENCES "publicacion"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "marcador_mapa" ADD CONSTRAINT "marcador_mapa_inmueble_id_fkey" FOREIGN KEY ("inmueble_id") REFERENCES "inmueble"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "marcador_mapa" ADD CONSTRAINT "marcador_mapa_ubicacion_id_fkey" FOREIGN KEY ("ubicacion_id") REFERENCES "ubicacion_inmueble"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "detalle_grupo" ADD CONSTRAINT "detalle_grupo_grupo_id_fkey" FOREIGN KEY ("grupo_id") REFERENCES "grupo_marcadores"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "detalle_grupo" ADD CONSTRAINT "detalle_grupo_marcador_id_fkey" FOREIGN KEY ("marcador_id") REFERENCES "marcador_mapa"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "interaccion_mapa" ADD CONSTRAINT "interaccion_mapa_marcador_id_fkey" FOREIGN KEY ("marcador_id") REFERENCES "marcador_mapa"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "interaccion_mapa" ADD CONSTRAINT "interaccion_mapa_sesion_id_fkey" FOREIGN KEY ("sesion_id") REFERENCES "sesion_mapa"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "visitor" ADD CONSTRAINT "visitor_usuario_id_fkey" FOREIGN KEY ("usuario_id") REFERENCES "usuario"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "bitacora_pagos" ADD CONSTRAINT "bitacora_pagos_id_suscripcion_fkey" FOREIGN KEY ("id_suscripcion") REFERENCES "plan_suscripcion"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "bitacora_pagos" ADD CONSTRAINT "bitacora_pagos_id_transaccion_fkey" FOREIGN KEY ("id_transaccion") REFERENCES "transacciones"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "bitacora_pagos" ADD CONSTRAINT "bitacora_pagos_id_usuario_fkey" FOREIGN KEY ("id_usuario") REFERENCES "usuario"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "suscripciones_activas" ADD CONSTRAINT "suscripciones_activas_id_suscripcion_fkey" FOREIGN KEY ("id_suscripcion") REFERENCES "plan_suscripcion"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "suscripciones_activas" ADD CONSTRAINT "suscripciones_activas_id_transaccion_fkey" FOREIGN KEY ("id_transaccion") REFERENCES "transacciones"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "suscripciones_activas" ADD CONSTRAINT "suscripciones_activas_id_usuario_fkey" FOREIGN KEY ("id_usuario") REFERENCES "usuario"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "transacciones" ADD CONSTRAINT "transacciones_cupon_id_fkey" FOREIGN KEY ("cupon_id") REFERENCES "cupon"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "transacciones" ADD CONSTRAINT "transacciones_id_suscripcion_fkey" FOREIGN KEY ("id_suscripcion") REFERENCES "plan_suscripcion"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "transacciones" ADD CONSTRAINT "transacciones_id_usuario_fkey" FOREIGN KEY ("id_usuario") REFERENCES "usuario"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "verificacion_pago" ADD CONSTRAINT "verificacion_pago_id_admin_fkey" FOREIGN KEY ("id_admin") REFERENCES "usuario"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "verificacion_pago" ADD CONSTRAINT "verificacion_pago_id_transaccion_fkey" FOREIGN KEY ("id_transaccion") REFERENCES "transacciones"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "autenticacion_social" ADD CONSTRAINT "autenticacion_social_usuarioId_fkey" FOREIGN KEY ("usuarioId") REFERENCES "usuario"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "codigo_2fa" ADD CONSTRAINT "codigo_2fa_usuarioId_fkey" FOREIGN KEY ("usuarioId") REFERENCES "usuario"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "comparacion" ADD CONSTRAINT "comparacion_usuarioId_fkey" FOREIGN KEY ("usuarioId") REFERENCES "usuario"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "detalle_comparacion" ADD CONSTRAINT "detalle_comparacion_comparacionId_fkey" FOREIGN KEY ("comparacionId") REFERENCES "comparacion"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "detalle_comparacion" ADD CONSTRAINT "detalle_comparacion_inmuebleId_fkey" FOREIGN KEY ("inmuebleId") REFERENCES "inmueble"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "favorito" ADD CONSTRAINT "favorito_inmuebleId_fkey" FOREIGN KEY ("inmuebleId") REFERENCES "inmueble"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "favorito" ADD CONSTRAINT "favorito_usuarioId_fkey" FOREIGN KEY ("usuarioId") REFERENCES "usuario"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "historial_password" ADD CONSTRAINT "historial_password_usuarioId_fkey" FOREIGN KEY ("usuarioId") REFERENCES "usuario"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "propiedad_vista" ADD CONSTRAINT "propiedad_vista_inmuebleId_fkey" FOREIGN KEY ("inmuebleId") REFERENCES "inmueble"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "propiedad_vista" ADD CONSTRAINT "propiedad_vista_usuarioId_fkey" FOREIGN KEY ("usuarioId") REFERENCES "usuario"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "recuperacion_password" ADD CONSTRAINT "recuperacion_password_usuarioId_fkey" FOREIGN KEY ("usuarioId") REFERENCES "usuario"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "zona_usuario" ADD CONSTRAINT "zona_usuario_usuarioId_fkey" FOREIGN KEY ("usuarioId") REFERENCES "usuario"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ciudad_imagen" ADD CONSTRAINT "ciudad_imagen_ciudadid_fkey" FOREIGN KEY ("ciudadid") REFERENCES "ciudad"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "historial_busqueda" ADD CONSTRAINT "historial_usuario_fkey" FOREIGN KEY ("usuarioid") REFERENCES "usuario"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "publicacion_parametro" ADD CONSTRAINT "pub_param_parametro_fk" FOREIGN KEY ("parametro_id") REFERENCES "parametros_personalizados"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "publicacion_parametro" ADD CONSTRAINT "pub_param_publicacion_fk" FOREIGN KEY ("publicacion_id") REFERENCES "publicacion"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "barrio" ADD CONSTRAINT "barrio_zona_fk" FOREIGN KEY ("zona_id") REFERENCES "zona_geografica"("id") ON DELETE RESTRICT ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "blog" ADD CONSTRAINT "blog_categoria_fk" FOREIGN KEY ("categoria_id") REFERENCES "categoria_blog"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "blog" ADD CONSTRAINT "blog_usuario_fk" FOREIGN KEY ("usuario_id") REFERENCES "usuario"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "blog_rechazo" ADD CONSTRAINT "blog_rechazo_blog_fk" FOREIGN KEY ("blog_id") REFERENCES "blog"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "comentario" ADD CONSTRAINT "comentario_blog_fk" FOREIGN KEY ("blog_id") REFERENCES "blog"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "comentario" ADD CONSTRAINT "comentario_padre_fk" FOREIGN KEY ("comentario_padre_id") REFERENCES "comentario"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "comentario" ADD CONSTRAINT "comentario_usuario_fk" FOREIGN KEY ("usuario_id") REFERENCES "usuario"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "comentario_like" ADD CONSTRAINT "comentario_like_comentario_fk" FOREIGN KEY ("comentario_id") REFERENCES "comentario"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "comentario_like" ADD CONSTRAINT "comentario_like_usuario_fk" FOREIGN KEY ("usuario_id") REFERENCES "usuario"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "inmueble_amenidad" ADD CONSTRAINT "inmueble_amenidad_amenidad_fk" FOREIGN KEY ("amenidad_id") REFERENCES "amenidad"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "inmueble_amenidad" ADD CONSTRAINT "inmueble_amenidad_inmueble_fk" FOREIGN KEY ("inmueble_id") REFERENCES "inmueble"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "municipio" ADD CONSTRAINT "municipio_provincia_fkey" FOREIGN KEY ("provincia") REFERENCES "provincia"("id") ON DELETE RESTRICT ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "provincia" ADD CONSTRAINT "provincia_departamento_fkey" FOREIGN KEY ("departamento") REFERENCES "departamento"("id") ON DELETE RESTRICT ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "zona_geografica" ADD CONSTRAINT "zona_geografica_municipio_fkey" FOREIGN KEY ("municipio") REFERENCES "municipio"("id") ON DELETE RESTRICT ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "entrenamiento_ml" ADD CONSTRAINT "entrenamiento_ml_inmueble_id_fkey" FOREIGN KEY ("inmueble_id") REFERENCES "inmueble"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "entrenamiento_ml" ADD CONSTRAINT "entrenamiento_ml_usuario_id_fkey" FOREIGN KEY ("usuario_id") REFERENCES "usuario"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "magic_link" ADD CONSTRAINT "magic_link_usuario_id_fkey" FOREIGN KEY ("usuario_id") REFERENCES "usuario"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "testimonio" ADD CONSTRAINT "testimonio_usuario_id_fkey" FOREIGN KEY ("usuario_id") REFERENCES "usuario"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "testimonio_like" ADD CONSTRAINT "testimonio_like_testimonio_id_fkey" FOREIGN KEY ("testimonio_id") REFERENCES "testimonio"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "testimonio_like" ADD CONSTRAINT "testimonio_like_usuario_id_fkey" FOREIGN KEY ("usuario_id") REFERENCES "usuario"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "tutorial_publicacion_usuario" ADD CONSTRAINT "tutorial_publicacion_usuario_usuario_id_fkey" FOREIGN KEY ("usuario_id") REFERENCES "usuario"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "publicacion_tag" ADD CONSTRAINT "publicacion_tag_publicacion_id_fkey" FOREIGN KEY ("publicacion_id") REFERENCES "publicacion"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "publicacion_tag" ADD CONSTRAINT "publicacion_tag_tag_id_fkey" FOREIGN KEY ("tag_id") REFERENCES "tag"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "Chat" ADD CONSTRAINT "Chat_instanceId_fkey" FOREIGN KEY ("instanceId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Chatwoot" ADD CONSTRAINT "Chatwoot_instanceId_fkey" FOREIGN KEY ("instanceId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Contact" ADD CONSTRAINT "Contact_instanceId_fkey" FOREIGN KEY ("instanceId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Dify" ADD CONSTRAINT "Dify_instanceId_fkey" FOREIGN KEY ("instanceId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "DifySetting" ADD CONSTRAINT "DifySetting_difyIdFallback_fkey" FOREIGN KEY ("difyIdFallback") REFERENCES "Dify"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "DifySetting" ADD CONSTRAINT "DifySetting_instanceId_fkey" FOREIGN KEY ("instanceId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "EvolutionBot" ADD CONSTRAINT "EvolutionBot_instanceId_fkey" FOREIGN KEY ("instanceId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "EvolutionBotSetting" ADD CONSTRAINT "EvolutionBotSetting_botIdFallback_fkey" FOREIGN KEY ("botIdFallback") REFERENCES "EvolutionBot"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "EvolutionBotSetting" ADD CONSTRAINT "EvolutionBotSetting_instanceId_fkey" FOREIGN KEY ("instanceId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Flowise" ADD CONSTRAINT "Flowise_instanceId_fkey" FOREIGN KEY ("instanceId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "FlowiseSetting" ADD CONSTRAINT "FlowiseSetting_flowiseIdFallback_fkey" FOREIGN KEY ("flowiseIdFallback") REFERENCES "Flowise"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "FlowiseSetting" ADD CONSTRAINT "FlowiseSetting_instanceId_fkey" FOREIGN KEY ("instanceId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "IntegrationSession" ADD CONSTRAINT "IntegrationSession_instanceId_fkey" FOREIGN KEY ("instanceId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Label" ADD CONSTRAINT "Label_instanceId_fkey" FOREIGN KEY ("instanceId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Media" ADD CONSTRAINT "Media_instanceId_fkey" FOREIGN KEY ("instanceId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Media" ADD CONSTRAINT "Media_messageId_fkey" FOREIGN KEY ("messageId") REFERENCES "Message"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Message" ADD CONSTRAINT "Message_instanceId_fkey" FOREIGN KEY ("instanceId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Message" ADD CONSTRAINT "Message_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "IntegrationSession"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "MessageUpdate" ADD CONSTRAINT "MessageUpdate_instanceId_fkey" FOREIGN KEY ("instanceId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "MessageUpdate" ADD CONSTRAINT "MessageUpdate_messageId_fkey" FOREIGN KEY ("messageId") REFERENCES "Message"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OpenaiBot" ADD CONSTRAINT "OpenaiBot_instanceId_fkey" FOREIGN KEY ("instanceId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OpenaiBot" ADD CONSTRAINT "OpenaiBot_openaiCredsId_fkey" FOREIGN KEY ("openaiCredsId") REFERENCES "OpenaiCreds"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OpenaiCreds" ADD CONSTRAINT "OpenaiCreds_instanceId_fkey" FOREIGN KEY ("instanceId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OpenaiSetting" ADD CONSTRAINT "OpenaiSetting_instanceId_fkey" FOREIGN KEY ("instanceId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OpenaiSetting" ADD CONSTRAINT "OpenaiSetting_openaiCredsId_fkey" FOREIGN KEY ("openaiCredsId") REFERENCES "OpenaiCreds"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OpenaiSetting" ADD CONSTRAINT "OpenaiSetting_openaiIdFallback_fkey" FOREIGN KEY ("openaiIdFallback") REFERENCES "OpenaiBot"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Proxy" ADD CONSTRAINT "Proxy_instanceId_fkey" FOREIGN KEY ("instanceId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Pusher" ADD CONSTRAINT "Pusher_instanceId_fkey" FOREIGN KEY ("instanceId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Rabbitmq" ADD CONSTRAINT "Rabbitmq_instanceId_fkey" FOREIGN KEY ("instanceId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Session" ADD CONSTRAINT "Session_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Setting" ADD CONSTRAINT "Setting_instanceId_fkey" FOREIGN KEY ("instanceId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Sqs" ADD CONSTRAINT "Sqs_instanceId_fkey" FOREIGN KEY ("instanceId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Template" ADD CONSTRAINT "Template_instanceId_fkey" FOREIGN KEY ("instanceId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Typebot" ADD CONSTRAINT "Typebot_instanceId_fkey" FOREIGN KEY ("instanceId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TypebotSetting" ADD CONSTRAINT "TypebotSetting_instanceId_fkey" FOREIGN KEY ("instanceId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TypebotSetting" ADD CONSTRAINT "TypebotSetting_typebotIdFallback_fkey" FOREIGN KEY ("typebotIdFallback") REFERENCES "Typebot"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Webhook" ADD CONSTRAINT "Webhook_instanceId_fkey" FOREIGN KEY ("instanceId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Websocket" ADD CONSTRAINT "Websocket_instanceId_fkey" FOREIGN KEY ("instanceId") REFERENCES "Instance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
