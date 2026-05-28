@@ -1729,13 +1729,6 @@ function BusquedaMapaContent() {
                 }}
               />
             </div>
-          ) : isSidebarOpen && activeSidebarView === 'superficie' ? ( /* <-- AÑADE ESTE BLOQUE AQUÍ */
-            <div className="flex flex-col h-full w-full bg-white dark:bg-stone-900 relative">
-              <SuperficieFilterSidebar
-                isOpen={true}
-                onClose={() => setActiveSidebarView('results')}
-              />
-            </div>
           ) : isSidebarOpen && activeSidebarView === 'results' ? (
             <div className="flex flex-col h-full min-h-0 relative bg-stone-50 dark:bg-stone-950">
               <div className="bg-white dark:bg-stone-900 shrink-0 border-b border-stone-200 dark:border-stone-800 shadow-sm">

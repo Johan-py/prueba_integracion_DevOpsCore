@@ -445,7 +445,7 @@ export default function FilterBar({ onSearch, variant = 'home', onOpenPriceFilte
         <button
           type="button"
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute left-1/2 -translate-x-1/2 -bottom-[28px] h-[28px] px-8 bg-white dark:bg-stone-900 border-x border-b border-stone-200 dark:border-stone-800 rounded-b-2xl shadow-md flex items-center justify-center hover:bg-stone-50 transition-all z-[40]"
+          className="absolute left-1/2 -translate-x-1/2 -bottom-[28px] h-[28px] px-8 bg-white dark:bg-stone-900 border-x border-b border-stone-200 dark:border-stone-800 rounded-b-2xl shadow-md flex items-center justify-center hover:bg-stone-50 transition-all z-[10000]"
         >
           {isCollapsed ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
         </button>
@@ -496,15 +496,10 @@ export default function FilterBar({ onSearch, variant = 'home', onOpenPriceFilte
                 <CapacidadButton variant={variant} isActive={isCapacidadActive} onClick={onToggleCapacidad} />
               </div>
 
-              {/* Botón Unificado de Superficie (Abre el panel lateral) */}
-              <button 
-                type="button" 
-                onClick={() => onOpenSuperficieFilter?.()} 
-                className={`h-[38px] flex items-center gap-2 px-4 rounded-full border text-sm font-medium shadow-sm transition-all focus:outline-none shrink-0 ${isSuperficieFilterActive ? 'bg-[#d97706] text-white border-[#d97706] dark:bg-[#E87C1E] dark:border-[#E87C1E]' : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-[#d97706] dark:hover:border-[#E87C1E] dark:hover:bg-stone-700'}`}
-              >
+              <button type="button" onClick={() => onOpenSuperficieFilter?.()} className={`h-[38px] flex items-center gap-2 px-4 rounded-full border text-sm font-medium shadow-sm transition-all focus:outline-none shrink-0 ${isSuperficieFilterActive ? 'bg-[#d97706] text-white border-[#d97706] dark:bg-[#E87C1E] dark:border-[#E87C1E]' : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-[#d97706] dark:hover:border-[#E87C1E] dark:hover:bg-stone-700'}`}>
                 <Maximize className={`w-4 h-4 ${isSuperficieFilterActive ? 'text-white' : 'text-stone-500 dark:text-stone-400'}`} />
                 <span>Metros</span>
-                <ChevronDown className={`w-4 h-4 transition-transform ${isSuperficieFilterActive ? 'rotate-180 text-white' : 'text-stone-400 dark:text-stone-400'}`} />
+                <ChevronDown className={`w-4 h-4 ${isSuperficieFilterActive ? 'text-white' : 'text-stone-400 dark:text-stone-400'}`} />
               </button>
 
               <button type="button" onClick={() => onOpenEtiquetasFilter?.()} className={`h-[38px] flex items-center gap-2 px-4 rounded-full border text-sm font-medium shadow-sm transition-all focus:outline-none shrink-0 ${isEtiquetasFilterActive ? 'bg-[#d97706] text-white border-[#d97706] dark:bg-[#E87C1E] dark:border-[#E87C1E]' : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-[#d97706] dark:hover:border-[#E87C1E] dark:hover:bg-stone-700'}`}>
