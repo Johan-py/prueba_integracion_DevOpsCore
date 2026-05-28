@@ -1272,7 +1272,7 @@ function BusquedaMapaContent() {
           {/* ── BOTONES FLOTANTES DE ZONAS (portrait móvil) ──
               z-[25] para quedar detrás del bottom sheet (z-[30]) cuando este se expande
               Alineados a la derecha en la parte superior del mapa para no solapar el zoom */}
-          <div className="absolute top-3 right-4 z-[25] flex flex-col items-end gap-2 pointer-events-none">
+          <div className="absolute top-[90px] right-4 z-[25] flex flex-col items-end gap-2 pointer-events-none">
             {/* Estado normal: Dibujar zona + Mis zonas */}
             {!isDrawingMode && !editingZoneId && (
               <div className="flex flex-row gap-2 pointer-events-auto">

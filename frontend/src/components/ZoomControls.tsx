@@ -50,7 +50,8 @@ export default function ZoomControls() {
   }
 
   return (
-    <div className="absolute top-4 left-[52px] z-[1000] flex flex-col bg-white dark:bg-stone-900 rounded-lg shadow-md border border-stone-200 dark:border-stone-700 overflow-hidden w-[36px]">
+    // Aplicamos top-[90px] para móvil y md:top-4 para desktop. Ajustamos left a 4 en móvil.
+    <div className="absolute top-[90px] md:top-4 left-4 md:left-[52px] z-[1000] flex flex-col bg-white dark:bg-stone-900 rounded-lg shadow-md border border-stone-200 dark:border-stone-700 overflow-hidden w-[36px]">
       <button
         onClick={handleZoomIn}
         disabled={isMaxZoom}
